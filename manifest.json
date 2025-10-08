@@ -1,7 +1,7 @@
 {
-  "name": "LeoAI Story Platform",
-  "short_name": "LeoAI",
-  "description": "AI-powered story platform with social features",
+  "name": "蕾奥AI",
+  "short_name": "蕾奥AI",
+  "description": "专业的AI投融资咨询平台",
   "start_url": "/",
   "display": "browser",
   "background_color": "#ffffff",
@@ -22,7 +22,7 @@
     }
   ],
   "categories": ["business", "finance", "productivity"],
-  "lang": "en-US",
+  "lang": "zh-CN",
   "screenshots": [
     {
       "src": "/leoai-logo-light.png",
