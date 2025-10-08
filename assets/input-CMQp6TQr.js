@@ -1,0 +1,6 @@
+import{c as a,r as i,j as r,d as s}from"./index-BZnjROPM.js";/**
+ * @license lucide-react v0.364.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const l=a("Upload",[["path",{d:"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4",key:"ih7n3h"}],["polyline",{points:"17 8 12 3 7 8",key:"t8dd8p"}],["line",{x1:"12",x2:"12",y1:"3",y2:"15",key:"widbto"}]]),d=i.forwardRef(({className:e,type:t,...n},o)=>r.jsx("input",{type:t,className:s("flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",e),ref:o,...n,"data-matrix-id":"src/components/ui/input.tsx:7:6","data-matrix-name":"input","data-component-path":"src/components/ui/input.tsx","data-component-line":"7","data-component-file":"input.tsx","data-component-name":"input","data-component-content":"%7B%22type%22%3A%22%5BIdentifier%5D%22%2C%22className%22%3A%22%5BCallExpression%5D%22%2C%22...spread%22%3Atrue%7D"}));d.displayName="Input";export{d as I,l as U};
