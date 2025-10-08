@@ -1,0 +1,394 @@
+{
+  "app_name": "LeiaoAI",
+  "loading": "Loading...",
+  "error": "Error",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "save": "Save",
+  "delete": "Delete",
+  "edit": "Edit",
+  "submit": "Submit",
+  "back": "Back",
+  "next": "Next",
+  "previous": "Previous",
+  "search": "Search",
+  "filter": "Filter",
+  "sort": "Sort",
+  "refresh": "Refresh",
+  "upload": "Upload",
+  "download": "Download",
+  "view": "View",
+  "share": "Share",
+  "like": "Like",
+  "comment": "Comment",
+  "follow": "Follow",
+  "unfollow": "Unfollow",
+  "login": "Login",
+  "logout": "Logout",
+  "register": "Register",
+  "profile": "Profile",
+  "help": "Help",
+  "about": "About",
+  "contact": "Contact Us",
+  "privacy": "Privacy Policy",
+  "terms": "Terms of Service",
+  "success": "Success",
+  
+  "app_description": "Professional AI Investment Platform",
+  "footer": {
+    "developed_by": "Developed by LeiaoAI Agent"
+  },
+  
+  "auth": {
+    "sign_in": "Sign In",
+    "sign_out": "Sign Out",
+    "sign_up": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "forgot_password": "Forgot Password",
+    "reset_password": "Reset Password",
+    "login_with_google": "Login with Google",
+    "login_with_github": "Login with GitHub",
+    "login_success": "Login Successful",
+    "logout_success": "Logout Successful",
+    "login_required": "Please login first"
+  },
+  
+  "user": {
+    "avatar": "Avatar",
+    "username": "Username",
+    "email": "Email",
+    "profile": "Profile"
+  },
+  
+  "loading": {
+    "page": "Loading page...",
+    "auth": "Verifying login status..."
+  },
+  
+  "nav": {
+    "home": "Home",
+    "ai_chat": "AI Chat",
+    "stories": "Stories",
+    "questions": "Questions",
+    "bp_analysis": "BP Analysis",
+    "profile": "Profile",
+    "settings": "Settings"
+  },
+  
+  "home": {
+    "hero": {
+      "title_1": "Professional",
+      "title_2": "AI Investment",
+      "title_3": "Platform",
+      "description": "Based on advanced AI technology, providing professional investment analysis, business plan evaluation and intelligent decision support",
+      "mobile_description": "AI intelligent investment analysis for smart business decisions"
+    },
+    "cta": {
+      "title": "Start Experiencing Professional AI Investment Consulting",
+      "subtitle": "Upload your business plan for AI analysis, or directly consult on investment and financing issues",
+      "mobile_title": "Start AI Investment Consulting",
+      "mobile_subtitle": "Upload BP analysis or consult directly",
+      "upload_bp": "Upload BP Analysis",
+      "ai_chat": "AI Q&A Consulting"
+    },
+    "stats": {
+      "total_users": "Platform Users",
+      "total_qa": "Q&A Sessions",
+      "bp_analysis": "BP Analysis",
+      "avg_response": "Avg Response"
+    }
+  },
+  
+  "professional_services": {
+    "title": "Professional Service Areas",
+    "subtitle": "Click on area cards for professional investment consulting advice",
+    "mobile_title": "Professional Services",
+    "mobile_subtitle": "Select areas for professional advice",
+    "refresh_suggestions": "Refresh Suggestions",
+    "suggested_questions": "Suggested Questions",
+    "mobile_suggested_questions": "Suggestions",
+    "click_for_advice": "Click for Professional Advice",
+    "bottom_description": "Showing 3 random suggestion questions each time, click 'Refresh Suggestions' for new consultation directions",
+    "mobile_bottom_description": "Click 'Refresh' for new suggestions",
+    "enter_full_chat": "Enter Full AI Chat"
+  },
+  
+  "ai_chat": {
+    "title": "AI Investment Expert",
+    "subtitle": "Professional investment consulting services to empower your business decisions",
+    "page_title": "AI Intelligent Investment Q&A",
+    "page_subtitle": "Professional investment Q&A service based on advanced AI technology, providing intelligent support for your investment decisions",
+    "mobile_page_title": "AI Smart Q&A",
+    "mobile_page_subtitle": "Professional investment consulting, ask and answer instantly",
+    "answer_placeholder": "Select professional areas below to start Q&A, or directly enter your questions",
+    "publish_story": "Publish Story",
+    "placeholder": "Please enter your investment-related questions...",
+    "send": "Send",
+    "voice_input": "Voice Input",
+    "stop_recording": "Stop Recording",
+    "processing": "Processing your question...",
+    "new_chat": "New Chat",
+    "chat_history": "Chat History",
+    "select_model": "Select Model",
+    "model_recommended": "Recommended",
+    "model_fastest": "Fastest",
+    "model_china_optimized": "China Optimized",
+    "model_overseas_optimized": "Overseas Optimized",
+    "expertise_navigation": "Professional Area Navigation",
+    "recommended_questions": "Recommended Questions",
+    "default_questions": {
+      "q1": "What are some investment opportunities in this field?",
+      "q2": "What are the latest industry trends in this area?",
+      "q3": "What successful cases can you share?"
+    },
+    "model_responses": {
+      "deepseek": "Based on current economic trends, I recommend focusing on ESG investments, artificial intelligence, and green energy. For emerging markets, consider a diversified investment strategy with sufficient liquidity.",
+      "openai": "When considering investment directions, focus on digital transformation, large language models, and process automation. These areas are poised for rapid growth in the next five years and potential unicorn companies are already emerging.",
+      "qwen": "For the current investment environment, I recommend a 'layered allocation' strategy - base layer with low-volatility high-yield products, opportunity layer focused on innovative companies in AI, biotechnology and clean energy, and a defensive cash reserve.",
+      "default": "Based on current market analysis, investment strategies should be diversified, with a balanced allocation of traditional and emerging assets. I recommend focusing on ESG investments, AI, and green energy. I can provide more detailed investment advice for specific industries."
+    },
+    "sample_questions": {
+      "q1": "Please analyze current stock market investment opportunities",
+      "q2": "How should startups approach Series A financing?",
+      "q3": "What is ESG investment strategy?"
+    },
+    "expertise_categories": {
+      "macroeconomic": "Macroeconomic",
+      "investment_environment": "Investment Environment",
+      "cvc_investment": "CVC Investment",
+      "ma_strategy": "M&A Strategy",
+      "ipo_listing": "IPO Listing",
+      "listing_preparation": "Listing Preparation",
+      "valuation": "Valuation",
+      "startup_financing": "Startup Financing",
+      "industry_research": "Industry Research",
+      "risk_management": "Risk Management",
+      "due_diligence": "Due Diligence",
+      "exit_strategy": "Exit Strategy"
+    },
+    "expertise_questions": {
+      "cvc_investment": [
+        "Strategic differences between CVC investment and traditional VC",
+        "How to evaluate the strategic synergy value of CVC investments?",
+        "How can large enterprises build an effective CVC investment system?",
+        "What are the key success factors for corporate venture capital?",
+        "How to balance financial returns with strategic objectives in CVC?",
+        "Best practices for CVC portfolio management and governance"
+      ],
+      "ma_restructuring": [
+        "Valuation methods and pricing strategies in M&A transactions",
+        "How to identify and evaluate synergies in M&A targets?",
+        "Main risks and countermeasures for cross-border M&A",
+        "Integration strategies for successful post-merger operations",
+        "Cultural due diligence in international M&A deals",
+        "Regulatory approval processes for large-scale mergers"
+      ],
+      "ipo_a_share": [
+        "Comparison of listing conditions: STAR Market vs ChiNext",
+        "Key factor analysis for IPO valuation and pricing",
+        "Market considerations for IPO timing selection",
+        "IPO readiness assessment and preparation timeline",
+        "Regulatory compliance requirements for A-share listings",
+        "Investor relations strategy for newly listed companies"
+      ],
+      "ipo_hk_share": [
+        "Hong Kong Stock Exchange listing requirements and procedures",
+        "Advantages and challenges of dual listing",
+        "How to navigate Hong Kong market regulatory environment?",
+        "Currency hedging strategies for HK-listed companies",
+        "Cross-border capital allocation optimization",
+        "Maintaining international investor confidence"
+      ],
+      "ipo_us_share": [
+        "US market IPO preparation and compliance requirements",
+        "SEC reporting and disclosure obligations",
+        "Strategies for successful US public offering",
+        "Sarbanes-Oxley compliance for foreign issuers",
+        "Managing currency and political risks in US listings",
+        "Building institutional investor base in American markets"
+      ],
+      "spac_listing": [
+        "SPAC vs traditional IPO: pros and cons comparison",
+        "Due diligence considerations for SPAC transactions",
+        "How to structure and negotiate SPAC deals?",
+        "SPAC sponsor economics and alignment mechanisms",
+        "Regulatory changes affecting SPAC market dynamics",
+        "Post-merger integration planning for SPAC deals"
+      ],
+      "macro_analysis": [
+        "How does the current global economic situation impact China's investment market?",
+        "How will macroeconomic policies in 2025 affect investment strategies?",
+        "What is the best investment allocation in an inflationary environment?",
+        "Central bank policy divergence and cross-border capital flows",
+        "Geopolitical tensions impact on global investment patterns",
+        "Emerging market opportunities in the current economic cycle"
+      ],
+      "investment_environment": [
+        "What are the main differences between US and China investment environments?",
+        "Current investment opportunities comparison: A-shares, HK stocks, US stocks",
+        "Investment risk assessment: Emerging markets vs developed markets",
+        "Regulatory environment changes affecting foreign investment",
+        "ESG considerations in Asian vs Western markets",
+        "Technology sector investment climate comparison"
+      ],
+      "valuation_adjustment": [
+        "Key terms and mechanisms in valuation adjustment agreements",
+        "How to structure anti-dilution provisions?",
+        "Negotiating valuation adjustment triggers and calculations",
+        "Milestone-based valuation adjustment frameworks",
+        "Protecting investor interests through adjustment mechanisms",
+        "Common disputes and resolution in valuation adjustments"
+      ],
+      "exit_strategy": [
+        "Exit timing and method selection for PE/VC",
+        "Pros and cons comparison: IPO exit vs M&A exit",
+        "How to maximize investment exit returns?",
+        "Secondary market strategies for private equity exits",
+        "Cross-border exit considerations and tax implications",
+        "Building strategic buyer relationships for exits"
+      ],
+      "valuation_model": [
+        "Application scenarios for DCF, PE, PB and other valuation methods",
+        "How to establish reasonable valuations for high-growth companies?",
+        "Key factor analysis in comparable company valuation methods",
+        "Adjusting valuations for emerging market risks",
+        "Technology company valuation methodologies",
+        "ESG factors integration in modern valuation models"
+      ],
+      "due_diligence": [
+        "Core focus points and methods for financial due diligence",
+        "Key business indicator analysis in commercial due diligence",
+        "Main risk identification points in legal due diligence",
+        "Technology and IP due diligence for tech investments",
+        "Environmental and social due diligence frameworks",
+        "Management team assessment and reference checking"
+      ]
+    },
+    "expertise_areas": {
+      "cvc_investment": "CVC Industrial Investment",
+      "ma_restructuring": "M&A Restructuring",
+      "ipo_a_share": "IPO Listing (A-Share)",
+      "ipo_hk_share": "IPO Listing (HK Stock)",
+      "ipo_us_share": "IPO Listing (US Stock)",
+      "spac_listing": "SPAC Shell Listing",
+      "macro_analysis": "Macroeconomic Analysis",
+      "investment_environment": "Investment Environment",
+      "valuation_adjustment": "Valuation Adjustment Agreement",
+      "exit_strategy": "Exit Strategy Planning",
+      "valuation_model": "Valuation Model",
+      "due_diligence": "Due Diligence"
+    },
+    "welcome_message": "Welcome to the AI intelligent investment Q&A system. Please select a professional area or directly enter your questions",
+    "direct_input_hint": "Or you can directly enter your investment-related questions at the bottom",
+    "click_to_consult": "Click to get professional consultation about {{area}}"
+  },
+  
+  "bp_analysis": {
+    "title": "Business Plan Analysis",
+    "subtitle": "Upload your business plan to get a professional AI analysis report",
+    "page_title": "AI-Powered Business Plan Analysis",
+    "page_subtitle": "Upload your business plan and get comprehensive AI analysis with actionable insights.",
+    "mobile_page_title": "BP Analysis",
+    "mobile_page_subtitle": "AI analysis for your business plan.",
+    "hero_title": "AI Business Plan Analysis Platform",
+    "hero_subtitle": "Professional business plan analysis service based on advanced AI technology, providing deep insights and optimization suggestions for your startup projects",
+    "tabs": {
+      "upload": "Document Upload",
+      "upload_short": "Upload",
+      "canvas": "Business Model Canvas",
+      "canvas_short": "BMC",
+      "insights": "AI Insights"
+    },
+    "features": {
+      "ai_analysis": "AI Analysis",
+      "ai_analysis_desc": "Advanced AI models analyze your business plan structure, content, and viability.",
+      "market_insights": "Market Insights",
+      "market_insights_desc": "Get deep market analysis and competitive landscape insights.",
+      "risk_assessment": "Risk Assessment",
+      "risk_assessment_desc": "Identify potential risks and mitigation strategies for your business.",
+      "growth_projections": "Growth Projections",
+      "growth_projections_desc": "Receive data-driven growth forecasts and scaling recommendations."
+    },
+    "upload_bp": "Upload BP",
+    "drag_drop": "Drag files here or click to upload",
+    "supported_formats": "Supports PDF, DOCX formats",
+    "max_size": "Maximum file size 50MB",
+    "analyzing": "Analyzing...",
+    "analysis_complete": "Analysis Complete",
+    "analysis_report": "Analysis Report",
+    "score": "Overall Score",
+    "recommendations": "Improvement Recommendations",
+    "market_analysis": "Market Analysis",
+    "business_model": "Business Model",
+    "team_assessment": "Team Assessment",
+    "financial_projection": "Financial Projection",
+    "risk_assessment": "Risk Assessment",
+    "investment_value": "Investment Value"
+  },
+  
+  "stories": {
+    "title": "Stories",
+    "page_title": "Stories with Artificial Intelligence",
+    "page_subtitle": "Share user experiences, discover new tools, and learn best practices with AI",
+    "mobile_page_title": "Stories with AI",
+    "mobile_page_subtitle": "Share user experiences, discover new tools, and learn best practices with AI",
+    "create_story": "Share Story",
+    "story_title": "Story Title",
+    "story_content": "Story Content",
+    "category": "Category",
+    "public": "Public",
+    "private": "Private",
+    "publish": "Publish",
+    "draft": "Draft",
+    "view_count": "Views",
+    "like_count": "Likes",
+    "comment_count": "Comments",
+    "section_title": "User Stories and Community",
+    "section_subtitle": "Share investment experiences, learn from success cases",
+    "create_button": "Publish Story",
+    "no_stories": {
+      "title": "No Stories Yet",
+      "desc": "There are no user stories shared in this category yet"
+    },
+    "be_first_share": "Be the first to share",
+    "writing_section_title": "Write Your Investment and Financing AI Experience Story",
+    "writing_section_desc": "Share your experience using AI tools for investment analysis, financial modeling, or business planning to help other users understand the practical application value of AI in the financial field.",
+    "mobile_writing_section_title": "Share AI Experience Story",
+    "mobile_writing_section_desc": "Share AI investment analysis experience, exchange practical application value.",
+    "start_writing": "Start Writing",
+    "categories": {
+      "all": "All",
+      "ai_tools": "AI Tools Experience",
+      "startup_interview": "Startup Interviews",
+      "investment_outlook": "Investment Outlook",
+      "finance_ai": "Financial AI Applications",
+      "video_generation": "Video Generation Experience",
+      "domestic_ai": "Domestic AI Tools",
+      "overseas_ai": "Overseas AI Platforms"
+    }
+  },
+  
+  "quick_ai_consultation_title": "Quick AI Investment Consultation",
+  "ai_expert_greeting": "Hello! I am LeiaoAI Investment Expert, specializing in professional investment consulting services.",
+  "view_complete_ai_chat": "View Complete AI Chat",
+  "auto_select_model": "Auto Select",
+  "select_model": "Select Model",
+  "model_fastest": "Fastest",
+  "avg_response_time": "{{time}}s avg",
+  "avg_response_time_title": "Average response time: {{time}} seconds",
+  "analyzing_question": "Analyzing your question...",
+  "export": "Export",
+  "regenerate": "Regenerate",
+  "feedback": "Feedback",
+  "footer_description": "LeiaoAI professional investment consulting services, providing intelligent investment analysis and decision support.",
+  "footer_provider": "Powered by LeiaoAI Agent",
+  "placeholder_response": "Ask investment-related questions to get professional AI advice",
+  
+  "date": {
+    "today": "Today",
+    "days_ago": "{{days}} days ago",
+    "months_ago": "{{months}} months ago",
+    "years_ago": "{{years}} years ago"
+  }
+}

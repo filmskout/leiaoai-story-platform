@@ -1,0 +1,189 @@
+{
+  "app_name": "LeiaoAI",
+  "loading": "Laden...",
+  "error": "Fout",
+  "cancel": "Annuleren",
+  "confirm": "Bevestigen",
+  "save": "Opslaan",
+  "delete": "Verwijderen",
+  "edit": "Bewerken",
+  "submit": "Indienen",
+  "back": "Terug",
+  "next": "Volgende",
+  "previous": "Vorige",
+  "search": "Zoeken",
+  "filter": "Filteren",
+  "sort": "Sorteren",
+  "refresh": "Vernieuwen",
+  "upload": "Uploaden",
+  "download": "Downloaden",
+  "view": "Bekijken",
+  "share": "Delen",
+  "like": "Vind ik leuk",
+  "comment": "Commentaar",
+  "follow": "Volgen",
+  "unfollow": "Ontvolgen",
+  "login": "Inloggen",
+  "logout": "Uitloggen",
+  "register": "Registreren",
+  "profile": "Profiel",
+  "help": "Help",
+  "about": "Over",
+  "contact": "Contact",
+  "privacy": "Privacybeleid",
+  "terms": "Servicevoorwaarden",
+  "success": "Succes",
+  
+  "app_description": "Professioneel AI Investeringsplatform",
+  "footer": {
+    "developed_by": "Ontwikkeld door LeiaoAI Agent"
+  },
+  
+  "nav": {
+    "home": "Startpagina",
+    "ai_chat": "AI Chat",
+    "stories": "Verhalen",
+    "questions": "Vragen",
+    "bp_analysis": "BP Analyse",
+    "profile": "Profiel",
+    "settings": "Instellingen"
+  },
+  
+  "home": {
+    "cta": {
+      "title": "Begin met Professionele AI Investeringsadvies Ervaring",
+      "subtitle": "Upload uw businessplan voor AI-analyse, of raadpleeg direct voor investerings- en financieringskwesties",
+      "upload_bp": "BP Analyse Uploaden",
+      "ai_chat": "AI V&A Advies"
+    }
+  },
+  
+  "professional_services": {
+    "title": "Professionele Servicegebieden",
+    "subtitle": "Klik op gebiedkaarten voor professioneel investeringsadvies",
+    "refresh_suggestions": "Suggesties Vernieuwen",
+    "suggested_questions": "Voorgestelde Vragen",
+    "click_for_advice": "Klik voor Professioneel Advies",
+    "bottom_description": "Toont 3 willekeurige suggestievragen elke keer, klik 'Suggesties Vernieuwen' voor nieuwe adviesrichtingen",
+    "enter_full_chat": "Volledige AI Chat Betreden"
+  },
+  
+  "ai_chat": {
+    "title": "AI Investeringsexpert",
+    "subtitle": "Professionele investeringsadvies diensten om uw zakelijke beslissingen te versterken",
+    "placeholder": "Voer uw investering-gerelateerde vragen in...",
+    "send": "Verzenden",
+    "voice_input": "Spraakinvoer",
+    "stop_recording": "Stop Opname",
+    "processing": "Uw vraag verwerken...",
+    "new_chat": "Nieuwe Chat",
+    "chat_history": "Chatgeschiedenis",
+    "model_selection": "Model Selectie",
+    "model_recommended": "Aanbevolen",
+    "model_china_optimized": "China Geoptimaliseerd",
+    "model_overseas_optimized": "Buitenland Geoptimaliseerd",
+    "model_responses": {
+      "deepseek": "Gebaseerd op huidige economische trends, raad ik aan om te focussen op ESG-investeringen, kunstmatige intelligentie en groene energie. Voor opkomende markten, overweeg een gediversifieerde investeringsstrategie met voldoende liquiditeit.",
+      "openai": "Bij het overwegen van investeringsrichtingen, focus op digitale transformatie, wildlife grote modellen, en procesautomatisering. Deze gebieden staan op het punt van snelle groei in de komende vijf jaar en potentiële unicorn bedrijven ontstaan al.",
+      "qwen": "Voor de huidige investeringsomgeving, raad ik een 'gelaagde allocatie' strategie aan - basislaag met lage volatiliteit hoge opbrengst producten, kanslaag gericht op innovatieve bedrijven in AI, biotechnologie en schone energie, en een defensieve kasreserve.",
+      "default": "Gebaseerd op huidige marktanalyse, zouden investeringsstrategieën gediversifieerd moeten zijn, met een evenwichtige allocatie van traditionele en opkomende activa. Ik raad aan om te focussen op ESG-investeringen, AI, en groene energie. Ik kan meer gedetailleerd investeringsadvies geven voor specifieke industrieën."
+    },
+    "sample_questions": {
+      "q1": "Wat zijn de waarderingstrends voor bedrijven genoteerd op China's STAR Market in 2025?",
+      "q2": "Hoe kunnen startups hun Series A financieringsstrategie optimaliseren?",
+      "q3": "Wat zijn de verschillen tussen Amerikaanse en Chinese VC investeringsomgevingen?"
+    },
+    "expertise_areas": {
+      "cvc_investment": "CVC Industriële Investering",
+      "ma_restructuring": "M&A Herstructurering",
+      "ipo_a_share": "IPO Notering (A-Aandeel)",
+      "ipo_hk_share": "IPO Notering (HK Aandeel)",
+      "ipo_us_share": "IPO Notering (US Aandeel)",
+      "spac_listing": "SPAC Shell Notering",
+      "macro_analysis": "Macro-economische Analyse",
+      "investment_environment": "Investeringsomgeving",
+      "valuation_adjustment": "Waardering Aanpassingsovereenkomst",
+      "exit_strategy": "Exit Strategie Planning",
+      "valuation_model": "Waarderingsmodel",
+      "due_diligence": "Due Diligence"
+    }
+  },
+  
+  "bp_analysis": {
+    "title": "Businessplan Analyse",
+    "subtitle": "Upload uw businessplan om een professioneel AI analyserapport te krijgen",
+    "upload_bp": "BP Uploaden",
+    "drag_drop": "Sleep bestanden hier of klik om te uploaden",
+    "supported_formats": "Ondersteunt PDF, DOCX formaten",
+    "max_size": "Maximale bestandsgrootte 50MB",
+    "analyzing": "Analyseren...",
+    "analysis_complete": "Analyse Voltooid",
+    "analysis_report": "Analyserapport",
+    "score": "Totaalscore",
+    "recommendations": "Verbeteringsuggesties",
+    "market_analysis": "Marktanalyse",
+    "business_model": "Bedrijfsmodel",
+    "team_assessment": "Teambeoordeling",
+    "financial_projection": "Financiële Projectie",
+    "risk_assessment": "Risicobeoordeling",
+    "investment_value": "Investeringswaarde"
+  },
+  
+  "stories": {
+    "title": "Verhalen",
+    "create_story": "Verhaal Delen",
+    "story_title": "Verhaaltitel",
+    "story_content": "Verhaalinhoud",
+    "category": "Categorie",
+    "public": "Openbaar",
+    "private": "Privé",
+    "publish": "Publiceren",
+    "draft": "Concept",
+    "view_count": "Weergaven",
+    "like_count": "Vind ik leuks",
+    "comment_count": "Opmerkingen",
+    "section_title": "Gebruikersverhalen en Gemeenschap",
+    "section_subtitle": "Deel investeringservaringen, leer van succescases",
+    "create_button": "Verhaal Delen",
+    "no_stories": {
+      "title": "Nog Geen Verhalen",
+      "desc": "Er zijn nog geen gebruikersverhalen gedeeld in deze categorie"
+    },
+    "be_first_share": "Wees de eerste om te delen",
+    "categories": {
+      "all": "Alle",
+      "ai_tools": "AI Tools Ervaring",
+      "startup_interview": "Startup Interviews",
+      "investment_outlook": "Investeringsvooruitzichten",
+      "finance_ai": "Financiële AI Toepassingen",
+      "video_generation": "Videogeneratie Ervaring",
+      "domestic_ai": "Binnenlandse AI Tools",
+      "overseas_ai": "Buitenlandse AI Platforms"
+    }
+  },
+  
+  "quick_ai_consultation_title": "Snelle AI Investeringsadvies",
+  "ai_expert_greeting": "Hallo! Ik ben 蕾奥AI Investeringsexpert, gespecialiseerd in professionele investeringsadvies diensten.",
+  "view_complete_ai_chat": "Bekijk Volledige AI Chat",
+  "auto_select_model": "Auto Selecteer",
+  "select_model": "Selecteer Model",
+  "model_fastest": "Snelste",
+  "avg_response_time": "{{time}}s gem",
+  "avg_response_time_title": "Gemiddelde responstijd: {{time}} seconden",
+  "analyzing_question": "Uw vraag analyseren...",
+  "export": "Exporteren",
+  "regenerate": "Regenereren",
+  "feedback": "Feedback",
+  
+  "date": {
+    "today": "Vandaag",
+    "days_ago": "{{days}} dagen geleden",
+    "months_ago": "{{months}} maanden geleden",
+    "years_ago": "{{years}} jaar geleden"
+  }
+,
+  "placeholder_response": "Ask investment-related questions to get professional AI advice"
+,
+  "footer_description": "LeiaoAI professional investment consulting services, providing intelligent investment analysis and decision support",
+  "footer_provider": "Powered by LeiaoAI Agent"
+}

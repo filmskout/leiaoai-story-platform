@@ -1,0 +1,185 @@
+{
+  "app_name": "LeiaoAI",
+  "loading": "Loading...",
+  "error": "Error",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "save": "Save",
+  "delete": "Delete",
+  "edit": "Edit",
+  "submit": "Submit",
+  "back": "Back",
+  "next": "Next",
+  "previous": "Previous",
+  "search": "Search",
+  "filter": "Filter",
+  "sort": "Sort",
+  "refresh": "Refresh",
+  "upload": "Upload",
+  "download": "Download",
+  "view": "View",
+  "share": "Share",
+  "like": "Like",
+  "comment": "Comment",
+  "follow": "Follow",
+  "unfollow": "Unfollow",
+  "login": "Login",
+  "logout": "Logout",
+  "register": "Register",
+  "profile": "Profile",
+  "help": "Help",
+  "about": "About",
+  "contact": "Contact Us",
+  "privacy": "Privacy Policy",
+  "terms": "Terms of Service",
+  "success": "Success",
+  
+  "app_description": "Professional AI Investment Platform",
+  "footer": {
+    "developed_by": "Developed by LeiaoAI Agent"
+  },
+  
+  "nav": {
+    "home": "Home",
+    "ai_chat": "AI Chat",
+    "stories": "Stories",
+    "questions": "Questions",
+    "bp_analysis": "BP Analysis",
+    "profile": "Profile",
+    "settings": "Settings"
+  },
+  
+  "home": {
+    "cta": {
+      "title": "Start Experiencing Professional AI Investment Consulting",
+      "subtitle": "Upload your business plan for AI analysis, or directly consult on investment and financing issues",
+      "upload_bp": "Upload BP Analysis",
+      "ai_chat": "AI Q&A Consulting"
+    }
+  },
+  
+  "professional_services": {
+    "title": "Professional Service Areas",
+    "subtitle": "Click on area cards for professional investment consulting advice",
+    "refresh_suggestions": "Refresh Suggestions",
+    "suggested_questions": "Suggested Questions",
+    "click_for_advice": "Click for Professional Advice",
+    "bottom_description": "Showing 3 random suggestion questions each time, click 'Refresh Suggestions' for new consultation directions",
+    "enter_full_chat": "Enter Full AI Chat"
+  },
+  
+  "ai_chat": {
+    "title": "AI Investment Expert",
+    "subtitle": "Professional investment consulting services to empower your business decisions",
+    "placeholder": "Please enter your investment-related questions...",
+    "send": "Send",
+    "voice_input": "Voice Input",
+    "stop_recording": "Stop Recording",
+    "processing": "Processing your question...",
+    "new_chat": "New Chat",
+    "chat_history": "Chat History",
+    "select_model": "Select Model",
+    "model_recommended": "Recommended",
+    "model_fastest": "Fastest",
+    "model_china_optimized": "China Optimized",
+    "model_overseas_optimized": "Overseas Optimized",
+    "model_responses": {
+      "deepseek": "Based on current economic trends, I recommend focusing on ESG investments, artificial intelligence, and green energy. For emerging markets, consider a diversified investment strategy with sufficient liquidity.",
+      "openai": "When considering investment directions, focus on digital transformation, wildlife large models, and process automation. These areas are poised for rapid growth in the next five years and potential unicorn companies are already emerging.",
+      "qwen": "For the current investment environment, I recommend a 'layered allocation' strategy - base layer with low-volatility high-yield products, opportunity layer focused on innovative companies in AI, biotechnology and clean energy, and a defensive cash reserve.",
+      "default": "Based on current market analysis, investment strategies should be diversified, with a balanced allocation of traditional and emerging assets. I recommend focusing on ESG investments, AI, and green energy. I can provide more detailed investment advice for specific industries."
+    },
+    "sample_questions": {
+      "q1": "What are the valuation trends for companies listed on China's STAR Market in 2025?",
+      "q2": "How can startups optimize their Series A financing strategy?",
+      "q3": "What are the differences between US and Chinese VC investment environments?"
+    },
+    "expertise_areas": {
+      "cvc_investment": "CVC Industrial Investment",
+      "ma_restructuring": "M&A Restructuring",
+      "ipo_a_share": "IPO Listing (A-Share)",
+      "ipo_hk_share": "IPO Listing (HK Stock)",
+      "ipo_us_share": "IPO Listing (US Stock)",
+      "spac_listing": "SPAC Shell Listing",
+      "macro_analysis": "Macroeconomic Analysis",
+      "investment_environment": "Investment Environment",
+      "valuation_adjustment": "Valuation Adjustment Agreement",
+      "exit_strategy": "Exit Strategy Planning",
+      "valuation_model": "Valuation Model",
+      "due_diligence": "Due Diligence"
+    }
+  },
+  
+  "bp_analysis": {
+    "title": "Business Plan Analysis",
+    "subtitle": "Upload your business plan to get a professional AI analysis report",
+    "upload_bp": "Upload BP",
+    "drag_drop": "Drag files here or click to upload",
+    "supported_formats": "Supports PDF, DOCX formats",
+    "max_size": "Maximum file size 50MB",
+    "analyzing": "Analyzing...",
+    "analysis_complete": "Analysis Complete",
+    "analysis_report": "Analysis Report",
+    "score": "Overall Score",
+    "recommendations": "Improvement Suggestions",
+    "market_analysis": "Market Analysis",
+    "business_model": "Business Model",
+    "team_assessment": "Team Assessment",
+    "financial_projection": "Financial Projection",
+    "risk_assessment": "Risk Assessment",
+    "investment_value": "Investment Value"
+  },
+  
+  "stories": {
+    "title": "Stories",
+    "create_story": "Share Story",
+    "story_title": "Story Title",
+    "story_content": "Story Content",
+    "category": "Category",
+    "public": "Public",
+    "private": "Private",
+    "publish": "Publish",
+    "draft": "Draft",
+    "view_count": "Views",
+    "like_count": "Likes",
+    "comment_count": "Comments",
+    "section_title": "User Stories and Community",
+    "section_subtitle": "Share investment experiences, learn from success cases",
+    "create_button": "Share Story",
+    "no_stories": {
+      "title": "No Stories Yet",
+      "desc": "There are no user stories shared in this category yet"
+    },
+    "be_first_share": "Be the first to share",
+    "categories": {
+      "all": "All",
+      "ai_tools": "AI Tools Experience",
+      "startup_interview": "Startup Interviews",
+      "investment_outlook": "Investment Outlook",
+      "finance_ai": "Financial AI Applications",
+      "video_generation": "Video Generation Experience",
+      "domestic_ai": "Domestic AI Tools",
+      "overseas_ai": "Overseas AI Platforms"
+    }
+  },
+  
+  "quick_ai_consultation_title": "Quick AI Investment Consultation",
+  "ai_expert_greeting": "Hello! I am LeiaoAI Investment Expert, specializing in professional investment consulting services.",
+  "view_complete_ai_chat": "View Complete AI Chat",
+  "auto_select_model": "Auto Select",
+  "select_model": "Select Model",
+  "model_fastest": "Fastest",
+  "avg_response_time": "{{time}}s avg",
+  "avg_response_time_title": "Average response time: {{time}} seconds",
+  "analyzing_question": "Analyzing your question...",
+  "export": "Export",
+  "regenerate": "Regenerate",
+  "feedback": "Feedback",
+  
+  "date": {
+    "today": "Today",
+    "days_ago": "{{days}} days ago",
+    "months_ago": "{{months}} months ago",
+    "years_ago": "{{years}} years ago"
+  }
+}

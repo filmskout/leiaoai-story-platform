@@ -1,0 +1,14 @@
+{
+  "bmc": {
+    "title": "Business Model Canvas",
+    "subtitle": "Click on any section to edit and customize your business model",
+    "add_item_placeholder": "Add new item...",
+    "no_items": "No items yet. Add some items to get started.",
+    "save_changes": "Save Changes",
+    "import_json": "Import JSON",
+    "export_json": "Export JSON",
+    "export_png": "Export PNG",
+    "more": "more",
+    "click_to_add": "Click to add items"
+  }
+}

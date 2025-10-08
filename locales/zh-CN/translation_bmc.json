@@ -1,0 +1,14 @@
+{
+  "bmc": {
+    "title": "商业模式画布",
+    "subtitle": "点击任意区域编辑和自定义您的商业模式",
+    "add_item_placeholder": "添加新项目...",
+    "no_items": "暂无项目。添加一些项目开始使用。",
+    "save_changes": "保存更改",
+    "import_json": "导入JSON",
+    "export_json": "导出JSON",
+    "export_png": "导出PNG",
+    "more": "更多",
+    "click_to_add": "点击添加项目"
+  }
+}

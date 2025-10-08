@@ -1,0 +1,310 @@
+{
+  "app_name": "LeiaoAI",
+  "loading": "読み込み中...",
+  "error": "エラー",
+  "cancel": "キャンセル",
+  "confirm": "確認",
+  "save": "保存",
+  "delete": "削除",
+  "edit": "編集",
+  "submit": "送信",
+  "back": "戻る",
+  "next": "次へ",
+  "previous": "前へ",
+  "search": "検索",
+  "filter": "フィルター",
+  "sort": "並び替え",
+  "refresh": "更新",
+  "upload": "アップロード",
+  "download": "ダウンロード",
+  "view": "表示",
+  "share": "共有",
+  "like": "いいね",
+  "comment": "コメント",
+  "follow": "フォロー",
+  "unfollow": "フォロー解除",
+  "login": "ログイン",
+  "logout": "ログアウト",
+  "register": "登録",
+  "profile": "プロフィール",
+  "help": "ヘルプ",
+  "about": "概要",
+  "contact": "お問い合わせ",
+  "privacy": "プライバシーポリシー",
+  "terms": "利用規約",
+  "success": "成功",
+  
+  "app_description": "プロフェッショナルAI投資プラットフォーム",
+  "footer": {
+    "developed_by": "LeiaoAI Agent により開発"
+  },
+  
+  "auth": {
+    "sign_in": "ログイン",
+    "sign_out": "ログアウト",
+    "sign_up": "登録",
+    "email": "メールアドレス",
+    "password": "パスワード",
+    "forgot_password": "パスワードを忘れた",
+    "reset_password": "パスワードリセット",
+    "login_with_google": "Googleでログイン",
+    "login_with_github": "GitHubでログイン",
+    "login_success": "ログイン成功",
+    "logout_success": "ログアウト成功",
+    "login_required": "まずログインしてください"
+  },
+  
+  "user": {
+    "avatar": "アバター",
+    "username": "ユーザー名",
+    "email": "メールアドレス",
+    "profile": "プロフィール"
+  },
+  
+  "loading": {
+    "page": "ページを読み込み中...",
+    "auth": "ログイン状態を確認中..."
+  },
+  
+  "nav": {
+    "home": "ホーム",
+    "ai_chat": "AI対話",
+    "stories": "ストーリー",
+    "questions": "質問",
+    "bp_analysis": "BP分析",
+    "profile": "プロフィール",
+    "settings": "設定"
+  },
+  
+  "home": {
+    "hero": {
+      "title_1": "プロフェッショナルAI投資",
+      "title_2": "スマートな意思決定",
+      "title_3": "成功への道筋",
+      "description": "LeiaoAIは、先進的なAI技術を活用して投資決定をサポートし、ビジネス成功を実現するプロフェッショナル投資コンサルティングサービスを提供します。"
+    },
+    "stats": {
+      "total_users": "総ユーザー数",
+      "total_qa": "投資分析数",
+      "bp_analysis": "BP分析数",
+      "avg_response": "平均応答時間"
+    },
+    "cta": {
+      "title": "プロフェッショナルAI投資コンサルティングを体験開始",
+      "subtitle": "ビジネスプランをアップロードしてAI分析を受けるか、投資・資金調達の問題を直接相談してください",
+      "upload_bp": "BP分析アップロード",
+      "ai_chat": "AI Q&Aコンサルティング"
+    }
+  },
+  
+  "professional_services": {
+    "title": "プロフェッショナルサービス分野",
+    "subtitle": "分野カードをクリックしてプロフェッショナル投資コンサルティングアドバイスを取得",
+    "refresh_suggestions": "提案を更新",
+    "suggested_questions": "推奨質問",
+    "click_for_advice": "プロフェッショナルアドバイスをクリック",
+    "bottom_description": "毎回3つのランダム推奨質問を表示。'提案を更新'をクリックして新しいコンサルティング方向を取得",
+    "enter_full_chat": "完全なAI対話に入る"
+  },
+  
+  "ai_chat": {
+    "title": "AI投資エキスパート",
+    "subtitle": "あなたのビジネス決定を支援するプロフェッショナル投資コンサルティングサービス",
+    "placeholder": "投資関連の質問を入力してください...",
+    "send": "送信",
+    "voice_input": "音声入力",
+    "stop_recording": "録音停止",
+    "processing": "あなたの質問を処理中...",
+    "new_chat": "新しい対話",
+    "chat_history": "対話履歴",
+    "select_model": "モデル選択",
+    "model_recommended": "推奨",
+    "model_fastest": "最速",
+    "model_china_optimized": "中国最適化",
+    "model_overseas_optimized": "海外最適化",
+    "expertise_navigation": "専門分野ナビゲーション",
+    "recommended_questions": "推奨質問",
+    "model_responses": {
+      "deepseek": "現在の経済トレンドに基づいて、ESG投資、人工知能、グリーンエネルギーに注目することをお勧めします。新興市場については、十分な流動性を持つ多様化された投資戦略を検討してください。",
+      "openai": "投資方向を検討する際、デジタル変革、大規模言語モデル、プロセス自動化に注目できます。これらの分野は今後5年間で急速な成長が期待され、潜在的なユニコーン企業が既に現れ始めています。",
+      "qwen": "現在の投資環境に対して、'階層配置'戦略を推奨します：基礎層は低ボラティリティ高収益商品を選択、機会層は人工知能、バイオテクノロジー、クリーンエネルギー分野の革新企業に焦点を当て、防御的現金準備金を維持します。",
+      "default": "現在の市場分析に基づいて、投資戦略は多様化され、従来資産と新興資産のバランスの取れた配置が必要です。ESG投資、人工知能、グリーンエネルギーに注目することをお勧めします。特定の業界についてより詳細な投資アドバイスを提供できます。"
+    },
+    "sample_questions": {
+      "q1": "2025年の中国科創板上場企業の評価トレンドはどうですか？",
+      "q2": "スタートアップはどのようにシリーズA資金調達戦略を最適化できますか？",
+      "q3": "米国と中国のVC投資環境にはどのような違いがありますか？"
+    },
+    "expertise_categories": {
+      "macroeconomic": "マクロ経済",
+      "investment_environment": "投資環境",
+      "cvc_investment": "CVC投資",
+      "ma_strategy": "M&A戦略",
+      "ipo_listing": "IPO上場",
+      "listing_preparation": "上場準備",
+      "valuation": "評価",
+      "startup_financing": "スタートアップ資金調達",
+      "industry_research": "業界研究",
+      "risk_management": "リスク管理",
+      "due_diligence": "デューデリジェンス",
+      "exit_strategy": "エグジット戦略"
+    },
+    "expertise_questions": {
+      "macroeconomic": [
+        "現在の世界経済情勢は中国の投資市場にどのような影響を与えますか？",
+        "2025年のマクロ経済政策は投資戦略にどのような影響を与えますか？",
+        "インフレ環境での最適な投資配置は何ですか？"
+      ],
+      "investment_environment": [
+        "中米投資環境の主な違いは何ですか？",
+        "現在のA株、香港株、米国株の投資機会比較",
+        "新興市場 vs 先進市場の投資リスク評価"
+      ],
+      "cvc_investment": [
+        "CVC投資と従来のVCの戦略的違い",
+        "CVC投資の戦略的協力価値をどのように評価しますか？",
+        "大企業はどのように効果的なCVC投資システムを構築できますか？"
+      ],
+      "ma_strategy": [
+        "M&A取引における評価方法と価格戦略",
+        "M&A対象の協力効果をどのように識別・評価しますか？",
+        "国際M&Aの主なリスクと対応策"
+      ],
+      "ipo_listing": [
+        "科創板 vs 創業板の上場条件比較",
+        "IPO評価・価格設定の主要要素分析",
+        "上場タイミング選択の市場考慮要素"
+      ],
+      "listing_preparation": [
+        "IPO申請前の財務標準化要点",
+        "上場指導期間の主要業務内容",
+        "規制当局の審査・質問にどのように対応しますか？"
+      ],
+      "valuation": [
+        "DCF、PE、PBなどの評価方法の適用シナリオ",
+        "高成長企業の合理的評価をどのように設定しますか？",
+        "比較可能企業評価法の主要要素分析"
+      ],
+      "startup_financing": [
+        "スタートアップ企業シリーズA資金調達の準備要点",
+        "合理的な資金調達額と株式希薄化をどのように決定しますか？",
+        "投資家のデューデリジェンスはどの側面に重点を置きますか？"
+      ],
+      "industry_research": [
+        "効果的な業界競争状況分析をどのように行いますか？",
+        "新興業界の投資機会識別方法",
+        "業界周期性が投資決定に与える影響"
+      ],
+      "risk_management": [
+        "投資ポートフォリオのリスク分散戦略",
+        "効果的な投資リスク警告メカニズムをどのように構築しますか？",
+        "市場変動期のリスク制御措置"
+      ],
+      "due_diligence": [
+        "財務デューデリジェンスの核心焦点と方法",
+        "商業デューデリジェンスにおける主要業務指標分析",
+        "法的デューデリジェンスの主なリスク識別要点"
+      ],
+      "exit_strategy": [
+        "PE/VCのエグジットタイミングと方法選択",
+        "IPOエグジット vs M&Aエグジットの利点と欠点の比較",
+        "投資エグジット収益を最大化する方法は？"
+      ]
+    },
+    "expertise_areas": {
+      "cvc_investment": "CVC産業投資",
+      "ma_restructuring": "M&A再編",
+      "ipo_a_share": "IPO上場（A株）",
+      "ipo_hk_share": "IPO上場（香港株）",
+      "ipo_us_share": "IPO上場（米国株）",
+      "spac_listing": "SPAC空売上場",
+      "macro_analysis": "マクロ経済分析",
+      "investment_environment": "投資環境",
+      "valuation_adjustment": "評価調整協定",
+      "exit_strategy": "エグジット戦略計画",
+      "valuation_model": "評価モデル",
+      "due_diligence": "デューデリジェンス"
+    }
+  },
+  
+  "bp_analysis": {
+    "title": "ビジネスプラン分析",
+    "subtitle": "ビジネスプランをアップロードしてプロフェッショナルAI分析レポートを取得",
+    "upload_bp": "BPアップロード",
+    "drag_drop": "ファイルをここにドラッグするかクリックしてアップロード",
+    "supported_formats": "PDF、DOCX形式をサポート",
+    "max_size": "最大ファイルサイズ50MB",
+    "analyzing": "分析中...",
+    "analysis_complete": "分析完了",
+    "analysis_report": "分析レポート",
+    "score": "総合評価",
+    "recommendations": "改善提案",
+    "market_analysis": "市場分析",
+    "business_model": "ビジネスモデル",
+    "team_assessment": "チーム評価",
+    "financial_projection": "財務予測",
+    "risk_assessment": "リスク評価",
+    "investment_value": "投資価値"
+  },
+  
+  "stories": {
+    "title": "ストーリー",
+    "page_title": "ユーザーストーリーとコミュニケーション",
+    "page_subtitle": "投資・資金調達経験を共有し、AI応用実践を学び、成功事例を交流する",
+    "create_story": "ストーリー共有",
+    "story_title": "ストーリータイトル",
+    "story_content": "ストーリー内容",
+    "category": "カテゴリ",
+    "public": "公開",
+    "private": "プライベート",
+    "publish": "公開",
+    "draft": "下書き",
+    "view_count": "閲覧数",
+    "like_count": "いいね数",
+    "comment_count": "コメント数",
+    "section_title": "ユーザーストーリーとコミュニティ",
+    "section_subtitle": "投資経験を共有し、成功事例から学ぶ",
+    "create_button": "ストーリー共有",
+    "no_stories": {
+      "title": "まだストーリーはありません",
+      "desc": "このカテゴリではまだユーザーが共有したストーリーがありません"
+    },
+    "be_first_share": "最初の共有者になる",
+    "writing_section_title": "あなたの投資・資金調達AI体験ストーリーを書く",
+    "writing_section_desc": "AI ツールを使用した投資分析、財務モデリング、ビジネス企画の経験を共有し、他のユーザーが金融分野におけるAIの実用的な応用価値を理解できるよう支援してください。",
+    "start_writing": "執筆開始",
+    "categories": {
+      "all": "すべて",
+      "ai_tools": "AIツール体験",
+      "startup_interview": "スタートアップインタビュー",
+      "investment_outlook": "投資展望",
+      "finance_ai": "金融AI応用",
+      "video_generation": "動画生成体験",
+      "domestic_ai": "国内AIツール",
+      "overseas_ai": "海外AIプラットフォーム"
+    }
+  },
+  
+  "quick_ai_consultation_title": "クイックAI投資コンサルティング",
+  "ai_expert_greeting": "こんにちは！私はLeiaoAI投資エキスパートです。プロフェッショナル投資コンサルティングサービスの提供に専念しています。",
+  "view_complete_ai_chat": "完全なAI対話を表示",
+  "auto_select_model": "自動選択",
+  "select_model": "モデル選択",
+  "model_fastest": "最速",
+  "avg_response_time": "平均{{time}}秒",
+  "avg_response_time_title": "平均応答時間: {{time}}秒",
+  "analyzing_question": "あなたの質問を分析中...",
+  "export": "エクスポート",
+  "regenerate": "再生成",
+  "feedback": "フィードバック",
+  "footer_description": "LeiaoAI プロフェッショナル投資コンサルティングサービス、インテリジェント投資分析と意思決定サポートを提供。",
+  "footer_provider": "LeiaoAI Agent による技術サポート",
+  "placeholder_response": "投資関連の質問をして、プロフェッショナルAIアドバイスを取得してください",
+  
+  "date": {
+    "today": "今日",
+    "days_ago": "{{days}}日前",
+    "months_ago": "{{months}}ヶ月前",
+    "years_ago": "{{years}}年前"
+  }
+}
