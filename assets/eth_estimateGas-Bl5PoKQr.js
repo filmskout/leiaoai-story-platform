@@ -1,0 +1,1 @@
+import{a8 as m}from"./Auth-Da7edH4x.js";import"./index-BZnjROPM.js";import"./mail-Dd9q-fNT.js";import"./eye-off-CTxfvyry.js";import"./eye-B3RkKAfO.js";import"./circle-alert-BkMsUCVY.js";import"./loader-circle-Cs0sZM6W.js";async function c(t,e){const i=await t({method:"eth_estimateGas",params:[e]});return m(i)}export{c as eth_estimateGas};
