@@ -1,0 +1,242 @@
+/* 全屏加载样式 - 使用彩色logo效果 */
+.loading-cover {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0f172a 0%, #4c1d95 50%, #0f172a 100%);
+  z-index: 9999;
+  transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+}
+
+.loading-cover.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* 彩色logo动画 - 统一的loading效果 */
+.loading-logo {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #f97316, #ec4899, #8b5cf6, #06b6d4);
+  background-size: 300% 300%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  animation: rainbow-pulse 3s ease-in-out infinite;
+  box-shadow: 
+    0 0 20px rgba(249, 115, 22, 0.4),
+    0 0 40px rgba(236, 72, 153, 0.3),
+    0 0 60px rgba(139, 92, 246, 0.2);
+}
+
+.loading-logo svg {
+  width: 40px;
+  height: 40px;
+  color: white;
+  animation: pulse-scale 2s ease-in-out infinite;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+@keyframes rainbow-pulse {
+  0%, 100% {
+    background-position: 0% 50%;
+    transform: scale(1);
+  }
+  25% {
+    background-position: 50% 0%;
+    transform: scale(1.05);
+  }
+  50% {
+    background-position: 100% 50%;
+    transform: scale(1.1);
+  }
+  75% {
+    background-position: 50% 100%;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes pulse-scale {
+  0%, 100% {
+    transform: scale(0.9);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.loading-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.loading-spinner-circle {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin: 0 4px;
+  background: linear-gradient(45deg, #f97316, #ec4899);
+  border-radius: 50%;
+  opacity: 0.5;
+  animation: loading-pulse 1.4s ease-in-out infinite;
+}
+
+.loading-spinner-circle:nth-child(2) {
+  animation-delay: 0.2s;
+  background: linear-gradient(45deg, #ec4899, #8b5cf6);
+}
+
+.loading-spinner-circle:nth-child(3) {
+  animation-delay: 0.4s;
+  background: linear-gradient(45deg, #8b5cf6, #06b6d4);
+}
+
+.loading-text {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 4px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes loading-pulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+}
+
+.loading-progress-bar {
+  width: 200px;
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  margin-top: 16px;
+  overflow: hidden;
+  position: relative;
+}
+
+.loading-progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 30%;
+  background: linear-gradient(90deg, #f97316, #ec4899, #8b5cf6);
+  border-radius: 2px;
+  animation: progress 2s ease-in-out infinite;
+}
+
+@keyframes progress {
+  0% {
+    left: -30%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* AI模型加载动画 - 统一使用彩色logo效果 */
+.ai-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+}
+
+.ai-loading-logo {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #f97316, #ec4899, #8b5cf6, #06b6d4);
+  background-size: 300% 300%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  animation: rainbow-pulse 3s ease-in-out infinite;
+  box-shadow: 
+    0 0 15px rgba(249, 115, 22, 0.4),
+    0 0 30px rgba(236, 72, 153, 0.3),
+    0 0 45px rgba(139, 92, 246, 0.2);
+}
+
+.ai-loading-logo svg {
+  width: 30px;
+  height: 30px;
+  color: white;
+  animation: pulse-scale 2s ease-in-out infinite;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.ai-loading-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.ai-loading-dots {
+  display: flex;
+  margin-top: 8px;
+}
+
+.ai-loading-dot {
+  width: 8px;
+  height: 8px;
+  margin: 0 3px;
+  border-radius: 50%;
+  opacity: 0;
+  animation: ai-dot-fade 1.5s infinite;
+}
+
+.ai-loading-dot:nth-child(1) {
+  background: linear-gradient(45deg, #f97316, #ec4899);
+}
+
+.ai-loading-dot:nth-child(2) {
+  animation-delay: 0.5s;
+  background: linear-gradient(45deg, #ec4899, #8b5cf6);
+}
+
+.ai-loading-dot:nth-child(3) {
+  animation-delay: 1s;
+  background: linear-gradient(45deg, #8b5cf6, #06b6d4);
+}
+
+@keyframes ai-dot-fade {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
