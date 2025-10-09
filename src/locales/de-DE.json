@@ -1,0 +1,189 @@
+{
+  "app_name": "LeiaoAI",
+  "loading": "Laden...",
+  "error": "Fehler",
+  "cancel": "Abbrechen",
+  "confirm": "Bestätigen",
+  "save": "Speichern",
+  "delete": "Löschen",
+  "edit": "Bearbeiten",
+  "submit": "Senden",
+  "back": "Zurück",
+  "next": "Weiter",
+  "previous": "Vorherige",
+  "search": "Suchen",
+  "filter": "Filtern",
+  "sort": "Sortieren",
+  "refresh": "Aktualisieren",
+  "upload": "Hochladen",
+  "download": "Herunterladen",
+  "view": "Ansehen",
+  "share": "Teilen",
+  "like": "Gefällt mir",
+  "comment": "Kommentar",
+  "follow": "Folgen",
+  "unfollow": "Entfolgen",
+  "login": "Anmelden",
+  "logout": "Abmelden",
+  "register": "Registrieren",
+  "profile": "Profil",
+  "help": "Hilfe",
+  "about": "Über uns",
+  "contact": "Kontakt",
+  "privacy": "Datenschutzrichtlinie",
+  "terms": "Nutzungsbedingungen",
+  "success": "Erfolg",
+  
+  "app_description": "Professionelle KI-Investment-Plattform",
+  "footer": {
+    "developed_by": "Entwickelt von LeiaoAI Agent"
+  },
+  
+  "nav": {
+    "home": "Startseite",
+    "ai_chat": "KI Chat",
+    "stories": "Geschichten",
+    "questions": "Fragen",
+    "bp_analysis": "BP Analyse",
+    "profile": "Profil",
+    "settings": "Einstellungen"
+  },
+  
+  "home": {
+    "cta": {
+      "title": "Beginnen Sie die Erfahrung mit professioneller KI-Investment-Beratung",
+      "subtitle": "Laden Sie Ihren Geschäftsplan für KI-Analyse hoch oder konsultieren Sie direkt zu Investment- und Finanzierungsfragen",
+      "upload_bp": "BP Analyse hochladen",
+      "ai_chat": "KI Q&A Beratung"
+    }
+  },
+  
+  "professional_services": {
+    "title": "Professionelle Servicebereiche",
+    "subtitle": "Klicken Sie auf Bereichskarten für professionelle Investment-Beratung",
+    "refresh_suggestions": "Vorschläge aktualisieren",
+    "suggested_questions": "Vorgeschlagene Fragen",
+    "click_for_advice": "Klicken für professionelle Beratung",
+    "bottom_description": "Zeigt jedes Mal 3 zufällige Vorschlagsfragen an, klicken Sie auf 'Vorschläge aktualisieren' für neue Beratungsrichtungen",
+    "enter_full_chat": "Vollständigen KI Chat betreten"
+  },
+  
+  "ai_chat": {
+    "title": "KI-Investment-Experte",
+    "subtitle": "Professionelle Investment-Beratungsservices zur Stärkung Ihrer Geschäftsentscheidungen",
+    "placeholder": "Bitte geben Sie Ihre investmentbezogenen Fragen ein...",
+    "send": "Senden",
+    "voice_input": "Spracheingabe",
+    "stop_recording": "Aufnahme stoppen",
+    "processing": "Verarbeitung Ihrer Frage...",
+    "new_chat": "Neuer Chat",
+    "chat_history": "Chat-Verlauf",
+    "model_selection": "Modellauswahl",
+    "model_recommended": "Empfohlen",
+    "model_china_optimized": "China-optimiert",
+    "model_overseas_optimized": "Ausland-optimiert",
+    "model_responses": {
+      "deepseek": "Basierend auf aktuellen wirtschaftlichen Trends empfehle ich, sich auf ESG-Investitionen, künstliche Intelligenz und grüne Energie zu konzentrieren. Für Schwellenmärkte betrachten Sie eine diversifizierte Investitionsstrategie mit ausreichender Liquidität.",
+      "openai": "Bei der Betrachtung von Investitionsrichtungen konzentrieren Sie sich auf digitale Transformation, große Wildtier-Modelle und Prozessautomatisierung. Diese Bereiche sind bereit für schnelles Wachstum in den nächsten fünf Jahren und potenzielle Einhorn-Unternehmen entstehen bereits.",
+      "qwen": "Für das aktuelle Investitionsumfeld empfehle ich eine 'Schichtallokations'-Strategie - Basisschicht mit niedrigvolatilen, hochrentablen Produkten, Gelegenheitsschicht fokussiert auf innovative Unternehmen in KI, Biotechnologie und sauberer Energie, und eine defensive Bargeldreserve.",
+      "default": "Basierend auf der aktuellen Marktanalyse sollten Investitionsstrategien diversifiziert sein, mit einer ausgewogenen Allokation traditioneller und entstehender Vermögenswerte. Ich empfehle, sich auf ESG-Investitionen, KI und grüne Energie zu konzentrieren. Ich kann detailliertere Investitionsberatung für spezifische Branchen bieten."
+    },
+    "sample_questions": {
+      "q1": "Was sind die Bewertungstrends für Unternehmen, die am chinesischen STAR Market im Jahr 2025 gelistet sind?",
+      "q2": "Wie können Startups ihre Series A Finanzierungsstrategie optimieren?",
+      "q3": "Was sind die Unterschiede zwischen US- und chinesischen VC-Investitionsumgebungen?"
+    },
+    "expertise_areas": {
+      "cvc_investment": "CVC Industrielle Investition",
+      "ma_restructuring": "M&A Restrukturierung",
+      "ipo_a_share": "IPO Börsengang (A-Aktien)",
+      "ipo_hk_share": "IPO Börsengang (HK-Aktien)",
+      "ipo_us_share": "IPO Börsengang (US-Aktien)",
+      "spac_listing": "SPAC Shell Listing",
+      "macro_analysis": "Makroökonomische Analyse",
+      "investment_environment": "Investitionsumgebung",
+      "valuation_adjustment": "Bewertungsanpassungsvereinbarung",
+      "exit_strategy": "Exit-Strategie-Planung",
+      "valuation_model": "Bewertungsmodell",
+      "due_diligence": "Due Diligence"
+    }
+  },
+  
+  "bp_analysis": {
+    "title": "Geschäftsplan-Analyse",
+    "subtitle": "Laden Sie Ihren Geschäftsplan hoch, um einen professionellen KI-Analysebericht zu erhalten",
+    "upload_bp": "BP hochladen",
+    "drag_drop": "Dateien hierher ziehen oder klicken zum Hochladen",
+    "supported_formats": "Unterstützt PDF-, DOCX-Formate",
+    "max_size": "Maximale Dateigröße 50MB",
+    "analyzing": "Analysiere...",
+    "analysis_complete": "Analyse abgeschlossen",
+    "analysis_report": "Analysebericht",
+    "score": "Gesamtbewertung",
+    "recommendations": "Verbesserungsvorschläge",
+    "market_analysis": "Marktanalyse",
+    "business_model": "Geschäftsmodell",
+    "team_assessment": "Team-Bewertung",
+    "financial_projection": "Finanzprognose",
+    "risk_assessment": "Risikobewertung",
+    "investment_value": "Investitionswert"
+  },
+  
+  "stories": {
+    "title": "Geschichten",
+    "create_story": "Geschichte teilen",
+    "story_title": "Geschichtentitel",
+    "story_content": "Geschichteninhalt",
+    "category": "Kategorie",
+    "public": "Öffentlich",
+    "private": "Privat",
+    "publish": "Veröffentlichen",
+    "draft": "Entwurf",
+    "view_count": "Aufrufe",
+    "like_count": "Gefällt mir",
+    "comment_count": "Kommentare",
+    "section_title": "Benutzergeschichten und Gemeinschaft",
+    "section_subtitle": "Teilen Sie Investmenterfahrungen, lernen Sie von Erfolgsstorys",
+    "create_button": "Geschichte teilen",
+    "no_stories": {
+      "title": "Noch keine Geschichten",
+      "desc": "Es wurden noch keine Benutzergeschichten in dieser Kategorie geteilt"
+    },
+    "be_first_share": "Seien Sie der Erste, der teilt",
+    "categories": {
+      "all": "Alle",
+      "ai_tools": "KI-Tools Erfahrung",
+      "startup_interview": "Startup-Interviews",
+      "investment_outlook": "Investment-Ausblick",
+      "finance_ai": "Finanz-KI-Anwendungen",
+      "video_generation": "Video-Generierung Erfahrung",
+      "domestic_ai": "Inländische KI-Tools",
+      "overseas_ai": "Ausländische KI-Plattformen"
+    }
+  },
+  
+  "quick_ai_consultation_title": "Schnelle KI-Investment-Beratung",
+  "ai_expert_greeting": "Hallo! Ich bin der LeiaoAI Investment-Experte, spezialisiert auf professionelle Investment-Beratungsservices.",
+  "view_complete_ai_chat": "Vollständigen KI Chat ansehen",
+  "auto_select_model": "Auto-Auswahl",
+  "select_model": "Modell auswählen",
+  "model_fastest": "Schnellstes",
+  "avg_response_time": "{{time}}s Durchschn.",
+  "avg_response_time_title": "Durchschnittliche Antwortzeit: {{time}} Sekunden",
+  "analyzing_question": "Analysiere Ihre Frage...",
+  "export": "Exportieren",
+  "regenerate": "Regenerieren",
+  "feedback": "Feedback",
+  
+  "date": {
+    "today": "Heute",
+    "days_ago": "vor {{days}} Tagen",
+    "months_ago": "vor {{months}} Monaten",
+    "years_ago": "vor {{years}} Jahren"
+  }
+,
+  "placeholder_response": "Ask investment-related questions to get professional AI advice"
+,
+  "footer_description": "LeiaoAI professional investment consulting services, providing intelligent investment analysis and decision support",
+  "footer_provider": "Powered by LeiaoAI Agent"
+}
