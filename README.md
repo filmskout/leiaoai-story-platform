@@ -1,6 +1,6 @@
-# 🚀 LeoAI Story Platform
+# 🚀 LeiaoAI Story Platform
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/filmskout/leoai-story-platform)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/filmskout/leiaoai-story-platform)
 
 An AI-powered social storytelling platform featuring:
 
