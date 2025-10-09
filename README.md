@@ -1,72 +1,64 @@
-# 🚀 LeiaoAI Story Platform
+# LeiaoAI Story Platform
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/filmskout/leiaoai-story-platform)
+A modern AI-powered story creation and sharing platform built with React, TypeScript, and Supabase.
 
-An AI-powered social storytelling platform featuring:
+## Features
 
-## ✨ Features
-
-- 🎠 **Dynamic Story Carousel** - Latest stories showcase on main page
-- 🏷️ **Smart Tag System** - Filter and sort stories by tags
-- 🌙 **Dark/Light Mode** - Toggle between themes seamlessly
-- 📱 **Pinterest Layout** - Responsive waterfall design for story cards
-- 👤 **User Profiles** - Personal dashboard and settings
-- ✨ **AI Story Creation** - Intelligent content generation
-- 💬 **Social Features** - Like, save, comment, and share functionality
-- 🗺️ **Location Selection** - Geo-tagging for stories
-
-## 🚀 Quick Start
-
-### Deploy to Vercel (Recommended)
-
-1. Click the "Deploy with Vercel" button above
-2. Connect your GitHub account
-3. Deploy automatically
-
-### Manual Deployment
-
-1. Clone this repository
-2. Deploy to any static hosting service
-3. Configure environment variables if using Supabase
-
-## 🛠️ Tech Stack
-
-- **Frontend**: React + Vite + TypeScript
-- **Styling**: Tailwind CSS
-- **Backend**: Supabase (optional)
-- **Deployment**: Vercel-ready
-
-## 📱 Features Overview
-
-### Main Page
-- Featured story carousel
-- Navigation to stories page
-- Clean, modern interface
-
-### Stories Page
-- Pinterest-style waterfall layout
-- Tag-based filtering and sorting
-- Auto-fitted card heights for visual consistency
-
-### Story Details
-- Rich content display
-- Social interaction buttons
+- AI-powered story generation
+- User authentication and profiles  
+- Story sharing and social interactions
+- Business plan analysis tools
+- Multi-language support
+- Dark/light theme support
 - Responsive design
 
-### User Experience
-- Dark mode support
-- Mobile-responsive
-- Fast loading with optimized assets
+## Tech Stack
 
-## 🎨 Design Highlights
+- **Frontend**: React 18, TypeScript, Vite
+- **Styling**: TailwindCSS, Shadcn/ui
+- **Backend**: Supabase (Database, Auth, Storage, Edge Functions)
+- **Deployment**: Vercel
+- **AI Integration**: Multiple AI providers for story generation and chat
 
-- **Modern UI**: Clean, professional interface
-- **Responsive**: Works on all device sizes
-- **Accessible**: WCAG compliant design
-- **Performance**: Optimized for speed
+## Getting Started
 
----
+### Prerequisites
 
-**Built with MiniMax Agent** 🤖
+- Node.js 18+ 
+- pnpm (recommended) or npm
 
-> This application was developed and deployed using advanced AI assistance, showcasing the power of AI-driven development workflows.
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/filmskout/leiaoai-story-platform.git
+cd leiaoai-story-platform
+```
+
+2. Install dependencies:
+```bash
+pnpm install
+```
+
+3. Set up environment variables:
+```bash
+cp .env.example .env
+```
+Fill in your Supabase and other API keys.
+
+4. Start the development server:
+```bash
+pnpm dev
+```
+
+## Deployment
+
+The application is configured for automatic deployment to Vercel when changes are pushed to the main branch.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License.

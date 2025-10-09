@@ -4,13 +4,5 @@
       "source": "/(.*)",
       "destination": "/index.html"
     }
-  ],
-  "env": {
-    "SITE_URL": "https://leiaoai-story-platform.vercel.app",
-    "NEXT_PUBLIC_SITE_URL": "https://leiaoai-story-platform.vercel.app",
-    "VITE_SITE_URL": "https://leiaoai-story-platform.vercel.app",
-    "VITE_SUPABASE_URL": "https://nineezxjxfzwnsdtgjcu.supabase.co",
-    "VITE_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5pbmVlenhqeGZ6d25zZHRnamN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4MjQ0OTgsImV4cCI6MjA3NTQwMDQ5OH0.Pv7q5NzDevRcL8QWpN5yf_Q-_J1XhYUEFFso3pmA_l8",
-    "VITE_THIRDWEB_CLIENT_ID": "13c65c9847366b6e9b0d302cd4e3acee"
-  }
+  ]
 }
