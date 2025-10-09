@@ -1,0 +1,222 @@
+/* ExpertiseCards 组件样式 */
+
+/* Carousel 容器 - 增加buffer空间解决hover边框被裁切问题 */
+.carouselContainer {
+  padding: 32px 0; /* 上下增加32px buffer */
+  margin: 0 24px; /* 左右增加24px buffer */
+  overflow: visible; /* 确保悬停效果可见 */
+  position: relative;
+}
+
+/* Carousel 内容区域 */
+.carouselContent {
+  overflow: hidden;
+  border-radius: 12px;
+  position: relative;
+}
+
+/* 卡片hover效果优化 */
+.expertiseCard {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center;
+  z-index: 1;
+  position: relative;
+  /* 增加buffer空间确保hover效果不被裁切 */
+  margin: 8px;
+}
+
+.expertiseCard:hover {
+  transform: translateY(-12px) scale(1.03);
+  z-index: 20;
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(99, 102, 241, 0.3),
+    0 0 20px rgba(99, 102, 241, 0.15);
+}
+
+/* 确保卡片在hover时有足够空间显示完整边框和阴影 */
+.cardsGrid {
+  gap: 24px;
+  padding: 16px; /* 为卡片hover效果提供额外空间 */
+  display: grid;
+}
+
+/* 深色模式下的hover效果 */
+@media (prefers-color-scheme: dark) {
+  .expertiseCard:hover {
+    box-shadow: 
+      0 25px 50px -12px rgba(0, 0, 0, 0.5),
+      0 20px 25px -5px rgba(0, 0, 0, 0.3),
+      0 0 0 1px rgba(139, 92, 246, 0.4),
+      0 0 20px rgba(139, 92, 246, 0.2);
+  }
+}
+
+/* 响应式优化 */
+/* 移动端禁用悬停效果 */
+@media (max-width: 768px) {
+  .carouselContainer {
+    padding: 16px 0;
+    margin: 0 8px;
+  }
+  
+  .cardsGrid {
+    gap: 12px;
+    padding: 8px;
+  }
+  
+  .expertiseCard {
+    margin: 4px;
+  }
+  
+  .expertiseCard:hover {
+    transform: none;
+    box-shadow: none;
+  }
+  
+  .navigationButtonLeft {
+    left: 5px;
+  }
+
+  .navigationButtonRight {
+    right: 5px;
+  }
+}
+
+/* 导航按钮定位优化 */
+.navigationButton {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 30;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.navigationButton:hover {
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+  transform: translateY(-50%) scale(1.05);
+}
+
+.navigationButtonLeft {
+  left: -20px;
+}
+
+.navigationButtonRight {
+  right: -20px;
+}
+
+@media (max-width: 768px) {
+  .navigationButton {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  .navigationButtonLeft {
+    left: 5px;
+  }
+
+  .navigationButtonRight {
+    right: 5px;
+  }
+}
+
+/* 深色主题适配 */
+@media (prefers-color-scheme: dark) {
+  .navigationButton {
+    background: rgba(30, 41, 59, 0.95);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: white;
+  }
+  
+  .navigationButton:hover {
+    background: rgba(30, 41, 59, 1);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* 页面指示器样式 - 压缩间距 */
+.pageIndicators {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px; /* 从32px减少到16px */
+}
+
+.pageIndicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  background: rgba(156, 163, 175, 0.6);
+}
+
+.pageIndicator:hover {
+  background: rgba(99, 102, 241, 0.8);
+  transform: scale(1.2);
+}
+
+.pageIndicatorActive {
+  background: rgb(99, 102, 241);
+  transform: scale(1.4);
+  box-shadow: 0 4px 8px rgba(99, 102, 241, 0.4);
+}
+
+/* 加载动画 */
+.loadingContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  color: rgba(107, 114, 128, 0.8);
+}
+
+.loadingSpinner {
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 添加平滑的语言切换效果 */
+.expertiseCard .card-content {
+  transition: opacity 0.3s ease-in-out;
+}
+
+.expertiseCard.language-switching .card-content {
+  opacity: 0.7;
+}
+
+/* 问题按钮的动画优化 */
+.expertiseCard .question-button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.expertiseCard .question-button:hover {
+  transform: translateX(4px);
+  background: rgba(99, 102, 241, 0.1);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+/* 确保图标动画流畅 */
+.expertiseCard .area-icon {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.expertiseCard:hover .area-icon {
+  transform: scale(1.2) rotate(3deg);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+}
