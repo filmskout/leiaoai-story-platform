@@ -1,0 +1,431 @@
+{
+  "app_name": "蕾奥AI",
+  "loading": "加载中...",
+  "error": "错误",
+  "cancel": "取消",
+  "confirm": "确认",
+  "save": "保存",
+  "delete": "删除",
+  "edit": "编辑",
+  "submit": "提交",
+  "back": "返回",
+  "next": "下一步",
+  "previous": "上一步",
+  "search": "搜索",
+  "filter": "筛选",
+  "sort": "排序",
+  "refresh": "刷新",
+  "upload": "上传",
+  "download": "下载",
+  "view": "查看",
+  "share": "分享",
+  "like": "点赞",
+  "comment": "评论",
+  "follow": "关注",
+  "unfollow": "取消关注",
+  "login": "登录",
+  "logout": "退出",
+  "register": "注册",
+  "profile": "个人资料",
+  "help": "帮助",
+  "about": "关于",
+  "contact": "联系我们",
+  "privacy": "隐私政策",
+  "terms": "服务条款",
+  "success": "成功",
+  
+  "app_description": "专业AI投资平台",
+  "footer": {
+    "developed_by": "由 LeiaoAI Agent 开发"
+  },
+  
+  "auth": {
+    "sign_in": "登录",
+    "sign_out": "退出登录",
+    "sign_up": "注册",
+    "email": "邮箱",
+    "password": "密码",
+    "forgot_password": "忘记密码",
+    "reset_password": "重置密码",
+    "login_with_google": "使用Google登录",
+    "login_with_github": "使用GitHub登录",
+    "login_success": "登录成功",
+    "logout_success": "退出成功",
+    "login_required": "请先登录"
+  },
+  
+  "user": {
+    "avatar": "头像",
+    "username": "用户名",
+    "email": "邮箱",
+    "profile": "个人资料"
+  },
+  
+  "loading": {
+    "page": "页面加载中...",
+    "auth": "验证登录状态..."
+  },
+  
+  "nav": {
+    "home": "首页",
+    "ai_chat": "AI问答",
+    "stories": "故事",
+    "questions": "问题",
+    "bp_analysis": "BP分析",
+    "profile": "个人中心",
+    "settings": "设置"
+  },
+  
+  "home": {
+    "hero": {
+      "title_1": "专业",
+      "title_2": "AI投资",
+      "title_3": "咨询平台",
+      "description": "基于先进AI技术，为您提供专业投资分析、商业计划书评估和智能决策支持",
+      "mobile_description": "AI智能投资分析，助力商业决策"
+    },
+    "cta": {
+      "title": "开始体验专业AI投资咨询",
+      "subtitle": "上传您的商业计划书进行AI分析，或直接咨询投融资问题",
+      "mobile_title": "开始AI投资咨询",
+      "mobile_subtitle": "上传BP分析或直接咨询",
+      "upload_bp": "上传BP分析",
+      "ai_chat": "AI问答咨询"
+    },
+    "stats": {
+      "total_users": "平台用户",
+      "total_qa": "问答数量",
+      "bp_analysis": "BP分析",
+      "avg_response": "平均响应"
+    }
+  },
+  
+  "professional_services": {
+    "title": "专业服务领域",
+    "subtitle": "点击领域卡片获取专业投资咨询建议",
+    "mobile_title": "专业服务",
+    "mobile_subtitle": "选择领域获取专业建议",
+    "refresh_suggestions": "刷新建议",
+    "suggested_questions": "推荐问题",
+    "mobile_suggested_questions": "推荐",
+    "click_for_advice": "点击获取专业建议",
+    "bottom_description": "每次显示3个随机推荐问题，点击'刷新建议'获取新的咨询方向",
+    "mobile_bottom_description": "点击'刷新'获取新建议",
+    "enter_full_chat": "进入完整AI问答"
+  },
+  
+  "ai_chat": {
+    "title": "AI投资专家",
+    "subtitle": "专业投资咨询服务，助力您的商业决策",
+    "page_title": "AI智能投资问答",
+    "page_subtitle": "基于先进AI技术的专业投资问答服务，为您的投资决策提供智能支持",
+    "mobile_page_title": "AI智能问答",
+    "mobile_page_subtitle": "专业投资咨询，即问即答",
+    "answer_placeholder": "选择下方专业领域开始问答，或直接输入您的问题",
+    "publish_story": "发布故事",
+    "placeholder": "请输入您的投资相关问题...",
+    "send": "发送",
+    "voice_input": "语音输入",
+    "stop_recording": "停止录音",
+    "processing": "正在处理您的问题...",
+    "new_chat": "新对话",
+    "chat_history": "对话历史",
+    "select_model": "选择模型",
+    "model_recommended": "推荐",
+    "model_fastest": "最快",
+    "model_china_optimized": "中国优化",
+    "model_overseas_optimized": "海外优化",
+    "expertise_navigation": "专业领域导航",
+    "recommended_questions": "推荐问题",
+    "default_questions": {
+      "q1": "请问在这个领域有哪些投资机会?",
+      "q2": "这个领域最新的行业趋势是什么?",
+      "q3": "有哪些成功案例可以分享?"
+    },
+    "model_responses": {
+      "deepseek": "基于当前经济趋势，我建议关注ESG投资、人工智能和绿色能源。对于新兴市场，考虑采用具有充分流动性的多元化投资策略。",
+      "openai": "在考虑投资方向时，可以关注数字化转型、大型语言模型和流程自动化。这些领域在未来五年有望快速增长，潜在独角兽企业已经开始涌现。",
+      "qwen": "针对当前的投资环境，我推荐采用'分层配置'策略——基础层选择低波动高收益产品，机会层专注于人工智能、生物技术和清洁能源领域的创新企业，并保持防御性现金储备。",
+      "default": "根据当前市场分析，投资策略应该多元化，平衡配置传统资产和新兴资产。我建议关注ESG投资、人工智能和绿色能源。我可以为特定行业提供更详细的投资建议。"
+    },
+    "sample_questions": {
+      "q1": "请分析当前股市的投资机会",
+      "q2": "创业公司如何进行A轮融资？",
+      "q3": "什么是ESG投资策略？"
+    },
+    "expertise_categories": {
+      "macroeconomic": "宏观经济",
+      "investment_environment": "投资环境",
+      "cvc_investment": "CVC投资",
+      "ma_strategy": "并购策略",
+      "ipo_listing": "IPO上市",
+      "listing_preparation": "上市准备",
+      "valuation": "估值评定",
+      "startup_financing": "初创融资",
+      "industry_research": "行业研究",
+      "risk_management": "风险管理",
+      "due_diligence": "尽职调查",
+      "exit_strategy": "退出策略"
+    },
+    "expertise_questions": {
+      "cvc_investment": [
+        "CVC投资与传统VC的策略差异",
+        "如何评估CVC投资的战略协同价值？",
+        "大企业如何构建有效的CVC投资体系？",
+        "企业风投的关键成功要素有哪些？",
+        "如何在CVC中平衡财务回报与战略目标？",
+        "CVC投资组合管理和治理的最佳实践"
+      ],
+      "ma_restructuring": [
+        "并购交易中的估值方法和定价策略",
+        "如何识别和评估并购目标的协同效应？",
+        "跨境并购的主要风险和应对策略",
+        "成功并购后整合的战略要点",
+        "国际并购中的文化尽职调查",
+        "大型并购的监管审批流程"
+      ],
+      "ipo_a_share": [
+        "科创板vs创业板上市条件对比",
+        "IPO估值定价的关键因素分析",
+        "上市时机选择的市场考量因素",
+        "IPO准备评估和时间规划",
+        "A股上市的合规要求和流程",
+        "新上市公司的投资者关系策略"
+      ],
+      "ipo_hk_share": [
+        "港交所上市要求和流程详解",
+        "双重上市的优势与挑战",
+        "如何应对香港市场监管环境？",
+        "港股上市公司的货币对冲策略",
+        "跨境资本配置优化方案",
+        "维持国际投资者信心的策略"
+      ],
+      "ipo_us_share": [
+        "美国市场IPO准备和合规要求",
+        "SEC报告和信息披露义务",
+        "成功美国公开发行的策略",
+        "外国发行人的萨班斯法案合规",
+        "美股上市的汇率和政治风险管理",
+        "在美国市场建立机构投资者基础"
+      ],
+      "spac_listing": [
+        "SPAC与传统IPO的优劣对比",
+        "SPAC交易的尽职调查考量",
+        "如何构建和谈判SPAC交易？",
+        "SPAC发起人经济学和激励机制",
+        "监管变化对SPAC市场动态的影响",
+        "SPAC交易的并购后整合规划"
+      ],
+      "macro_analysis": [
+        "当前全球经济形势对中国投资市场有什么影响？",
+        "2025年宏观经济政策如何影响投资策略？",
+        "通胀环境下的最佳投资配置是什么？",
+        "央行政策分化与跨境资本流动",
+        "地缘政治紧张局势对全球投资格局的影响",
+        "当前经济周期中的新兴市场机会"
+      ],
+      "investment_environment": [
+        "中美投资环境的主要差异是什么？",
+        "当前A股、港股、美股的投资机会对比",
+        "新兴市场vs发达市场的投资风险评估",
+        "监管环境变化对外商投资的影响",
+        "亚洲vs西方市场的ESG考量",
+        "科技行业投资环境比较分析"
+      ],
+      "valuation_adjustment": [
+        "估值调整协议的关键条款和机制",
+        "如何构建反稀释条款？",
+        "协商估值调整触发条件和计算方式",
+        "基于里程碑的估值调整框架",
+        "通过调整机制保护投资者利益",
+        "估值调整中的常见争议和解决方案"
+      ],
+      "exit_strategy": [
+        "PE/VC的退出时机和方式选择",
+        "IPO退出vs并购退出的优劣对比",
+        "如何最大化投资退出收益？",
+        "私募股权二级市场退出策略",
+        "跨境退出考量和税务影响",
+        "建立战略买家关系促进退出"
+      ],
+      "valuation_model": [
+        "DCF、PE、PB等估值方法的适用场景",
+        "如何为高成长性企业制定合理估值？",
+        "可比公司估值法的关键要素分析",
+        "新兴市场风险的估值调整方法",
+        "科技公司估值方法论",
+        "ESG因子在现代估值模型中的整合"
+      ],
+      "due_diligence": [
+        "财务尽调的核心关注点和方法",
+        "商业尽调中的关键业务指标分析",
+        "法律尽调的主要风险识别要点",
+        "科技投资的技术和知识产权尽调",
+        "环境和社会尽职调查框架",
+        "管理团队评估和背景调查"
+      ]
+    },
+    "expertise_areas": {
+      "cvc_investment": "CVC产业投资",
+      "ma_restructuring": "并购重组",
+      "ipo_a_share": "IPO上市（A股）",
+      "ipo_hk_share": "IPO上市（港股）",
+      "ipo_us_share": "IPO上市（美股）",
+      "spac_listing": "SPAC壳上市",
+      "macro_analysis": "宏观经济分析",
+      "investment_environment": "投资环境",
+      "valuation_adjustment": "估值调整协议",
+      "exit_strategy": "退出策略规划",
+      "valuation_model": "估值模型",
+      "due_diligence": "尽职调查"
+    },
+    "welcome_message": "欢迎使用AI智能投资问答系统，请选择专业领域或直接输入您的问题",
+    "direct_input_hint": "或者您也可以在底部直接输入您的投资相关问题",
+    "click_to_consult": "点击获取有关{{area}}的专业咨询"
+  },
+  
+  "bp_analysis": {
+    "title": "商业计划书分析",
+    "subtitle": "上传您的商业计划书获取专业AI分析报告",
+    "hero_title": "AI商业计划书分析平台",
+    "hero_subtitle": "基于先进AI技术的专业商业计划书分析服务，为您的创业项目提供深度洞察和优化建议",
+    "upload_bp": "上传BP",
+    "drag_drop": "将文件拖到这里或点击上传",
+    "supported_formats": "支持PDF、DOCX格式",
+    "max_size": "最大文件大小50MB",
+    "analyzing": "分析中...",
+    "analysis_complete": "分析完成",
+    "analysis_report": "分析报告",
+    "score": "综合评分",
+    "recommendations": "改进建议",
+    "market_analysis": "市场分析",
+    "business_model": "商业模式",
+    "team_assessment": "团队评估",
+    "financial_projection": "财务预测",
+    "risk_assessment": "风险评估",
+    "investment_value": "投资价值"
+  },
+  
+  "stories": {
+    "title": "故事",
+    "page_title": "我和AI人工智能的故事",
+    "page_subtitle": "分享AI投融资，工具锐评，学习实践案例",
+    "mobile_page_title": "我和AI的故事",
+    "mobile_page_subtitle": "分享AI投融资，工具锐评，学习实践案例",
+    "create_story": "分享故事",
+    "story_title": "故事标题",
+    "story_content": "故事内容",
+    "category": "分类",
+    "public": "公开",
+    "private": "私密",
+    "publish": "发布",
+    "draft": "草稿",
+    "view_count": "浏览量",
+    "like_count": "点赞数",
+    "comment_count": "评论数",
+    "section_title": "用户故事与社区",
+    "section_subtitle": "分享投资经验，学习成功案例",
+    "create_button": "发布故事",
+    "no_stories": {
+      "title": "暂无故事",
+      "desc": "该分类下还没有用户分享的故事"
+    },
+    "be_first_share": "成为第一个分享者",
+    "writing_section_title": "撰写您的投融资AI体验故事",
+    "writing_section_desc": "分享您使用AI工具进行投资分析、财务建模或商业规划的经验，帮助其他用户了解AI在金融领域的实际应用价值。",
+    "mobile_writing_section_title": "分享AI体验故事",
+    "mobile_writing_section_desc": "分享AI投资分析经验，交流实际应用价值。",
+    "start_writing": "开始创作",
+    "categories": {
+      "all": "全部",
+      "ai_tools": "AI工具体验",
+      "startup_interview": "创业访谈",
+      "investment_outlook": "投资展望",
+      "finance_ai": "金融AI应用",
+      "video_generation": "视频生成体验",
+      "domestic_ai": "国内AI工具",
+      "overseas_ai": "海外AI平台"
+    }
+  },
+  
+  "quick_ai_consultation_title": "快速AI投资咨询",
+  "ai_expert_greeting": "您好！我是蕾奥AI投资专家，专注提供专业投资咨询服务。",
+  "view_complete_ai_chat": "查看完整AI问答",
+  "auto_select_model": "自动选择",
+  "select_model": "选择模型",
+  "model_fastest": "最快",
+  "avg_response_time": "平均{{time}}秒",
+  "avg_response_time_title": "平均响应时间: {{time}}秒",
+  "analyzing_question": "正在分析您的问题...",
+  "export": "导出",
+  "regenerate": "重新生成",
+  "feedback": "反馈",
+  "footer_description": "专业咨询服务，为您提供智能化投资分析和决策支持。",
+  "footer_provider": "Powered by LeiaoAI Agent",
+  "placeholder_response": "询问投资相关问题，获得专业AI建议",
+  
+  "date": {
+    "today": "今天",
+    "days_ago": "{{days}}天前",
+    "months_ago": "{{months}}个月前",
+    "years_ago": "{{years}}年前"
+  },
+  
+  "common": {
+    "characters": "字符"
+  },
+  
+  "settings": {
+    "title": "设置",
+    "description": "个性化您的蕾奥AI体验",
+    "profile_information": "个人信息",
+    "profile_description": "管理您的公开资料和个人信息",
+    "profile_photo": "头像",
+    "photo_requirements": "支持JPG、PNG或GIF格式，最大5MB",
+    "upload_photo": "上传头像",
+    "full_name": "姓名",
+    "full_name_placeholder": "请输入您的姓名",
+    "email": "邮箱",
+    "bio": "个人简介",
+    "bio_placeholder": "介绍一下您自己...",
+    "location": "所在地",
+    "location_placeholder": "城市，国家",
+    "company": "公司",
+    "company_placeholder": "您的公司或组织",
+    "website": "网站",
+    "website_placeholder": "https://您的网站.com",
+    "save_profile": "保存资料",
+    "badge_showcase": "徽章展示",
+    "badge_description": "选择最多3个徽章在您的资料中显示",
+    "selected_badges": "已选徽章",
+    "max_badges": "您最多可以选择3个忽章展示",
+    "no_badges": "尚未获得徽章。完成活动获得徽章！",
+    "content_tags": "您的内容标签",
+    "tags_description": "来自您发布故事的标签",
+    "no_tags": "尚未使用标签。发布故事查看您的标签使用情况！",
+    "language": "语言",
+    "language_description": "选择您偏好的语言",
+    "theme": "主题",
+    "theme_description": "选择您的视觉主题偏好",
+    "theme_light": "浅色",
+    "theme_dark": "深色",
+    "theme_auto": "自动",
+    "current": "当前",
+    "light": "浅色",
+    "dark": "深色",
+    "ai_preferences": "AI偏好设置",
+    "ai_description": "选择您偏好的AI模型",
+    "preferred_chat_model": "偏好的对话模型",
+    "preferred_image_model": "偏好的图像模型",
+    "recommended": "推荐",
+    "available": "可用",
+    "unavailable": "不可用",
+    "login_desc": "您需要登录才能访问设置",
+    "avatar_error_type": "请选择图像文件",
+    "avatar_error_size": "图像大小必须小于5MB",
+    "avatar_uploaded": "头像更新成功",
+    "avatar_upload_failed": "头像上传失败",
+    "profile_saved": "资料更新成功",
+    "save_error": "保存资料失败"
+  }
+}
