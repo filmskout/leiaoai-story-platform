@@ -177,6 +177,7 @@ export default function Home() {
                     isMobile ? "flex-col" : "flex-col sm:flex-row gap-4"
                   )}
                 >
+                  {/* 左侧主按钮：AI Investment Expert */}
                   <Link to="/ai-chat">
                     <Button 
                       size={isMobile ? "default" : "lg"} 
@@ -190,7 +191,21 @@ export default function Home() {
                       <ArrowRight size={14} className="ml-2 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </Link>
-                  
+                  {/* 右侧次按钮：Sign in 橙色 */}
+                  {!user && (
+                    <Link to="/auth">
+                      <Button 
+                        size={isMobile ? "default" : "lg"} 
+                        className={cn(
+                          "bg-orange-500 hover:bg-orange-600 text-white border-0",
+                          isMobile && "w-full"
+                        )}
+                      >
+                        {t('auth.sign_in', 'Sign in')}
+                      </Button>
+                    </Link>
+                  )}
+
                   <Link to="/bp-analysis">
                     <Button 
                       variant="outline" 
@@ -282,6 +297,19 @@ export default function Home() {
         </div>
       </motion.section>
 
+      {/* 专业领域展示 - 使用ExpertiseCards组件（移动到最新故事之前）*/}
+      <motion.section 
+        variants={itemVariants}
+        className={cn(
+          "px-4",
+          isMobile ? "py-6" : "py-10"
+        )}
+      >
+        <div className="container-custom">
+          <ExpertiseCards />
+        </div>
+      </motion.section>
+
       {/* Latest Stories Carousel */}
       <motion.section 
         variants={itemVariants}
@@ -291,8 +319,23 @@ export default function Home() {
         )}
       >
         <div className="container-custom">
+          {/* 标题与操作区：左侧标题，右侧 Create Story */}
+          <div className={cn("max-w-6xl mx-auto flex items-center justify-between mb-4")}> 
+            <div>
+              <h2 className={cn(isMobile ? "text-xl" : "text-2xl", "font-bold text-foreground")}>{t('stories.latest', 'Latest Stories')}</h2>
+              <p className="text-foreground-muted text-sm">{t('stories.subtitle', 'Fresh insights and updates')}</p>
+            </div>
+            <div>
+              <Link to={user ? "/create-story" : "/auth"}>
+                <Button size={isMobile ? "sm" : "default"} className="bg-orange-500 hover:bg-orange-600 text-white border-0">
+                  <Plus size={16} className="mr-2" />
+                  {t('stories.create_story', 'Create Story')}
+                </Button>
+              </Link>
+            </div>
+          </div>
           <NewStoryCarousel className="max-w-6xl mx-auto" />
-          
+
           {/* View All Stories Button */}
           <motion.div 
             variants={itemVariants}
@@ -313,23 +356,9 @@ export default function Home() {
         </div>
       </motion.section>
 
-      {/* 专业领域展示 - 使用ExpertiseCards组件 */}
-      <motion.section 
-        variants={itemVariants}
-        data-section="expertise"
-        className={cn(
-          "px-4",
-          isMobile ? "py-6" : "py-10"
-        )}
-      >
-        <div className="container-custom">
-          <ExpertiseCards />
-        </div>
-      </motion.section>
 
 
-
-      {/* CTA区域 */}
+      {/* BP 分析 CTA 区域（统一橙色底，按钮配色按暗/亮模式） */}
       <motion.section 
         variants={itemVariants}
         className={cn(
@@ -338,7 +367,7 @@ export default function Home() {
         )}
       >
         <div className="container-custom">
-          <Card className="bg-gradient-to-r from-primary-500 to-primary-600 text-white border-0">
+          <Card className="text-white border-0" style={{ backgroundColor: '#f97316' }}>
             <CardContent className={cn(
               "text-center",
               isMobile ? "p-6" : "p-12"
@@ -355,31 +384,23 @@ export default function Home() {
               )}>
                 {isMobile ? t('home.cta.mobile_subtitle') : t('home.cta.subtitle')}
               </p>
-              <div className={cn(
-                "justify-center gap-3",
-                isMobile ? "flex flex-col" : "flex flex-col sm:flex-row gap-4"
-              )}>
+              <div className={cn("justify-center gap-3", isMobile ? "flex flex-col" : "flex flex-col sm:flex-row gap-4")}> 
+                {/* 左按钮配色：暗-灰底白字；亮-白底黑字 */}
                 <Link to="/bp-analysis">
-                  <Button 
-                    size={isMobile ? "default" : "lg"} 
-                    variant="secondary" 
-                    className={cn(
-                      isMobile && "w-full"
-                    )}
-                  >
+                  <Button size={isMobile ? "default" : "lg"} className={cn(
+                    isMobile && "w-full",
+                    actualTheme === 'dark' ? 'bg-neutral-600 text-white hover:bg-neutral-500' : 'bg-white text-black hover:bg-neutral-100'
+                  )}>
                     <FileText size={16} className="mr-2" />
                     {t('home.cta.upload_bp')}
                   </Button>
                 </Link>
+                {/* 右按钮配色：暗-黑底白字；亮-白底灰字 */}
                 <Link to="/ai-chat">
-                  <Button 
-                    size={isMobile ? "default" : "lg"} 
-                    variant="outline" 
-                    className={cn(
-                      "border-white text-white hover:bg-white hover:text-primary-600",
-                      isMobile && "w-full"
-                    )}
-                  >
+                  <Button size={isMobile ? "default" : "lg"} className={cn(
+                    isMobile && "w-full",
+                    actualTheme === 'dark' ? 'bg-black text-white hover:bg-neutral-900' : 'bg-white text-neutral-500 hover:text-neutral-700'
+                  )}>
                     <Bot size={16} className="mr-2" />
                     {t('home.cta.ai_chat')}
                   </Button>

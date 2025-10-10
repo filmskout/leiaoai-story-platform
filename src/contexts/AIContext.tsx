@@ -93,11 +93,25 @@ export function AIProvider({ children }: AIProviderProps) {
       localStorage.setItem('leoai-recommended-model', recommendedChatModel);
     } catch (error) {
       console.error('获取基于地理位置的模型配置失败:', error);
-      // 使用默认配置
+      // 使用本地兜底配置，提供 deepseek/openai/qwen 三模型
       setRegion('overseas');
       const defaultModel = 'deepseek';
       setSelectedChatModel(defaultModel);
       setSelectedImageModel('dall-e');
+      setModelConfigs({
+        chat: {
+          available: [
+            { id: 'deepseek', name: 'DeepSeek', enabled: true, recommended: true },
+            { id: 'openai', name: 'OpenAI GPT-4o', enabled: true, recommended: false },
+            { id: 'qwen', name: 'Qwen Turbo', enabled: true, recommended: false },
+          ]
+        },
+        image: {
+          available: [
+            { id: 'dall-e', name: 'DALL·E', enabled: true, recommended: true }
+          ]
+        }
+      });
     } finally {
       setIsLoading(false);
     }
@@ -126,6 +140,23 @@ export function AIProvider({ children }: AIProviderProps) {
           const currentLang = localStorage.getItem('i18nextLng') || 'en';
           const defaultModel = getRecommendedModelByUserPreference(currentLang);
           setSelectedChatModel(defaultModel);
+          // 若远端未返回，初始化本地兜底模型列表
+          if (!modelConfigs) {
+            setModelConfigs({
+              chat: {
+                available: [
+                  { id: 'deepseek', name: 'DeepSeek', enabled: true, recommended: true },
+                  { id: 'openai', name: 'OpenAI GPT-4o', enabled: true, recommended: false },
+                  { id: 'qwen', name: 'Qwen Turbo', enabled: true, recommended: false },
+                ]
+              },
+              image: {
+                available: [
+                  { id: 'dall-e', name: 'DALL·E', enabled: true, recommended: true }
+                ]
+              }
+            });
+          }
         }
         
         if (savedImageModel) {

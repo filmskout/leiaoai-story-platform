@@ -95,13 +95,13 @@ export function UnifiedLoader({
     }
   }, [show, minDuration, onComplete, variant]);
   
-  // 图片切换效果
+  // 图片静态切换（无旋转/闪烁特效），每 250ms 切换一次
   useEffect(() => {
     if (!show) return;
 
     const interval = setInterval(() => {
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % logoImages.length);
-    }, 200); // 每200ms切换一次图片
+    }, 250);
     
     return () => {
       clearInterval(interval);
@@ -181,35 +181,18 @@ export function UnifiedLoader({
     ));
   };
   
-  // 彩色A Logo渲染
+  // 彩色A Logo渲染（移除旋转/闪烁/白点等动画，仅静态切换图片）
   const renderColorfulALogo = () => {
     return (
       <div className="relative h-full w-full flex items-center justify-center">
-        <motion.div
-          initial={{ scale: 0.5, opacity: 0 }}
-          animate={{ 
-            scale: [0.5, 1.2, 1.0],
-            opacity: 1
-          }}
-          transition={{
-            duration: 0.5,
-            repeat: 0,
-          }}
-          className="relative h-full w-full"
-        >
-          {/* 白色圆形背景 */}
+        <div className="relative h-full w-full">
           <div className="absolute inset-0 bg-white/90 dark:bg-white/80 rounded-full flex items-center justify-center shadow-md"></div>
-          <img 
-            src={logoImages[currentImageIndex]} 
-            alt="蕾奥AI Logo" 
+          <img
+            src={logoImages[currentImageIndex]}
+            alt="蕾奥AI Logo"
             className="absolute inset-0 w-full h-full object-contain relative z-10"
           />
-          
-          {/* 白点旋转效果 */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            {renderDots()}
-          </div>
-        </motion.div>
+        </div>
       </div>
     );
   };
@@ -376,22 +359,16 @@ export function UnifiedLoader({
             <div className={cn(sizesConfig[size].logo, "mb-8")}>
               {renderColorfulALogo()}
             </div>
-            
-            <motion.h1 
+            <h1 
               className="text-2xl font-bold text-primary-600 dark:text-primary-400"
-              animate={{ opacity: [0.7, 1, 0.7] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
             >
               {text || '蕾奥AI'}
-            </motion.h1>
-            
-            <motion.p
+            </h1>
+            <p
               className="mt-2 text-base text-neutral-500 dark:text-neutral-400"
-              animate={{ opacity: [0.5, 0.8, 0.5] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
             >
               {subText || '专业AI投资顾问'}
-            </motion.p>
+            </p>
             
             {showProgress && (
               <div className="w-64 h-1 bg-neutral-200 dark:bg-neutral-700 rounded-full mt-8 overflow-hidden">
