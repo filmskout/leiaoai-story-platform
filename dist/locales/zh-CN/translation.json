@@ -39,6 +39,14 @@
     "developed_by": "由 LeiaoAI Agent 开发"
   },
   
+  "common": {
+    "cancel": "取消",
+    "confirm": "确认",
+    "save": "保存",
+    "saving": "保存中...",
+    "uploading": "上传中..."
+  },
+  
   "auth": {
     "sign_in": "登录",
     "sign_out": "退出登录",
@@ -72,8 +80,9 @@
     "stories": "故事",
     "questions": "问题",
     "bp_analysis": "BP分析",
+    "dashboard": "仪表板",
     "profile": "个人中心",
-    "settings": "设置"
+    "settings": "编辑资料"
   },
   
   "home": {
@@ -321,6 +330,72 @@
     "click_to_add": "点击添加项目"
   },
   
+  "settings": {
+    "title": "设置",
+    "description": "个性化您的LeoAI体验",
+    "login_desc": "您需要登录才能访问设置",
+    "change_avatar": "更换头像",
+    "avatar_dialog_desc": "上传照片或使用AI生成",
+    "upload": "上传",
+    "ai_generate": "AI生成",
+    "select_file": "选择文件",
+    "generating": "生成中...",
+    "regenerate": "重新生成",
+    "generate_avatar": "生成头像",
+    "ai_avatar_desc": "基于您的个人资料使用AI生成专业头像",
+    "avatar_generated": "头像已生成并保存",
+    "avatar_uploaded": "头像已上传",
+    "avatar_error_type": "请选择图片文件",
+    "avatar_error_size": "图片大小不能超过5MB",
+    "avatar_generate_error": "生成头像失败",
+    "avatar_upload_failed": "上传头像失败",
+    "avatar_error": "操作失败",
+    "profile_photo": "个人照片",
+    "photo_requirements": "JPG、PNG或GIF格式，最大5MB",
+    "upload_photo": "上传照片",
+    "profile_information": "个人资料",
+    "profile_description": "管理您的公开资料和个人信息",
+    "full_name": "全名",
+    "full_name_placeholder": "输入您的全名",
+    "email": "电子邮件",
+    "bio": "个人简介",
+    "bio_placeholder": "介绍一下您自己...",
+    "location": "位置",
+    "location_placeholder": "城市, 国家",
+    "company": "公司",
+    "company_placeholder": "您的公司或组织",
+    "website": "网站",
+    "website_placeholder": "https://your-website.com",
+    "save_profile": "保存资料",
+    "profile_saved": "资料更新成功",
+    "save_error": "保存资料失败",
+    "badge_showcase": "徽章展示",
+    "badge_description": "选择最多3个徽章在您的资料中显示",
+    "selected_badges": "已选徽章",
+    "no_badges": "还没有徽章。完成活动以获得徽章！",
+    "max_badges": "您最多可以选择3个徽章展示",
+    "content_tags": "您的内容标签",
+    "tags_description": "来自您已发布故事的标签",
+    "no_tags": "还没有使用标签。发布故事以查看您的标签使用情况！",
+    "language": "语言",
+    "language_description": "选择您偏好的语言",
+    "theme": "主题",
+    "theme_description": "选择您的视觉主题偏好",
+    "theme_light": "浅色",
+    "theme_dark": "深色",
+    "theme_auto": "自动",
+    "current": "当前",
+    "light": "浅色",
+    "dark": "深色",
+    "ai_preferences": "AI偏好",
+    "ai_description": "选择您偏好的AI模型",
+    "preferred_chat_model": "首选对话模型",
+    "preferred_image_model": "首选图像模型",
+    "recommended": "推荐",
+    "available": "可用",
+    "unavailable": "不可用"
+  },
+  
   "tags": {
     "select_tags": "选择标签",
     "max_tags_reached": "最多允许3个标签",
@@ -334,5 +409,30 @@
     "search_tags": "搜索标签...",
     "no_tags_found": "未找到标签",
     "remove_tag": "移除标签"
+  },
+  
+  "story": {
+    "edited": "已编辑",
+    "not_authorized": "您无权编辑此故事",
+    "load_error": "加载故事失败",
+    "title_required_for_image": "请先输入标题",
+    "image_generated": "图片生成成功",
+    "image_error": "图片生成失败",
+    "required_fields": "标题和内容为必填项",
+    "updated": "故事更新成功！",
+    "update_error": "更新故事失败",
+    "title": "标题",
+    "title_placeholder": "输入故事标题...",
+    "excerpt": "摘要",
+    "excerpt_placeholder": "简要描述（可选）...",
+    "content": "内容",
+    "content_placeholder": "在此编写您的故事内容...",
+    "featured_image": "特色图片",
+    "generating": "生成中...",
+    "regenerate_image": "重新生成",
+    "generate_image": "AI生成图片",
+    "tags": "标签",
+    "save_changes": "保存更改",
+    "saving": "保存中..."
   }
 }

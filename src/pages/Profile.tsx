@@ -166,7 +166,7 @@ export default function Profile() {
       const { data: stories, error: storiesError } = await supabase
         .from('stories')
         .select('view_count, like_count, comment_count')
-        .eq('author_id', user.id)
+        .eq('author', user.id)
         .eq('status', 'published');
 
       if (storiesError) {
@@ -288,7 +288,7 @@ export default function Profile() {
       const { data, error } = await supabase
         .from('stories')
         .select('id, title, content, excerpt, view_count, like_count, comment_count, created_at, updated_at')
-        .eq('author_id', user.id)
+        .eq('author', user.id)
         .eq('status', 'published')
         .order('created_at', { ascending: false })
         .limit(10);
@@ -323,7 +323,7 @@ export default function Profile() {
       const { data, error } = await supabase
         .from('stories')
         .select('id, title, content, excerpt, category, created_at, updated_at')
-        .eq('author_id', user.id)
+        .eq('author', user.id)
         .eq('status', 'draft')
         .order('updated_at', { ascending: false })
         .limit(20);

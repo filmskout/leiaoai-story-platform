@@ -39,6 +39,14 @@
     "developed_by": "Developed by LeiaoAI Agent"
   },
   
+  "common": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "saving": "Saving...",
+    "uploading": "Uploading..."
+  },
+  
   "auth": {
     "sign_in": "Sign In",
     "sign_out": "Sign Out",
@@ -72,8 +80,9 @@
     "stories": "Stories",
     "questions": "Questions",
     "bp_analysis": "BP Analysis",
+    "dashboard": "Dashboard",
     "profile": "Profile",
-    "settings": "Settings"
+    "settings": "Edit Profile"
   },
   
   "home": {
@@ -321,6 +330,72 @@
     "click_to_add": "Click to add items"
   },
   
+  "settings": {
+    "title": "Settings",
+    "description": "Personalize your LeoAI experience",
+    "login_desc": "You need to be logged in to access settings",
+    "change_avatar": "Change Avatar",
+    "avatar_dialog_desc": "Upload a photo or generate one with AI",
+    "upload": "Upload",
+    "ai_generate": "AI Generate",
+    "select_file": "Select a file",
+    "generating": "Generating...",
+    "regenerate": "Regenerate",
+    "generate_avatar": "Generate Avatar",
+    "ai_avatar_desc": "Generate a professional avatar using AI based on your profile",
+    "avatar_generated": "Avatar generated and saved successfully",
+    "avatar_uploaded": "Avatar uploaded successfully",
+    "avatar_error_type": "Please select an image file",
+    "avatar_error_size": "Image must be less than 5MB",
+    "avatar_generate_error": "Failed to generate avatar",
+    "avatar_upload_failed": "Failed to upload avatar",
+    "avatar_error": "Operation failed",
+    "profile_photo": "Profile Photo",
+    "photo_requirements": "JPG, PNG or GIF. Max size 5MB.",
+    "upload_photo": "Upload Photo",
+    "profile_information": "Profile Information",
+    "profile_description": "Manage your public profile and personal information",
+    "full_name": "Full Name",
+    "full_name_placeholder": "Enter your full name",
+    "email": "Email",
+    "bio": "Bio",
+    "bio_placeholder": "Tell us about yourself...",
+    "location": "Location",
+    "location_placeholder": "City, Country",
+    "company": "Company",
+    "company_placeholder": "Your company or organization",
+    "website": "Website",
+    "website_placeholder": "https://your-website.com",
+    "save_profile": "Save Profile",
+    "profile_saved": "Profile updated successfully",
+    "save_error": "Failed to save profile",
+    "badge_showcase": "Badge Showcase",
+    "badge_description": "Select up to 3 badges to display on your profile",
+    "selected_badges": "Selected badges",
+    "no_badges": "No badges earned yet. Complete activities to earn badges!",
+    "max_badges": "You can select up to 3 badges to showcase",
+    "content_tags": "Your Content Tags",
+    "tags_description": "Tags from your published stories",
+    "no_tags": "No tags used yet. Publish stories to see your tag usage!",
+    "language": "Language",
+    "language_description": "Choose your preferred language",
+    "theme": "Theme",
+    "theme_description": "Choose your visual theme preference",
+    "theme_light": "Light",
+    "theme_dark": "Dark",
+    "theme_auto": "Auto",
+    "current": "Current",
+    "light": "Light",
+    "dark": "Dark",
+    "ai_preferences": "AI Preferences",
+    "ai_description": "Choose your preferred AI models",
+    "preferred_chat_model": "Preferred Chat Model",
+    "preferred_image_model": "Preferred Image Model",
+    "recommended": "Recommended",
+    "available": "Available",
+    "unavailable": "Unavailable"
+  },
+  
   "tags": {
     "select_tags": "Select Tags",
     "max_tags_reached": "Maximum 3 tags allowed",
@@ -334,5 +409,30 @@
     "search_tags": "Search tags...",
     "no_tags_found": "No tags found",
     "remove_tag": "Remove tag"
+  },
+  
+  "story": {
+    "edited": "edited",
+    "not_authorized": "You are not authorized to edit this story",
+    "load_error": "Failed to load story",
+    "title_required_for_image": "Please enter a title first",
+    "image_generated": "Image generated successfully",
+    "image_error": "Failed to generate image",
+    "required_fields": "Title and content are required",
+    "updated": "Story updated successfully!",
+    "update_error": "Failed to update story",
+    "title": "Title",
+    "title_placeholder": "Enter story title...",
+    "excerpt": "Excerpt",
+    "excerpt_placeholder": "Brief description (optional)...",
+    "content": "Content",
+    "content_placeholder": "Write your story content here...",
+    "featured_image": "Featured Image",
+    "generating": "Generating...",
+    "regenerate_image": "Regenerate",
+    "generate_image": "Generate with AI",
+    "tags": "Tags",
+    "save_changes": "Save Changes",
+    "saving": "Saving..."
   }
 }

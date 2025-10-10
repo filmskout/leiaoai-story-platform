@@ -37,7 +37,7 @@ interface Story {
   title: string;
   content: string;
   excerpt: string;
-  author_id: string;
+  author: string;
   category: string;
   category_id: string;
   status: string;
@@ -53,11 +53,6 @@ interface Story {
   created_at: string;
   updated_at: string;
   published_at: string;
-  profiles?: {
-    full_name: string;
-    username: string;
-    avatar_url: string;
-  };
   tags?: Tag[];
 }
 
@@ -99,17 +94,10 @@ export default function StoryDetail() {
       setLoading(true);
       setError(null);
 
-      // Fetch story with author profile
+      // Fetch story
       const { data: storyData, error: storyError } = await supabase
         .from('stories')
-        .select(`
-          *,
-          profiles:author_id (
-            full_name,
-            username,
-            avatar_url
-          )
-        `)
+        .select('*')
         .eq('id', id)
         .eq('status', 'published')
         .eq('is_public', true)
@@ -348,7 +336,7 @@ export default function StoryDetail() {
           <div className="flex flex-wrap items-center gap-4 text-sm text-foreground-secondary">
             <div className="flex items-center gap-1">
               <User className="w-4 h-4" />
-              <span>{story.profiles?.full_name || story.profiles?.username || story.publisher || 'LeiaoAI Agent'}</span>
+              <span>LeiaoAI Agent</span>
             </div>
             <div className="flex items-center gap-1">
               <Calendar className="w-4 h-4" />
