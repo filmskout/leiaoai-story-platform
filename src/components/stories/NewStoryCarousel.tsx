@@ -252,6 +252,7 @@ export function NewStoryCarousel({ className }: NewStoryCarouselProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 * index }}
             className="group"
+            onClick={() => handleStoryClick(story.id)}
           >
             <Card className="overflow-hidden h-full hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer border-0 shadow-md">
               <div className="relative aspect-[4/3] overflow-hidden">

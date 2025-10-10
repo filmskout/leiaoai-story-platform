@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { PinterestStories } from '@/components/stories/PinterestStories';
+import { SimpleStoriesWall } from '@/components/stories/SimpleStoriesWall';
 import { PageHero } from '@/components/PageHero';
 import { useMobileLayout } from '@/hooks/use-mobile';
 import { 
@@ -66,14 +66,14 @@ export default function Stories() {
         )}
       </PageHero>
 
-      {/* Main Content - Pinterest-style Stories Grid */}
+      {/* Main Content - Stories Grid */}
       <section className={cn(
         "px-4",
         isMobile ? "py-8 pb-20" : "py-16 pb-24 md:pb-16"
       )}>
-        <div className="container-custom">
+        <div className="container-custom max-w-7xl">
           <motion.div variants={itemVariants}>
-            <PinterestStories />
+            <SimpleStoriesWall />
           </motion.div>
         </div>
       </section>
