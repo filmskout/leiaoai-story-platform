@@ -87,7 +87,7 @@ interface StoryAnalytics {
 
 export default function Profile() {
   const { t } = useTranslation();
-  const { user, updateProfile } = useAuth();
+  const { user, profile, updateProfile } = useAuth();
   const { badges = [], achievements = [], loadBadges, loadAchievements } = useGamification();
   
   const [stats, setStats] = useState<UserStats>({

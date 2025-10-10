@@ -87,10 +87,13 @@ export default function Stories() {
         )}
       >
         <div className="container mx-auto max-w-4xl">
-          <div className={cn(
-            "bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl shadow-lg",
-            isMobile ? "p-6" : "p-12"
-          )}>
+          <div 
+            className={cn(
+              "text-white rounded-xl shadow-lg",
+              isMobile ? "p-6" : "p-12"
+            )}
+            style={{ backgroundColor: '#f97316' }}
+          >
             <div className={cn(
               "text-center space-y-4",
               isMobile ? "" : "space-y-6"
@@ -102,7 +105,7 @@ export default function Stories() {
                 {t('stories.cta_title', 'Share Your Story')}
               </h2>
               <p className={cn(
-                "text-primary-100 mx-auto",
+                "text-white/90 mx-auto",
                 isMobile ? "text-base max-w-sm" : "text-xl max-w-3xl"
               )}>
                 {isMobile 

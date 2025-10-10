@@ -31,13 +31,18 @@ interface Story {
   title: string;
   content: string;
   excerpt: string;
-  author: string;
+  author_id: string;
   category: string;
   view_count: number;
   like_count: number;
   comment_count: number;
   created_at: string;
   image: string;
+  profiles?: {
+    full_name: string;
+    username: string;
+    avatar_url: string;
+  };
   tags?: Tag[];
 }
 
@@ -73,12 +78,17 @@ export function NewStoryCarousel({ className }: NewStoryCarouselProps) {
     try {
       setLoading(true);
       
-      // Fetch latest published stories (increased limit for grid)
+      // Fetch latest published stories with author profiles
       const { data: storiesData, error } = await supabase
         .from('stories')
         .select(`
           id, title, content, excerpt, view_count, like_count, comment_count, 
-          created_at, featured_image_url, author, category
+          created_at, featured_image_url, author_id, category,
+          profiles:author_id (
+            full_name,
+            username,
+            avatar_url
+          )
         `)
         .eq('status', 'published')
         .eq('is_public', true)
@@ -124,7 +134,8 @@ export function NewStoryCarousel({ className }: NewStoryCarouselProps) {
           title: story.title,
           content: story.content,
           excerpt: story.excerpt || story.content?.substring(0, 120) + '...' || 'Story excerpt...',
-          author: story.author || 'LeiaoAI Agent',
+          author_id: story.author_id,
+          profiles: story.profiles,
           category: story.category || 'general',
           view_count: story.view_count || 0,
           like_count: story.like_count || 0,
@@ -322,7 +333,9 @@ export function NewStoryCarousel({ className }: NewStoryCarouselProps) {
                     <div className="w-6 h-6 rounded-full bg-primary-100 flex items-center justify-center">
                       <User className="w-3 h-3 text-primary-600" />
                     </div>
-                    <span className="text-sm text-foreground-secondary">{story.author}</span>
+                    <span className="text-sm text-foreground-secondary">
+                      {story.profiles?.full_name || story.profiles?.username || 'LeiaoAI Agent'}
+                    </span>
                   </div>
                   
                   <Button 
