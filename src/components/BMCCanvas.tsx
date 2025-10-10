@@ -6,10 +6,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Plus, X, Download, Upload, Edit3, Image } from 'lucide-react';
+import { Plus, X, Download, Upload, Edit3, Image, Save } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/lib/supabase';
 
 // BMC Section Type
 type BMCSection = {
@@ -129,6 +131,7 @@ export default function BMCCanvas() {
   const { t, i18n } = useTranslation();
   const { actualTheme } = useTheme();
   const { user } = useAuth();
+  const navigate = useNavigate();
   
   // Get BMC data based on current language
   const getBMCData = useCallback((): Record<string, BMCSection> => {
@@ -334,6 +337,7 @@ export default function BMCCanvas() {
   }, []);
 
   const handleExportJSON = () => {
+    // 隐藏 JSON 导出功能（保留函数以防内部调用，但不在 UI 暴露）
     const exportData = Object.values(bmcData).reduce((acc, section) => {
       acc[section.id] = section.items;
       return acc;
@@ -349,6 +353,7 @@ export default function BMCCanvas() {
   };
 
   const handleImportJSON = () => {
+    // 隐藏 JSON 导入功能（保留函数以防内部调用，但不在 UI 暴露）
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
@@ -381,10 +386,7 @@ export default function BMCCanvas() {
   };
 
   const handleExportPNG = useCallback(async () => {
-    if (!user) {
-      alert(t('bmc.login_required', 'Please sign in to export BMC as image'));
-      return;
-    }
+    if (!user) return navigate('/auth');
 
     // Create a canvas element for export
     const canvas = document.createElement('canvas');
@@ -495,6 +497,34 @@ export default function BMCCanvas() {
     }, 'image/png');
   }, [bmcData, actualTheme, user, t]);
 
+  const handleSaveToDashboard = useCallback(async () => {
+    if (!user) return navigate('/auth');
+
+    try {
+      const dataToSave = Object.values(bmcData).reduce((acc, section) => {
+        acc[section.id] = section.items;
+        return acc;
+      }, {} as Record<string, string[]>);
+
+      const { error } = await supabase.from('bmc_boards').insert({
+        user_id: user.id,
+        data: dataToSave,
+        title: t('bmc.title', 'Business Model Canvas'),
+      });
+
+      if (error) {
+        console.warn('Save BMC failed:', error);
+        alert(t('bmc.save_failed', 'Failed to save. Please try again later.'));
+        return;
+      }
+      alert(t('bmc.save_success', 'Saved to your dashboard.'));
+      navigate('/dashboard');
+    } catch (e) {
+      console.error(e);
+      alert(t('bmc.save_failed', 'Failed to save. Please try again later.'));
+    }
+  }, [user, bmcData, navigate, t]);
+
   return (
     <div className="w-full max-w-7xl mx-auto p-4 space-y-6">
       {/* Header with controls */}
@@ -504,23 +534,25 @@ export default function BMCCanvas() {
           <p className="text-muted-foreground">{t('bmc.subtitle', 'Click on any section to edit and customize your business model')}</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleImportJSON}>
-            <Upload size={16} className="mr-2" />
-            {t('bmc.import_json', 'Import JSON')}
-          </Button>
-          <Button variant="outline" onClick={handleExportJSON}>
-            <Download size={16} className="mr-2" />
-            {t('bmc.export_json', 'Export JSON')}
-          </Button>
-          <Button 
-            variant="outline" 
-            onClick={handleExportPNG}
-            disabled={!user}
-            title={!user ? t('bmc.login_required', 'Please sign in to export BMC as image') : ''}
-          >
-            <Image size={16} className="mr-2" />
-            {t('bmc.export_png', 'Export as Image')}
-          </Button>
+          {/* 隐藏 JSON 导入/导出按钮，不在 UI 暴露 */}
+          {user ? (
+            <>
+              <Button variant="outline" onClick={handleSaveToDashboard}>
+                <Save size={16} className="mr-2" />
+                {t('bmc.save_to_dashboard', 'Save to Dashboard')}
+              </Button>
+              <Button variant="outline" onClick={handleExportPNG}>
+                <Image size={16} className="mr-2" />
+                {t('bmc.export_png', 'Export as Image')}
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button onClick={() => navigate('/auth')} className="bg-orange-500 hover:bg-orange-600 text-white">
+                {t('auth.sign_in', 'Sign in to Save/Export')}
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
