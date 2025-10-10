@@ -22,7 +22,7 @@ const AdminLogin = lazy(() => import('@/pages/AdminLogin'));
 const Profile = lazy(() => import('@/pages/Profile'));
 const StoryDetail = lazy(() => import('@/pages/StoryDetail'));
 const CreateStory = lazy(() => import('@/pages/CreateStory'));
-const Stories = lazy(() => import('@/pages/NewStories'));
+const Stories = lazy(() => import('@/pages/Stories'));
 const UserProfile = lazy(() => import('@/pages/UserProfile'));
 const AuthCallback = lazy(() => import('@/pages/AuthCallback'));
 const AIChat = lazy(() => import('@/pages/AIChat'));
