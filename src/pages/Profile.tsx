@@ -107,6 +107,7 @@ export default function Profile() {
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [savedStories, setSavedStories] = useState([]);
   const [userStories, setUserStories] = useState<StoryAnalytics[]>([]);
+  const [draftStories, setDraftStories] = useState<any[]>([]);
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
   const [bpSubmissions, setBpSubmissions] = useState([]);
   const [bmcSaves, setBmcSaves] = useState([]);
@@ -141,6 +142,7 @@ export default function Profile() {
         loadUserActivities(),
         loadSavedStories(),
         loadUserStories(),
+        loadDraftStories(),
         loadChatSessions(),
         loadBpSubmissions(),
         loadBmcSaves(),
@@ -285,7 +287,7 @@ export default function Profile() {
       const { data, error } = await supabase
         .from('stories')
         .select('id, title, content, view_count, like_count, comment_count, created_at')
-        .eq('author_id', user.id)
+        .eq('author', user.id)
         .eq('status', 'published')
         .order('created_at', { ascending: false })
         .limit(10);
@@ -310,6 +312,31 @@ export default function Profile() {
       }
     } catch (error) {
       console.error('Failed to load user stories:', error);
+    }
+  };
+
+  const loadDraftStories = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('stories')
+        .select('id, title, content, excerpt, category, created_at, updated_at')
+        .eq('author', user.id)
+        .eq('status', 'draft')
+        .order('updated_at', { ascending: false })
+        .limit(20);
+
+      if (error) {
+        console.error('Error loading draft stories:', error);
+        return;
+      }
+
+      if (data) {
+        setDraftStories(data);
+      }
+    } catch (error) {
+      console.error('Failed to load draft stories:', error);
     }
   };
 
@@ -617,9 +644,12 @@ export default function Profile() {
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="overview">{t('profile.tabs.overview', 'Overview')}</TabsTrigger>
           <TabsTrigger value="stories">{t('profile.tabs.stories', 'Stories')}</TabsTrigger>
+          <TabsTrigger value="drafts">
+            {t('profile.tabs.drafts', 'Drafts')} {draftStories.length > 0 && <Badge variant="secondary" className="ml-1">{draftStories.length}</Badge>}
+          </TabsTrigger>
           <TabsTrigger value="saved">{t('profile.tabs.saved', 'Saved')}</TabsTrigger>
           <TabsTrigger value="submissions">{t('profile.tabs.submissions', 'Submissions')}</TabsTrigger>
           <TabsTrigger value="achievements">{t('profile.tabs.achievements', 'Achievements')}</TabsTrigger>
@@ -726,6 +756,75 @@ export default function Profile() {
                             {story.comment_count}
                           </span>
                         </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Drafts Tab */}
+        <TabsContent value="drafts">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span>{t('profile.my_drafts', 'My Drafts')}</span>
+                <Button onClick={() => navigate('/create-story')} size="sm">
+                  <PlusCircle className="w-4 h-4 mr-2" />
+                  {t('story.create', 'Create Story')}
+                </Button>
+              </CardTitle>
+              <CardDescription>
+                {t('profile.drafts_desc', 'Unpublished drafts - only visible to you')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {draftStories.length === 0 ? (
+                <div className="text-center py-12">
+                  <FileText className="w-16 h-16 mx-auto text-gray-300 mb-4" />
+                  <p className="text-gray-500 mb-4">
+                    {t('profile.no_drafts', 'No drafts yet')}
+                  </p>
+                  <Button onClick={() => navigate('/create-story')} variant="outline">
+                    <PlusCircle className="w-4 h-4 mr-2" />
+                    {t('story.create_first', 'Create Your First Story')}
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {draftStories.map((draft: any) => (
+                    <div 
+                      key={draft.id} 
+                      className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer group"
+                      onClick={() => navigate(`/edit-story/${draft.id}`)}
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <h3 className="font-semibold text-gray-900 dark:text-gray-100 group-hover:text-primary-600 transition-colors">
+                          {draft.title}
+                        </h3>
+                        <Badge variant="outline" className="ml-2">Draft</Badge>
+                      </div>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm mb-3 line-clamp-2">
+                        {draft.excerpt || draft.content?.substring(0, 150) + '...' || 'No content yet'}
+                      </p>
+                      <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+                        <span className="flex items-center">
+                          <Clock className="w-4 h-4 mr-1" />
+                          {t('profile.last_edited', 'Last edited')} {formatDate(draft.updated_at)}
+                        </span>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/edit-story/${draft.id}`);
+                          }}
+                        >
+                          <Edit3 className="w-4 h-4 mr-1" />
+                          {t('common.edit', 'Edit')}
+                        </Button>
                       </div>
                     </div>
                   ))}

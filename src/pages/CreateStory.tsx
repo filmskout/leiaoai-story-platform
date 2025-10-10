@@ -59,7 +59,9 @@ export default function CreateStory() {
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
   const [publishing, setPublishing] = useState(false);
+  const [savingDraft, setSavingDraft] = useState(false);
   const [error, setError] = useState('');
+  const [draftId, setDraftId] = useState<string | null>(null);
   const [aiAssisting, setAiAssisting] = useState(false);
   const [aiPrompt, setAiPrompt] = useState('');
   const [selectedModel, setSelectedModel] = useState('deepseek');
@@ -299,18 +301,83 @@ export default function CreateStory() {
     }
   };
 
+  // Save draft function
+  const handleSaveDraft = async () => {
+    if (!user) {
+      toast.error(t('story.login_required', 'Please login to save drafts'));
+      navigate('/auth');
+      return;
+    }
+
+    if (!title.trim()) {
+      setError(t('story.title_required', 'Title is required'));
+      return;
+    }
+
+    setSavingDraft(true);
+    setError('');
+
+    try {
+      const storyData = {
+        title: title.trim(),
+        content: content.trim(),
+        excerpt: content.trim().substring(0, 200),
+        author: user.id,
+        category: category,
+        status: 'draft' as const,
+        is_public: false,
+        location: location.trim() || null,
+        updated_at: new Date().toISOString()
+      };
+
+      if (draftId) {
+        // Update existing draft
+        const { error } = await supabase
+          .from('stories')
+          .update(storyData)
+          .eq('id', draftId)
+          .eq('author', user.id);
+
+        if (error) throw error;
+        toast.success(t('story.draft_updated', 'Draft updated successfully'));
+      } else {
+        // Create new draft
+        const { data, error } = await supabase
+          .from('stories')
+          .insert([storyData])
+          .select()
+          .single();
+
+        if (error) throw error;
+        if (data) {
+          setDraftId(data.id);
+          toast.success(t('story.draft_saved', 'Draft saved successfully'));
+        }
+      }
+    } catch (error: any) {
+      console.error('Draft save failed:', error);
+      setError(error.message || t('story.draft_error', 'Failed to save draft'));
+      toast.error(t('story.draft_error', 'Failed to save draft'));
+    } finally {
+      setSavingDraft(false);
+    }
+  };
+
+  // Publish story function
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!user) {
+      toast.error(t('story.login_required', 'Please login to publish stories'));
+      navigate('/auth');
+      return;
+    }
+
     setError('');
 
     if (!title.trim() || !content.trim()) {
       setError(t('story.required_fields', 'Title and content are required'));
       return;
-    }
-
-    if (!user) {
-       // For non-logged-in users, proceed with story creation
-      // Create story directly without requiring login
     }
 
     setPublishing(true);
@@ -334,29 +401,77 @@ export default function CreateStory() {
           mimeType: f.mimeType!
         }));
 
-      // Create story
-      const { data, error } = await supabase.functions.invoke('story-management', {
-        body: {
-          title: title.trim(),
-          content: content.trim(),
-          tags: selectedTags.map(tag => tag.id),
-          category: category,
-          location: location.trim() || null,
-          mediaFiles: uploadedMediaFiles
+      const storyData = {
+        title: title.trim(),
+        content: content.trim(),
+        excerpt: content.trim().substring(0, 200),
+        author: user.id,
+        category: category,
+        status: 'published' as const,
+        is_public: true,
+        location: location.trim() || null,
+        featured_image_url: uploadedMediaFiles.find(f => f.mediaType === 'image')?.publicUrl || null,
+        updated_at: new Date().toISOString()
+      };
+
+      if (draftId) {
+        // Update and publish existing draft
+        const { error } = await supabase
+          .from('stories')
+          .update(storyData)
+          .eq('id', draftId)
+          .eq('author', user.id);
+
+        if (error) throw error;
+
+        // Save tags
+        if (selectedTags.length > 0) {
+          const { error: tagsError } = await supabase
+            .from('story_tags')
+            .delete()
+            .eq('story_id', draftId);
+
+          if (!tagsError) {
+            await supabase
+              .from('story_tags')
+              .insert(selectedTags.map(tag => ({
+                story_id: draftId,
+                tag_id: tag.id
+              })));
+          }
         }
-      });
 
-      if (error) throw error;
-
-      // Navigate to story detail page
-      if (data?.data?.story?.id) {
-        navigate(`/story/${data.data.story.id}`);
+        navigate(`/story/${draftId}`);
       } else {
-        navigate('/');
+        // Create and publish new story
+        const { data, error } = await supabase
+          .from('stories')
+          .insert([storyData])
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        if (data) {
+          // Save tags
+          if (selectedTags.length > 0) {
+            await supabase
+              .from('story_tags')
+              .insert(selectedTags.map(tag => ({
+                story_id: data.id,
+                tag_id: tag.id
+              })));
+          }
+
+          navigate(`/story/${data.id}`);
+        }
       }
+
+      toast.success(t('story.published', 'Story published successfully!'));
     } catch (error: any) {
       console.error('Story publishing failed:', error);
       setError(error.message || t('story.publish_error', 'Publishing failed, please try again later'));
+      toast.error(error.message || t('story.publish_error', 'Publishing failed'));
     } finally {
       setPublishing(false);
     }
@@ -739,7 +854,7 @@ export default function CreateStory() {
           </div>
         )}
 
-        {/* Submit button */}
+        {/* Submit buttons */}
         <div className="flex items-center justify-between">
           <div className="text-sm text-foreground-muted">
             <p>{t('story.publish_notice', 'After publishing, your story will be public to all users.')}</p>
@@ -751,6 +866,23 @@ export default function CreateStory() {
               className="px-6 py-2 border border-border text-foreground rounded-lg hover:bg-background-secondary transition-colors"
             >
               {t('common.cancel', 'Cancel')}
+            </button>
+            <button
+              type="button"
+              onClick={handleSaveDraft}
+              disabled={savingDraft || !title.trim()}
+              className="flex items-center space-x-2 px-6 py-2 border border-primary-500 text-primary-500 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {savingDraft ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary-500 border-t-transparent"></div>
+                  <span>{t('story.saving_draft', 'Saving...')}</span>
+                </>
+              ) : (
+                <>
+                  <span>{draftId ? t('story.update_draft', 'Update Draft') : t('story.save_draft', 'Save Draft')}</span>
+                </>
+              )}
             </button>
             <button
               type="submit"

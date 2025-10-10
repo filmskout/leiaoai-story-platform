@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { NewStoriesGrid } from '@/components/stories/NewStoriesGrid';
+import { PinterestStories } from '@/components/stories/PinterestStories';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -170,7 +170,7 @@ export default function NewStories() {
             </div>
             
             {/* Stories Grid Component */}
-            <NewStoriesGrid />
+            <PinterestStories />
           </motion.div>
         </div>
       </motion.section>
