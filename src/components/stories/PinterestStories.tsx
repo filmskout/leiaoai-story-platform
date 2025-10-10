@@ -214,7 +214,7 @@ export function PinterestStories({ className, initialCategory = 'all', initialTa
         .from('stories')
         .select(`
           id, title, content, excerpt, view_count, like_count, comment_count, 
-          created_at, featured_image_url, status, publisher, category_id, category
+          created_at, featured_image_url, status, author, category_id, category
         `)
         .eq('status', 'published')
         .order(orderColumn, { ascending })
@@ -303,7 +303,7 @@ export function PinterestStories({ className, initialCategory = 'all', initialTa
           title: story.title,
           content: story.content,
           excerpt: story.excerpt || story.content?.substring(0, 120) + '...' || 'Story excerpt...',
-          author: story.publisher || 'LeiaoAI Agent',
+          author: story.author || 'LeiaoAI Agent',
           category: story.category || categoryInfo?.name || 'general',
           categoryDisplay: categoryInfo?.display_name || getCategoryDisplay(story.category || categoryInfo?.name || 'general'),
           view_count: story.view_count || 0,

@@ -36,7 +36,7 @@ interface Story {
   like_count: number;
   comment_count: number;
   created_at: string;
-  publisher: string;
+  author: string;
   tags?: Tag[];
   height?: number; // For masonry layout
 }
@@ -141,7 +141,7 @@ export function NewStoriesGrid({ className }: NewStoriesGridProps) {
           like_count,
           comment_count,
           created_at,
-          publisher
+          author
         `)
         .eq('status', 'published')
         .eq('is_public', true)
@@ -453,7 +453,7 @@ export function NewStoriesGrid({ className }: NewStoriesGridProps) {
                         <span>{formatDate(story.created_at)}</span>
                       </span>
                       <span className="font-medium truncate ml-2">
-                        {story.publisher}
+                        {story.author}
                       </span>
                     </div>
                   </div>

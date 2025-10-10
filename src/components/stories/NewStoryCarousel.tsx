@@ -78,7 +78,7 @@ export function NewStoryCarousel({ className }: NewStoryCarouselProps) {
         .from('stories')
         .select(`
           id, title, content, excerpt, view_count, like_count, comment_count, 
-          created_at, featured_image_url, publisher, category
+          created_at, featured_image_url, author, category
         `)
         .eq('status', 'published')
         .eq('is_public', true)
@@ -124,7 +124,7 @@ export function NewStoryCarousel({ className }: NewStoryCarouselProps) {
           title: story.title,
           content: story.content,
           excerpt: story.excerpt || story.content?.substring(0, 120) + '...' || 'Story excerpt...',
-          author: story.publisher || 'LeiaoAI Agent',
+          author: story.author || 'LeiaoAI Agent',
           category: story.category || 'general',
           view_count: story.view_count || 0,
           like_count: story.like_count || 0,

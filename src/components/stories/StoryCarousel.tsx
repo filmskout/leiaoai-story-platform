@@ -88,7 +88,7 @@ export function StoryCarousel({ className, initialCategory = 'all' }: StoryCarou
       // Fetch stories with basic info first
       const { data: storiesData, error: storiesError } = await supabase
         .from('stories')
-        .select('id, title, content, excerpt, view_count, like_count, comment_count, created_at, featured_image_url, status, publisher, category_id')
+        .select('id, title, content, excerpt, view_count, like_count, comment_count, created_at, featured_image_url, status, author, category_id')
         .eq('status', 'published')
         .eq('is_public', true)
         .order('created_at', { ascending: false })
@@ -112,7 +112,7 @@ export function StoryCarousel({ className, initialCategory = 'all' }: StoryCarou
         title: story.title,
         content: story.content,
         excerpt: story.excerpt || story.content?.substring(0, 120) + '...' || 'Story excerpt...',
-        author: story.publisher || 'LeiaoAI Agent',
+        author: story.author || 'LeiaoAI Agent',
         category: 'ai_tools', // Default category for now
         categoryDisplay: 'AI工具体验',
         view_count: story.view_count || 0,

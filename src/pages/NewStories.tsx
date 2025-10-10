@@ -3,6 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { NewStoriesGrid } from '@/components/stories/NewStoriesGrid';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { useTheme } from '@/contexts/ThemeContext';
 import { 
   BookOpen,
   PlusCircle,
@@ -15,6 +17,7 @@ import { cn } from '@/lib/utils';
 export default function NewStories() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { actualTheme } = useTheme();
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -172,66 +175,69 @@ export default function NewStories() {
         </div>
       </motion.section>
 
-      {/* Call to Action Section */}
+      {/* Call to Action Section - Orange background with theme-based button styles */}
       <motion.section 
         variants={itemVariants}
         className={cn(
-          "bg-gradient-to-r from-primary-600 to-primary-700 text-white px-4",
+          "px-4",
           isMobile ? "py-12" : "py-20"
         )}
       >
         <div className="container mx-auto max-w-4xl">
-          <div className={cn(
-            "text-center",
-            isMobile ? "space-y-4" : "space-y-6"
-          )}>
-            <h2 className={cn(
-              "font-bold",
-              isMobile ? "text-2xl" : "text-4xl"
+          <Card className="text-white border-0" style={{ backgroundColor: '#f97316' }}>
+            <CardContent className={cn(
+              "text-center",
+              isMobile ? "p-6" : "p-12"
             )}>
-              Share Your Story
-            </h2>
-            <p className={cn(
-              "text-primary-100",
-              isMobile ? "text-base max-w-sm mx-auto" : "text-xl max-w-3xl mx-auto"
-            )}>
-              {isMobile 
-                ? "Your experience could inspire others. Join our community and share your journey."
-                : "Your experiences and insights could inspire the next generation of innovators. Join our community of storytellers and make an impact."
-              }
-            </p>
-            <div className={cn(
-              "flex gap-4 pt-4",
-              isMobile ? "flex-col" : "flex-row justify-center"
-            )}>
-              <Button 
-                onClick={() => navigate('/create-story')} 
-                variant="secondary"
-                size={isMobile ? "default" : "lg"}
-                className={cn(
-                  "group bg-white text-primary-600 hover:bg-white/90",
-                  isMobile && "w-full"
-                )}
-              >
-                <PlusCircle size={18} className="mr-2" />
-                Create Story
-                <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
-              </Button>
-              
-              <Button 
-                onClick={() => navigate('/ai-chat')} 
-                variant="outline" 
-                size={isMobile ? "default" : "lg"}
-                className={cn(
-                  "border-white text-white hover:bg-white hover:text-primary-600",
-                  isMobile && "w-full"
-                )}
-              >
-                Need Ideas? Chat with AI
-                <Sparkles size={16} className="ml-2" />
-              </Button>
-            </div>
-          </div>
+              <h2 className={cn(
+                "font-bold mb-4",
+                isMobile ? "text-2xl" : "text-4xl"
+              )}>
+                Share Your Story
+              </h2>
+              <p className={cn(
+                "text-white/90 mb-6 mx-auto",
+                isMobile ? "text-base max-w-sm" : "text-xl mb-8 max-w-3xl"
+              )}>
+                {isMobile 
+                  ? "Your experience could inspire others. Join our community and share your journey."
+                  : "Your experiences and insights could inspire the next generation of innovators. Join our community of storytellers and make an impact."
+                }
+              </p>
+              <div className={cn(
+                "justify-center gap-3",
+                isMobile ? "flex flex-col" : "flex flex-col sm:flex-row gap-4"
+              )}>
+                {/* Left button: dark mode - grey bg white text; light mode - white bg black text */}
+                <Button 
+                  onClick={() => navigate('/create-story')} 
+                  size={isMobile ? "default" : "lg"}
+                  className={cn(
+                    "group",
+                    isMobile && "w-full",
+                    actualTheme === 'dark' ? 'bg-neutral-600 text-white hover:bg-neutral-500' : 'bg-white text-black hover:bg-neutral-100'
+                  )}
+                >
+                  <PlusCircle size={18} className="mr-2" />
+                  Create Story
+                  <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+                
+                {/* Right button: dark mode - black bg white text; light mode - white bg grey text */}
+                <Button 
+                  onClick={() => navigate('/ai-chat')} 
+                  size={isMobile ? "default" : "lg"}
+                  className={cn(
+                    isMobile && "w-full",
+                    actualTheme === 'dark' ? 'bg-black text-white hover:bg-neutral-900' : 'bg-white text-neutral-500 hover:text-neutral-700'
+                  )}
+                >
+                  Need Ideas? Chat with AI
+                  <Sparkles size={16} className="ml-2" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </motion.section>
 
