@@ -70,12 +70,22 @@ export function StoriesDebug() {
         .update({
           status: 'published',
           is_public: true,
-          published_at: new Date().toISOString()
+          updated_at: new Date().toISOString()
         })
-        .neq('status', 'published')
-        .or('is_public.eq.false,published_at.is.null');
+        .or('status.neq.published,is_public.eq.false,status.is.null,is_public.is.null');
 
       if (updateError) throw updateError;
+
+      // 确保所有stories有author_id
+      const { error: authorError } = await supabase
+        .from('stories')
+        .update({
+          author_id: '8e19098b-ac2a-4ae0-b063-1e21a8dea19d',
+          updated_at: new Date().toISOString()
+        })
+        .is('author_id', null);
+
+      if (authorError) throw authorError;
 
       // 重新检查
       await checkDatabase();

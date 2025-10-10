@@ -49,13 +49,11 @@ UPDATE stories
 SET 
   status = 'published',
   is_public = true,
-  published_at = COALESCE(published_at, created_at),
   updated_at = NOW()
 WHERE status IS NULL 
    OR status != 'published' 
    OR is_public IS NULL 
-   OR is_public = false 
-   OR published_at IS NULL;
+   OR is_public = false;
 
 -- 步骤3: 确保所有stories有author_id
 UPDATE stories

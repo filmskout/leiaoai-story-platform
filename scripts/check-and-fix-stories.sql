@@ -57,8 +57,8 @@ UPDATE stories
 SET 
   status = 'published',
   is_public = true,
-  published_at = COALESCE(published_at, created_at)
-WHERE status != 'published' OR is_public != true OR published_at IS NULL;
+  updated_at = NOW()
+WHERE status != 'published' OR is_public != true;
 
 -- 6. 确保所有stories都有author_id（设置为Admin用户）
 UPDATE stories
@@ -81,7 +81,7 @@ SELECT
   s.author_id,
   p.full_name as author_name,
   s.created_at,
-  s.published_at
+  s.updated_at
 FROM stories s
 LEFT JOIN profiles p ON s.author_id = p.id
 WHERE s.status = 'published' AND s.is_public = true

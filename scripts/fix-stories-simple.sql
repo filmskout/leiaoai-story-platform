@@ -1,9 +1,9 @@
--- 快速修复Stories显示问题
--- 在Supabase SQL Editor中运行此脚本
+-- 简化版Stories修复脚本（不使用published_at）
+-- 在Supabase SQL Editor中运行
 
--- 步骤1: 查看当前状态
+-- 步骤1: 查看当前stories状态
 SELECT 
-  'Current Status' as step,
+  'Current Stories Status' as step,
   status,
   is_public,
   COUNT(*) as count
@@ -11,7 +11,7 @@ FROM stories
 GROUP BY status, is_public
 ORDER BY count DESC;
 
--- 步骤2: 查看具体的stories
+-- 步骤2: 查看前5个stories
 SELECT 
   id,
   title,
@@ -24,6 +24,7 @@ ORDER BY created_at DESC
 LIMIT 5;
 
 -- 步骤3: 修复 - 将所有stories设置为published和public
+-- 注意：这个脚本不依赖published_at列
 UPDATE stories
 SET 
   status = 'published',
@@ -43,14 +44,12 @@ WHERE author_id IS NULL;
 
 -- 步骤5: 验证修复结果
 SELECT 
-  'After Fix' as step,
-  status,
-  is_public,
-  COUNT(*) as count
+  'After Fix - Published Stories' as step,
+  COUNT(*) as published_count
 FROM stories
-GROUP BY status, is_public;
+WHERE status = 'published' AND is_public = true;
 
--- 步骤6: 查看修复后的stories（应该都能显示了）
+-- 步骤6: 查看修复后的stories（与profiles关联）
 SELECT 
   s.id,
   s.title,
@@ -58,6 +57,7 @@ SELECT
   s.is_public,
   s.author_id,
   p.full_name as author_name,
+  p.username as author_username,
   s.view_count,
   s.like_count,
   s.comment_count,
@@ -69,5 +69,7 @@ ORDER BY s.created_at DESC
 LIMIT 10;
 
 -- 如果上面查询返回了stories，说明修复成功！
--- 刷新网站应该能看到stories了
+-- 现在刷新网站：
+-- 主页: https://leiaoai-story-platform.vercel.app/
+-- Stories页面: https://leiaoai-story-platform.vercel.app/stories
 
