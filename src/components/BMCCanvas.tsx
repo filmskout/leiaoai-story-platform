@@ -501,32 +501,57 @@ export default function BMCCanvas() {
     if (!user) return navigate('/auth');
 
     try {
+      // 准备JSON数据
       const dataToSave = Object.values(bmcData).reduce((acc, section) => {
         acc[section.id] = section.items;
         return acc;
       }, {} as Record<string, string[]>);
 
-      const { error } = await supabase.from('bmc_boards').insert({
-        user_id: user.id,
-        data: dataToSave,
-        title: t('bmc.title', 'Business Model Canvas'),
-      });
-
-      if (error) {
-        console.warn('Save BMC failed:', error);
+      // 生成PNG图片的base64
+      const canvasElement = document.getElementById('bmc-canvas');
+      if (!canvasElement) {
         alert(t('bmc.save_failed', 'Failed to save. Please try again later.'));
         return;
       }
+
+      // 使用html2canvas生成PNG
+      const html2canvas = (await import('html2canvas')).default;
+      const canvas = await html2canvas(canvasElement, {
+        backgroundColor: actualTheme === 'dark' ? '#1e293b' : '#ffffff',
+        scale: 2,
+        logging: false,
+        useCORS: true,
+      });
+
+      // 转换为base64
+      const imageBase64 = canvas.toDataURL('image/png');
+
+      // 保存到数据库（包含JSON数据和PNG图片）
+      const { error } = await supabase.from('bmc_boards').insert({
+        user_id: user.id,
+        data: dataToSave,
+        image_base64: imageBase64,
+        title: t('bmc.title', 'Business Model Canvas'),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+
+      if (error) {
+        console.error('Save BMC failed:', error);
+        alert(t('bmc.save_failed', 'Failed to save. Please try again later.'));
+        return;
+      }
+      
       alert(t('bmc.save_success', 'Saved to your dashboard.'));
       navigate('/dashboard');
     } catch (e) {
-      console.error(e);
+      console.error('Error saving BMC:', e);
       alert(t('bmc.save_failed', 'Failed to save. Please try again later.'));
     }
-  }, [user, bmcData, navigate, t]);
+  }, [user, bmcData, actualTheme, navigate, t]);
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-4 space-y-6">
+    <div id="bmc-canvas" className="w-full max-w-7xl mx-auto p-4 space-y-6">
       {/* Header with controls */}
       <div className="flex justify-between items-center">
         <div>

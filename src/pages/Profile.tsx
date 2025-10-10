@@ -194,8 +194,8 @@ export default function Profile() {
       }
 
       // Load BMC saves count
-      const { data: bmcs, error: bmcsError } = await supabase
-        .from('user_bmc_saves')
+      const { data: bmcs, error: bmcsError} = await supabase
+        .from('bmc_boards')
         .select('id')
         .eq('user_id', user.id);
 
@@ -344,15 +344,33 @@ export default function Profile() {
   const loadChatSessions = async () => {
     if (!user) return;
 
-    const { data } = await supabase
-      .from('ai_chat_sessions')
-      .select('id, title, ai_model, message_count, created_at, updated_at')
-      .eq('user_id', user.id)
-      .order('updated_at', { ascending: false })
-      .limit(10);
+    try {
+      // 使用正确的表名 'chat_sessions' 而不是 'ai_chat_sessions'
+      const { data, error } = await supabase
+        .from('chat_sessions')
+        .select('session_id, title, created_at, updated_at')
+        .eq('user_id', user.id)
+        .order('updated_at', { ascending: false })
+        .limit(10);
 
-    if (data) {
-      setChatSessions(data);
+      if (error) {
+        console.error('Error loading chat sessions:', error);
+        return;
+      }
+
+      if (data) {
+        // 转换数据格式以匹配UI期望的格式
+        const formattedSessions = data.map(session => ({
+          id: session.session_id,
+          title: session.title || '新的对话',
+          created_at: session.created_at,
+          updated_at: session.updated_at,
+          message_count: 0 // 可以后续优化，从 chat_messages 表统计
+        }));
+        setChatSessions(formattedSessions as any);
+      }
+    } catch (error) {
+      console.error('Failed to load chat sessions:', error);
     }
   };
 
@@ -447,15 +465,25 @@ export default function Profile() {
   const loadBmcSaves = async () => {
     if (!user) return;
 
-    const { data } = await supabase
-      .from('user_bmc_saves')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(10);
+    try {
+      // 使用正确的表名 'bmc_boards' 而不是 'user_bmc_saves'
+      const { data, error } = await supabase
+        .from('bmc_boards')
+        .select('id, title, image_base64, data, created_at, updated_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(10);
 
-    if (data) {
-      setBmcSaves(data);
+      if (error) {
+        console.error('Error loading BMC saves:', error);
+        return;
+      }
+
+      if (data) {
+        setBmcSaves(data);
+      }
+    } catch (error) {
+      console.error('Failed to load BMC saves:', error);
     }
   };
 
@@ -906,18 +934,67 @@ export default function Profile() {
             <Card>
               <CardHeader>
                 <CardTitle>{t('profile.bmc_saves', 'Business Model Canvas Saves')}</CardTitle>
+                <CardDescription>
+                  {t('profile.bmc_desc', 'Your saved Business Model Canvas designs')}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 {bmcSaves.length === 0 ? (
-                  <p className="text-gray-500 text-center py-4">
-                    {t('profile.no_bmc', 'No BMC saves yet')}
-                  </p>
+                  <div className="text-center py-8">
+                    <p className="text-foreground-secondary mb-4">
+                      {t('profile.no_bmc', 'No BMC saves yet')}
+                    </p>
+                    <Button 
+                      onClick={() => navigate('/bp-analysis')}
+                      variant="outline"
+                    >
+                      {t('profile.create_bmc', 'Create Your First BMC')}
+                    </Button>
+                  </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {bmcSaves.map((bmc: any) => (
-                      <div key={bmc.id} className="border border-gray-200 rounded-lg p-3">
-                        <h4 className="font-medium text-gray-900">{bmc.title || 'Untitled BMC'}</h4>
-                        <p className="text-sm text-gray-500">{formatDate(bmc.created_at)}</p>
+                      <div key={bmc.id} className="border border-border rounded-lg p-4 hover:shadow-md transition-shadow bg-card">
+                        <h4 className="font-semibold text-foreground mb-2">{bmc.title || 'Untitled BMC'}</h4>
+                        
+                        {/* 显示BMC图片预览 */}
+                        {bmc.image_base64 && (
+                          <div className="mb-3 rounded-lg overflow-hidden border border-border">
+                            <img 
+                              src={bmc.image_base64} 
+                              alt={bmc.title || 'BMC Preview'}
+                              className="w-full h-auto object-contain bg-background"
+                            />
+                          </div>
+                        )}
+                        
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-foreground-secondary">
+                            {formatDate(bmc.created_at)}
+                          </span>
+                          <div className="flex gap-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => {
+                                // 下载图片
+                                const link = document.createElement('a');
+                                link.href = bmc.image_base64;
+                                link.download = `${bmc.title || 'BMC'}_${new Date().toISOString().split('T')[0]}.png`;
+                                link.click();
+                              }}
+                            >
+                              {t('profile.download', 'Download')}
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => navigate('/bp-analysis')}
+                            >
+                              {t('profile.view_edit', 'View/Edit')}
+                            </Button>
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
