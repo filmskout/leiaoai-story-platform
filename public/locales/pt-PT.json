@@ -1,0 +1,272 @@
+{
+  "app_name": "LeiaoAI",
+  "loading": "Carregando...",
+  "error": "Erro",
+  "cancel": "Cancelar",
+  "confirm": "Confirmar",
+  "save": "Guardar",
+  "delete": "Eliminar",
+  "edit": "Editar",
+  "submit": "Enviar",
+  "back": "Voltar",
+  "next": "Próximo",
+  "previous": "Anterior",
+  "search": "Pesquisar",
+  "filter": "Filtrar",
+  "sort": "Ordenar",
+  "refresh": "Atualizar",
+  "upload": "Carregar",
+  "download": "Descarregar",
+  "view": "Ver",
+  "share": "Partilhar",
+  "like": "Gosto",
+  "comment": "Comentário",
+  "follow": "Seguir",
+  "unfollow": "Deixar de seguir",
+  "login": "Iniciar sessão",
+  "logout": "Terminar sessão",
+  "register": "Registar",
+  "profile": "Perfil",
+  "help": "Ajuda",
+  "about": "Acerca de",
+  "contact": "Contactar",
+  "privacy": "Política de privacidade",
+  "terms": "Termos de serviço",
+  "success": "Sucesso",
+  
+  "app_description": "Plataforma de Investimento IA Profissional",
+  "footer": {
+    "developed_by": "Desenvolvido por LeiaoAI Agent"
+  },
+  
+  "nav": {
+    "home": "Início",
+    "ai_chat": "Chat IA",
+    "stories": "Histórias",
+    "questions": "Perguntas",
+    "bp_analysis": "Análise BP",
+    "profile": "Perfil",
+    "settings": "Definições"
+  },
+  
+  "home": {
+    "hero": {
+      "title_1": "Plataforma",
+      "title_2": "IA Investimento",
+      "title_3": "Profissional",
+      "description": "Baseado em tecnologia IA avançada, fornecendo análise de investimento profissional, avaliação de planos de negócio e suporte de decisões inteligentes",
+      "mobile_description": "Análise de investimento IA inteligente para decisões empresariais inteligentes"
+    },
+    "cta": {
+      "title": "Comece a Experiência de Consultoria de Investimento IA Profissional",
+      "subtitle": "Carregue o seu plano de negócios para análise IA, ou consulte diretamente sobre questões de investimento e financiamento",
+      "mobile_title": "Iniciar Consultoria IA de Investimento",
+      "mobile_subtitle": "Carregar análise BP ou consultar diretamente",
+      "upload_bp": "Carregar Análise BP",
+      "ai_chat": "Consultoria IA Q&A"
+    },
+    "stats": {
+      "total_users": "Utilizadores da Plataforma",
+      "total_qa": "Sessões Q&A",
+      "bp_analysis": "Análise BP",
+      "avg_response": "Resposta Média"
+    }
+  },
+  
+  "professional_services": {
+    "title": "Áreas de Serviços Profissionais",
+    "subtitle": "Clique nos cartões de área para conselhos de investimento profissionais",
+    "refresh_suggestions": "Atualizar Sugestões",
+    "suggested_questions": "Perguntas Sugeridas",
+    "click_for_advice": "Clique para Conselhos Profissionais",
+    "bottom_description": "Mostra 3 perguntas de sugestão aleatórias de cada vez, clique em 'Atualizar Sugestões' para novas direções de consultoria",
+    "enter_full_chat": "Entrar no Chat IA Completo"
+  },
+  
+  "ai_chat": {
+    "title": "Especialista em Investimento IA",
+    "subtitle": "Serviços de consultoria de investimento profissionais para potenciar as suas decisões empresariais",
+    "page_title": "Perguntas e Respostas de Investimento Inteligente IA",
+    "page_subtitle": "Serviço de perguntas e respostas de investimento profissional baseado em tecnologia IA avançada, fornecendo suporte inteligente para as suas decisões de investimento",
+    "mobile_page_title": "Perguntas e Respostas Inteligentes IA",
+    "mobile_page_subtitle": "Consultoria de investimento profissional, pergunte e responda instantaneamente",
+    "answer_placeholder": "Selecione as áreas profissionais abaixo para começar as perguntas e respostas, ou insira diretamente as suas perguntas",
+    "publish_story": "Publicar História",
+    "placeholder": "Por favor, insira as suas perguntas relacionadas com investimentos...",
+    "send": "Enviar",
+    "voice_input": "Entrada de Voz",
+    "stop_recording": "Parar Gravação",
+    "processing": "Processando a sua pergunta...",
+    "new_chat": "Novo Chat",
+    "chat_history": "Histórico do Chat",
+    "model_selection": "Seleção de Modelo",
+    "model_recommended": "Recomendado",
+    "model_china_optimized": "Otimizado para a China",
+    "model_overseas_optimized": "Otimizado para o Estrangeiro",
+    "model_responses": {
+      "deepseek": "Com base nas tendências económicas atuais, recomendo focar em investimentos ESG, inteligência artificial e energia verde. Para mercados emergentes, considere uma estratégia de investimento diversificada com liquidez suficiente.",
+      "openai": "Ao considerar direções de investimento, foque na transformação digital, grandes modelos de vida selvagem e automatização de processos. Estas áreas estão prontas para crescimento rápido nos próximos cinco anos e empresas unicorn potenciais já estão a emergir.",
+      "qwen": "Para o atual ambiente de investimento, recomendo uma estratégia de 'alocação em camadas' - camada base com produtos de baixa volatilidade e alto rendimento, camada de oportunidade focada em empresas inovadoras em IA, biotecnologia e energia limpa, e uma reserva de dinheiro defensiva.",
+      "default": "Com base na análise atual do mercado, as estratégias de investimento devem ser diversificadas, com uma alocação equilibrada de ativos tradicionais e emergentes. Recomendo focar em investimentos ESG, IA e energia verde. Posso fornecer conselhos de investimento mais detalhados para indústrias específicas."
+    },
+    "sample_questions": {
+      "q1": "Quais são as tendências de avaliação para empresas cotadas no STAR Market da China em 2025?",
+      "q2": "Como podem as startups otimizar a sua estratégia de financiamento Série A?",
+      "q3": "Quais são as diferenças entre os ambientes de investimento VC dos EUA e da China?"
+    },
+    "expertise_questions": {
+      "cvc_investment": [
+        "Diferenças estratégicas entre investimento CVC e VC tradicional",
+        "Como avaliar o valor sinérgico estratégico dos investimentos CVC?",
+        "Como podem as grandes empresas construir um sistema de investimento CVC eficaz?"
+      ],
+      "ma_restructuring": [
+        "Métodos de avaliação e estratégias de preços em transações M&A",
+        "Como identificar e avaliar sinergias em alvos de M&A?",
+        "Principais riscos e contramedidas para M&A transfronteiriças"
+      ],
+      "ipo_a_share": [
+        "Comparação de condições de cotização: STAR Market vs ChiNext",
+        "Análise de fatores-chave para avaliação e preços IPO",
+        "Considerações de mercado para seleção de momento IPO"
+      ],
+      "ipo_hk_share": [
+        "Requisitos e procedimentos de cotização da Hong Kong Stock Exchange",
+        "Vantagens e desafios da cotização dupla",
+        "Como navegar no ambiente regulatório do mercado de Hong Kong?"
+      ],
+      "ipo_us_share": [
+        "Preparação IPO do mercado americano e requisitos de conformidade",
+        "Obrigações de relatórios e divulgação SEC",
+        "Estratégias para uma oferta pública bem-sucedida nos EUA"
+      ],
+      "spac_listing": [
+        "SPAC vs IPO tradicional: comparação de prós e contras",
+        "Considerações de due diligence para transações SPAC",
+        "Como estruturar e negociar acordos SPAC?"
+      ],
+      "macro_analysis": [
+        "Como a situação económica global atual impacta o mercado de investimento da China?",
+        "Como as políticas macroeconómicas de 2025 afetarão as estratégias de investimento?",
+        "Qual é a melhor alocação de investimento num ambiente inflacionário?"
+      ],
+      "investment_environment": [
+        "Quais são as principais diferenças entre os ambientes de investimento dos EUA e da China?",
+        "Comparação de oportunidades de investimento atuais: ações A, ações de HK, ações dos EUA",
+        "Avaliação de riscos de investimento: mercados emergentes vs mercados desenvolvidos"
+      ],
+      "valuation_adjustment": [
+        "Termos-chave e mecanismos em acordos de ajuste de avaliação",
+        "Como estruturar disposições anti-diluição?",
+        "Negociação de gatilhos e cálculos de ajuste de avaliação"
+      ],
+      "exit_strategy": [
+        "Seleção de momento e método de saída para PE/VC",
+        "Comparação de prós e contras: saída IPO vs saída M&A",
+        "Como maximizar os retornos de saída de investimento?"
+      ],
+      "valuation_model": [
+        "Cenários de aplicação para métodos de avaliação DCF, PE, PB e outros",
+        "Como estabelecer avaliações razoáveis para empresas de alto crescimento?",
+        "Análise de fatores-chave em métodos de avaliação de empresas comparáveis"
+      ],
+      "due_diligence": [
+        "Pontos de foco principais e métodos para due diligence financeira",
+        "Análise de indicadores comerciais-chave em due diligence comercial",
+        "Principais pontos de identificação de riscos em due diligence legal"
+      ]
+    },
+    "expertise_areas": {
+      "cvc_investment": "Investimento Industrial CVC",
+      "ma_restructuring": "Reestruturação M&A",
+      "ipo_a_share": "Cotação IPO (Ações A)",
+      "ipo_hk_share": "Cotação IPO (Ações HK)",
+      "ipo_us_share": "Cotação IPO (Ações US)",
+      "spac_listing": "Cotação SPAC Shell",
+      "macro_analysis": "Análise Macroeconómica",
+      "investment_environment": "Ambiente de Investimento",
+      "valuation_adjustment": "Acordo de Ajuste de Avaliação",
+      "exit_strategy": "Planeamento de Estratégia de Saída",
+      "valuation_model": "Modelo de Avaliação",
+      "due_diligence": "Due Diligence"
+    }
+  },
+  
+  "bp_analysis": {
+    "title": "Análise do Plano de Negócios",
+    "subtitle": "Carregue o seu plano de negócios para obter um relatório de análise IA profissional",
+    "upload_bp": "Carregar BP",
+    "drag_drop": "Arraste ficheiros aqui ou clique para carregar",
+    "supported_formats": "Suporta formatos PDF, DOCX",
+    "max_size": "Tamanho máximo do ficheiro 50MB",
+    "analyzing": "Analisando...",
+    "analysis_complete": "Análise Completa",
+    "analysis_report": "Relatório de Análise",
+    "score": "Pontuação Geral",
+    "recommendations": "Sugestões de Melhoria",
+    "market_analysis": "Análise de Mercado",
+    "business_model": "Modelo de Negócio",
+    "team_assessment": "Avaliação da Equipa",
+    "financial_projection": "Projeção Financeira",
+    "risk_assessment": "Avaliação de Risco",
+    "investment_value": "Valor de Investimento"
+  },
+  
+  "stories": {
+    "title": "Histórias",
+    "create_story": "Partilhar História",
+    "story_title": "Título da História",
+    "story_content": "Conteúdo da História",
+    "category": "Categoria",
+    "public": "Público",
+    "private": "Privado",
+    "publish": "Publicar",
+    "draft": "Rascunho",
+    "view_count": "Visualizações",
+    "like_count": "Gostos",
+    "comment_count": "Comentários",
+    "section_title": "Histórias de Utilizadores e Comunidade",
+    "section_subtitle": "Partilhe experiências de investimento, aprenda com casos de sucesso",
+    "create_button": "Partilhar História",
+    "no_stories": {
+      "title": "Ainda Não Há Histórias",
+      "desc": "Ainda não há histórias de utilizadores partilhadas nesta categoria"
+    },
+    "be_first_share": "Seja o primeiro a partilhar",
+    "categories": {
+      "all": "Todos",
+      "ai_tools": "Experiência com Ferramentas IA",
+      "startup_interview": "Entrevistas de Startups",
+      "investment_outlook": "Perspetiva de Investimento",
+      "finance_ai": "Aplicações IA Financeiras",
+      "video_generation": "Experiência de Geração de Vídeo",
+      "domestic_ai": "Ferramentas IA Domésticas",
+      "overseas_ai": "Plataformas IA Estrangeiras"
+    }
+  },
+  
+  "quick_ai_consultation_title": "Consultoria Rápida de Investimento IA",
+  "ai_expert_greeting": "Olá! Sou o Especialista em Investimento 蕾奥AI, especializado em serviços de consultoria de investimento profissionais.",
+  "view_complete_ai_chat": "Ver Chat IA Completo",
+  "auto_select_model": "Seleção Automática",
+  "select_model": "Selecionar Modelo",
+  "model_fastest": "Mais Rápido",
+  "avg_response_time": "{{time}}s média",
+  "avg_response_time_title": "Tempo de resposta médio: {{time}} segundos",
+  "analyzing_question": "Analisando a sua pergunta...",
+  "export": "Exportar",
+  "regenerate": "Regenerar",
+  "feedback": "Feedback",
+  
+  "date": {
+    "today": "Hoje",
+    "days_ago": "há {{days}} dias",
+    "months_ago": "há {{months}} meses",
+    "years_ago": "há {{years}} anos"
+  }
+,
+  "placeholder_response": "Ask investment-related questions to get professional AI advice"
+,
+  "footer_description": "LeiaoAI professional investment consulting services, providing intelligent investment analysis and decision support",
+  "footer_provider": "Powered by LeiaoAI Agent"
+}

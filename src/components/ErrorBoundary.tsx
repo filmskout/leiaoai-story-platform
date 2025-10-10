@@ -69,7 +69,7 @@ class ErrorBoundary extends Component<Props, State> {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.732 15.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
             </div>
-            <h1 className="text-2xl font-bold text-white mb-4">蝕奥AI</h1>
+            <h1 className="text-2xl font-bold text-white mb-4">蕾奥AI</h1>
             <p className="text-gray-300 mb-6">
               {this.state.isSupabaseError 
                 ? '服务连接暂时不可用，正在自动尝试恢复...'

@@ -26,7 +26,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
     if (onClose) onClose();
   };
 
-  const adminSessionTime = localStorage.getItem('leiaoai-admin-session');
+  const adminSessionTime = localStorage.getItem('leoai-admin-session');
   const sessionStart = adminSessionTime ? new Date(parseInt(adminSessionTime, 10)) : null;
 
   return (

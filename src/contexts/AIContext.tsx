@@ -77,20 +77,20 @@ export function AIProvider({ children }: AIProviderProps) {
       setModelConfigs(modelData.modelConfigs);
 
       // 如果用户没有手动选择模型，则使用建议模型
-      const savedChatModel = localStorage.getItem('leiaoai-chat-model');
+      const savedChatModel = localStorage.getItem('leoai-chat-model');
       if (!savedChatModel) {
         setSelectedChatModel(recommendedChatModel);
       }
 
       // 保存图像模型选择
-      const savedImageModel = localStorage.getItem('leiaoai-image-model');
+      const savedImageModel = localStorage.getItem('leoai-image-model');
       if (!savedImageModel) {
         setSelectedImageModel(modelData.recommendedModels.image);
       }
 
       // 保存区域信息到本地存储
-      localStorage.setItem('leiaoai-region', modelData.region);
-      localStorage.setItem('leiaoai-recommended-model', recommendedChatModel);
+      localStorage.setItem('leoai-region', modelData.region);
+      localStorage.setItem('leoai-recommended-model', recommendedChatModel);
     } catch (error) {
       console.error('获取基于地理位置的模型配置失败:', error);
       // 使用默认配置
@@ -110,10 +110,10 @@ export function AIProvider({ children }: AIProviderProps) {
       try {
         setIsLoading(true);
         // 加载保存的偏好设置
-        const savedChatModel = localStorage.getItem('leiaoai-chat-model');
-        const savedImageModel = localStorage.getItem('leiaoai-image-model');
-        const savedRegion = localStorage.getItem('leiaoai-region');
-        const savedRecommendedModel = localStorage.getItem('leiaoai-recommended-model');
+        const savedChatModel = localStorage.getItem('leoai-chat-model');
+        const savedImageModel = localStorage.getItem('leoai-image-model');
+        const savedRegion = localStorage.getItem('leoai-region');
+        const savedRecommendedModel = localStorage.getItem('leoai-recommended-model');
 
         // 优先使用用户手动选择的模型
         if (savedChatModel) {
@@ -152,14 +152,14 @@ export function AIProvider({ children }: AIProviderProps) {
   const handleSetSelectedChatModel = (model: string) => {
     console.log(`切换模型为: ${model}`);
     setSelectedChatModel(model);
-    localStorage.setItem('leiaoai-chat-model', model);
+    localStorage.setItem('leoai-chat-model', model);
     // 触发自定义事件，通知UI更新
     window.dispatchEvent(new CustomEvent('model-changed', { detail: { model } }));
   };
 
   const handleSetSelectedImageModel = (model: string) => {
     setSelectedImageModel(model);
-    localStorage.setItem('leiaoai-image-model', model);
+    localStorage.setItem('leoai-image-model', model);
   };
 
   // 更新模型响应时间（兼容旧版本API，实际调用updateAverageResponseTime）
@@ -231,7 +231,7 @@ export function AIProvider({ children }: AIProviderProps) {
     // 3. 响应最快的模型
     
     // 检查是否有用户自定义设置
-    const userDefinedModel = localStorage.getItem('leiaoai-chat-model-preference');
+    const userDefinedModel = localStorage.getItem('leoai-chat-model-preference');
     if (userDefinedModel) {
       return userDefinedModel;
     }
@@ -302,14 +302,14 @@ export function AIProvider({ children }: AIProviderProps) {
         }
 
         // 保存到本地存储
-        localStorage.setItem(`leiaoai-model-${modelId}-avgTime`, newAvgTime.toString());
-        localStorage.setItem(`leiaoai-model-${modelId}-count`, newCount.toString());
+        localStorage.setItem(`leoai-model-${modelId}-avgTime`, newAvgTime.toString());
+        localStorage.setItem(`leoai-model-${modelId}-count`, newCount.toString());
         
         // 如果这个模型是最快的，自动设置为默认
         const fastestModel = sortedModels[0];
         if (fastestModel && fastestModel.id !== selectedChatModel) {
           // 不立即切换，只在本地存储中标记
-          localStorage.setItem('leiaoai-fastest-model', fastestModel.id);
+          localStorage.setItem('leoai-fastest-model', fastestModel.id);
         }
       }
 
@@ -331,8 +331,8 @@ export function AIProvider({ children }: AIProviderProps) {
 
         // 从本地存储中加载并更新每个模型的数据
         newConfigs.chat.available.forEach((model, index) => {
-          const savedAvgTime = localStorage.getItem(`leiaoai-model-${model.id}-avgTime`);
-          const savedCount = localStorage.getItem(`leiaoai-model-${model.id}-count`);
+          const savedAvgTime = localStorage.getItem(`leoai-model-${model.id}-avgTime`);
+          const savedCount = localStorage.getItem(`leoai-model-${model.id}-count`);
           
           if (savedAvgTime && savedCount) {
             newConfigs.chat.available[index] = {

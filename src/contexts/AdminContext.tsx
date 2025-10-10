@@ -39,8 +39,8 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       return false;
     }
 
-    const adminVerified = localStorage.getItem('leiaoai-admin-verified') === 'true';
-    const adminSession = localStorage.getItem('leiaoai-admin-session');
+    const adminVerified = localStorage.getItem('leoai-admin-verified') === 'true';
+    const adminSession = localStorage.getItem('leoai-admin-session');
     
     if (!adminVerified || !adminSession) {
       return false;
@@ -62,8 +62,8 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   // Revoke admin access
   const revokeAdminAccess = () => {
-    localStorage.removeItem('leiaoai-admin-verified');
-    localStorage.removeItem('leiaoai-admin-session');
+    localStorage.removeItem('leoai-admin-verified');
+    localStorage.removeItem('leoai-admin-session');
     setIsAdmin(false);
     setAdminSessionValid(false);
   };

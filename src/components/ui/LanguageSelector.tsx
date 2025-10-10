@@ -114,7 +114,7 @@ export function LanguageSelector({ className, variant = 'default' }: LanguageSel
       setCurrentLanguage(languageCode);
       
       // 保存用户选择
-      localStorage.setItem('leiaoai-language', languageCode);
+      localStorage.setItem('leoai-language', languageCode);
       
       // 更新HTML lang属性
       document.documentElement.lang = languageCode;
@@ -147,7 +147,7 @@ export function LanguageSelector({ className, variant = 'default' }: LanguageSel
         const detectedLanguage = countryToLanguage[countryCode] || 'en-US';
         
         // 如果没有用户保存的语言选择，使用检测到的语言
-        const savedLanguage = localStorage.getItem('leiaoai-language');
+        const savedLanguage = localStorage.getItem('leoai-language');
         if (!savedLanguage) {
           await changeLanguage(detectedLanguage);
         }

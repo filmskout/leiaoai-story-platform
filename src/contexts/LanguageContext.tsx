@@ -62,7 +62,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
     try {
       await i18n.changeLanguage(lang);
       // Save to localStorage for persistence
-      localStorage.setItem('leiaoai-language', lang);
+      localStorage.setItem('leoai-language', lang);
     } catch (error) {
       console.error('Failed to change language:', error);
     }

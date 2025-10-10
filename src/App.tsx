@@ -19,11 +19,11 @@ import { Toaster } from 'sonner';
 const Home = lazy(() => import('@/pages/Home'));
 const AuthNew = lazy(() => import('@/pages/Auth'));
 const AdminLogin = lazy(() => import('@/pages/AdminLogin'));
-const Dashboard = lazy(() => import('@/pages/Dashboard'));
+const Profile = lazy(() => import('@/pages/Profile'));
 const StoryDetail = lazy(() => import('@/pages/StoryDetail'));
 const CreateStory = lazy(() => import('@/pages/CreateStory'));
 const Stories = lazy(() => import('@/pages/NewStories'));
-const PublicProfile = lazy(() => import('@/pages/PublicProfile'));
+const UserProfile = lazy(() => import('@/pages/UserProfile'));
 const AuthCallback = lazy(() => import('@/pages/AuthCallback'));
 const AIChat = lazy(() => import('@/pages/AIChat'));
 const BPAnalysis = lazy(() => import('@/pages/BPAnalysis'));
@@ -151,7 +151,7 @@ function AppRoutes() {
             <span className="text-white font-bold text-2xl">L</span>
           </div>
           <LoadingSpinner size="lg" />
-          <p className="mt-4 text-gray-700 font-medium">LeiaoAI Platform</p>
+          <p className="mt-4 text-gray-700 font-medium">LeoAI Platform</p>
           <p className="text-gray-500 text-sm">Initializing...</p>
         </div>
       </div>
@@ -197,12 +197,12 @@ function AppRoutes() {
           <Route path="bp-analysis" element={<BPAnalysis />} />
           <Route path="stories" element={<Stories />} />
           <Route path="story/:id" element={<StoryDetail />} />
-          <Route path="profile/:token" element={<PublicProfile />} />
+          <Route path="user/:id" element={<UserProfile />} />
           
           {/* Protected routes */}
-          <Route path="dashboard" element={
+          <Route path="profile" element={
             <ProtectedRoute>
-              <Dashboard />
+              <Profile />
             </ProtectedRoute>
           } />
           <Route path="settings" element={

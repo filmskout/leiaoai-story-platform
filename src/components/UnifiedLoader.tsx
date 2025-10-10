@@ -53,7 +53,7 @@ export function UnifiedLoader({
   variant = 'inline',
   size = 'md',
   text,
-  subText = variant === 'page' || variant === 'fullscreen' ? '蝕奥AI正在为您思考...' : undefined,
+  subText = variant === 'page' || variant === 'fullscreen' ? '蕾奥AI正在为您思考...' : undefined,
   className,
   onComplete,
   minDuration = 1500,
@@ -201,7 +201,7 @@ export function UnifiedLoader({
           <div className="absolute inset-0 bg-white/90 dark:bg-white/80 rounded-full flex items-center justify-center shadow-md"></div>
           <img 
             src={logoImages[currentImageIndex]} 
-            alt="蝕奥AI Logo" 
+            alt="蕾奥AI Logo" 
             className="absolute inset-0 w-full h-full object-contain relative z-10"
           />
           
@@ -341,7 +341,7 @@ export function UnifiedLoader({
                 animate={{ opacity: [0.7, 1, 0.7] }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
               >
-                {text || '蝕奥AI'}
+                {text || '蕾奥AI'}
               </motion.h1>
               <motion.p
                 className="mt-2 text-base text-neutral-500 dark:text-neutral-400"
@@ -382,7 +382,7 @@ export function UnifiedLoader({
               animate={{ opacity: [0.7, 1, 0.7] }}
               transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
             >
-              {text || '蝕奥AI'}
+              {text || '蕾奥AI'}
             </motion.h1>
             
             <motion.p

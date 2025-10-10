@@ -32,7 +32,7 @@ function getTimeBasedTheme(): 'light' | 'dark' {
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const [theme, setThemeState] = useState<Theme>(() => {
     if (typeof window === 'undefined') return 'auto';
-    const saved = localStorage.getItem('leiaoai-theme');
+    const saved = localStorage.getItem('leoai-theme');
     return (saved as Theme) || 'auto';
   });
   
@@ -103,14 +103,14 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     
     // Persist theme preference
     if (typeof window !== 'undefined') {
-      localStorage.setItem('leiaoai-theme', theme);
+      localStorage.setItem('leoai-theme', theme);
     }
   }, [actualTheme, theme]);
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('leiaoai-theme', newTheme);
+      localStorage.setItem('leoai-theme', newTheme);
     }
   };
 

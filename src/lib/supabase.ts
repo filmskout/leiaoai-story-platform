@@ -69,9 +69,8 @@ class AuthService {
 
       // Listen for auth state changes
       supabase.auth.onAuthStateChange(async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.email || 'no user');
+        console.log('Auth state changed:', event, session?.user?.email);
         
-        // Update current user state
         this.currentUser = session?.user || null;
         
         if (this.currentUser) {
@@ -80,16 +79,8 @@ class AuthService {
           this.currentProfile = null;
         }
         
-        // Notify listeners with slight delay to ensure all state updates are complete
-        setTimeout(() => {
-          this.authListeners.forEach(listener => {
-            try {
-              listener(this.currentUser);
-            } catch (error) {
-              console.error('Auth listener error:', error);
-            }
-          });
-        }, 100);
+        // Notify listeners
+        this.authListeners.forEach(listener => listener(this.currentUser));
       });
 
       this.initialized = true;
@@ -185,27 +176,18 @@ class AuthService {
 
   // Sign out
   public async signOut() {
-    console.log('AuthService: Starting signOut...');
     try {
-      // Clear local state first
-      this.currentUser = null;
-      this.currentProfile = null;
-      
-      // Sign out from Supabase
       const { error } = await supabase.auth.signOut();
-      
       if (error) {
-        console.error('Supabase signOut error:', error);
         throw error;
       }
       
-      console.log('AuthService: SignOut completed successfully');
-      return { error: null };
-    } catch (error: any) {
-      console.error('AuthService: Sign out failed:', error);
-      // Even if signOut fails, clear local state
       this.currentUser = null;
       this.currentProfile = null;
+      
+      return { error: null };
+    } catch (error: any) {
+      console.error('Sign out failed:', error);
       return { error };
     }
   }

@@ -24,7 +24,7 @@ i18n
     },
     detection: {
       order: ['localStorage', 'navigator', 'htmlTag'],
-      lookupLocalStorage: 'leiaoai-language',
+      lookupLocalStorage: 'leoai-language',
       caches: ['localStorage'],
       // 检测选项
       checkWhitelist: true

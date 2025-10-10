@@ -336,8 +336,8 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
                 'relative border-l-4 border-primary-500 pl-6 pr-4 py-4 my-6',
                 'bg-gradient-to-r from-primary-50 to-transparent dark:from-primary-900/20 dark:to-transparent',
                 'rounded-r-lg shadow-sm',
-                'before:content-[\'\"\''] before:absolute before:top-2 before:left-2 before:text-3xl before:text-primary-400 before:font-serif',
-                'after:content-[\'\"\''] after:absolute after:bottom-2 after:right-2 after:text-3xl after:text-primary-400 after:font-serif'
+                'before:content-[\'\"\'] before:absolute before:top-2 before:left-2 before:text-3xl before:text-primary-400 before:font-serif',
+                'after:content-[\'\"\'] after:absolute after:bottom-2 after:right-2 after:text-3xl after:text-primary-400 after:font-serif'
               )}
               {...props}
             >

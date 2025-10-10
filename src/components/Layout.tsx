@@ -64,8 +64,7 @@ export default function Layout() {
   const handleSignOut = async () => {
     try {
       await signOut();
-      // Remove manual navigation - let the auth state change handle routing
-      console.log('Logout initiated - auth state will handle navigation');
+      navigate('/auth');
     } catch (error) {
       console.error('Sign out error:', error);
     }
@@ -268,12 +267,12 @@ export default function Layout() {
                         </div>
                         
                         <Link
-                          to="/dashboard"
+                          to="/profile"
                           className="flex items-center space-x-2 px-3 py-2 text-sm text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
                           onClick={() => setShowProfileMenu(false)}
                         >
                           <User size={16} />
-                          <span>{t('nav.dashboard')}</span>
+                          <span>{t('nav.profile')}</span>
                         </Link>
                         
                         <Link
@@ -422,7 +421,7 @@ export default function Layout() {
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="flex items-center space-x-3">
               <img
-                src={actualTheme === 'dark' ? '/leiaoai-logo-light.png' : '/leiaoai-logo-dark.png'}
+                src={actualTheme === 'dark' ? '/leoai-logo-light.png' : '/leoai-logo-dark.png'}
                 alt={t('app_name')}
                 className="h-6 w-auto object-contain"
               />

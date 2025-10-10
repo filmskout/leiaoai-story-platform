@@ -37,7 +37,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // Initialize authentication
   useEffect(() => {
     let unsubscribe: (() => void) | null = null;
-    let isInitializing = true;
 
     const initialize = async () => {
       try {
@@ -53,27 +52,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         
         // Subscribe to auth changes
         unsubscribe = authService.addAuthListener((newUser) => {
-          console.log('Auth state changed in context:', newUser?.email || 'logged out');
           setUser(newUser);
           setProfile(authService.getCurrentProfile());
-          
-          // Only update loading state if we're not currently in an explicit auth operation
-          if (isInitializing) {
-            setLoading(false);
-            isInitializing = false;
-          }
         });
         
       } catch (error) {
         console.error('Auth initialization failed:', error);
       } finally {
-        // Set initial loading to false if no auth state change occurred
-        setTimeout(() => {
-          if (isInitializing) {
-            setLoading(false);
-            isInitializing = false;
-          }
-        }, 1000);
+        setLoading(false);
       }
     };
 
@@ -144,15 +130,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // Sign out function
   const signOut = async () => {
     try {
-      console.log('Starting signOut process...');
       setLoading(true);
       
       // Clear all local state first
       setUser(null);
       setProfile(null);
       
-      // Clear any cached data immediately
-      localStorage.removeItem('leiaoai-language');
+      // Sign out from Supabase
+      await authService.signOut();
+      
+      // Clear any cached data
+      localStorage.removeItem('leoai-language');
       sessionStorage.clear();
       
       // Clear Thirdweb connection if exists
@@ -161,16 +149,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         localStorage.removeItem('thirdweb_wallet_data');
       }
       
-      // Sign out from Supabase
-      const result = await authService.signOut();
-      
-      if (result.error) {
-        console.error('Supabase signOut error:', result.error);
-      }
-      
-      console.log('SignOut process completed');
       toast.success('Successfully signed out');
-      
     } catch (error: any) {
       console.error('Sign out error:', error);
       // Even if signOut fails, clear local state
@@ -179,11 +158,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       localStorage.removeItem('thirdweb_wallet_data');
       toast.error('Sign out completed with issues');
     } finally {
-      // Use a short delay to ensure auth state change is processed
-      setTimeout(() => {
-        setLoading(false);
-        console.log('SignOut loading state cleared');
-      }, 500);
+      setLoading(false);
     }
   };
 

@@ -1,0 +1,204 @@
+{
+  "app_name": "LeiaoAI",
+  "loading": "로딩 중...",
+  "error": "오류",
+  "cancel": "취소",
+  "confirm": "확인",
+  "save": "저장",
+  "delete": "삭제",
+  "edit": "편집",
+  "submit": "제출",
+  "back": "뒤로",
+  "next": "다음",
+  "previous": "이전",
+  "search": "검색",
+  "filter": "필터",
+  "sort": "정렬",
+  "refresh": "새로고침",
+  "upload": "업로드",
+  "download": "다운로드",
+  "view": "보기",
+  "share": "공유",
+  "like": "좋아요",
+  "comment": "댓글",
+  "follow": "팔로우",
+  "unfollow": "언팔로우",
+  "login": "로그인",
+  "logout": "로그아웃",
+  "register": "가입",
+  "profile": "프로필",
+  "help": "도움말",
+  "about": "정보",
+  "contact": "문의하기",
+  "privacy": "개인정보처리방침",
+  "terms": "서비스 약관",
+  "success": "성공",
+  
+  "app_description": "전문 AI 투자 플랫폼",
+  "footer": {
+    "developed_by": "LeiaoAI Agent에 의해 개발됨"
+  },
+  
+  "nav": {
+    "home": "홈",
+    "ai_chat": "AI 채팅",
+    "stories": "스토리",
+    "questions": "질문",
+    "bp_analysis": "BP 분석",
+    "profile": "프로필",
+    "settings": "설정"
+  },
+  
+  "home": {
+    "hero": {
+      "title_1": "전문",
+      "title_2": "AI 투자",
+      "title_3": "플랫폼",
+      "description": "고급 AI 기술을 기반으로 전문적인 투자 분석, 비즈니스 플랜 평가, 인텔리전트 의사결정 지원 제공",
+      "mobile_description": "스마트한 비즈니스 의사결정을 위한 AI 인텔리전트 투자 분석"
+    },
+    "cta": {
+      "title": "전문 AI 투자 컨설팅 경험 시작하기",
+      "subtitle": "비즈니스 플랜을 업로드하여 AI 분석을 받거나 투자 및 자금 조달 문제에 대해 직접 상담하세요",
+      "mobile_title": "AI 투자 컨설팅 시작",
+      "mobile_subtitle": "BP 분석 업로드 또는 직접 상담",
+      "upload_bp": "BP 분석 업로드",
+      "ai_chat": "AI Q&A 컨설팅"
+    },
+    "stats": {
+      "total_users": "플랫폼 사용자",
+      "total_qa": "Q&A 세션",
+      "bp_analysis": "BP 분석",
+      "avg_response": "평균 응답"
+    }
+  },
+  
+  "professional_services": {
+    "title": "전문 서비스 영역",
+    "subtitle": "전문적인 투자 조언을 위해 영역 카드를 클릭하세요",
+    "refresh_suggestions": "제안 새로고침",
+    "suggested_questions": "추천 질문",
+    "click_for_advice": "전문 조언을 위해 클릭",
+    "bottom_description": "매번 3개의 무작위 제안 질문을 표시합니다. 새로운 컨설팅 방향을 위해 '제안 새로고침'을 클릭하세요",
+    "enter_full_chat": "전체 AI 채팅 입장"
+  },
+  
+  "ai_chat": {
+    "title": "AI 투자 전문가",
+    "subtitle": "귀하의 비즈니스 의사결정을 강화하는 전문 투자 컨설팅 서비스",
+    "placeholder": "투자 관련 질문을 입력해 주세요...",
+    "send": "전송",
+    "voice_input": "음성 입력",
+    "stop_recording": "녹음 중지",
+    "processing": "질문 처리 중...",
+    "new_chat": "새 채팅",
+    "chat_history": "채팅 기록",
+    "model_selection": "모델 선택",
+    "model_recommended": "추천",
+    "model_china_optimized": "중국 최적화",
+    "model_overseas_optimized": "해외 최적화",
+    "model_responses": {
+      "deepseek": "현재 경제 트렌드를 바탕으로 ESG 투자, 인공지능, 그린 에너지에 집중할 것을 권합니다. 신흥 시장의 경우 충분한 유동성을 갖춘 다각화된 투자 전략을 고려하세요.",
+      "openai": "투자 방향을 고려할 때 디지털 전환, 대규모 야생동물 모델, 프로세스 자동화에 집중하세요. 이러한 영역들은 향후 5년간 빠른 성장을 위한 준비가 되어 있으며 잠재적 유니콘 기업들이 이미 등장하고 있습니다.",
+      "qwen": "현재 투자 환경에 대해서는 '계층적 배분' 전략을 권합니다 - 저변동성 고수익 상품의 기본 계층, AI, 생명공학, 청정 에너지의 혁신 기업에 집중한 기회 계층, 그리고 방어적 현금 준비금.",
+      "default": "현재 시장 분석을 바탕으로 투자 전략은 다각화되어야 하며, 전통 자산과 신흥 자산의 균형 잡힌 배분이 필요합니다. ESG 투자, AI, 그린 에너지에 집중할 것을 권합니다. 특정 산업에 대한 더 자세한 투자 조언을 제공할 수 있습니다."
+    },
+    "sample_questions": {
+      "q1": "2025년 중국 STAR Market 상장 기업들의 밸류에이션 트렌드는 무엇인가요?",
+      "q2": "스타트업들은 어떻게 시리즈 A 펀딩 전략을 최적화할 수 있나요?",
+      "q3": "미국과 중국 VC 투자 환경의 차이점은 무엇인가요?"
+    },
+    "expertise_areas": {
+      "cvc_investment": "CVC 산업 투자",
+      "ma_restructuring": "M&A 구조조정",
+      "ipo_a_share": "IPO 상장 (A주)",
+      "ipo_hk_share": "IPO 상장 (HK주)",
+      "ipo_us_share": "IPO 상장 (US주)",
+      "spac_listing": "SPAC 쉘 상장",
+      "macro_analysis": "거시경제 분석",
+      "investment_environment": "투자 환경",
+      "valuation_adjustment": "밸류에이션 조정 계약",
+      "exit_strategy": "엑시트 전략 기획",
+      "valuation_model": "밸류에이션 모델",
+      "due_diligence": "실사"
+    }
+  },
+  
+  "bp_analysis": {
+    "title": "사업계획서 분석",
+    "subtitle": "사업계획서를 업로드하여 전문 AI 분석 보고서를 받아보세요",
+    "upload_bp": "BP 업로드",
+    "drag_drop": "파일을 여기에 드래그하거나 클릭하여 업로드",
+    "supported_formats": "PDF, DOCX 형식 지원",
+    "max_size": "최대 파일 크기 50MB",
+    "analyzing": "분석 중...",
+    "analysis_complete": "분석 완료",
+    "analysis_report": "분석 보고서",
+    "score": "종합 점수",
+    "recommendations": "개선 제안",
+    "market_analysis": "시장 분석",
+    "business_model": "비즈니스 모델",
+    "team_assessment": "팀 평가",
+    "financial_projection": "재무 전망",
+    "risk_assessment": "위험 평가",
+    "investment_value": "투자 가치"
+  },
+  
+  "stories": {
+    "title": "스토리",
+    "create_story": "스토리 공유",
+    "story_title": "스토리 제목",
+    "story_content": "스토리 내용",
+    "category": "카테고리",
+    "public": "공개",
+    "private": "비공개",
+    "publish": "게시",
+    "draft": "초안",
+    "view_count": "조회수",
+    "like_count": "좋아요 수",
+    "comment_count": "댓글 수",
+    "section_title": "사용자 스토리 및 커뮤니티",
+    "section_subtitle": "투자 경험을 공유하고 성공 사례에서 배우세요",
+    "create_button": "스토리 공유",
+    "no_stories": {
+      "title": "아직 스토리가 없습니다",
+      "desc": "이 카테고리에는 아직 공유된 사용자 스토리가 없습니다"
+    },
+    "be_first_share": "첫 번째로 공유해 보세요",
+    "categories": {
+      "all": "전체",
+      "ai_tools": "AI 도구 경험",
+      "startup_interview": "스타트업 인터뷰",
+      "investment_outlook": "투자 전망",
+      "finance_ai": "금융 AI 응용",
+      "video_generation": "비디오 생성 경험",
+      "domestic_ai": "국내 AI 도구",
+      "overseas_ai": "해외 AI 플랫폼"
+    }
+  },
+  
+  "quick_ai_consultation_title": "빠른 AI 투자 컨설팅",
+  "ai_expert_greeting": "안녕하세요! 저는 蕾奥AI 투자 전문가입니다. 전문 투자 컨설팅 서비스를 전문으로 합니다.",
+  "view_complete_ai_chat": "전체 AI 채팅 보기",
+  "auto_select_model": "자동 선택",
+  "select_model": "모델 선택",
+  "model_fastest": "가장 빠른",
+  "avg_response_time": "{{time}}초 평균",
+  "avg_response_time_title": "평균 응답 시간: {{time}}초",
+  "analyzing_question": "질문 분석 중...",
+  "export": "내보내기",
+  "regenerate": "재생성",
+  "feedback": "피드백",
+  
+  "date": {
+    "today": "오늘",
+    "days_ago": "{{days}}일 전",
+    "months_ago": "{{months}}개월 전",
+    "years_ago": "{{years}}년 전"
+  }
+,
+  "placeholder_response": "Ask investment-related questions to get professional AI advice"
+,
+  "footer_description": "LeiaoAI professional investment consulting services, providing intelligent investment analysis and decision support",
+  "footer_provider": "Powered by LeiaoAI Agent"
+}

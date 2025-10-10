@@ -1,0 +1,189 @@
+{
+  "app_name": "LeiaoAI",
+  "loading": "جاري التحميل...",
+  "error": "خطأ",
+  "cancel": "إلغاء",
+  "confirm": "تأكيد",
+  "save": "حفظ",
+  "delete": "حذف",
+  "edit": "تحرير",
+  "submit": "إرسال",
+  "back": "رجوع",
+  "next": "التالي",
+  "previous": "السابق",
+  "search": "بحث",
+  "filter": "تصفية",
+  "sort": "ترتيب",
+  "refresh": "تحديث",
+  "upload": "رفع",
+  "download": "تحميل",
+  "view": "عرض",
+  "share": "مشاركة",
+  "like": "إعجاب",
+  "comment": "تعليق",
+  "follow": "متابعة",
+  "unfollow": "إلغاء المتابعة",
+  "login": "تسجيل الدخول",
+  "logout": "تسجيل الخروج",
+  "register": "التسجيل",
+  "profile": "الملف الشخصي",
+  "help": "مساعدة",
+  "about": "حول",
+  "contact": "اتصل بنا",
+  "privacy": "سياسة الخصوصية",
+  "terms": "شروط الخدمة",
+  "success": "نجح",
+  
+  "app_description": "منصة الاستثمار الذكية المتخصصة",
+  "footer": {
+    "developed_by": "طُوّر بواسطة LeiaoAI Agent"
+  },
+  
+  "nav": {
+    "home": "الرئيسية",
+    "ai_chat": "دردشة الذكاء الاصطناعي",
+    "stories": "القصص",
+    "questions": "الأسئلة",
+    "bp_analysis": "تحليل خطة العمل",
+    "profile": "الملف الشخصي",
+    "settings": "الإعدادات"
+  },
+  
+  "home": {
+    "cta": {
+      "title": "ابدأ تجربة استشارات الاستثمار الذكية المتخصصة",
+      "subtitle": "ارفع خطة عملك لتحليل الذكاء الاصطناعي، أو استشر مباشرة حول قضايا الاستثمار والتمويل",
+      "upload_bp": "رفع تحليل خطة العمل",
+      "ai_chat": "استشارة الذكاء الاصطناعي"
+    }
+  },
+  
+  "professional_services": {
+    "title": "مجالات الخدمات المتخصصة",
+    "subtitle": "انقر على بطاقات المجال للحصول على نصائح استثمارية متخصصة",
+    "refresh_suggestions": "تحديث الاقتراحات",
+    "suggested_questions": "الأسئلة المقترحة",
+    "click_for_advice": "انقر للحصول على نصيحة متخصصة",
+    "bottom_description": "عرض 3 أسئلة اقتراح عشوائية في كل مرة، انقر 'تحديث الاقتراحات' للحصول على اتجاهات استشارية جديدة",
+    "enter_full_chat": "دخول الدردشة الكاملة"
+  },
+  
+  "ai_chat": {
+    "title": "خبير الاستثمار الذكي",
+    "subtitle": "خدمات الاستشارة الاستثمارية المتخصصة لتمكين قراراتك التجارية",
+    "placeholder": "يرجى إدخال أسئلتك المتعلقة بالاستثمار...",
+    "send": "إرسال",
+    "voice_input": "إدخال صوتي",
+    "stop_recording": "إيقاف التسجيل",
+    "processing": "معالجة سؤالك...",
+    "new_chat": "دردشة جديدة",
+    "chat_history": "تاريخ الدردشة",
+    "model_selection": "اختيار النموذج",
+    "model_recommended": "موصى به",
+    "model_china_optimized": "محسّن للصين",
+    "model_overseas_optimized": "محسّن للخارج",
+    "model_responses": {
+      "deepseek": "بناءً على الاتجاهات الاقتصادية الحالية، أنصح بالتركيز على استثمارات ESG والذكاء الاصطناعي والطاقة الخضراء. بالنسبة للأسواق الناشئة، فكر في استراتيجية استثمار متنوعة مع سيولة كافية.",
+      "openai": "عند النظر في اتجاهات الاستثمار، ركز على التحول الرقمي ونماذج الحياة البرية الكبيرة وأتمتة العمليات. هذه المجالات على وشك النمو السريع في السنوات الخمس القادمة وتظهر بالفعل شركات يونيكورن محتملة.",
+      "qwen": "بالنسبة لبيئة الاستثمار الحالية، أوصي باستراتيجية 'التخصيص الطبقي' - طبقة أساسية مع منتجات منخفضة التقلب وعائد عالي، طبقة الفرص تركز على الشركات المبتكرة في الذكاء الاصطناعي والتكنولوجيا الحيوية والطاقة النظيفة، واحتياطي نقدي دفاعي.",
+      "default": "بناءً على تحليل السوق الحالي، يجب أن تكون استراتيجيات الاستثمار متنوعة، مع تخصيص متوازن للأصول التقليدية والناشئة. أنصح بالتركيز على استثمارات ESG والذكاء الاصطناعي والطاقة الخضراء. يمكنني تقديم نصائح استثمارية أكثر تفصيلاً لصناعات محددة."
+    },
+    "sample_questions": {
+      "q1": "ما هي اتجاهات التقييم للشركات المدرجة في سوق STAR الصيني في 2025؟",
+      "q2": "كيف يمكن للشركات الناشئة تحسين استراتيجية التمويل في السلسلة A؟",
+      "q3": "ما هي الاختلافات بين بيئات الاستثمار الأمريكية والصينية لرؤوس الأموال الاستثمارية؟"
+    },
+    "expertise_areas": {
+      "cvc_investment": "الاستثمار الصناعي CVC",
+      "ma_restructuring": "إعادة الهيكلة والاندماج والاستحواذ",
+      "ipo_a_share": "الطرح العام الأولي (الأسهم A)",
+      "ipo_hk_share": "الطرح العام الأولي (أسهم هونغ كونغ)",
+      "ipo_us_share": "الطرح العام الأولي (الأسهم الأمريكية)",
+      "spac_listing": "إدراج SPAC Shell",
+      "macro_analysis": "التحليل الاقتصادي الكلي",
+      "investment_environment": "بيئة الاستثمار",
+      "valuation_adjustment": "اتفاقية تعديل التقييم",
+      "exit_strategy": "تخطيط استراتيجية الخروج",
+      "valuation_model": "نموذج التقييم",
+      "due_diligence": "العناية الواجبة"
+    }
+  },
+  
+  "bp_analysis": {
+    "title": "تحليل خطة العمل",
+    "subtitle": "ارفع خطة عملك للحصول على تقرير تحليل ذكي متخصص",
+    "upload_bp": "رفع خطة العمل",
+    "drag_drop": "اسحب الملفات هنا أو انقر للرفع",
+    "supported_formats": "يدعم تنسيقات PDF، DOCX",
+    "max_size": "الحد الأقصى لحجم الملف 50 ميجابايت",
+    "analyzing": "جاري التحليل...",
+    "analysis_complete": "اكتمل التحليل",
+    "analysis_report": "تقرير التحليل",
+    "score": "النتيجة الإجمالية",
+    "recommendations": "اقتراحات التحسين",
+    "market_analysis": "تحليل السوق",
+    "business_model": "نموذج العمل",
+    "team_assessment": "تقييم الفريق",
+    "financial_projection": "الإسقاط المالي",
+    "risk_assessment": "تقييم المخاطر",
+    "investment_value": "قيمة الاستثمار"
+  },
+  
+  "stories": {
+    "title": "القصص",
+    "create_story": "مشاركة القصة",
+    "story_title": "عنوان القصة",
+    "story_content": "محتوى القصة",
+    "category": "الفئة",
+    "public": "عام",
+    "private": "خاص",
+    "publish": "نشر",
+    "draft": "مسودة",
+    "view_count": "المشاهدات",
+    "like_count": "الإعجابات",
+    "comment_count": "التعليقات",
+    "section_title": "قصص المستخدمين والمجتمع",
+    "section_subtitle": "شارك تجارب الاستثمار، تعلم من حالات النجاح",
+    "create_button": "مشاركة القصة",
+    "no_stories": {
+      "title": "لا توجد قصص بعد",
+      "desc": "لا توجد قصص مستخدمين مشاركة في هذه الفئة بعد"
+    },
+    "be_first_share": "كن أول من يشارك",
+    "categories": {
+      "all": "الكل",
+      "ai_tools": "تجربة أدوات الذكاء الاصطناعي",
+      "startup_interview": "مقابلات الشركات الناشئة",
+      "investment_outlook": "نظرة الاستثمار",
+      "finance_ai": "تطبيقات الذكاء الاصطناعي المالية",
+      "video_generation": "تجربة توليد الفيديو",
+      "domestic_ai": "أدوات الذكاء الاصطناعي المحلية",
+      "overseas_ai": "منصات الذكاء الاصطناعي الخارجية"
+    }
+  },
+  
+  "quick_ai_consultation_title": "استشارة الاستثمار الذكية السريعة",
+  "ai_expert_greeting": "مرحباً! أنا خبير الاستثمار 蕾奥AI، متخصص في خدمات الاستشارة الاستثمارية المتخصصة.",
+  "view_complete_ai_chat": "عرض الدردشة الكاملة",
+  "auto_select_model": "اختيار تلقائي",
+  "select_model": "اختيار النموذج",
+  "model_fastest": "الأسرع",
+  "avg_response_time": "{{time}}ث متوسط",
+  "avg_response_time_title": "متوسط وقت الاستجابة: {{time}} ثانية",
+  "analyzing_question": "تحليل سؤالك...",
+  "export": "تصدير",
+  "regenerate": "إعادة توليد",
+  "feedback": "التعليق",
+  
+  "date": {
+    "today": "اليوم",
+    "days_ago": "منذ {{days}} أيام",
+    "months_ago": "منذ {{months}} أشهر",
+    "years_ago": "منذ {{years}} سنوات"
+  }
+,
+  "placeholder_response": "Ask investment-related questions to get professional AI advice"
+,
+  "footer_description": "LeiaoAI professional investment consulting services, providing intelligent investment analysis and decision support",
+  "footer_provider": "Powered by LeiaoAI Agent"
+}
