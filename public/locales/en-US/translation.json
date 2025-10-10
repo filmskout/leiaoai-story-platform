@@ -389,6 +389,8 @@
     "dark": "Dark",
     "ai_preferences": "AI Preferences",
     "ai_description": "Choose your preferred AI models",
+    "preferred_chat_model": "Preferred Chat Model",
+    "preferred_image_model": "Preferred Image Model",
     "recommended": "Recommended",
     "available": "Available",
     "unavailable": "Unavailable"

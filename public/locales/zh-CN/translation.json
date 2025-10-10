@@ -389,6 +389,8 @@
     "dark": "深色",
     "ai_preferences": "AI偏好",
     "ai_description": "选择您偏好的AI模型",
+    "preferred_chat_model": "首选对话模型",
+    "preferred_image_model": "首选图像模型",
     "recommended": "推荐",
     "available": "可用",
     "unavailable": "不可用"
