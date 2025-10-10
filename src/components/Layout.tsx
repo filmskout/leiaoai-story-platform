@@ -330,7 +330,10 @@ export default function Layout() {
                 </>
               ) : (
                 <Link to="/auth">
-                  <Button size="sm">
+                  <Button 
+                    size="sm"
+                    className="bg-orange-500 hover:bg-orange-600 text-white border-0"
+                  >
                     {t('auth.sign_in')}
                   </Button>
                 </Link>

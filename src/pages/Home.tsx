@@ -174,7 +174,7 @@ export default function Home() {
                   variants={itemVariants}
                   className={cn(
                     "flex gap-3",
-                    isMobile ? "flex-col" : "flex-col sm:flex-row gap-4"
+                    isMobile ? "flex-col" : "flex-row gap-4"
                   )}
                 >
                   {/* 左侧主按钮：AI Investment Expert */}
@@ -189,33 +189,6 @@ export default function Home() {
                       <Bot size={16} className="mr-2" />
                       {t('ai_chat.title')}
                       <ArrowRight size={14} className="ml-2 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-                  </Link>
-                  {/* 右侧次按钮：Sign in 橙色 */}
-                  {!user && (
-                    <Link to="/auth">
-                      <Button 
-                        size={isMobile ? "default" : "lg"} 
-                        className={cn(
-                          "bg-orange-500 hover:bg-orange-600 text-white border-0",
-                          isMobile && "w-full"
-                        )}
-                      >
-                        {t('auth.sign_in', 'Sign in')}
-                      </Button>
-                    </Link>
-                  )}
-
-                  <Link to="/bp-analysis">
-                    <Button 
-                      variant="outline" 
-                      size={isMobile ? "default" : "lg"} 
-                      className={cn(
-                        isMobile && "w-full"
-                      )}
-                    >
-                      <FileText size={16} className="mr-2" />
-                      {t('bp_analysis.title')}
                     </Button>
                   </Link>
                 </motion.div>
