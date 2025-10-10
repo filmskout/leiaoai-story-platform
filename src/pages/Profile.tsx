@@ -31,7 +31,8 @@ import {
   ChevronRight,
   Flame,
   Bookmark,
-  PlusCircle
+  PlusCircle,
+  Download
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -41,6 +42,7 @@ import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
+import { cn, formatFileSize } from '@/lib/utils';
 
 interface UserStats {
   totalStories: number;
@@ -185,7 +187,7 @@ export default function Profile() {
 
       // Load BP submissions count
       const { data: bps, error: bpsError } = await supabase
-        .from('user_bp_submissions')
+        .from('bp_submissions')
         .select('id')
         .eq('user_id', user.id);
 
@@ -450,15 +452,25 @@ export default function Profile() {
   const loadBpSubmissions = async () => {
     if (!user) return;
 
-    const { data } = await supabase
-      .from('user_bp_submissions')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(10);
+    try {
+      // 使用正确的表名 'bp_submissions'
+      const { data, error } = await supabase
+        .from('bp_submissions')
+        .select('id, file_name, file_type, file_base64, file_size, score, created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false})
+        .limit(10);
 
-    if (data) {
-      setBpSubmissions(data);
+      if (error) {
+        console.error('Error loading BP submissions:', error);
+        return;
+      }
+
+      if (data) {
+        setBpSubmissions(data);
+      }
+    } catch (error) {
+      console.error('Failed to load BP submissions:', error);
     }
   };
 
@@ -911,18 +923,76 @@ export default function Profile() {
             <Card>
               <CardHeader>
                 <CardTitle>{t('profile.bp_submissions', 'Business Plan Submissions')}</CardTitle>
+                <CardDescription>
+                  {t('profile.bp_desc', 'Your uploaded business plans and analysis results')}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 {bpSubmissions.length === 0 ? (
-                  <p className="text-gray-500 text-center py-4">
-                    {t('profile.no_bp', 'No business plan submissions yet')}
-                  </p>
+                  <div className="text-center py-8">
+                    <p className="text-foreground-secondary mb-4">
+                      {t('profile.no_bp', 'No business plan submissions yet')}
+                    </p>
+                    <Button 
+                      onClick={() => navigate('/bp-analysis')}
+                      variant="outline"
+                    >
+                      {t('profile.upload_bp', 'Upload Your First BP')}
+                    </Button>
+                  </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {bpSubmissions.map((bp: any) => (
-                      <div key={bp.id} className="border border-gray-200 rounded-lg p-3">
-                        <h4 className="font-medium text-gray-900">{bp.submission_title || 'Untitled'}</h4>
-                        <p className="text-sm text-gray-500">{formatDate(bp.created_at)}</p>
+                      <div key={bp.id} className="border border-border rounded-lg p-4 hover:shadow-md transition-shadow bg-card">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <FileText className="w-5 h-5 text-primary-500" />
+                              <h4 className="font-semibold text-foreground">{bp.file_name}</h4>
+                            </div>
+                            <div className="flex items-center gap-4 text-sm text-foreground-secondary">
+                              <span>{formatDate(bp.created_at)}</span>
+                              <span>•</span>
+                              <span>{formatFileSize(bp.file_size)}</span>
+                              {bp.score && (
+                                <>
+                                  <span>•</span>
+                                  <span className={cn(
+                                    "font-semibold",
+                                    bp.score >= 80 ? "text-green-600 dark:text-green-400" :
+                                    bp.score >= 60 ? "text-yellow-600 dark:text-yellow-400" :
+                                    "text-red-600 dark:text-red-400"
+                                  )}>
+                                    Score: {bp.score}/100
+                                  </span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex gap-2 ml-4">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => {
+                                // 下载文件
+                                const link = document.createElement('a');
+                                link.href = bp.file_base64;
+                                link.download = bp.file_name;
+                                link.click();
+                              }}
+                            >
+                              <Download size={16} className="mr-1" />
+                              {t('profile.download', 'Download')}
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => navigate('/bp-analysis')}
+                            >
+                              {t('profile.view_analysis', 'View Analysis')}
+                            </Button>
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>

@@ -16,6 +16,9 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatFileSize } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
+import { useNavigate } from 'react-router-dom';
 
 interface BPUploadAnalysisProps {
   className?: string;
@@ -37,11 +40,14 @@ interface AnalysisResult {
 
 export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [dragActive, setDragActive] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   // 处理文件拖拽
   const handleDrag = useCallback((e: React.DragEvent) => {
@@ -89,14 +95,30 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
   const analyzeFile = async () => {
     if (!file) return;
     
+    // 检查用户是否登录
+    if (!user) {
+      setError(t('bp_analysis.login_required', 'Please log in to analyze your BP'));
+      navigate('/auth');
+      return;
+    }
+    
     setIsAnalyzing(true);
     setError(null);
     
     try {
-      // 模拟分析过程（在实际应用中调用 bp-upload-analysis Edge Function）
+      // 1. 将文件转换为base64
+      const reader = new FileReader();
+      const base64Promise = new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      const fileBase64 = await base64Promise;
+      
+      // 2. 模拟分析过程（在实际应用中调用 bp-upload-analysis Edge Function）
       await new Promise(resolve => setTimeout(resolve, 3000));
       
-      // 模拟分析结果
+      // 3. 模拟分析结果
       const mockResult: AnalysisResult = {
         score: 85,
         summary: '该商业计划书在市场机会、商业模式和团队能力方面表现出色，但在财务预测和风险管理方面仍有改进空间。',
@@ -118,8 +140,37 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
       };
       
       setAnalysisResult(mockResult);
+      
+      // 4. 保存到数据库
+      try {
+        const { error: saveError } = await supabase
+          .from('bp_submissions')
+          .insert({
+            user_id: user.id,
+            file_name: file.name,
+            file_type: file.type,
+            file_base64: fileBase64,
+            file_size: file.size,
+            analysis_result: mockResult,
+            score: mockResult.score,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          });
+        
+        if (saveError) {
+          console.error('Failed to save BP submission:', saveError);
+          // 不阻止用户看到分析结果
+        } else {
+          console.log('✅ BP submission saved successfully');
+        }
+      } catch (saveErr) {
+        console.error('Error saving BP submission:', saveErr);
+        // 不阻止用户看到分析结果
+      }
+      
     } catch (err) {
-      setError(t('errors.analysis_failed'));
+      console.error('Analysis error:', err);
+      setError(t('errors.analysis_failed', 'Analysis failed. Please try again.'));
     } finally {
       setIsAnalyzing(false);
     }
