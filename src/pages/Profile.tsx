@@ -323,7 +323,7 @@ export default function Profile() {
       const { data, error } = await supabase
         .from('stories')
         .select('id, title, content, excerpt, category, created_at, updated_at')
-        .eq('author', user.id)
+        .eq('author_id', user.id)
         .eq('status', 'draft')
         .order('updated_at', { ascending: false })
         .limit(20);
