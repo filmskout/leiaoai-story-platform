@@ -35,12 +35,12 @@ WHERE status IS NULL
    OR is_public IS NULL 
    OR is_public = false;
 
--- 步骤4: 确保所有stories都有author_id（使用Admin账户ID）
+-- 步骤4: 确保所有stories都有author（使用Admin账户ID）
 UPDATE stories
 SET 
-  author_id = '8e19098b-ac2a-4ae0-b063-1e21a8dea19d',
+  author = '8e19098b-ac2a-4ae0-b063-1e21a8dea19d',
   updated_at = NOW()
-WHERE author_id IS NULL;
+WHERE author IS NULL;
 
 -- 步骤5: 验证修复结果
 SELECT 
@@ -55,7 +55,7 @@ SELECT
   s.title,
   s.status,
   s.is_public,
-  s.author_id,
+  s.author,
   p.full_name as author_name,
   p.username as author_username,
   s.view_count,
@@ -63,7 +63,7 @@ SELECT
   s.comment_count,
   s.created_at
 FROM stories s
-LEFT JOIN profiles p ON s.author_id = p.id
+LEFT JOIN profiles p ON s.author::uuid = p.id
 WHERE s.status = 'published' AND s.is_public = true
 ORDER BY s.created_at DESC
 LIMIT 10;

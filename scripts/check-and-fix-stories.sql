@@ -15,12 +15,12 @@ SELECT
 FROM stories
 GROUP BY status, is_public;
 
--- 2. 检查是否有author_id为NULL的stories
+-- 2. 检查是否有author为NULL的stories
 SELECT 
-  'Stories with NULL author_id' as info,
+  'Stories with NULL author' as info,
   COUNT(*) as count
 FROM stories
-WHERE author_id IS NULL;
+WHERE author IS NULL;
 
 -- 3. 查看前5个stories的详细信息
 SELECT 
@@ -28,24 +28,23 @@ SELECT
   title,
   status,
   is_public,
-  author_id,
-  created_at,
-  published_at
+  author,
+  created_at
 FROM stories
 ORDER BY created_at DESC
 LIMIT 5;
 
--- 4. 检查author_id是否指向有效的profiles
+-- 4. 检查author是否指向有效的profiles
 SELECT 
   s.id,
   s.title,
   s.status,
   s.is_public,
-  s.author_id,
+  s.author,
   p.full_name,
   p.username
 FROM stories s
-LEFT JOIN profiles p ON s.author_id = p.id
+LEFT JOIN profiles p ON s.author::uuid = p.id
 ORDER BY s.created_at DESC
 LIMIT 5;
 
@@ -60,10 +59,10 @@ SET
   updated_at = NOW()
 WHERE status != 'published' OR is_public != true;
 
--- 6. 确保所有stories都有author_id（设置为Admin用户）
+-- 6. 确保所有stories都有author（设置为Admin用户）
 UPDATE stories
-SET author_id = '8e19098b-ac2a-4ae0-b063-1e21a8dea19d'
-WHERE author_id IS NULL;
+SET author = '8e19098b-ac2a-4ae0-b063-1e21a8dea19d'
+WHERE author IS NULL;
 
 -- 7. 验证修复结果
 SELECT 
@@ -78,12 +77,12 @@ SELECT
   s.title,
   s.status,
   s.is_public,
-  s.author_id,
+  s.author,
   p.full_name as author_name,
   s.created_at,
   s.updated_at
 FROM stories s
-LEFT JOIN profiles p ON s.author_id = p.id
+LEFT JOIN profiles p ON s.author::uuid = p.id
 WHERE s.status = 'published' AND s.is_public = true
 ORDER BY s.created_at DESC
 LIMIT 10;

@@ -38,12 +38,8 @@ export function StoriesDebug() {
           title,
           status,
           is_public,
-          author_id,
-          created_at,
-          profiles:author_id (
-            full_name,
-            username
-          )
+          author,
+          created_at
         `)
         .order('created_at', { ascending: false })
         .limit(10);
@@ -76,14 +72,14 @@ export function StoriesDebug() {
 
       if (updateError) throw updateError;
 
-      // 确保所有stories有author_id
+      // 确保所有stories有author
       const { error: authorError } = await supabase
         .from('stories')
         .update({
-          author_id: '8e19098b-ac2a-4ae0-b063-1e21a8dea19d',
+          author: '8e19098b-ac2a-4ae0-b063-1e21a8dea19d',
           updated_at: new Date().toISOString()
         })
-        .is('author_id', null);
+        .is('author', null);
 
       if (authorError) throw authorError;
 
@@ -138,8 +134,7 @@ export function StoriesDebug() {
                   <p><strong>标题:</strong> {story.title}</p>
                   <p><strong>状态:</strong> {story.status}</p>
                   <p><strong>公开:</strong> {story.is_public ? '是' : '否'}</p>
-                  <p><strong>作者ID:</strong> {story.author_id}</p>
-                  <p><strong>作者:</strong> {story.profiles?.full_name || story.profiles?.username || '未知'}</p>
+                  <p><strong>作者ID:</strong> {story.author}</p>
                   <p className="text-xs text-gray-500">创建于: {new Date(story.created_at).toLocaleString()}</p>
                 </div>
               ))}
