@@ -530,10 +530,10 @@ export default function Profile() {
                 <h1 className="text-2xl font-bold text-gray-900">
                   {user.user_metadata?.full_name || user.email}
                 </h1>
-                <Button
+                <Button 
                   variant="outline"
                   size="sm"
-                  onClick={() => setIsEditing(true)}
+                  onClick={() => navigate('/profile/edit')}
                 >
                   <Edit3 className="w-4 h-4 mr-2" />
                   {t('profile.edit', 'Edit Profile')}

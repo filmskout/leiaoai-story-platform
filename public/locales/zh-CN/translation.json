@@ -72,8 +72,9 @@
     "stories": "故事",
     "questions": "问题",
     "bp_analysis": "BP分析",
+    "dashboard": "仪表板",
     "profile": "个人中心",
-    "settings": "设置"
+    "settings": "编辑资料"
   },
   
   "home": {

@@ -279,9 +279,39 @@ export default function EnhancedSettings() {
       const data = await response.json();
       
       if (data.success && data.imageUrl) {
-        // 将生成的图片 URL 保存到 profile
-        setProfileForm(prev => ({ ...prev, avatar_url: data.imageUrl }));
-        toast.success(t('settings.avatar_generated', 'Avatar generated successfully! Remember to save your changes.'));
+        // 下载生成的图片
+        const imageResponse = await fetch(data.imageUrl);
+        const imageBlob = await imageResponse.blob();
+        
+        // 转换为 base64
+        const reader = new FileReader();
+        const base64Promise = new Promise<string>((resolve, reject) => {
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(imageBlob);
+        });
+        
+        const base64Data = await base64Promise;
+        const fileName = `avatar-${user.id}-${Date.now()}.png`;
+        
+        // 上传到 Supabase
+        const { data: uploadData, error: uploadError } = await supabase.functions.invoke('media-upload', {
+          body: {
+            mediaData: base64Data,
+            fileName,
+            mediaType: 'image'
+          }
+        });
+        
+        if (uploadError) throw uploadError;
+        
+        const avatarUrl = uploadData?.data?.publicUrl;
+        if (avatarUrl) {
+          setProfileForm(prev => ({ ...prev, avatar_url: avatarUrl }));
+          toast.success(t('settings.avatar_generated', 'Avatar generated successfully! Remember to save your changes.'));
+        } else {
+          throw new Error('Failed to upload generated avatar');
+        }
       } else {
         throw new Error('Invalid response from avatar generation service');
       }

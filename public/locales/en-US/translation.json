@@ -72,8 +72,9 @@
     "stories": "Stories",
     "questions": "Questions",
     "bp_analysis": "BP Analysis",
+    "dashboard": "Dashboard",
     "profile": "Profile",
-    "settings": "Settings"
+    "settings": "Edit Profile"
   },
   
   "home": {

@@ -200,9 +200,19 @@ function AppRoutes() {
           <Route path="user/:id" element={<UserProfile />} />
           
           {/* Protected routes */}
+          <Route path="dashboard" element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          } />
           <Route path="profile" element={
             <ProtectedRoute>
               <Profile />
+            </ProtectedRoute>
+          } />
+          <Route path="profile/edit" element={
+            <ProtectedRoute>
+              <Settings />
             </ProtectedRoute>
           } />
           <Route path="settings" element={
@@ -213,11 +223,6 @@ function AppRoutes() {
           <Route path="create-story" element={
             <ProtectedRoute>
               <CreateStory />
-            </ProtectedRoute>
-          } />
-          <Route path="dashboard" element={
-            <ProtectedRoute>
-              <Profile />
             </ProtectedRoute>
           } />
           <Route path="debug-stories" element={<DebugStories />} />

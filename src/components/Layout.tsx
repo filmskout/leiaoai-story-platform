@@ -267,16 +267,16 @@ export default function Layout() {
                         </div>
                         
                         <Link
-                          to="/profile"
+                          to="/dashboard"
                           className="flex items-center space-x-2 px-3 py-2 text-sm text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
                           onClick={() => setShowProfileMenu(false)}
                         >
                           <User size={16} />
-                          <span>{t('nav.profile')}</span>
+                          <span>{t('nav.dashboard', 'Dashboard')}</span>
                         </Link>
                         
                         <Link
-                          to="/settings"
+                          to="/profile/edit"
                           className="flex items-center space-x-2 px-3 py-2 text-sm text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
                           onClick={() => setShowProfileMenu(false)}
                         >
