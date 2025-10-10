@@ -39,6 +39,14 @@
     "developed_by": "由 LeiaoAI Agent 开发"
   },
   
+  "common": {
+    "cancel": "取消",
+    "confirm": "确认",
+    "save": "保存",
+    "saving": "保存中...",
+    "uploading": "上传中..."
+  },
+  
   "auth": {
     "sign_in": "登录",
     "sign_out": "退出登录",
@@ -320,6 +328,36 @@
     "export_png": "导出PNG",
     "more": "更多",
     "click_to_add": "点击添加项目"
+  },
+  
+  "settings": {
+    "change_avatar": "更换头像",
+    "avatar_dialog_desc": "上传照片或使用AI生成",
+    "upload": "上传",
+    "ai_generate": "AI生成",
+    "select_file": "选择文件",
+    "generating": "生成中...",
+    "regenerate": "重新生成",
+    "generate_avatar": "生成头像",
+    "ai_avatar_desc": "基于您的个人资料使用AI生成专业头像",
+    "avatar_generated": "头像已生成并保存",
+    "avatar_uploaded": "头像已上传",
+    "avatar_error_type": "请选择图片文件",
+    "avatar_error_size": "图片大小不能超过5MB",
+    "avatar_generate_error": "生成头像失败",
+    "avatar_upload_failed": "上传头像失败",
+    "avatar_error": "操作失败",
+    "profile_photo": "个人照片",
+    "photo_requirements": "JPG、PNG或GIF格式，最大5MB",
+    "upload_photo": "上传照片",
+    "profile_description": "管理您的公开资料和个人信息",
+    "theme": "主题",
+    "theme_light": "浅色",
+    "theme_dark": "深色",
+    "theme_auto": "自动",
+    "recommended": "推荐",
+    "available": "可用",
+    "unavailable": "不可用"
   },
   
   "tags": {

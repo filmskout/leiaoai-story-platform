@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { AvatarUploadDialog } from '@/components/ui/AvatarUploadDialog';
 import { 
   Settings as SettingsIcon, 
   Globe, 
@@ -73,8 +74,7 @@ export default function EnhancedSettings() {
   const [selectedBadges, setSelectedBadges] = useState<string[]>([]);
   const [popularTags, setPopularTags] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
-  const [uploadingAvatar, setUploadingAvatar] = useState(false);
-  const [generatingAvatar, setGeneratingAvatar] = useState(false);
+  const [showAvatarDialog, setShowAvatarDialog] = useState(false);
   const [error, setError] = useState('');
 
   const themeOptions: { value: Theme; label: string; icon: React.ReactNode }[] = [
@@ -200,127 +200,8 @@ export default function EnhancedSettings() {
     }
   };
 
-  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    // Validate file
-    if (!file.type.startsWith('image/')) {
-      toast.error(t('settings.avatar_error_type', 'Please select an image file'));
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) { // 5MB limit
-      toast.error(t('settings.avatar_error_size', 'Image must be less than 5MB'));
-      return;
-    }
-
-    setUploadingAvatar(true);
-    try {
-      // Convert to base64
-      const reader = new FileReader();
-      const base64Promise = new Promise<string>((resolve, reject) => {
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-
-      const base64Data = await base64Promise;
-      const fileName = `avatar-${user.id}-${Date.now()}.${file.name.split('.').pop()}`;
-
-      // Upload via edge function
-      const { data, error } = await supabase.functions.invoke('media-upload', {
-        body: {
-          mediaData: base64Data,
-          fileName,
-          mediaType: 'image'
-        }
-      });
-
-      if (error) throw error;
-
-      const avatarUrl = data?.data?.publicUrl;
-      if (avatarUrl) {
-        setProfileForm(prev => ({ ...prev, avatar_url: avatarUrl }));
-        toast.success(t('settings.avatar_uploaded', 'Avatar updated successfully'));
-      }
-    } catch (error: any) {
-      console.error('Avatar upload failed:', error);
-      toast.error(error.message || t('settings.avatar_upload_failed', 'Failed to upload avatar'));
-    } finally {
-      setUploadingAvatar(false);
-    }
-  };
-
-  const handleGenerateAvatar = async () => {
-    if (!user) return;
-
-    const prompt = `Professional business avatar portrait for ${profileForm.full_name || 'professional'}, modern style, high quality, suitable for business profile picture`;
-    
-    setGeneratingAvatar(true);
-    try {
-      // 调用 Vercel Serverless Function 生成头像
-      const response = await fetch('/api/generate-avatar', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          prompt,
-          size: '1024x1024'
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to generate avatar');
-      }
-
-      const data = await response.json();
-      
-      if (data.success && data.imageUrl) {
-        // 下载生成的图片
-        const imageResponse = await fetch(data.imageUrl);
-        const imageBlob = await imageResponse.blob();
-        
-        // 转换为 base64
-        const reader = new FileReader();
-        const base64Promise = new Promise<string>((resolve, reject) => {
-          reader.onload = () => resolve(reader.result as string);
-          reader.onerror = reject;
-          reader.readAsDataURL(imageBlob);
-        });
-        
-        const base64Data = await base64Promise;
-        const fileName = `avatar-${user.id}-${Date.now()}.png`;
-        
-        // 上传到 Supabase
-        const { data: uploadData, error: uploadError } = await supabase.functions.invoke('media-upload', {
-          body: {
-            mediaData: base64Data,
-            fileName,
-            mediaType: 'image'
-          }
-        });
-        
-        if (uploadError) throw uploadError;
-        
-        const avatarUrl = uploadData?.data?.publicUrl;
-        if (avatarUrl) {
-          setProfileForm(prev => ({ ...prev, avatar_url: avatarUrl }));
-          toast.success(t('settings.avatar_generated', 'Avatar generated successfully! Remember to save your changes.'));
-        } else {
-          throw new Error('Failed to upload generated avatar');
-        }
-      } else {
-        throw new Error('Invalid response from avatar generation service');
-      }
-    } catch (error: any) {
-      console.error('Avatar generation error:', error);
-      toast.error(error.message || t('settings.avatar_generate_error', 'Failed to generate avatar'));
-    } finally {
-      setGeneratingAvatar(false);
-    }
+  const handleAvatarUpdate = (avatarUrl: string) => {
+    setProfileForm(prev => ({ ...prev, avatar_url: avatarUrl }));
   };
 
   const handleBadgeToggle = (badgeId: string) => {
@@ -440,50 +321,27 @@ export default function EnhancedSettings() {
                     {(profileForm.full_name || user.email || 'U')[0].toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <label className="absolute -bottom-2 -right-2 bg-primary-500 text-white rounded-full p-2 cursor-pointer hover:bg-primary-600 transition-colors">
-                  {uploadingAvatar ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                  ) : (
-                    <Camera className="w-4 h-4" />
-                  )}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleAvatarUpload}
-                    className="hidden"
-                    disabled={uploadingAvatar}
-                  />
-                </label>
+                <button
+                  onClick={() => setShowAvatarDialog(true)}
+                  className="absolute -bottom-2 -right-2 bg-primary-500 text-white rounded-full p-2 cursor-pointer hover:bg-primary-600 transition-colors"
+                  title={t('settings.change_avatar', 'Change Avatar')}
+                >
+                  <Camera className="w-4 h-4" />
+                </button>
               </div>
               <div>
                 <h3 className="font-medium text-foreground mb-1">{t('settings.profile_photo', 'Profile Photo')}</h3>
                 <p className="text-sm text-foreground-muted mb-2">
                   {t('settings.photo_requirements', 'JPG, PNG or GIF. Max size 5MB.')}
                 </p>
-                <div className="flex gap-2">
-                  <Button size="sm" variant="outline" onClick={() => document.querySelector('input[type="file"]')?.click()}>
-                    <Upload className="w-4 h-4 mr-2" />
-                    {t('settings.upload_photo', 'Upload Photo')}
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    onClick={handleGenerateAvatar}
-                    disabled={generatingAvatar}
-                  >
-                    {generatingAvatar ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent mr-2" />
-                        {t('settings.generating', 'Generating...')}
-                      </>
-                    ) : (
-                      <>
-                        <Bot className="w-4 h-4 mr-2" />
-                        {t('settings.ai_generate', 'AI Generate')}
-                      </>
-                    )}
-                  </Button>
-                </div>
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  onClick={() => setShowAvatarDialog(true)}
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  {t('settings.change_avatar', 'Change Avatar')}
+                </Button>
               </div>
             </div>
 
@@ -865,6 +723,16 @@ export default function EnhancedSettings() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Avatar Upload Dialog */}
+      <AvatarUploadDialog
+        open={showAvatarDialog}
+        onClose={() => setShowAvatarDialog(false)}
+        onAvatarUpdate={handleAvatarUpdate}
+        userId={user?.id || ''}
+        currentAvatarUrl={profileForm.avatar_url}
+        userName={profileForm.full_name || user?.email || 'User'}
+      />
     </div>
   );
 }
