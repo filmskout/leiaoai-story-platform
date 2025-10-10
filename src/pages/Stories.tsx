@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { PinterestStories } from '@/components/stories/PinterestStories';
+import { PageHero } from '@/components/PageHero';
 import { useMobileLayout } from '@/hooks/use-mobile';
 import { 
   ArrowRight,
@@ -45,52 +46,25 @@ export default function Stories() {
       animate="visible"
       className="min-h-screen bg-background"
     >
-      {/* 页面标题 */}
-      <section className={cn(
-        "bg-gradient-subtle",
-        isMobile ? "py-8 px-4" : "py-12 px-4"
-      )}>
-        <div className="container-custom">
-          <motion.div variants={itemVariants} className={cn(
-            "mx-auto text-center space-y-3",
-            isMobile ? "max-w-sm" : "max-w-3xl space-y-4"
-          )}>
-            <div className={cn(
-              "inline-flex items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900/30 mb-3",
-              isMobile ? "w-12 h-12 mb-2" : "w-16 h-16 mb-4"
-            )}>
-              <BookOpen className="text-primary-600" size={isMobile ? 20 : 24} />
-            </div>
-            <h1 className={cn(
-              "font-bold text-foreground leading-tight",
-              isMobile ? "text-2xl" : "text-4xl md:text-5xl"
-            )}>
-              {isMobile ? t('stories.mobile_page_title') : t('stories.page_title')}
-            </h1>
-            <p className={cn(
-              "text-foreground-secondary leading-relaxed",
-              isMobile ? "text-base" : "text-xl"
-            )}>
-              {isMobile ? t('stories.mobile_page_subtitle') : t('stories.page_subtitle')}
-            </p>
-            {/* 桌面端按钮 */}
-            <div className={cn(
-              "hidden",
-              !isMobile && "pt-4 md:block"
-            )}>
-              <Button 
-                onClick={() => navigate('/create-story')} 
-                size="lg"
-                className="group"
-              >
-                <PlusCircle size={18} className="mr-2" />
-                {t('stories.create_button')}
-                <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </div>
-          </motion.div>
-        </div>
-      </section>
+      {/* 页面标题 - 使用PageHero组件保持一致性 */}
+      <PageHero 
+        titleKey={isMobile ? "stories.mobile_page_title" : "stories.page_title"}
+        subtitleKey={isMobile ? "stories.mobile_page_subtitle" : "stories.page_subtitle"}
+        icon={BookOpen}
+      >
+        {/* 桌面端创建故事按钮 */}
+        {!isMobile && (
+          <Button 
+            onClick={() => navigate('/create-story')} 
+            size="lg"
+            className="group"
+          >
+            <PlusCircle size={18} className="mr-2" />
+            {t('stories.create_button')}
+            <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
+          </Button>
+        )}
+      </PageHero>
 
       {/* Main Content - Pinterest-style Stories Grid */}
       <section className={cn(
@@ -99,84 +73,73 @@ export default function Stories() {
       )}>
         <div className="container-custom">
           <motion.div variants={itemVariants}>
-            <div className={cn(
-              "mx-auto text-center space-y-3 mb-8",
-              isMobile ? "max-w-sm" : "max-w-3xl space-y-4"
-            )}>
-              <h2 className={cn(
-                "font-bold text-foreground",
-                isMobile ? "text-xl" : "text-3xl"
-              )}>
-                {t('stories.section_title')}
-              </h2>
-              <p className={cn(
-                "text-foreground-secondary",
-                isMobile ? "text-sm" : "text-lg"
-              )}>
-                {t('stories.section_subtitle')}
-              </p>
-            </div>
             <PinterestStories />
           </motion.div>
         </div>
       </section>
 
-      {/* 故事撰写提示区 */}
+      {/* Share Your Story CTA - 与主页BP分析模块宽度一致 */}
       <motion.section 
         variants={itemVariants}
         className={cn(
-          "px-4 bg-background-secondary",
-          isMobile ? "py-8 pb-20" : "py-16 pb-24 md:pb-16"
+          "px-4",
+          isMobile ? "py-12" : "py-20"
         )}
       >
-        <div className="container-custom">
+        <div className="container mx-auto max-w-4xl">
           <div className={cn(
-            "mx-auto bg-background rounded-xl border border-border shadow-sm",
-            isMobile ? "max-w-sm p-4" : "max-w-4xl p-8"
+            "bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl shadow-lg",
+            isMobile ? "p-6" : "p-12"
           )}>
             <div className={cn(
-              "items-center",
-              isMobile ? "flex flex-col gap-4 text-center" : "flex flex-col md:flex-row gap-8"
+              "text-center space-y-4",
+              isMobile ? "" : "space-y-6"
             )}>
-              <div className={cn(
-                "text-center",
-                !isMobile && "md:w-1/3"
+              <h2 className={cn(
+                "font-bold",
+                isMobile ? "text-2xl" : "text-4xl"
               )}>
-                <div className={cn(
-                  "inline-flex items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900/30 mb-3",
-                  isMobile ? "w-16 h-16" : "w-20 h-20 mb-4"
-                )}>
-                  <FileText className="text-primary-600" size={isMobile ? 24 : 32} />
-                </div>
-              </div>
-              <div className={cn(
-                "space-y-3",
-                !isMobile && "md:w-2/3 space-y-4"
+                {t('stories.cta_title', 'Share Your Story')}
+              </h2>
+              <p className={cn(
+                "text-primary-100 mx-auto",
+                isMobile ? "text-base max-w-sm" : "text-xl max-w-3xl"
               )}>
-                <h2 className={cn(
-                  "font-bold text-foreground",
-                  isMobile ? "text-lg" : "text-2xl"
-                )}>
-                  {isMobile ? t('stories.mobile_writing_section_title') : t('stories.writing_section_title')}
-                </h2>
-                <p className={cn(
-                  "text-foreground-secondary",
-                  isMobile ? "text-sm" : ""
-                )}>
-                  {isMobile ? t('stories.mobile_writing_section_desc') : t('stories.writing_section_desc')}
-                </p>
-                <div className="pt-1">
-                  <Button 
-                    onClick={() => navigate('/create-story')} 
-                    variant="outline"
-                    size={isMobile ? "sm" : "default"}
-                    className="group"
-                  >
-                    <PenLine size={14} className="mr-2" />
-                    {t('stories.start_writing')}
-                    <ArrowRight size={12} className="ml-2 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </div>
+                {isMobile 
+                  ? t('stories.cta_subtitle_mobile', 'Your experience could inspire others. Join our community and share your journey.')
+                  : t('stories.cta_subtitle', 'Your experiences and insights could inspire the next generation of innovators. Join our community of storytellers and make an impact.')
+                }
+              </p>
+              <div className={cn(
+                "flex gap-4 pt-4",
+                isMobile ? "flex-col" : "flex-row justify-center"
+              )}>
+                <Button 
+                  onClick={() => navigate('/create-story')} 
+                  variant="secondary"
+                  size={isMobile ? "default" : "lg"}
+                  className={cn(
+                    "group bg-white text-primary-600 hover:bg-white/90",
+                    isMobile && "w-full"
+                  )}
+                >
+                  <PlusCircle size={18} className="mr-2" />
+                  {t('stories.create_story', 'Create Story')}
+                  <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+                
+                <Button 
+                  onClick={() => navigate('/ai-chat')} 
+                  variant="outline" 
+                  size={isMobile ? "default" : "lg"}
+                  className={cn(
+                    "border-white text-white hover:bg-white hover:text-primary-600",
+                    isMobile && "w-full"
+                  )}
+                >
+                  {t('stories.need_ideas', 'Need Ideas? Chat with AI')}
+                  <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
               </div>
             </div>
           </div>
@@ -207,3 +170,4 @@ export default function Stories() {
     </motion.div>
   );
 }
+

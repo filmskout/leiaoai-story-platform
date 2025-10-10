@@ -217,6 +217,7 @@ export function PinterestStories({ className, initialCategory = 'all', initialTa
           created_at, featured_image_url, status, author, category_id, category
         `)
         .eq('status', 'published')
+        .eq('is_public', true)
         .order(orderColumn, { ascending })
         .range(offset, offset + STORIES_PER_PAGE - 1);
 
