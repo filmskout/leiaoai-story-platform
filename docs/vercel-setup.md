@@ -27,7 +27,11 @@
 - VITE_APP_URL：站点 URL
 
 服务端专用（不暴露给浏览器）
-- DEEPSEEK_API_KEY：在 Vercel 环境变量中配置（仅 Serverless Function 使用）。前端改为请求 `/api/ai-chat`，由该函数使用 `process.env.DEEPSEEK_API_KEY` 代理调用上游。
+- DEEPSEEK_API_KEY：DeepSeek 服务端密钥
+- OPENAI_API_KEY：OpenAI 服务端密钥
+- QWEN_API_KEY：Qwen（DashScope）服务端密钥
+
+前端调用统一走 `/api/ai-chat`，由该函数读取以上服务端变量，按所选模型转发。
 
 安全注意
 - 任意 VITE_* 变量都会注入到浏览器，勿放置生产密钥。

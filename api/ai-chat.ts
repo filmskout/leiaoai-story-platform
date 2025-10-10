@@ -1,20 +1,18 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getSystemPrompt } from '../src/lib/apiConfig';
 
-const MODEL_MAP: Record<string, string> = {
-  deepseek: 'deepseek-chat',
-  'deepseek-chat': 'deepseek-chat',
+const MODEL_MAP: Record<string, { provider: 'deepseek' | 'openai' | 'qwen'; model: string }> = {
+  deepseek: { provider: 'deepseek', model: 'deepseek-chat' },
+  'deepseek-chat': { provider: 'deepseek', model: 'deepseek-chat' },
+  openai: { provider: 'openai', model: 'gpt-4o' },
+  'gpt-4o': { provider: 'openai', model: 'gpt-4o' },
+  qwen: { provider: 'qwen', model: 'qwen-turbo' },
+  'qwen-turbo': { provider: 'qwen', model: 'qwen-turbo' },
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method Not Allowed' });
-    return;
-  }
-
-  const apiKey = process.env.DEEPSEEK_API_KEY;
-  if (!apiKey) {
-    res.status(500).json({ error: 'Server misconfigured: missing DEEPSEEK_API_KEY' });
     return;
   }
 
@@ -25,18 +23,49 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    const modelToUse = MODEL_MAP[model] || MODEL_MAP['deepseek'];
+    const mapped = MODEL_MAP[model] || MODEL_MAP['deepseek'];
+
+    // 选择上游与密钥
+    let url = '';
+    let apiKey = '';
+    let authHeader = '';
+    if (mapped.provider === 'deepseek') {
+      url = 'https://api.deepseek.com/chat/completions';
+      apiKey = process.env.DEEPSEEK_API_KEY || '';
+      authHeader = `Bearer ${apiKey}`;
+      if (!apiKey) {
+        res.status(500).json({ error: 'Server misconfigured: missing DEEPSEEK_API_KEY' });
+        return;
+      }
+    } else if (mapped.provider === 'openai') {
+      url = 'https://api.openai.com/v1/chat/completions';
+      apiKey = process.env.OPENAI_API_KEY || '';
+      authHeader = `Bearer ${apiKey}`;
+      if (!apiKey) {
+        res.status(500).json({ error: 'Server misconfigured: missing OPENAI_API_KEY' });
+        return;
+      }
+    } else if (mapped.provider === 'qwen') {
+      // Qwen 兼容 OpenAI Chat Completions 协议（DashScope compatible-mode）
+      url = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
+      apiKey = process.env.QWEN_API_KEY || '';
+      authHeader = `Bearer ${apiKey}`;
+      if (!apiKey) {
+        res.status(500).json({ error: 'Server misconfigured: missing QWEN_API_KEY' });
+        return;
+      }
+    }
 
     const startTime = Date.now();
 
-    const response = await fetch('https://api.deepseek.com/chat/completions', {
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${apiKey}`,
+        Authorization: authHeader,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: modelToUse,
+        model: mapped.model,
         messages: [
           { role: 'system', content: getSystemPrompt() },
           { role: 'user', content: message },
@@ -69,7 +98,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(200).json({
       data: {
         content: aiResponse,
-        model: modelToUse,
+        model: mapped.model,
       },
       processingTime: processingTimeSeconds,
     });
