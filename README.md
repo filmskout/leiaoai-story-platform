@@ -236,6 +236,12 @@ supabase/
 
 *At least one AI model API key is required for chat functionality.
 
+## 📚 Documentation
+
+- [Vercel Deployment Guide](docs/vercel-setup.md)
+- [AI Chat Testing Guide](docs/AI-CHAT-TESTING.md)
+- [Admin Account Setup](docs/ADMIN-SETUP.md)
+
 ## Contributing
 
 1. Fork the repository

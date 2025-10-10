@@ -74,6 +74,7 @@ export default function EnhancedSettings() {
   const [popularTags, setPopularTags] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [generatingAvatar, setGeneratingAvatar] = useState(false);
   const [error, setError] = useState('');
 
   const themeOptions: { value: Theme; label: string; icon: React.ReactNode }[] = [
@@ -251,6 +252,47 @@ export default function EnhancedSettings() {
     }
   };
 
+  const handleGenerateAvatar = async () => {
+    if (!user) return;
+
+    const prompt = `Professional business avatar portrait for ${profileForm.full_name || 'professional'}, modern style, high quality, suitable for business profile picture`;
+    
+    setGeneratingAvatar(true);
+    try {
+      // 调用 Vercel Serverless Function 生成头像
+      const response = await fetch('/api/generate-avatar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt,
+          size: '1024x1024'
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate avatar');
+      }
+
+      const data = await response.json();
+      
+      if (data.success && data.imageUrl) {
+        // 将生成的图片 URL 保存到 profile
+        setProfileForm(prev => ({ ...prev, avatar_url: data.imageUrl }));
+        toast.success(t('settings.avatar_generated', 'Avatar generated successfully! Remember to save your changes.'));
+      } else {
+        throw new Error('Invalid response from avatar generation service');
+      }
+    } catch (error: any) {
+      console.error('Avatar generation error:', error);
+      toast.error(error.message || t('settings.avatar_generate_error', 'Failed to generate avatar'));
+    } finally {
+      setGeneratingAvatar(false);
+    }
+  };
+
   const handleBadgeToggle = (badgeId: string) => {
     setSelectedBadges(prev => {
       if (prev.includes(badgeId)) {
@@ -388,10 +430,30 @@ export default function EnhancedSettings() {
                 <p className="text-sm text-foreground-muted mb-2">
                   {t('settings.photo_requirements', 'JPG, PNG or GIF. Max size 5MB.')}
                 </p>
-                <Button size="sm" variant="outline" onClick={() => document.querySelector('input[type="file"]')?.click()}>
-                  <Upload className="w-4 h-4 mr-2" />
-                  {t('settings.upload_photo', 'Upload Photo')}
-                </Button>
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" onClick={() => document.querySelector('input[type="file"]')?.click()}>
+                    <Upload className="w-4 h-4 mr-2" />
+                    {t('settings.upload_photo', 'Upload Photo')}
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    onClick={handleGenerateAvatar}
+                    disabled={generatingAvatar}
+                  >
+                    {generatingAvatar ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent mr-2" />
+                        {t('settings.generating', 'Generating...')}
+                      </>
+                    ) : (
+                      <>
+                        <Bot className="w-4 h-4 mr-2" />
+                        {t('settings.ai_generate', 'AI Generate')}
+                      </>
+                    )}
+                  </Button>
+                </div>
               </div>
             </div>
 
