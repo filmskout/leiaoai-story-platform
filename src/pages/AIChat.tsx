@@ -93,28 +93,32 @@ export default function AIChat() {
     // 检查URL参数中的问题
     if (questionParam && !isLoading) {
       console.log('🎯 Auto-asking question from URL parameter:', questionParam);
+      console.log('📍 Current model:', selectedChatModel);
       sessionStorage.setItem(sessionKey, 'true');
       hasAutoAskedRef.current = true;
       setInputMessage(questionParam);
       // 延迟一下发送，让组件充分初始化
       setTimeout(() => {
+        console.log('⏰ Sending auto-ask message now...');
         sendMessage(questionParam);
-      }, 800);
+      }, 1200); // 增加延迟到1.2秒
       return;
     }
     
     // 检查路由状态中的问题
     if (locationState?.autoAsk && locationState?.question && !isLoading) {
       console.log('🎯 Auto-asking question from location state:', locationState.question);
+      console.log('📍 Current model:', selectedChatModel);
       sessionStorage.setItem(sessionKey, 'true');
       hasAutoAskedRef.current = true;
       setInputMessage(locationState.question);
       // 延迟一下发送，让组件充分初始化
       setTimeout(() => {
+        console.log('⏰ Sending auto-ask message now...');
         sendMessage(locationState.question);
         // 清除状态，防止刷新时重复提问
         navigate(location.pathname, { replace: true, state: null });
-      }, 800);
+      }, 1200); // 增加延迟到1.2秒
     }
   }, [questionParam, isLoading, locationState, navigate, location.pathname, sendMessage, setInputMessage, sessionKey]);
 

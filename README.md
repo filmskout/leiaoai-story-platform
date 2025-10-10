@@ -65,7 +65,9 @@ Security notes:
 pnpm dev
 ```
 
-更多部署细节请参考文档：`docs/vercel-setup.md`。
+更多部署细节请参考文档：
+- `docs/vercel-setup.md` - Vercel部署指南
+- `docs/API-KEYS-SETUP.md` - API Keys配置和测试指南
 
 ## Environment Configuration
 
