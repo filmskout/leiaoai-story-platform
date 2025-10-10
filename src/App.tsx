@@ -210,7 +210,16 @@ function AppRoutes() {
               <Settings />
             </ProtectedRoute>
           } />
-          <Route path="create-story" element={<CreateStory />} />
+          <Route path="create-story" element={
+            <ProtectedRoute>
+              <CreateStory />
+            </ProtectedRoute>
+          } />
+          <Route path="dashboard" element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          } />
           <Route path="debug-stories" element={<DebugStories />} />
         </Route>
 

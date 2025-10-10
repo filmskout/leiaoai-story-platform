@@ -16,7 +16,8 @@ import {
   Share2,
   Heart,
   Bookmark,
-  MessageSquare
+  MessageSquare,
+  Edit
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -419,6 +420,20 @@ export default function StoryDetail() {
             <span>Share</span>
           </button>
         </div>
+
+        {/* Edit button for story author */}
+        {user && story.author_id === user.id && (
+          <div className="flex justify-end mb-4">
+            <Button 
+              onClick={() => navigate(`/edit-story/${story.id}`)}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <Edit size={16} />
+              {t('story.edit', 'Edit Story')}
+            </Button>
+          </div>
+        )}
 
         {/* Story content */}
         <div className="prose prose-lg max-w-none">
