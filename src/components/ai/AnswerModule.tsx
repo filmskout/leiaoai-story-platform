@@ -408,33 +408,6 @@ export function AnswerModule({
         
         {/* 输入框区域 */}
         <div className="border-t border-border bg-card/50 p-4">
-          {/* 快速问题建议 - 仅在输入框为空时显示 */}
-          {!inputMessage.trim() && (
-            <motion.div 
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
-              className="mb-4"
-            >
-              <div className="flex flex-wrap gap-2 justify-center">
-                {sampleQuestions.map((question, index) => (
-                  <motion.button
-                    key={index}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.2, delay: index * 0.1 }}
-                    onClick={() => onInputChange && onInputChange(question)}
-                    className="px-3 py-2 text-sm bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 rounded-full hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors duration-200 flex items-center gap-2"
-                  >
-                    <Zap size={14} />
-                    {question}
-                  </motion.button>
-                ))}
-              </div>
-            </motion.div>
-          )}
-
           {/* 主输入区域 */}
           <div className="relative bg-background rounded-xl border border-border shadow-sm p-4">
             <Textarea 

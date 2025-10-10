@@ -27,6 +27,8 @@ export async function fetchAIResponse(
       throw new Error('No message content provided');
     }
 
+    console.log('🔵 Frontend: Calling AI Chat API', { model, messageLength: lastMessage.content.length });
+
     // 调用 Vercel Serverless Function 以隐藏服务端密钥
     const resp = await fetch('/api/ai-chat', {
       method: 'POST',
@@ -38,18 +40,28 @@ export async function fetchAIResponse(
       })
     });
 
+    console.log('🔵 Frontend: API Response Status', resp.status, resp.statusText);
+
     if (!resp.ok) {
       const txt = await resp.text();
+      console.error('🔴 Frontend: API Error Response', txt.slice(0, 200));
       throw new Error(txt || 'AI service temporarily unavailable');
     }
 
     const data = await resp.json();
     if (!data || !data.data) {
+      console.error('🔴 Frontend: Invalid response structure', data);
       throw new Error('Invalid response from AI service');
     }
 
     const endTime = Date.now();
     const processingTime = Number(((endTime - startTime) / 1000).toFixed(1));
+
+    console.log('🟢 Frontend: Success', { 
+      model: data.data.model, 
+      responseLength: data.data.content?.length,
+      time: processingTime 
+    });
 
     return {
       response: data.data.content || 'No response generated',
@@ -57,7 +69,7 @@ export async function fetchAIResponse(
       processingTime
     };
   } catch (error) {
-    console.error('Error in fetchAIResponse:', error);
+    console.error('🔴 Frontend: Error in fetchAIResponse:', error);
     
     // 返回友好的错误消息
     const isZh = language.startsWith('zh');

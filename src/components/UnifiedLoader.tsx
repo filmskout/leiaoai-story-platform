@@ -185,14 +185,11 @@ export function UnifiedLoader({
   const renderColorfulALogo = () => {
     return (
       <div className="relative h-full w-full flex items-center justify-center">
-        <div className="relative h-full w-full">
-          <div className="absolute inset-0 bg-white/90 dark:bg-white/80 rounded-full flex items-center justify-center shadow-md"></div>
-          <img
-            src={logoImages[currentImageIndex]}
-            alt="蕾奥AI Logo"
-            className="absolute inset-0 w-full h-full object-contain relative z-10"
-          />
-        </div>
+        <img
+          src={logoImages[currentImageIndex]}
+          alt="蕾奥AI Logo"
+          className="w-full h-full object-contain"
+        />
       </div>
     );
   };

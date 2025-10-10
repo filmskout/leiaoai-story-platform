@@ -592,9 +592,9 @@ export default function Profile() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">{t('profile.stats.stories', 'Stories Published')}</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalStories}</p>
-                <p className="text-xs text-green-600 mt-1">
+                <p className="text-sm font-medium text-foreground-secondary">{t('profile.stats.stories', 'Stories Published')}</p>
+                <p className="text-2xl font-bold text-foreground">{stats.totalStories}</p>
+                <p className="text-xs text-green-600 dark:text-green-400 mt-1">
                   <TrendingUp className="w-3 h-3 inline mr-1" />
                   {t('profile.stats.total_views', 'Total Views')}: {stats.totalViews.toLocaleString()}
                 </p>
@@ -610,8 +610,8 @@ export default function Profile() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">{t('profile.stats.likes', 'Likes Received')}</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalLikes}</p>
+                <p className="text-sm font-medium text-foreground-secondary">{t('profile.stats.likes', 'Likes Received')}</p>
+                <p className="text-2xl font-bold text-foreground">{stats.totalLikes}</p>
               </div>
               <Heart className="w-8 h-8 text-red-600" />
             </div>
@@ -622,8 +622,8 @@ export default function Profile() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">{t('profile.stats.comments', 'Comments Made')}</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalComments}</p>
+                <p className="text-sm font-medium text-foreground-secondary">{t('profile.stats.comments', 'Comments Made')}</p>
+                <p className="text-2xl font-bold text-foreground">{stats.totalComments}</p>
               </div>
               <MessageSquare className="w-8 h-8 text-green-600" />
             </div>
@@ -634,8 +634,8 @@ export default function Profile() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">{t('profile.stats.saved', 'Saved Stories')}</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.savedStories}</p>
+                <p className="text-sm font-medium text-foreground-secondary">{t('profile.stats.saved', 'Saved Stories')}</p>
+                <p className="text-2xl font-bold text-foreground">{stats.savedStories}</p>
               </div>
               <BookMarked className="w-8 h-8 text-purple-600" />
             </div>
@@ -856,16 +856,16 @@ export default function Profile() {
             </CardHeader>
             <CardContent>
               {savedStories.length === 0 ? (
-                <p className="text-gray-500 text-center py-8">
+                <p className="text-foreground-secondary text-center py-8">
                   {t('profile.no_saved', 'No saved stories yet')}
                 </p>
               ) : (
                 <div className="space-y-4">
                   {savedStories.map((save: any) => (
-                    <div key={save.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                      <h3 className="font-semibold text-gray-900 mb-2">{save.stories?.title}</h3>
-                      <p className="text-gray-600 text-sm mb-3 line-clamp-2">{save.stories?.content}</p>
-                      <div className="flex items-center justify-between text-sm text-gray-500">
+                    <div key={save.id} className="border border-border rounded-lg p-4 hover:shadow-md dark:hover:shadow-lg transition-shadow bg-card">
+                      <h3 className="font-semibold text-foreground mb-2">{save.stories?.title}</h3>
+                      <p className="text-foreground-secondary text-sm mb-3 line-clamp-2">{save.stories?.content}</p>
+                      <div className="flex items-center justify-between text-sm text-foreground-secondary">
                         <span>{t('profile.saved_on', 'Saved on')} {formatDate(save.created_at)}</span>
                       </div>
                     </div>

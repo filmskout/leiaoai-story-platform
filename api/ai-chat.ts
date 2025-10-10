@@ -36,12 +36,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const { message, model = 'deepseek', sessionId } = req.body || {};
+    console.log('🚀 AI Chat Request:', { model, messageLength: message?.length, sessionId });
+    
     if (!message || typeof message !== 'string') {
       res.status(400).json({ error: 'Invalid request: message is required' });
       return;
     }
 
     const mapped = MODEL_MAP[model] || MODEL_MAP['deepseek'];
+    console.log('📍 Mapped Model:', { provider: mapped.provider, model: mapped.model });
 
     // 选择上游与密钥
     let url = '';
@@ -75,6 +78,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const startTime = Date.now();
+    console.log('🌐 Calling API:', { url, model: mapped.model });
 
     const response = await fetch(url, {
       method: 'POST',
@@ -96,8 +100,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }),
     });
 
+    console.log('📡 API Response Status:', response.status, response.statusText);
+
     if (!response.ok) {
       const errorText = await response.text();
+      console.error('❌ API Error:', errorText.slice(0, 200));
       res.status(response.status).json({ error: errorText.slice(0, 500) });
       return;
     }
@@ -106,12 +113,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const aiResponse: string | undefined = data?.choices?.[0]?.message?.content;
 
     if (!aiResponse) {
-      res.status(502).json({ error: 'Invalid response from DeepSeek' });
+      console.error('❌ Invalid AI response structure:', JSON.stringify(data).slice(0, 200));
+      res.status(502).json({ error: 'Invalid response from AI service' });
       return;
     }
 
     const endTime = Date.now();
     const processingTimeSeconds = Number(((endTime - startTime) / 1000).toFixed(1));
+
+    console.log('✅ Success:', { model: mapped.model, responseLength: aiResponse.length, time: processingTimeSeconds });
 
     res.status(200).json({
       data: {
@@ -121,6 +131,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       processingTime: processingTimeSeconds,
     });
   } catch (err: any) {
+    console.error('💥 Handler Error:', err?.message || err);
     res.status(500).json({ error: err?.message || 'Internal Server Error' });
   }
 }
