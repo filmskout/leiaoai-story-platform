@@ -742,10 +742,20 @@ export default function Profile() {
               ) : (
                 <div className="space-y-4">
                   {userStories.map((story: any) => (
-                    <div key={story.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                      <h3 className="font-semibold text-gray-900 mb-2">{story.title}</h3>
-                      <p className="text-gray-600 text-sm mb-3 line-clamp-2">{story.content}</p>
-                      <div className="flex items-center justify-between text-sm text-gray-500">
+                    <div key={story.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow">
+                      <div className="flex items-start justify-between mb-2">
+                        <h3 className="font-semibold text-gray-900 dark:text-gray-100 flex-1">{story.title}</h3>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => navigate(`/edit-story/${story.id}`)}
+                        >
+                          <Edit3 className="w-4 h-4 mr-1" />
+                          {t('common.edit', 'Edit')}
+                        </Button>
+                      </div>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm mb-3 line-clamp-2">{story.content}</p>
+                      <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
                         <span>{formatDate(story.created_at)}</span>
                         <div className="flex items-center space-x-4">
                           <span className="flex items-center">

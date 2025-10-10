@@ -406,10 +406,23 @@ export default function StoryDetail() {
               <span>{userInteractions.hasSaved ? 'Saved' : 'Save'}</span>
             </button>
 
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 text-gray-600">
+            <button
+              onClick={() => {
+                const commentsSection = document.getElementById('comments-section');
+                if (commentsSection) {
+                  commentsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  // Focus on comment input after scroll
+                  setTimeout(() => {
+                    const commentInput = document.querySelector<HTMLTextAreaElement>('[data-comment-input]');
+                    if (commentInput) commentInput.focus();
+                  }, 500);
+                }
+              }}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors cursor-pointer"
+            >
               <MessageSquare className="w-4 h-4" />
               <span>{(story.comment_count || 0).toLocaleString()}</span>
-            </div>
+            </button>
           </div>
 
           <button
@@ -443,7 +456,7 @@ export default function StoryDetail() {
         </div>
 
         {/* Comments section */}
-        <div className="mt-12 pt-8 border-t border-border">
+        <div id="comments-section" className="mt-12 pt-8 border-t border-border">
           <h3 className="text-xl font-semibold mb-6">Comments ({story.comment_count || 0})</h3>
           <CommentSystem 
             storyId={story.id} 

@@ -140,35 +140,18 @@ export function SimpleStoriesWall() {
   const loadStoriesTags = async (stories: any[]) => {
     if (stories.length === 0) return;
 
-    const storyIds = stories.map(s => s.id);
-    const { data: storyTagsData } = await supabase
-      .from('story_tags')
-      .select(`
-        story_id,
-        tags!inner(id, name, display_name, color)
-      `)
-      .in('story_id', storyIds);
-
-    if (storyTagsData) {
-      const tagsMap = new Map();
-      storyTagsData.forEach((st: any) => {
-        if (!tagsMap.has(st.story_id)) {
-          tagsMap.set(st.story_id, []);
-        }
-        tagsMap.get(st.story_id).push(st.tags);
-      });
-
-      stories.forEach(story => {
-        story.tags = tagsMap.get(story.id) || [];
-      });
-    }
+    // For now, just set empty tags array for each story
+    // Tags functionality will be enhanced once the story_stories_tags junction table is properly set up
+    stories.forEach(story => {
+      story.tags = [];
+    });
   };
 
   const loadTags = async () => {
     try {
       const { data, error } = await supabase
-        .from('tags')
-        .select('*')
+        .from('story_tags')
+        .select('id, name, display_name, color, usage_count')
         .eq('is_active', true)
         .order('usage_count', { ascending: false })
         .limit(20);

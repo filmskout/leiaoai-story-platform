@@ -180,6 +180,7 @@ export function CommentSystem({ storyId, userId, sessionId, onCommentAdded }: Co
                 Add a comment
               </label>
               <textarea
+                data-comment-input
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 rows={3}
