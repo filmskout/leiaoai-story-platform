@@ -340,7 +340,14 @@ export default function StoryDetail() {
             </div>
             <div className="flex items-center gap-1">
               <Calendar className="w-4 h-4" />
-              <span>{formatDate(story.published_at || story.created_at)}</span>
+              <span>
+                {formatDate(story.published_at || story.created_at)}
+                {story.updated_at && story.updated_at !== story.created_at && (
+                  <span className="ml-2 text-xs text-muted-foreground">
+                    ({t('story.edited', 'edited')})
+                  </span>
+                )}
+              </span>
             </div>
             <div className="flex items-center gap-1">
               <Clock className="w-4 h-4" />

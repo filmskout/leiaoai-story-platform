@@ -287,8 +287,8 @@ export default function Profile() {
     try {
       const { data, error } = await supabase
         .from('stories')
-        .select('id, title, content, view_count, like_count, comment_count, created_at')
-        .eq('author', user.id)
+        .select('id, title, content, excerpt, view_count, like_count, comment_count, created_at, updated_at')
+        .eq('author_id', user.id)
         .eq('status', 'published')
         .order('created_at', { ascending: false })
         .limit(10);
@@ -536,11 +536,11 @@ export default function Profile() {
             <div className="relative">
               <Avatar className="w-24 h-24">
                 <AvatarImage 
-                  src={user.user_metadata?.avatar_url || '/default-user-avatar-placeholder-modern-clean.jpg'} 
-                  alt={user.user_metadata?.full_name || 'User'}
+                  src={profile?.avatar_url || user.user_metadata?.avatar_url || '/default-user-avatar-placeholder-modern-clean.jpg'} 
+                  alt={profile?.full_name || user.user_metadata?.full_name || 'User'}
                 />
                 <AvatarFallback>
-                  {(user.user_metadata?.full_name || user.email || 'U')[0].toUpperCase()}
+                  {(profile?.full_name || user.user_metadata?.full_name || user.email || 'U')[0].toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <Button

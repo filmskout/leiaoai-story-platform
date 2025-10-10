@@ -22,6 +22,7 @@ const AdminLogin = lazy(() => import('@/pages/AdminLogin'));
 const Profile = lazy(() => import('@/pages/Profile'));
 const StoryDetail = lazy(() => import('@/pages/StoryDetail'));
 const CreateStory = lazy(() => import('@/pages/CreateStory'));
+const EditStory = lazy(() => import('@/pages/EditStory'));
 const Stories = lazy(() => import('@/pages/Stories'));
 const UserProfile = lazy(() => import('@/pages/UserProfile'));
 const AuthCallback = lazy(() => import('@/pages/AuthCallback'));
@@ -223,6 +224,11 @@ function AppRoutes() {
           <Route path="create-story" element={
             <ProtectedRoute>
               <CreateStory />
+            </ProtectedRoute>
+          } />
+          <Route path="edit-story/:id" element={
+            <ProtectedRoute>
+              <EditStory />
             </ProtectedRoute>
           } />
           <Route path="debug-stories" element={<DebugStories />} />

@@ -409,5 +409,30 @@
     "search_tags": "搜索标签...",
     "no_tags_found": "未找到标签",
     "remove_tag": "移除标签"
+  },
+  
+  "story": {
+    "edited": "已编辑",
+    "not_authorized": "您无权编辑此故事",
+    "load_error": "加载故事失败",
+    "title_required_for_image": "请先输入标题",
+    "image_generated": "图片生成成功",
+    "image_error": "图片生成失败",
+    "required_fields": "标题和内容为必填项",
+    "updated": "故事更新成功！",
+    "update_error": "更新故事失败",
+    "title": "标题",
+    "title_placeholder": "输入故事标题...",
+    "excerpt": "摘要",
+    "excerpt_placeholder": "简要描述（可选）...",
+    "content": "内容",
+    "content_placeholder": "在此编写您的故事内容...",
+    "featured_image": "特色图片",
+    "generating": "生成中...",
+    "regenerate_image": "重新生成",
+    "generate_image": "AI生成图片",
+    "tags": "标签",
+    "save_changes": "保存更改",
+    "saving": "保存中..."
   }
 }

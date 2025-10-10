@@ -409,5 +409,30 @@
     "search_tags": "Search tags...",
     "no_tags_found": "No tags found",
     "remove_tag": "Remove tag"
+  },
+  
+  "story": {
+    "edited": "edited",
+    "not_authorized": "You are not authorized to edit this story",
+    "load_error": "Failed to load story",
+    "title_required_for_image": "Please enter a title first",
+    "image_generated": "Image generated successfully",
+    "image_error": "Failed to generate image",
+    "required_fields": "Title and content are required",
+    "updated": "Story updated successfully!",
+    "update_error": "Failed to update story",
+    "title": "Title",
+    "title_placeholder": "Enter story title...",
+    "excerpt": "Excerpt",
+    "excerpt_placeholder": "Brief description (optional)...",
+    "content": "Content",
+    "content_placeholder": "Write your story content here...",
+    "featured_image": "Featured Image",
+    "generating": "Generating...",
+    "regenerate_image": "Regenerate",
+    "generate_image": "Generate with AI",
+    "tags": "Tags",
+    "save_changes": "Save Changes",
+    "saving": "Saving..."
   }
 }

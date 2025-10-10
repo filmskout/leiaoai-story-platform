@@ -245,12 +245,12 @@ export function AIProvider({ children }: AIProviderProps) {
                                (new Date().getTimezoneOffset() / -60) === 8; // 中国标准时区是UTC+8
     
     // 根据不同语言返回不同的模型
-    // 简体及繁体中文用户默认使用 DeepSeek
-    // 英文和其他语言用户默认使用 OpenAI
+    // 简体及繁体中文用户默认使用 Qwen（阿里通义千问）
+    // 英文和其他语言用户默认使用 OpenAI GPT-4o
     if (possibleChineseUser) {
-      return 'deepseek'; // 中国用户使用国内模型
+      return 'qwen'; // 中国用户使用Qwen（阿里通义千问）
     } else {
-      return 'openai'; // 海外用户优先使用OpenAI
+      return 'openai'; // 海外用户优先使用OpenAI GPT-4o
     }
   };
   
