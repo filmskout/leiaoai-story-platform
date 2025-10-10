@@ -65,6 +65,8 @@ Security notes:
 pnpm dev
 ```
 
+更多部署细节请参考文档：`docs/vercel-setup.md`。
+
 ## Environment Configuration
 
 Create a `.env.local` file with the following variables:
