@@ -30,13 +30,8 @@ interface Story {
   like_count: number;
   comment_count: number;
   created_at: string;
-  author_id: string;
+  author: string;
   category: string;
-  profiles?: {
-    full_name: string;
-    username: string;
-    avatar_url: string;
-  };
   tags?: Array<{ id: string; name: string; display_name: string; color: string }>;
 }
 
@@ -69,7 +64,7 @@ export function SimpleStoriesWall() {
     try {
       setLoading(true);
 
-      // Build query with author profile join
+      // Build query
       let query = supabase
         .from('stories')
         .select(`
@@ -82,13 +77,8 @@ export function SimpleStoriesWall() {
           like_count,
           comment_count,
           created_at,
-          author_id,
-          category,
-          profiles:author_id (
-            full_name,
-            username,
-            avatar_url
-          )
+          author,
+          category
         `)
         .eq('status', 'published')
         .eq('is_public', true);
@@ -364,7 +354,7 @@ export function SimpleStoriesWall() {
                       <User className="w-3 h-3 text-primary-600" />
                     </div>
                     <span className="text-sm text-foreground-secondary">
-                      {story.profiles?.full_name || story.profiles?.username || 'LeiaoAI Agent'}
+                      LeiaoAI Agent
                     </span>
                   </div>
                 </CardContent>

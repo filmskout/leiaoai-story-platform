@@ -83,12 +83,7 @@ export function NewStoryCarousel({ className }: NewStoryCarouselProps) {
         .from('stories')
         .select(`
           id, title, content, excerpt, view_count, like_count, comment_count, 
-          created_at, featured_image_url, author_id, category,
-          profiles:author_id (
-            full_name,
-            username,
-            avatar_url
-          )
+          created_at, featured_image_url, author, category
         `)
         .eq('status', 'published')
         .eq('is_public', true)
@@ -134,8 +129,7 @@ export function NewStoryCarousel({ className }: NewStoryCarouselProps) {
           title: story.title,
           content: story.content,
           excerpt: story.excerpt || story.content?.substring(0, 120) + '...' || 'Story excerpt...',
-          author_id: story.author_id,
-          profiles: story.profiles,
+          author: story.author,
           category: story.category || 'general',
           view_count: story.view_count || 0,
           like_count: story.like_count || 0,
@@ -334,7 +328,7 @@ export function NewStoryCarousel({ className }: NewStoryCarouselProps) {
                       <User className="w-3 h-3 text-primary-600" />
                     </div>
                     <span className="text-sm text-foreground-secondary">
-                      {story.profiles?.full_name || story.profiles?.username || 'LeiaoAI Agent'}
+                      LeiaoAI Agent
                     </span>
                   </div>
                   
