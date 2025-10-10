@@ -61,27 +61,23 @@ export function AvatarUploadDialog({
 
     setUploading(true);
     try {
-      const fileName = `avatar-${userId}-${Date.now()}.${selectedFile.name.split('.').pop()}`;
+      // 直接使用base64上传到profiles表，不经过edge function
+      const base64Data = previewUrl;
+      
+      // 更新profile中的avatar_url为base64
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ 
+          avatar_url: base64Data,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', userId);
 
-      // Upload via edge function
-      const { data, error } = await supabase.functions.invoke('media-upload', {
-        body: {
-          mediaData: previewUrl,
-          fileName,
-          mediaType: 'image'
-        }
-      });
+      if (updateError) throw updateError;
 
-      if (error) throw error;
-
-      const avatarUrl = data?.data?.publicUrl;
-      if (avatarUrl) {
-        onAvatarUpdate(avatarUrl);
-        toast.success(t('settings.avatar_uploaded', 'Avatar uploaded successfully'));
-        handleClose();
-      } else {
-        throw new Error('Failed to get avatar URL');
-      }
+      onAvatarUpdate(base64Data);
+      toast.success(t('settings.avatar_uploaded', 'Avatar uploaded successfully'));
+      handleClose();
     } catch (error: any) {
       console.error('Upload error:', error);
       toast.error(error.message || t('settings.avatar_error', 'Failed to upload avatar'));
@@ -161,32 +157,24 @@ export function AvatarUploadDialog({
           base64Data = await base64Promise;
         } catch (fetchError) {
           console.error('Failed to fetch image, using direct URL:', fetchError);
-          // 如果fetch失败，尝试直接使用URL
           throw new Error('Unable to download generated image. Please try generating again.');
         }
       }
 
-      const fileName = `avatar-${userId}-${Date.now()}.png`;
+      // 直接保存base64到profiles表
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ 
+          avatar_url: base64Data,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', userId);
 
-      // Upload to Supabase
-      const { data, error } = await supabase.functions.invoke('media-upload', {
-        body: {
-          mediaData: base64Data,
-          fileName,
-          mediaType: 'image'
-        }
-      });
+      if (updateError) throw updateError;
 
-      if (error) throw error;
-
-      const avatarUrl = data?.data?.publicUrl;
-      if (avatarUrl) {
-        onAvatarUpdate(avatarUrl);
-        toast.success(t('settings.avatar_generated', 'Avatar generated and saved successfully'));
-        handleClose();
-      } else {
-        throw new Error('Failed to upload generated avatar');
-      }
+      onAvatarUpdate(base64Data);
+      toast.success(t('settings.avatar_generated', 'Avatar generated and saved successfully'));
+      handleClose();
     } catch (error: any) {
       console.error('Confirm error:', error);
       toast.error(error.message || t('settings.avatar_error', 'Failed to save avatar'));
@@ -241,8 +229,8 @@ export function AvatarUploadDialog({
             <div>
               <label className="block">
                 <div className="flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary-500 transition-colors">
-                  <Upload className="w-5 h-5 mr-2 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">
+                  <Upload className="w-5 h-5 mr-2 flex-shrink-0 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground truncate max-w-[250px]" title={selectedFile?.name}>
                     {selectedFile ? selectedFile.name : t('settings.select_file', 'Select a file')}
                   </span>
                 </div>

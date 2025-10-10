@@ -224,10 +224,16 @@ export default function EnhancedSettings() {
     setError('');
 
     try {
-      // Update profile through auth context
-      if (updateProfile) {
-        await updateProfile(profileForm);
-      }
+      // 直接更新到profiles表，包括avatar_url
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          ...profileForm,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
+
+      if (profileError) throw profileError;
 
       // Save selected badges preferences
       const { error: prefsError } = await supabase
@@ -245,7 +251,15 @@ export default function EnhancedSettings() {
         // Don't throw here - profile update might have succeeded
       }
 
+      // 刷新认证上下文中的profile数据
+      if (updateProfile) {
+        await updateProfile(profileForm);
+      }
+
       toast.success(t('settings.profile_saved', 'Profile updated successfully'));
+      
+      // 强制刷新页面以更新所有头像显示
+      window.location.reload();
     } catch (error: any) {
       console.error('Failed to save profile:', error);
       setError(error.message || t('settings.save_error', 'Failed to save profile'));

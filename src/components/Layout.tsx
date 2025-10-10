@@ -33,7 +33,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
 export default function Layout() {
-  const { user, isAuthenticated, signOut } = useAuth();
+  const { user, profile, isAuthenticated, signOut } = useAuth();
   const { isAdmin, adminSessionValid } = useAdmin();
   const { theme, actualTheme, toggleTheme } = useTheme();
   const { t } = useTranslation();
@@ -73,10 +73,13 @@ export default function Layout() {
   // Get current user info from unified auth context
   const getCurrentUser = () => {
     if (user) {
+      // 优先使用profile中的avatar_url（支持base64），其次使用user metadata
+      const avatarUrl = profile?.avatar_url || user.user_metadata?.avatar_url || '/default_user_avatar_placeholder_modern_clean.jpg';
+      
       return {
-        name: user.name || 'User',
+        name: profile?.full_name || user.user_metadata?.full_name || user.email || 'User',
         email: user.email || '',
-        avatar: user.avatar_url || '/default_user_avatar_placeholder_modern_clean.jpg',
+        avatar: avatarUrl,
         isAuthenticated: true
       };
     }
