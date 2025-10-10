@@ -27,20 +27,23 @@ export async function fetchAIResponse(
       throw new Error('No message content provided');
     }
 
-    // 调用AI聊天edge function
-    const { data, error } = await supabase.functions.invoke('ai-chat', {
-      body: {
+    // 调用 Vercel Serverless Function 以隐藏服务端密钥
+    const resp = await fetch('/api/ai-chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
         message: lastMessage.content,
-        model: model,
-        sessionId: crypto.randomUUID() // 临时会话ID
-      }
+        model,
+        sessionId: crypto.randomUUID()
+      })
     });
 
-    if (error) {
-      console.error('AI Chat function error:', error);
-      throw new Error(error.message || 'AI service temporarily unavailable');
+    if (!resp.ok) {
+      const txt = await resp.text();
+      throw new Error(txt || 'AI service temporarily unavailable');
     }
 
+    const data = await resp.json();
     if (!data || !data.data) {
       throw new Error('Invalid response from AI service');
     }
