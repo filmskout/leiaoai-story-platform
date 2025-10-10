@@ -13,6 +13,7 @@ import {
   Plus
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -86,18 +87,17 @@ export default function Stories() {
           isMobile ? "py-12" : "py-20"
         )}
       >
-        <div className="container mx-auto max-w-4xl">
-          <div 
-            className={cn(
-              "text-white rounded-xl shadow-lg",
-              isMobile ? "p-6" : "p-12"
-            )}
+        <div className="container-custom">
+          <Card 
+            className="text-white border-0"
             style={{ backgroundColor: '#f97316' }}
           >
-            <div className={cn(
-              "text-center space-y-4",
-              isMobile ? "" : "space-y-6"
-            )}>
+            <CardContent 
+              className={cn(
+                "text-center space-y-4",
+                isMobile ? "p-6" : "p-12 space-y-6"
+              )}
+            >
               <h2 className={cn(
                 "font-bold",
                 isMobile ? "text-2xl" : "text-4xl"
@@ -144,8 +144,8 @@ export default function Stories() {
                   <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </motion.section>
 
