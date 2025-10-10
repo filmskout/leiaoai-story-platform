@@ -71,7 +71,7 @@ export default function EditStory() {
       if (error) throw error;
 
       // Check if user is the author
-      if (data.author_id !== user?.id) {
+      if (data.author !== user?.id) {
         toast.error(t('story.not_authorized', 'You are not authorized to edit this story'));
         navigate('/stories');
         return;

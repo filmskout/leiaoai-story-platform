@@ -442,7 +442,7 @@ export default function StoryDetail() {
         </div>
 
         {/* Edit button for story author */}
-        {user && story.author_id === user.id && (
+        {user && story.author === user.id && (
           <div className="flex justify-end mb-4">
             <Button 
               onClick={() => navigate(`/edit-story/${story.id}`)}
