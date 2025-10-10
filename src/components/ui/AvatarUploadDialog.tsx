@@ -113,9 +113,11 @@ export function AvatarUploadDialog({
 
       const data = await response.json();
 
-      if (data.success && data.imageUrl) {
-        setGeneratedUrl(data.imageUrl);
-        setPreviewUrl(data.imageUrl);
+      if (data.success && (data.base64Image || data.imageUrl)) {
+        // 优先使用base64，如果没有则使用URL
+        const imageData = data.base64Image || data.imageUrl;
+        setGeneratedUrl(imageData);
+        setPreviewUrl(imageData);
       } else {
         throw new Error('Invalid response from avatar generation service');
       }
@@ -132,19 +134,38 @@ export function AvatarUploadDialog({
 
     setUploading(true);
     try {
-      // Download generated image
-      const imageResponse = await fetch(generatedUrl);
-      const imageBlob = await imageResponse.blob();
+      let base64Data = generatedUrl;
 
-      // Convert to base64
-      const reader = new FileReader();
-      const base64Promise = new Promise<string>((resolve, reject) => {
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(imageBlob);
-      });
+      // 如果不是base64格式（以data:开头），则需要下载
+      if (!generatedUrl.startsWith('data:')) {
+        try {
+          const imageResponse = await fetch(generatedUrl, {
+            mode: 'cors',
+            credentials: 'omit'
+          });
+          
+          if (!imageResponse.ok) {
+            throw new Error('Failed to download image');
+          }
+          
+          const imageBlob = await imageResponse.blob();
 
-      const base64Data = await base64Promise;
+          // Convert to base64
+          const reader = new FileReader();
+          const base64Promise = new Promise<string>((resolve, reject) => {
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(imageBlob);
+          });
+
+          base64Data = await base64Promise;
+        } catch (fetchError) {
+          console.error('Failed to fetch image, using direct URL:', fetchError);
+          // 如果fetch失败，尝试直接使用URL
+          throw new Error('Unable to download generated image. Please try generating again.');
+        }
+      }
+
       const fileName = `avatar-${userId}-${Date.now()}.png`;
 
       // Upload to Supabase
