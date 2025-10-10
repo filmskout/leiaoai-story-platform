@@ -175,7 +175,7 @@ export default function Profile() {
 
       // Load saved stories count
       const { data: saves, error: savesError } = await supabase
-        .from('user_saves')
+        .from('story_saves')
         .select('id')
         .eq('user_id', user.id);
 
@@ -259,7 +259,7 @@ export default function Profile() {
 
     try {
       const { data, error } = await supabase
-        .from('user_saves')
+        .from('story_saves')
         .select(`
           *,
           stories!inner(*)
