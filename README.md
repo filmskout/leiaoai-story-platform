@@ -53,6 +53,11 @@ pnpm install
 # Copy environment variables
 cp .env.example .env.local
 
+Security notes:
+- Vite 会在构建时将 `VITE_*` 前缀变量注入到客户端，请勿在其中放置生产密钥。
+- 生产环境下请通过受保护的后端代理获取临时令牌，不要在浏览器暴露真实密钥。
+- `src/lib/apiConfig.ts` 中的 `getAPIKey` 将优先使用 `window.__API_KEY__`，其次使用 `import.meta.env.VITE_DEEPSEEK_API_KEY`；若均未配置会返回空字符串，请在调用处提示配置或走后端代理。
+
 # Configure your environment variables in .env.local
 # See Environment Configuration section below
 

@@ -38,10 +38,17 @@ export const getAPIKey = async (): Promise<string> => {
   if (typeof window !== 'undefined' && (window as any).__API_KEY__) {
     return (window as any).__API_KEY__;
   }
+
+  // Vite 环境变量（仅在构建时注入）
+  // 注意：不要在浏览器端暴露真正的生产密钥，建议通过后端代理。
+  const viteKey = (import.meta as any)?.env?.VITE_DEEPSEEK_API_KEY;
+  if (viteKey) {
+    return viteKey as string;
+  }
   
   // 在实际生产环境中，这里应该调用安全的后端API获取临时密钥
-  // 目前使用配置的密钥作为临时解决方案
-  return 'sk-85720175774449d49569e8a3a15f387a';
+  // 未配置密钥时返回空字符串，调用方应处理该情况（例如提示配置密钥）
+  return '';
 };
 
 // 投融资专业系统提示词
