@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { AnswerModule } from '@/components/ai/AnswerModule';
@@ -44,6 +44,16 @@ export default function AIChat() {
     clearError,
     selectQuestion
   } = useSmartAIChat();
+  
+  // 使用 ref 来跟踪是否已经自动提问过（避免重复触发）
+  const hasAutoAskedRef = useRef(false);
+  
+  // 生成当前会话的唯一标识（基于问题或路由状态）
+  const sessionKey = questionParam 
+    ? `auto-asked-${questionParam}` 
+    : locationState?.question 
+      ? `auto-asked-${locationState.question}` 
+      : null;
 
   // 返回专业服务区域
   const handleGoBack = () => {
@@ -68,27 +78,54 @@ export default function AIChat() {
 
   // 自动提问初始问题
   useEffect(() => {
+    // 如果没有会话标识，跳过
+    if (!sessionKey) {
+      return;
+    }
+
+    // 检查是否已经为这个问题自动提问过
+    const alreadyAsked = sessionStorage.getItem(sessionKey);
+    if (alreadyAsked === 'true') {
+      console.log('⏭️ Skipping auto-ask, already asked:', sessionKey);
+      return;
+    }
+
     // 检查URL参数中的问题
-    if (questionParam && !isLoading && currentMessages.length === 0) {
-      console.log('Auto-asking question from URL parameter:', questionParam);
+    if (questionParam && !isLoading) {
+      console.log('🎯 Auto-asking question from URL parameter:', questionParam);
+      sessionStorage.setItem(sessionKey, 'true');
+      hasAutoAskedRef.current = true;
       setInputMessage(questionParam);
       // 延迟一下发送，让组件充分初始化
       setTimeout(() => {
         sendMessage(questionParam);
       }, 800);
+      return;
     }
+    
     // 检查路由状态中的问题
-    else if (locationState?.autoAsk && locationState?.question && !isLoading) {
-      console.log('Auto-asking question from location state:', locationState.question);
+    if (locationState?.autoAsk && locationState?.question && !isLoading) {
+      console.log('🎯 Auto-asking question from location state:', locationState.question);
+      sessionStorage.setItem(sessionKey, 'true');
+      hasAutoAskedRef.current = true;
       setInputMessage(locationState.question);
       // 延迟一下发送，让组件充分初始化
       setTimeout(() => {
         sendMessage(locationState.question);
         // 清除状态，防止刷新时重复提问
-        navigate(location.pathname, { replace: true });
+        navigate(location.pathname, { replace: true, state: null });
       }, 800);
     }
-  }, [questionParam, isLoading, currentMessages.length, locationState, navigate, location.pathname, sendMessage, setInputMessage]);
+  }, [questionParam, isLoading, locationState, navigate, location.pathname, sendMessage, setInputMessage, sessionKey]);
+
+  // 当用户点击"新对话"时，清除会话标记并重置自动提问标志
+  const handleStartNewChat = () => {
+    if (sessionKey) {
+      sessionStorage.removeItem(sessionKey);
+    }
+    hasAutoAskedRef.current = false;
+    startNewChat();
+  };
 
   // 页面动画
   const containerVariants = {
@@ -204,7 +241,7 @@ export default function AIChat() {
                   
                   <Button 
                     variant="outline" 
-                    onClick={startNewChat}
+                    onClick={handleStartNewChat}
                     className="flex items-center gap-2 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
                   >
                     <MessageSquare size={18} />
