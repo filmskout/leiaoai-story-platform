@@ -115,18 +115,25 @@ export function SimpleStoriesWall() {
       if (selectedTags.length > 0) {
         // Get story IDs with selected tags
         const { data: taggedStories } = await supabase
-          .from('story_tags')
-          .select('story_id, tags!inner(name)')
-          .in('tags.name', selectedTags);
+          .from('story_tag_assignments')
+          .select('story_id, story_tags!inner(name)')
+          .in('story_tags.name', selectedTags);
 
-        if (taggedStories) {
-          const storyIds = new Set(taggedStories.map(t => t.story_id));
+        if (taggedStories && taggedStories.length > 0) {
+          const storyIds = new Set(taggedStories.map((t: any) => t.story_id));
           const filteredStories = storiesData.filter(s => storyIds.has(s.id));
+          
+          console.log('🟢 SimpleStoriesWall: Filtered by tags', { 
+            originalCount: storiesData.length,
+            filteredCount: filteredStories.length,
+            selectedTags
+          });
           
           // Load tags for filtered stories
           await loadStoriesTags(filteredStories);
           setStories(filteredStories);
         } else {
+          console.log('🟡 SimpleStoriesWall: No stories found with selected tags');
           setStories([]);
         }
       } else {
@@ -146,18 +153,62 @@ export function SimpleStoriesWall() {
   const loadStoriesTags = async (stories: any[]) => {
     if (stories.length === 0) return;
 
-    // For now, just set empty tags array for each story
-    // Tags functionality will be enhanced once the story_stories_tags junction table is properly set up
-    stories.forEach(story => {
-      story.tags = [];
-    });
+    try {
+      const storyIds = stories.map(s => s.id);
+      
+      // 查询所有story的tags（使用story_tag_assignments关联）
+      const { data: storyTagsData, error } = await supabase
+        .from('story_tag_assignments')
+        .select(`
+          story_id,
+          story_tags!inner(
+            id,
+            name,
+            display_name,
+            color
+          )
+        `)
+        .in('story_id', storyIds);
+
+      if (error) {
+        console.error('🔴 SimpleStoriesWall: Error loading story tags:', error);
+        // Set empty arrays on error
+        stories.forEach(story => {
+          story.tags = [];
+        });
+        return;
+      }
+
+      // 组织tags数据
+      const tagsByStory: Record<string, any[]> = {};
+      storyTagsData?.forEach((item: any) => {
+        if (!tagsByStory[item.story_id]) {
+          tagsByStory[item.story_id] = [];
+        }
+        tagsByStory[item.story_id].push(item.story_tags);
+      });
+
+      // 将tags附加到stories
+      stories.forEach(story => {
+        story.tags = tagsByStory[story.id] || [];
+      });
+
+      console.log('🟢 SimpleStoriesWall: Loaded story tags', { 
+        storiesWithTags: Object.keys(tagsByStory).length 
+      });
+    } catch (error) {
+      console.error('🔴 SimpleStoriesWall: Error in loadStoriesTags:', error);
+      stories.forEach(story => {
+        story.tags = [];
+      });
+    }
   };
 
   const loadTags = async () => {
     try {
-      console.log('🔵 SimpleStoriesWall: Loading tags from tags table');
+      console.log('🔵 SimpleStoriesWall: Loading tags from story_tags table');
       const { data, error } = await supabase
-        .from('tags')
+        .from('story_tags')
         .select('id, name, display_name, color, usage_count')
         .eq('is_active', true)
         .order('usage_count', { ascending: false })

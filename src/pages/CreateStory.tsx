@@ -447,18 +447,26 @@ export default function CreateStory() {
 
         // Save tags
         if (selectedTags.length > 0) {
-          const { error: tagsError } = await supabase
-            .from('story_tags')
+          // 删除旧的tag assignments
+          const { error: deleteError } = await supabase
+            .from('story_tag_assignments')
             .delete()
             .eq('story_id', draftId);
 
-          if (!tagsError) {
-            await supabase
-              .from('story_tags')
-              .insert(selectedTags.map(tag => ({
-                story_id: draftId,
-                tag_id: tag.id
-              })));
+          if (deleteError) {
+            console.warn('Failed to delete old tag assignments:', deleteError);
+          }
+
+          // 插入新的tag assignments
+          const { error: tagsError } = await supabase
+            .from('story_tag_assignments')
+            .insert(selectedTags.map(tag => ({
+              story_id: draftId,
+              tag_id: tag.id
+            })));
+
+          if (tagsError) {
+            console.error('Failed to save tags:', tagsError);
           }
         }
 
@@ -476,12 +484,16 @@ export default function CreateStory() {
         if (data) {
           // Save tags
           if (selectedTags.length > 0) {
-            await supabase
-              .from('story_tags')
+            const { error: tagsError } = await supabase
+              .from('story_tag_assignments')
               .insert(selectedTags.map(tag => ({
                 story_id: data.id,
                 tag_id: tag.id
               })));
+
+            if (tagsError) {
+              console.error('Failed to save tags:', tagsError);
+            }
           }
 
           navigate(`/story/${data.id}`);

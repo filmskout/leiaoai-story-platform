@@ -132,9 +132,10 @@ export function PinterestStories({ className, initialCategory = 'all', initialTa
   const loadAvailableTags = useCallback(async () => {
     try {
       const { data: tagsData, error: tagsError } = await supabase
-        .from('tags')
-        .select('id, name')
-        .order('created_at', { ascending: false })
+        .from('story_tags')
+        .select('id, name, display_name, color, usage_count')
+        .eq('is_active', true)
+        .order('usage_count', { ascending: false })
         .limit(20);
 
       if (tagsError) {
@@ -143,14 +144,7 @@ export function PinterestStories({ className, initialCategory = 'all', initialTa
       }
 
       if (tagsData) {
-        const formattedTags = tagsData.map(tag => ({
-          id: tag.id,
-          name: tag.name,
-          display_name: tag.name,
-          color: '#3B82F6',
-          usage_count: 0
-        }));
-        setAvailableTags(formattedTags);
+        setAvailableTags(tagsData);
       }
     } catch (error) {
       console.error('Error loading tags:', error);
