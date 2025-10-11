@@ -543,8 +543,10 @@ export default function BMCCanvas() {
       
       console.log('🟢 BMC Save: Image generated', { size: blob.size });
 
-      // 上传到Supabase Storage
-      const fileName = `bmc_${user.id}_${Date.now()}.png`;
+      // 上传到Supabase Storage (使用用户ID作为文件夹)
+      const fileName = `${user.id}/bmc_${Date.now()}.png`;
+      console.log('🔵 BMC Save: Uploading to Storage...', { fileName, blobSize: blob.size });
+      
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('bmc-images')
         .upload(fileName, blob, {
@@ -554,17 +556,35 @@ export default function BMCCanvas() {
         });
 
       if (uploadError) {
-        console.error('🔴 BMC Save: Upload error', uploadError);
-        alert(t('bmc.save_failed', 'Failed to save. Please try again later.'));
+        console.error('🔴 BMC Save: Upload error', {
+          message: uploadError.message,
+          statusCode: uploadError.statusCode,
+          error: uploadError
+        });
+        
+        // 提供更具体的错误信息
+        let errorMsg = t('bmc.save_failed', 'Failed to save. Please try again later.');
+        if (uploadError.message?.includes('not found')) {
+          errorMsg = 'Storage bucket not found. Please contact support.';
+        } else if (uploadError.message?.includes('policy')) {
+          errorMsg = 'Permission denied. Please check your account settings.';
+        }
+        
+        alert(errorMsg);
         return;
       }
 
-      console.log('🟢 BMC Save: Image uploaded', { path: uploadData.path });
+      console.log('🟢 BMC Save: Image uploaded', { 
+        path: uploadData.path, 
+        fullPath: uploadData.fullPath 
+      });
 
       // 获取公开URL
       const { data: urlData } = supabase.storage
         .from('bmc-images')
         .getPublicUrl(fileName);
+      
+      console.log('🔵 BMC Save: Public URL generated', { url: urlData.publicUrl });
 
       // 保存到数据库（包含JSON数据和图片URL）
       console.log('🔵 BMC Save: Saving to database...');
