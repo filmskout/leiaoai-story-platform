@@ -153,6 +153,12 @@ export default function CreateStory() {
 
   // AI Writing Assistance
   const handleAiGenerate = async () => {
+    console.log('🔵 AI Generate: Starting', { 
+      prompt: aiPrompt.slice(0, 50), 
+      model: selectedModel,
+      tagsCount: selectedTags.length 
+    });
+    
     if (!aiPrompt.trim()) {
       toast.error(t('story.ai_assist.prompt_required', 'Please enter a prompt for AI story generation.'));
       return;
@@ -162,6 +168,7 @@ export default function CreateStory() {
     setAiGeneratedContent('');
     
     try {
+      console.log('🔵 AI Generate: Calling Supabase function');
       const { data, error } = await supabase.functions.invoke('ai-story-generator', {
         body: {
           prompt: aiPrompt,
@@ -173,20 +180,34 @@ export default function CreateStory() {
         }
       });
       
-      if (error) throw error;
+      console.log('🔵 AI Generate: Response received', { 
+        hasData: !!data, 
+        hasError: !!error,
+        dataKeys: data ? Object.keys(data) : []
+      });
       
-      const generatedContent = data?.data?.content || '';
+      if (error) {
+        console.error('🔴 AI Generate: Supabase function error', error);
+        throw error;
+      }
+      
+      const generatedContent = data?.data?.content || data?.content || '';
+      console.log('🔵 AI Generate: Content extracted', { length: generatedContent.length });
+      
       if (generatedContent) {
         setAiGeneratedContent(generatedContent);
         toast.success(t('story.ai_assist.success', 'AI story generated successfully!'));
       } else {
-        throw new Error('No content generated');
+        console.error('🔴 AI Generate: No content in response', data);
+        throw new Error('No content generated. The AI response was empty.');
       }
     } catch (error: any) {
-      console.error('AI generation failed:', error);
-      toast.error(error.message || t('story.ai_assist.error', 'AI generation failed. Please try again.'));
+      console.error('🔴 AI Generate: Failed', error);
+      const errorMsg = error.message || error.msg || t('story.ai_assist.error', 'AI generation failed. Please try again.');
+      toast.error(errorMsg);
     } finally {
       setAiAssisting(false);
+      console.log('🔵 AI Generate: Completed');
     }
   };
 
