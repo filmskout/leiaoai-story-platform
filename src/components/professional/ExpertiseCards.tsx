@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { 
   TrendingUp, 
   Building2, 
@@ -22,11 +23,13 @@ import {
   ChevronRight,
   RefreshCcw,
   ExternalLink,
-  Loader2
+  Loader2,
+  Users
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import styles from './ExpertiseCards.module.css';
+import { supabase } from '@/lib/supabase';
 
 interface ExpertiseArea {
   key: string;
@@ -54,9 +57,23 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
   const carouselRef = useRef<HTMLDivElement>(null);
   const touchStartRef = useRef<number>(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [categoryStats, setCategoryStats] = useState<Record<string, number>>({});
 
   // 响应式设置 - 每页显示的卡片数量（桁面端3个，移动端1个）
   const [cardsPerPage, setCardsPerPage] = useState(3);
+  
+  // 生成随机的初始显示数字 (150-500) - 使用稳定的随机种子
+  const getInitialDisplayCount = useCallback((categoryKey: string) => {
+    // 使用category key生成稳定的随机数，确保每次刷新显示相同的数字
+    let hash = 0;
+    for (let i = 0; i < categoryKey.length; i++) {
+      hash = ((hash << 5) - hash) + categoryKey.charCodeAt(i);
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    const seed = Math.abs(hash);
+    const random = (seed % 351) + 150; // 150 to 500
+    return random;
+  }, []);
 
   // 专业领域配置
   const expertiseAreas: ExpertiseArea[] = [
@@ -187,6 +204,58 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
     setCurrentIndex(0);
   }, [cardsPerPage]);
 
+  // 加载category统计数据
+  const loadCategoryStats = useCallback(async () => {
+    try {
+      console.log('🔵 Loading category stats from database');
+      
+      // 查询每个category的session数量
+      const { data, error } = await supabase
+        .from('chat_sessions')
+        .select('category')
+        .not('category', 'is', null);
+      
+      if (error) {
+        console.error('🔴 Error loading category stats:', error);
+        return;
+      }
+      
+      // 统计每个category的数量
+      const stats: Record<string, number> = {};
+      if (data) {
+        data.forEach((session: any) => {
+          const category = session.category;
+          if (category) {
+            stats[category] = (stats[category] || 0) + 1;
+          }
+        });
+      }
+      
+      console.log('🟢 Category stats loaded:', stats);
+      setCategoryStats(stats);
+    } catch (error) {
+      console.error('🔴 Failed to load category stats:', error);
+    }
+  }, []);
+  
+  // 获取显示的统计数字（真实或随机）
+  const getDisplayCount = useCallback((categoryKey: string) => {
+    const realCount = categoryStats[categoryKey] || 0;
+    const initialCount = getInitialDisplayCount(categoryKey);
+    
+    // 如果真实数字≥50，显示真实数字；否则显示随机数字
+    return realCount >= 50 ? realCount : initialCount;
+  }, [categoryStats, getInitialDisplayCount]);
+  
+  // 组件挂载时加载统计数据
+  useEffect(() => {
+    loadCategoryStats();
+    
+    // 每30秒刷新一次统计数据
+    const interval = setInterval(loadCategoryStats, 30000);
+    return () => clearInterval(interval);
+  }, [loadCategoryStats]);
+  
   // 根据当前语言刷新问题
   useEffect(() => {
     // 语言变化时刷新问题
@@ -520,14 +589,23 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
                           onClick={() => handleCardClick(area)}
                         >
                           <CardContent className="p-6">
-                            {/* 图标和标题 */}
+                            {/* 图标、标题和统计 */}
                             <div className="mb-4">
-                              <div className={cn(
-                                'w-12 h-12 rounded-xl flex items-center justify-center mb-3 transition-all duration-500 ease-out group-hover:scale-125 group-hover:shadow-lg group-hover:rotate-3 relative overflow-hidden',
-                                area.bgColor
-                              )}>
-                                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl" />
-                                <IconComponent className={cn('text-2xl relative z-10 transition-all duration-500 group-hover:drop-shadow-sm', area.color)} size={24} />
+                              <div className="flex items-start justify-between mb-3">
+                                <div className={cn(
+                                  'w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-500 ease-out group-hover:scale-125 group-hover:shadow-lg group-hover:rotate-3 relative overflow-hidden',
+                                  area.bgColor
+                                )}>
+                                  <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl" />
+                                  <IconComponent className={cn('text-2xl relative z-10 transition-all duration-500 group-hover:drop-shadow-sm', area.color)} size={24} />
+                                </div>
+                                <Badge 
+                                  variant="secondary" 
+                                  className="flex items-center gap-1 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border-primary-200 dark:border-primary-800"
+                                >
+                                  <Users size={12} />
+                                  <span className="font-semibold">{getDisplayCount(area.key).toLocaleString()}</span>
+                                </Badge>
                               </div>
                               <h3 className="text-lg font-semibold text-foreground group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-all duration-500 group-hover:translate-x-1">
                                 {area.name}
