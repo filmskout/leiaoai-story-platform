@@ -9,33 +9,55 @@ import {
   CheckCircle, 
   BarChart3,
   TrendingUp,
-  DollarSign,
-  Users,
-  Target,
-  AlertTriangle
+  Shield,
+  Lightbulb,
+  X
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatFileSize } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { useNavigate } from 'react-router-dom';
+import { UnifiedLoader } from '@/components/UnifiedLoader';
 
 interface BPUploadAnalysisProps {
   className?: string;
 }
 
-interface AnalysisResult {
-  score: number;
-  summary: string;
-  details: {
-    marketAnalysis: string;
-    businessModel: string;
-    teamAssessment: string;
-    financialProjection: string;
-    riskAssessment: string;
-    investmentValue: string;
+interface AnalysisScores {
+  aiInsight: {
+    overall: number;
+    planStructure: number;
+    content: number;
+    viability: number;
   };
-  recommendations: string[];
+  marketInsights: {
+    overall: number;
+    marketCap: number;
+    profitPotential: number;
+    popularity: number;
+    competition: number;
+  };
+  riskAssessment: {
+    overall: number;
+    politicalStability: number;
+    economicTrend: number;
+    policyVolatility: number;
+    warSanctions: number;
+  };
+  growthProjections: {
+    overall: number;
+    marketGrowth: number;
+    fiveYearProjection: number;
+    saturationTimeline: number;
+    resourceLimitations: number;
+  };
+  detailedAnalysis: {
+    aiInsight: string;
+    marketInsights: string;
+    riskAssessment: string;
+    growthProjections: string;
+  };
 }
 
 export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
@@ -44,10 +66,11 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
   const navigate = useNavigate();
   const [dragActive, setDragActive] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+  const [analysisScores, setAnalysisScores] = useState<AnalysisScores | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
+  const [uploadedBpId, setUploadedBpId] = useState<string | null>(null);
 
   // 处理文件拖拽
   const handleDrag = useCallback((e: React.DragEvent) => {
@@ -74,127 +97,269 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
   const handleFileSelect = (selectedFile: File | undefined) => {
     if (!selectedFile) return;
     
+    console.log('🔵 BP Upload: File selected', { 
+      name: selectedFile.name, 
+      type: selectedFile.type,
+      size: selectedFile.size 
+    });
+    
     // 验证文件类型
-    const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    const allowedTypes = [
+      'application/pdf', 
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
     if (!allowedTypes.includes(selectedFile.type)) {
-      setError(t('errors.invalid_format'));
+      setError(t('errors.invalid_format', 'Invalid file format. Only PDF and DOCX are supported.'));
       return;
     }
     
     // 验证文件大小 (50MB)
     if (selectedFile.size > 50 * 1024 * 1024) {
-      setError(t('errors.file_too_large'));
+      setError(t('errors.file_too_large', 'File is too large. Maximum size is 50MB.'));
       return;
     }
     
     setFile(selectedFile);
     setError(null);
+    setAnalysisScores(null);
+    setUploadedBpId(null);
+    
+    // 自动上传
+    uploadFile(selectedFile);
   };
 
-  // 分析文件
-  const analyzeFile = async () => {
-    if (!file) return;
-    
-    // 检查用户是否登录
+  // 上传文件到Storage
+  const uploadFile = async (fileToUpload: File) => {
+    if (!user) {
+      setError(t('bp_analysis.login_required', 'Please log in to upload your BP'));
+      navigate('/auth');
+      return;
+    }
+
+    setIsUploading(true);
+    setError(null);
+
+    try {
+      console.log('🔵 BP Upload: Starting upload to Storage');
+
+      // 1. 上传到Supabase Storage
+      const fileName = `${user.id}/${Date.now()}_${fileToUpload.name}`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('bp-documents')
+        .upload(fileName, fileToUpload, {
+          contentType: fileToUpload.type,
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) {
+        console.error('🔴 BP Upload: Storage error', uploadError);
+        let errorMsg = t('errors.upload_failed', 'Upload failed. Please try again.');
+        if (uploadError.message?.includes('not found')) {
+          errorMsg = 'Storage bucket not found. Please contact support.';
+        } else if (uploadError.message?.includes('policy')) {
+          errorMsg = 'Permission denied. Please check your account settings.';
+        }
+        setError(errorMsg);
+        return;
+      }
+
+      console.log('🟢 BP Upload: File uploaded to Storage', { path: uploadData.path });
+
+      // 2. 获取文件URL
+      const { data: urlData } = supabase.storage
+        .from('bp-documents')
+        .getPublicUrl(fileName);
+
+      console.log('🔵 BP Upload: Public URL generated', { url: urlData.publicUrl });
+
+      // 3. 保存记录到数据库
+      const { data: dbData, error: dbError } = await supabase
+        .from('bp_submissions')
+        .insert({
+          user_id: user.id,
+          file_name: fileToUpload.name,
+          file_type: fileToUpload.type,
+          file_url: urlData.publicUrl,
+          file_size: fileToUpload.size,
+          analysis_status: 'pending',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (dbError) {
+        console.error('🔴 BP Upload: Database error', dbError);
+        setError(t('errors.upload_failed', 'Upload failed. Please try again.'));
+        return;
+      }
+
+      console.log('🟢 BP Upload: Success!', { bpId: dbData.id });
+      setUploadedBpId(dbData.id);
+
+    } catch (err: any) {
+      console.error('🔴 BP Upload: Error', err);
+      setError(t('errors.upload_failed', 'Upload failed. Please try again.'));
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  // OCR提取文本（简化版 - 直接调用OpenAI Vision API）
+  const extractText = async (fileUrl: string, fileType: string): Promise<string> => {
+    console.log('🔵 BP OCR: Extracting text', { fileUrl, fileType });
+
+    try {
+      // 对于PDF，使用OCR API
+      if (fileType === 'application/pdf') {
+        const response = await fetch('/api/ocr-extract', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ imageUrl: fileUrl })
+        });
+
+        if (!response.ok) {
+          throw new Error('OCR extraction failed');
+        }
+
+        const data = await response.json();
+        console.log('🟢 BP OCR: Text extracted', { length: data.extractedText?.length });
+        return data.extractedText || '';
+      } else {
+        // 对于DOCX，暂时返回空字符串（需要额外的库支持）
+        console.log('⚠️ BP OCR: DOCX extraction not yet implemented');
+        return 'DOCX file uploaded. Text extraction for DOCX files will be implemented soon.';
+      }
+    } catch (err: any) {
+      console.error('🔴 BP OCR: Error', err);
+      throw new Error('Text extraction failed');
+    }
+  };
+
+  // 分析BP
+  const analyzeBP = async () => {
+    if (!file || !uploadedBpId) return;
+
     if (!user) {
       setError(t('bp_analysis.login_required', 'Please log in to analyze your BP'));
       navigate('/auth');
       return;
     }
-    
+
     setIsAnalyzing(true);
     setError(null);
-    
+
     try {
-      // 1. 将文件转换为base64
-      const reader = new FileReader();
-      const base64Promise = new Promise<string>((resolve, reject) => {
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-      const fileBase64 = await base64Promise;
-      
-      // 2. 模拟分析过程（在实际应用中调用 bp-upload-analysis Edge Function）
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      
-      // 3. 模拟分析结果
-      const mockResult: AnalysisResult = {
-        score: 85,
-        summary: '该商业计划书在市场机会、商业模式和团队能力方面表现出色，但在财务预测和风险管理方面仍有改进空间。',
-        details: {
-          marketAnalysis: '目标市场规模巨大，增长潜力明显，竞争对手分散，存在明显的市场空白。目标客户群体定位准确，需求痛点明确。',
-          businessModel: '商业模式清晰，盈利模式可行，具有一定的可扩展性。产品价值主张突出，差异化优势明显。',
-          teamAssessment: '创始人和核心团队经验丰富，背景互补，具备行业深度和执行能力。需要进一步完善技术团队配置。',
-          financialProjection: '财务预测相对保守，收入增长预期合理。成本结构需要优化，现金流计划需要更加详细。',
-          riskAssessment: '主要风险包括市场竞争加剧、技术更新迭代和政策变化。风险识别较为全面，但缺乏具体的应对措施。',
-          investmentValue: '投资价值较高，具有较好的成长性和退出前景。建议在A轮或B轮进入，估值范围合理。'
-        },
-        recommendations: [
-          '完善财务模型，提供更详细的成本分析和现金流预测',
-          '加强技术团队建设，引入更多技术专家',
-          '制定更具体的风险应对方案和应急预案',
-          '进一步验证商业模式，考虑多元化收入来源',
-          '完善市场进入策略，制定明确的里程碑计划'
-        ]
-      };
-      
-      setAnalysisResult(mockResult);
-      
-      // 4. 保存到数据库
-      try {
-        const { error: saveError } = await supabase
-          .from('bp_submissions')
-          .insert({
-            user_id: user.id,
-            file_name: file.name,
-            file_type: file.type,
-            file_base64: fileBase64,
-            file_size: file.size,
-            analysis_result: mockResult,
-            score: mockResult.score,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          });
-        
-        if (saveError) {
-          console.error('Failed to save BP submission:', saveError);
-          // 不阻止用户看到分析结果
-        } else {
-          console.log('✅ BP submission saved successfully');
-        }
-      } catch (saveErr) {
-        console.error('Error saving BP submission:', saveErr);
-        // 不阻止用户看到分析结果
+      console.log('🔵 BP Analysis: Starting');
+
+      // 1. 更新状态为analyzing
+      await supabase
+        .from('bp_submissions')
+        .update({ analysis_status: 'analyzing', updated_at: new Date().toISOString() })
+        .eq('id', uploadedBpId);
+
+      // 2. 获取文件URL
+      const { data: bpData } = await supabase
+        .from('bp_submissions')
+        .select('file_url, file_type')
+        .eq('id', uploadedBpId)
+        .single();
+
+      if (!bpData) {
+        throw new Error('BP submission not found');
       }
-      
-    } catch (err) {
-      console.error('Analysis error:', err);
-      setError(t('errors.analysis_failed', 'Analysis failed. Please try again.'));
+
+      // 3. OCR提取文本
+      console.log('🔵 BP Analysis: Extracting text...');
+      const extractedText = await extractText(bpData.file_url, bpData.file_type);
+
+      // 4. 更新extracted_text到数据库
+      await supabase
+        .from('bp_submissions')
+        .update({ extracted_text: extractedText })
+        .eq('id', uploadedBpId);
+
+      // 5. 调用分析API
+      console.log('🔵 BP Analysis: Calling analysis API...');
+      const response = await fetch('/api/bp-analysis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          extractedText,
+          model: 'qwen' // 默认使用Qwen
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Analysis failed');
+      }
+
+      const analysisData = await response.json();
+      const scores: AnalysisScores = analysisData.data.analysisScores;
+
+      console.log('🟢 BP Analysis: Success!', scores);
+
+      // 6. 计算总分（4个维度的平均值）
+      const overallScore = Math.round(
+        (scores.aiInsight.overall +
+          scores.marketInsights.overall +
+          scores.riskAssessment.overall +
+          scores.growthProjections.overall) / 4
+      );
+
+      // 7. 保存分析结果到数据库
+      await supabase
+        .from('bp_submissions')
+        .update({
+          analysis_scores: scores,
+          score: overallScore,
+          analysis_status: 'completed',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', uploadedBpId);
+
+      setAnalysisScores(scores);
+
+    } catch (err: any) {
+      console.error('🔴 BP Analysis: Error', err);
+      setError(err.message || t('errors.analysis_failed', 'Analysis failed. Please try again.'));
+
+      // 更新状态为failed
+      if (uploadedBpId) {
+        await supabase
+          .from('bp_submissions')
+          .update({ analysis_status: 'failed', updated_at: new Date().toISOString() })
+          .eq('id', uploadedBpId);
+      }
     } finally {
       setIsAnalyzing(false);
     }
   };
 
-  // 重置状态
+  // 重置
   const resetUpload = () => {
     setFile(null);
-    setAnalysisResult(null);
+    setAnalysisScores(null);
     setError(null);
+    setIsUploading(false);
     setIsAnalyzing(false);
+    setUploadedBpId(null);
   };
 
+  // 得分颜色
   const getScoreColor = (score: number) => {
-    if (score >= 90) return 'text-success-600';
-    if (score >= 80) return 'text-primary-600';
-    if (score >= 70) return 'text-warning-600';
-    return 'text-error-600';
+    if (score >= 80) return 'text-success-600 dark:text-success-400';
+    if (score >= 60) return 'text-primary-600 dark:text-primary-400';
+    if (score >= 40) return 'text-warning-600 dark:text-warning-400';
+    return 'text-error-600 dark:text-error-400';
   };
 
   const getScoreBgColor = (score: number) => {
-    if (score >= 90) return 'bg-success-100 dark:bg-success-900/20';
-    if (score >= 80) return 'bg-primary-100 dark:bg-primary-900/20';
-    if (score >= 70) return 'bg-warning-100 dark:bg-warning-900/20';
+    if (score >= 80) return 'bg-success-100 dark:bg-success-900/20';
+    if (score >= 60) return 'bg-primary-100 dark:bg-primary-900/20';
+    if (score >= 40) return 'bg-warning-100 dark:bg-warning-900/20';
     return 'bg-error-100 dark:bg-error-900/20';
   };
 
@@ -205,10 +370,10 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Upload className="text-primary-500" size={24} />
-            {t('bp_analysis.title')}
+            {t('bp_analysis.title', 'Upload Business Plan')}
           </CardTitle>
           <CardDescription>
-            {t('bp_analysis.subtitle')}
+            {t('bp_analysis.subtitle', 'Upload your business plan for AI-powered analysis')}
           </CardDescription>
         </CardHeader>
         
@@ -233,13 +398,13 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
                 
                 <div>
                   <p className="text-lg font-medium text-foreground mb-2">
-                    {t('bp_analysis.drag_drop')}
+                    {t('bp_analysis.drag_drop', 'Drag & drop your file here')}
                   </p>
-                  <p className="text-sm text-foreground-muted mb-4">
-                    {t('bp_analysis.supported_formats')}
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {t('bp_analysis.supported_formats', 'PDF or DOCX format')}
                   </p>
-                  <p className="text-xs text-foreground-muted">
-                    {t('bp_analysis.max_size')}
+                  <p className="text-xs text-muted-foreground">
+                    {t('bp_analysis.max_size', 'Maximum file size: 50MB')}
                   </p>
                 </div>
                 
@@ -252,7 +417,7 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
                         onChange={(e) => handleFileSelect(e.target.files?.[0])}
                         className="hidden"
                       />
-                      {t('bp_analysis.upload_bp')}
+                      {t('bp_analysis.upload_bp', 'Upload BP')}
                     </label>
                   </Button>
                 </div>
@@ -260,38 +425,55 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="flex items-center gap-3 p-4 bg-background-secondary rounded-lg">
-                <FileText className="text-primary-500" size={20} />
+              {/* 文件信息 */}
+              <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg border border-border">
+                <FileText className="text-primary-500" size={24} />
                 <div className="flex-1">
                   <p className="font-medium text-foreground">{file.name}</p>
-                  <p className="text-sm text-foreground-muted">
-                    {formatFileSize(file.size)}
+                  <p className="text-sm text-muted-foreground">
+                    {formatFileSize(file.size)} • {t('bp_analysis.uploaded', 'Uploaded')}
                   </p>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={resetUpload}
-                  disabled={isAnalyzing}
-                >
-                  重新上传
-                </Button>
+                {!isUploading && !isAnalyzing && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={resetUpload}
+                  >
+                    <X size={16} />
+                  </Button>
+                )}
               </div>
+
+              {/* 上传中 */}
+              {isUploading && (
+                <div className="flex justify-center py-4">
+                  <UnifiedLoader 
+                    variant="inline" 
+                    show={true} 
+                    size="md"
+                    loaderStyle="spinner"
+                    text={t('bp_analysis.uploading', 'Uploading...')}
+                  />
+                </div>
+              )}
               
-              {!analysisResult && (
+              {/* 分析按钮 */}
+              {!isUploading && uploadedBpId && !analysisScores && (
                 <div className="flex justify-center">
                   <Button
-                    onClick={analyzeFile}
+                    onClick={analyzeBP}
                     disabled={isAnalyzing}
-                    className="min-w-32"
+                    className="min-w-48 bg-primary-500 hover:bg-primary-600"
+                    size="lg"
                   >
                     {isAnalyzing ? (
                       <>
                         <div className="mr-2 w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        {t('bp_analysis.analyzing')}
+                        {t('bp_analysis.analyzing', 'Analyzing...')}
                       </>
                     ) : (
-                      t('bp_analysis.analysis_report')
+                      t('bp_analysis.analysis_report', 'Analyze BP')
                     )}
                   </Button>
                 </div>
@@ -308,133 +490,174 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
         </CardContent>
       </Card>
 
-      {/* 分析结果 */}
-      {analysisResult && (
-        <div className="space-y-6">
-          {/* 综合评分 */}
-          <Card>
+      {/* 分析结果 - 4个维度卡片 */}
+      {analysisScores && (
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* 1. AI Insight */}
+          <Card className="border-2 border-primary-200 dark:border-primary-800">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="text-primary-500" size={24} />
-                {t('bp_analysis.analysis_complete')}
-              </CardTitle>
-            </CardHeader>
-            
-            <CardContent>
-              <div className="flex items-center gap-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Lightbulb className="text-primary-500" size={24} />
+                  <CardTitle>AI Insight</CardTitle>
+                </div>
                 <div className={cn(
-                  'w-24 h-24 rounded-full flex items-center justify-center text-2xl font-bold',
-                  getScoreBgColor(analysisResult.score)
+                  'w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold',
+                  getScoreBgColor(analysisScores.aiInsight.overall)
                 )}>
-                  <span className={getScoreColor(analysisResult.score)}>
-                    {analysisResult.score}
+                  <span className={getScoreColor(analysisScores.aiInsight.overall)}>
+                    {analysisScores.aiInsight.overall}
                   </span>
                 </div>
-                
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-foreground mb-2">
-                    {t('bp_analysis.score')}: {analysisResult.score}/100
-                  </h3>
-                  <p className="text-foreground-secondary">
-                    {analysisResult.summary}
-                  </p>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-3 gap-2 text-center text-sm">
+                <div>
+                  <p className="text-muted-foreground mb-1">Structure</p>
+                  <p className="font-semibold">{analysisScores.aiInsight.planStructure}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">Content</p>
+                  <p className="font-semibold">{analysisScores.aiInsight.content}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">Viability</p>
+                  <p className="font-semibold">{analysisScores.aiInsight.viability}</p>
                 </div>
               </div>
+              <p className="text-sm text-muted-foreground">
+                {analysisScores.detailedAnalysis.aiInsight}
+              </p>
             </CardContent>
           </Card>
 
-          {/* 详细分析 */}
-          <Card>
+          {/* 2. Market Insights */}
+          <Card className="border-2 border-success-200 dark:border-success-800">
             <CardHeader>
-              <CardTitle>{t('bp_analysis.analysis_report')}</CardTitle>
-            </CardHeader>
-            
-            <CardContent>
-              <div className="grid gap-6 md:grid-cols-2">
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <TrendingUp className="text-primary-500" size={16} />
-                    <h4 className="font-semibold text-foreground">{t('bp_analysis.market_analysis')}</h4>
-                  </div>
-                  <p className="text-sm text-foreground-secondary">
-                    {analysisResult.details.marketAnalysis}
-                  </p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="text-success-500" size={24} />
+                  <CardTitle>Market Insights</CardTitle>
                 </div>
-                
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Target className="text-primary-500" size={16} />
-                    <h4 className="font-semibold text-foreground">{t('bp_analysis.business_model')}</h4>
-                  </div>
-                  <p className="text-sm text-foreground-secondary">
-                    {analysisResult.details.businessModel}
-                  </p>
-                </div>
-                
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Users className="text-primary-500" size={16} />
-                    <h4 className="font-semibold text-foreground">{t('bp_analysis.team_assessment')}</h4>
-                  </div>
-                  <p className="text-sm text-foreground-secondary">
-                    {analysisResult.details.teamAssessment}
-                  </p>
-                </div>
-                
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <DollarSign className="text-primary-500" size={16} />
-                    <h4 className="font-semibold text-foreground">{t('bp_analysis.financial_projection')}</h4>
-                  </div>
-                  <p className="text-sm text-foreground-secondary">
-                    {analysisResult.details.financialProjection}
-                  </p>
-                </div>
-                
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <AlertTriangle className="text-warning-500" size={16} />
-                    <h4 className="font-semibold text-foreground">{t('bp_analysis.risk_assessment')}</h4>
-                  </div>
-                  <p className="text-sm text-foreground-secondary">
-                    {analysisResult.details.riskAssessment}
-                  </p>
-                </div>
-                
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="text-success-500" size={16} />
-                    <h4 className="font-semibold text-foreground">{t('bp_analysis.investment_value')}</h4>
-                  </div>
-                  <p className="text-sm text-foreground-secondary">
-                    {analysisResult.details.investmentValue}
-                  </p>
+                <div className={cn(
+                  'w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold',
+                  getScoreBgColor(analysisScores.marketInsights.overall)
+                )}>
+                  <span className={getScoreColor(analysisScores.marketInsights.overall)}>
+                    {analysisScores.marketInsights.overall}
+                  </span>
                 </div>
               </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-2 gap-2 text-center text-sm">
+                <div>
+                  <p className="text-muted-foreground mb-1">Market Cap</p>
+                  <p className="font-semibold">{analysisScores.marketInsights.marketCap}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">Profit</p>
+                  <p className="font-semibold">{analysisScores.marketInsights.profitPotential}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">Popularity</p>
+                  <p className="font-semibold">{analysisScores.marketInsights.popularity}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">Competition</p>
+                  <p className="font-semibold">{analysisScores.marketInsights.competition}</p>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {analysisScores.detailedAnalysis.marketInsights}
+              </p>
             </CardContent>
           </Card>
 
-          {/* 改进建议 */}
-          <Card>
+          {/* 3. Risk Assessment */}
+          <Card className="border-2 border-warning-200 dark:border-warning-800">
             <CardHeader>
-              <CardTitle>{t('bp_analysis.recommendations')}</CardTitle>
-            </CardHeader>
-            
-            <CardContent>
-              <div className="space-y-3">
-                {analysisResult.recommendations.map((recommendation, index) => (
-                  <div key={index} className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-xs font-medium text-primary-600 dark:text-primary-400">
-                        {index + 1}
-                      </span>
-                    </div>
-                    <p className="text-sm text-foreground-secondary">
-                      {recommendation}
-                    </p>
-                  </div>
-                ))}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Shield className="text-warning-500" size={24} />
+                  <CardTitle>Risk Assessment</CardTitle>
+                </div>
+                <div className={cn(
+                  'w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold',
+                  getScoreBgColor(analysisScores.riskAssessment.overall)
+                )}>
+                  <span className={getScoreColor(analysisScores.riskAssessment.overall)}>
+                    {analysisScores.riskAssessment.overall}
+                  </span>
+                </div>
               </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-2 gap-2 text-center text-sm">
+                <div>
+                  <p className="text-muted-foreground mb-1">Political</p>
+                  <p className="font-semibold">{analysisScores.riskAssessment.politicalStability}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">Economic</p>
+                  <p className="font-semibold">{analysisScores.riskAssessment.economicTrend}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">Policy</p>
+                  <p className="font-semibold">{analysisScores.riskAssessment.policyVolatility}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">War/Sanctions</p>
+                  <p className="font-semibold">{analysisScores.riskAssessment.warSanctions}</p>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {analysisScores.detailedAnalysis.riskAssessment}
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* 4. Growth Projections */}
+          <Card className="border-2 border-blue-200 dark:border-blue-800">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="text-blue-500" size={24} />
+                  <CardTitle>Growth Projections</CardTitle>
+                </div>
+                <div className={cn(
+                  'w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold',
+                  getScoreBgColor(analysisScores.growthProjections.overall)
+                )}>
+                  <span className={getScoreColor(analysisScores.growthProjections.overall)}>
+                    {analysisScores.growthProjections.overall}
+                  </span>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-2 gap-2 text-center text-sm">
+                <div>
+                  <p className="text-muted-foreground mb-1">Growth</p>
+                  <p className="font-semibold">{analysisScores.growthProjections.marketGrowth}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">5-Year</p>
+                  <p className="font-semibold">{analysisScores.growthProjections.fiveYearProjection}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">Saturation</p>
+                  <p className="font-semibold">{analysisScores.growthProjections.saturationTimeline}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">Resources</p>
+                  <p className="font-semibold">{analysisScores.growthProjections.resourceLimitations}</p>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {analysisScores.detailedAnalysis.growthProjections}
+              </p>
             </CardContent>
           </Card>
         </div>

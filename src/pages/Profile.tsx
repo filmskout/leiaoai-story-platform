@@ -457,24 +457,83 @@ export default function Profile() {
     if (!user) return;
 
     try {
-      // 使用正确的表名 'bp_submissions'
+      console.log('🔵 Profile: Loading BP submissions');
       const { data, error } = await supabase
         .from('bp_submissions')
-        .select('id, file_name, file_type, file_base64, file_size, score, created_at')
+        .select('id, file_name, file_type, file_url, file_size, score, analysis_status, analysis_scores, created_at, updated_at')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false})
         .limit(10);
 
       if (error) {
-        console.error('Error loading BP submissions:', error);
+        console.error('🔴 Profile: Error loading BP submissions:', error);
         return;
       }
 
+      console.log('🟢 Profile: Loaded BP submissions', { count: data?.length || 0 });
       if (data) {
         setBpSubmissions(data);
       }
     } catch (error) {
-      console.error('Failed to load BP submissions:', error);
+      console.error('🔴 Profile: Failed to load BP submissions:', error);
+    }
+  };
+
+  // 删除BP文档
+  const deleteBpSubmission = async (bpId: string, fileUrl: string) => {
+    if (!user) return;
+    
+    if (!confirm(t('profile.confirm_delete_bp', 'Are you sure you want to delete this business plan?'))) {
+      return;
+    }
+
+    try {
+      console.log('🔵 Profile: Deleting BP', { bpId });
+      
+      // 1. 从Storage删除文件
+      if (fileUrl) {
+        // 提取文件路径
+        const urlParts = fileUrl.split('/');
+        const bucketIndex = urlParts.findIndex(part => part === 'bp-documents');
+        if (bucketIndex !== -1 && urlParts.length > bucketIndex + 1) {
+          const filePath = urlParts.slice(bucketIndex + 1).join('/');
+          
+          console.log('🔵 Profile: Deleting from Storage', { filePath });
+          const { error: storageError } = await supabase.storage
+            .from('bp-documents')
+            .remove([filePath]);
+
+          if (storageError) {
+            console.error('🔴 Profile: Storage delete error', storageError);
+            // 继续删除数据库记录，即使Storage删除失败
+          } else {
+            console.log('🟢 Profile: File deleted from Storage');
+          }
+        }
+      }
+
+      // 2. 从数据库删除记录
+      const { error: dbError } = await supabase
+        .from('bp_submissions')
+        .delete()
+        .eq('id', bpId)
+        .eq('user_id', user.id);
+
+      if (dbError) {
+        console.error('🔴 Profile: Database delete error', dbError);
+        toast.error(t('profile.delete_failed', 'Failed to delete BP'));
+        return;
+      }
+
+      console.log('🟢 Profile: BP deleted successfully');
+      toast.success(t('profile.delete_success', 'BP deleted successfully'));
+
+      // 3. 重新加载列表
+      loadBpSubmissions();
+      loadUserStats(); // 更新统计
+    } catch (error: any) {
+      console.error('🔴 Profile: Delete error', error);
+      toast.error(error.message || t('profile.delete_failed', 'Failed to delete BP'));
     }
   };
 
@@ -1007,8 +1066,18 @@ export default function Profile() {
                             <div className="flex items-center gap-2 mb-2">
                               <FileText className="w-5 h-5 text-primary-500" />
                               <h4 className="font-semibold text-foreground">{bp.file_name}</h4>
+                              {bp.analysis_status && (
+                                <Badge variant={
+                                  bp.analysis_status === 'completed' ? 'default' : 
+                                  bp.analysis_status === 'analyzing' ? 'secondary' :
+                                  bp.analysis_status === 'failed' ? 'destructive' : 
+                                  'outline'
+                                }>
+                                  {bp.analysis_status}
+                                </Badge>
+                              )}
                             </div>
-                            <div className="flex items-center gap-4 text-sm text-foreground-secondary">
+                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
                               <span>{formatDate(bp.created_at)}</span>
                               <span>•</span>
                               <span>{formatFileSize(bp.file_size)}</span>
@@ -1017,27 +1086,48 @@ export default function Profile() {
                                   <span>•</span>
                                   <span className={cn(
                                     "font-semibold",
-                                    bp.score >= 80 ? "text-green-600 dark:text-green-400" :
-                                    bp.score >= 60 ? "text-yellow-600 dark:text-yellow-400" :
-                                    "text-red-600 dark:text-red-400"
+                                    bp.score >= 80 ? "text-success-600 dark:text-success-400" :
+                                    bp.score >= 60 ? "text-warning-600 dark:text-warning-400" :
+                                    "text-error-600 dark:text-error-400"
                                   )}>
-                                    Score: {bp.score}/100
+                                    {t('profile.score', 'Score')}: {bp.score}/100
                                   </span>
                                 </>
                               )}
                             </div>
+                            
+                            {/* 显示4个维度的得分（如果已分析） */}
+                            {bp.analysis_scores && (
+                              <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                                <div className="p-2 bg-muted/50 rounded">
+                                  <p className="text-muted-foreground mb-1">AI Insight</p>
+                                  <p className="font-semibold text-foreground">{bp.analysis_scores.aiInsight?.overall || 0}</p>
+                                </div>
+                                <div className="p-2 bg-muted/50 rounded">
+                                  <p className="text-muted-foreground mb-1">Market</p>
+                                  <p className="font-semibold text-foreground">{bp.analysis_scores.marketInsights?.overall || 0}</p>
+                                </div>
+                                <div className="p-2 bg-muted/50 rounded">
+                                  <p className="text-muted-foreground mb-1">Risk</p>
+                                  <p className="font-semibold text-foreground">{bp.analysis_scores.riskAssessment?.overall || 0}</p>
+                                </div>
+                                <div className="p-2 bg-muted/50 rounded">
+                                  <p className="text-muted-foreground mb-1">Growth</p>
+                                  <p className="font-semibold text-foreground">{bp.analysis_scores.growthProjections?.overall || 0}</p>
+                                </div>
+                              </div>
+                            )}
                           </div>
                           <div className="flex gap-2 ml-4">
                             <Button 
                               variant="outline" 
                               size="sm"
                               onClick={() => {
-                                // 下载文件
-                                const link = document.createElement('a');
-                                link.href = bp.file_base64;
-                                link.download = bp.file_name;
-                                link.click();
+                                if (bp.file_url) {
+                                  window.open(bp.file_url, '_blank');
+                                }
                               }}
+                              disabled={!bp.file_url}
                             >
                               <Download size={16} className="mr-1" />
                               {t('profile.download', 'Download')}
@@ -1045,9 +1135,11 @@ export default function Profile() {
                             <Button 
                               variant="outline" 
                               size="sm"
-                              onClick={() => navigate('/bp-analysis')}
+                              onClick={() => deleteBpSubmission(bp.id, bp.file_url)}
+                              className="text-error-600 hover:text-error-700 hover:bg-error-50"
                             >
-                              {t('profile.view_analysis', 'View Analysis')}
+                              <X size={16} className="mr-1" />
+                              {t('profile.delete', 'Delete')}
                             </Button>
                           </div>
                         </div>
