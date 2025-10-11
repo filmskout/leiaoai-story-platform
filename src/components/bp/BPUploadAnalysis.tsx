@@ -148,7 +148,12 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
       });
 
       // 1. 上传到Supabase Storage
-      const fileName = `${user.id}/${Date.now()}_${fileToUpload.name}`;
+      // 清理文件名，移除特殊字符，保留扩展名
+      const cleanFileName = fileToUpload.name
+        .replace(/[^a-zA-Z0-9._-]/g, '_') // 替换特殊字符为下划线
+        .replace(/_{2,}/g, '_'); // 多个下划线合并为一个
+      
+      const fileName = `${user.id}/${Date.now()}_${cleanFileName}`;
       console.log('🔵 BP Upload: Uploading to path:', fileName);
       
       const { data: uploadData, error: uploadError } = await supabase.storage
@@ -170,7 +175,9 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
         let errorMsg = t('errors.upload_failed', 'Upload failed. Please try again.');
         
         // 更详细的错误消息
-        if (uploadError.message?.includes('not found') || uploadError.message?.includes('Bucket')) {
+        if (uploadError.message?.includes('Invalid key')) {
+          errorMsg = '文件名包含不支持的字符。请重命名文件（只使用英文字母、数字、点、横线、下划线）。';
+        } else if (uploadError.message?.includes('not found') || uploadError.message?.includes('Bucket')) {
           errorMsg = '存储桶不存在。请联系技术支持。';
         } else if (uploadError.message?.includes('policy') || uploadError.message?.includes('permission') || uploadError.message?.includes('JWT')) {
           errorMsg = '权限错误：Storage policies未正确配置。请检查Supabase Storage policies。';
