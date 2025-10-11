@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { fetchAIResponse } from '../services/api';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
+import { useWebsiteStats } from './useWebsiteStats';
 
 export interface ChatMessage {
   id: string;
@@ -34,6 +35,7 @@ export function useAIChat() {
   const { selectedChatModel, updateModelResponseTime } = useAI();
   const { i18n } = useTranslation();
   const { user } = useAuth() || { user: null };
+  const { updateResponseTime: updateAvgResponseTime, incrementStat } = useWebsiteStats();
 
   // 加载用户的聊天会话
   const loadChatSessions = async () => {
@@ -108,6 +110,7 @@ export function useAIChat() {
           session_id: sessionId,
           user_id: user?.id || null,
           title: sessionTitle,
+          category: category || null, // 保存category字段
           message_count: 0
         })
         .select()
@@ -167,9 +170,8 @@ export function useAIChat() {
         
         // 增加会话统计（如果是新会话）
         try {
-          const { updateResponseTime } = await import('./useWebsiteStats');
-          // 这里应该调用 incrementStat，但我们需要重新设计
-          console.log('🔵 New session created, should increment stats');
+          await incrementStat('qa');
+          console.log('✅ Incremented Q&A session stats');
         } catch (err) {
           console.warn('Failed to increment session stats', err);
         }
@@ -234,6 +236,10 @@ export function useAIChat() {
           try {
             // 使用从上下文中获取的 updateModelResponseTime 函数
             updateModelResponseTime(response.model, response.processingTime);
+            
+            // 同时更新到数据库统计（全局平均响应时间）
+            await updateAvgResponseTime(response.processingTime);
+            console.log('✅ Updated average response time to database', response.processingTime);
           } catch (updateError) {
             console.warn('更新模型响应时间失败:', updateError);
           }
