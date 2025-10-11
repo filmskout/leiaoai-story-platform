@@ -22,7 +22,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(500).json({ error: 'Server misconfigured: missing OPENAI_API_KEY' });
     }
 
-    console.log('🔍 Starting OCR extraction...');
+    console.log('🔍 Starting OCR extraction...', {
+      urlLength: imageData.length,
+      urlPreview: imageData.substring(0, 100),
+      isDataUrl: imageData.startsWith('data:'),
+      isHttpUrl: imageData.startsWith('http')
+    });
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -38,25 +43,45 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             content: [
               {
                 type: 'text',
-                text: 'Extract all text from this image. Please return ONLY the extracted text, without any additional commentary or formatting. If it\'s a Business Model Canvas, extract the content of each section.'
+                text: 'Extract all text from this PDF document or image. Please return ONLY the extracted text, without any additional commentary or formatting. Extract all readable text you can see.'
               },
               {
                 type: 'image_url',
                 image_url: {
-                  url: imageData
+                  url: imageData,
+                  detail: 'high' // 使用高清模式以获得更好的文本识别
                 }
               }
             ]
           }
         ],
-        max_tokens: 2000
+        max_tokens: 4000 // 增加token限制以支持更长的文档
       })
     });
 
+    console.log('🔵 OpenAI API response status:', response.status);
+
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('❌ OpenAI API error:', errorText.slice(0, 200));
-      return res.status(response.status).json({ error: 'OCR extraction failed' });
+      console.error('❌ OpenAI API error:', {
+        status: response.status,
+        error: errorText.slice(0, 500)
+      });
+      
+      // 提供更具体的错误消息
+      let errorMessage = 'OCR extraction failed';
+      if (response.status === 401) {
+        errorMessage = 'OpenAI API key is invalid or missing';
+      } else if (response.status === 400) {
+        errorMessage = 'Invalid request to OpenAI API - URL may not be accessible';
+      } else if (response.status === 429) {
+        errorMessage = 'OpenAI API rate limit exceeded';
+      }
+      
+      return res.status(response.status).json({ 
+        error: errorMessage,
+        details: errorText.slice(0, 200)
+      });
     }
 
     const data = await response.json();

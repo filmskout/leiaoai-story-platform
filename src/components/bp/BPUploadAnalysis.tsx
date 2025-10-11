@@ -195,14 +195,22 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
 
       console.log('🟢 BP Upload: File uploaded to Storage', { path: uploadData.path });
 
-      // 2. 获取文件URL
-      const { data: urlData } = supabase.storage
+      // 2. 获取文件的签名URL（24小时有效，可被外部访问）
+      const { data: urlData, error: urlError } = await supabase.storage
         .from('bp-documents')
-        .getPublicUrl(fileName);
+        .createSignedUrl(fileName, 86400); // 24小时有效期
 
-      console.log('🔵 BP Upload: Public URL generated', { url: urlData.publicUrl });
+      if (urlError || !urlData) {
+        console.error('🔴 BP Upload: Failed to create signed URL', urlError);
+        setError('无法生成文件访问链接');
+        return;
+      }
 
-      // 3. 保存记录到数据库
+      console.log('🔵 BP Upload: Signed URL generated', { 
+        url: urlData.signedUrl.substring(0, 100) + '...' 
+      });
+
+      // 3. 保存记录到数据库（保存原始路径，不是签名URL）
       console.log('🔵 BP Upload: Saving to database...');
       const { data: dbData, error: dbError } = await supabase
         .from('bp_submissions')
@@ -210,7 +218,7 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
           user_id: user.id,
           file_name: fileToUpload.name,
           file_type: fileToUpload.type,
-          file_url: urlData.publicUrl,
+          file_url: fileName, // 保存文件路径，而不是签名URL
           file_size: fileToUpload.size,
           analysis_status: 'pending',
           created_at: new Date().toISOString(),
@@ -246,6 +254,9 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
 
       console.log('🟢 BP Upload: Success!', { bpId: dbData.id });
       setUploadedBpId(dbData.id);
+      
+      // 显示成功提示
+      alert(`✅ 文件上传成功！\n\n文件名: ${fileToUpload.name}\n大小: ${formatFileSize(fileToUpload.size)}\n\n已保存到您的Dashboard。\n现在可以点击"Analyze BP"进行分析。`);
 
     } catch (err: any) {
       console.error('🔴 BP Upload: Unexpected error', {
@@ -336,7 +347,7 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
         .update({ analysis_status: 'analyzing', updated_at: new Date().toISOString() })
         .eq('id', uploadedBpId);
 
-      // 2. 获取文件URL
+      // 2. 获取文件路径和类型
       const { data: bpData } = await supabase
         .from('bp_submissions')
         .select('file_url, file_type')
@@ -347,17 +358,32 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
         throw new Error('BP submission not found');
       }
 
-      // 3. OCR提取文本
-      console.log('🔵 BP Analysis: Extracting text...');
-      const extractedText = await extractText(bpData.file_url, bpData.file_type);
+      // 3. 生成签名URL用于OCR（24小时有效）
+      console.log('🔵 BP Analysis: Creating signed URL for OCR...');
+      const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+        .from('bp-documents')
+        .createSignedUrl(bpData.file_url, 86400);
 
-      // 4. 更新extracted_text到数据库
+      if (signedUrlError || !signedUrlData) {
+        console.error('🔴 BP Analysis: Failed to create signed URL', signedUrlError);
+        throw new Error('无法生成文件访问链接');
+      }
+
+      console.log('🔵 BP Analysis: Signed URL created', {
+        urlPreview: signedUrlData.signedUrl.substring(0, 100) + '...'
+      });
+
+      // 4. OCR提取文本
+      console.log('🔵 BP Analysis: Extracting text...');
+      const extractedText = await extractText(signedUrlData.signedUrl, bpData.file_type);
+
+      // 5. 更新extracted_text到数据库
       await supabase
         .from('bp_submissions')
         .update({ extracted_text: extractedText })
         .eq('id', uploadedBpId);
 
-      // 5. 调用分析API
+      // 6. 调用分析API
       console.log('🔵 BP Analysis: Calling analysis API...');
       const response = await fetch('/api/bp-analysis', {
         method: 'POST',
@@ -378,7 +404,7 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
 
       console.log('🟢 BP Analysis: Success!', scores);
 
-      // 6. 计算总分（4个维度的平均值）
+      // 7. 计算总分（4个维度的平均值）
       const overallScore = Math.round(
         (scores.aiInsight.overall +
           scores.marketInsights.overall +
@@ -386,7 +412,7 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
           scores.growthProjections.overall) / 4
       );
 
-      // 7. 保存分析结果到数据库
+      // 8. 保存分析结果到数据库
       await supabase
         .from('bp_submissions')
         .update({
