@@ -1,25 +1,7 @@
-// @ts-nocheck
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { getSystemPrompt } from '../src/lib/apiConfig';
 
-// System prompt for AI investment consultant
-const getSystemPrompt = () => `你是一位专业的AI投融资顾问，拥有丰富的商业分析、投资策略和企业咨询经验。你的目标是为用户提供专业、准确且实用的投融资建议。
-
-请遵循以下原则：
-1. 提供专业、客观的分析和建议
-2. 使用简洁明了的语言，避免过多行业术语
-3. 结合实际案例和数据支持你的观点
-4. 关注风险评估和投资回报分析
-5. 提供可操作的建议和下一步行动计划
-
-当回答问题时，请考虑：
-- 商业模式的可行性
-- 市场机会和竞争格局
-- 财务健康状况和增长潜力
-- 团队能力和执行力
-- 风险因素和缓解策略
-
-请用用户的语言回复，保持专业且易于理解。`;
-
-const MODEL_MAP = {
+const MODEL_MAP: Record<string, { provider: 'deepseek' | 'openai' | 'qwen'; model: string }> = {
   deepseek: { provider: 'deepseek', model: 'deepseek-chat' },
   'deepseek-chat': { provider: 'deepseek', model: 'deepseek-chat' },
   openai: { provider: 'openai', model: 'gpt-4o' },
@@ -28,7 +10,7 @@ const MODEL_MAP = {
   'qwen-turbo': { provider: 'qwen', model: 'qwen-turbo' },
 };
 
-export default async function handler(req, res) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method Not Allowed' });
     return;
@@ -36,15 +18,12 @@ export default async function handler(req, res) {
 
   try {
     const { message, model = 'deepseek', sessionId } = req.body || {};
-    console.log('🚀 AI Chat Request:', { model, messageLength: message?.length, sessionId });
-    
     if (!message || typeof message !== 'string') {
       res.status(400).json({ error: 'Invalid request: message is required' });
       return;
     }
 
     const mapped = MODEL_MAP[model] || MODEL_MAP['deepseek'];
-    console.log('📍 Mapped Model:', { provider: mapped.provider, model: mapped.model });
 
     // 选择上游与密钥
     let url = '';
@@ -78,7 +57,6 @@ export default async function handler(req, res) {
     }
 
     const startTime = Date.now();
-    console.log('🌐 Calling API:', { url, model: mapped.model });
 
     const response = await fetch(url, {
       method: 'POST',
@@ -100,28 +78,22 @@ export default async function handler(req, res) {
       }),
     });
 
-    console.log('📡 API Response Status:', response.status, response.statusText);
-
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('❌ API Error:', errorText.slice(0, 200));
       res.status(response.status).json({ error: errorText.slice(0, 500) });
       return;
     }
 
-      const data = await response.json();
-    const aiResponse = data?.choices?.[0]?.message?.content;
+    const data: any = await response.json();
+    const aiResponse: string | undefined = data?.choices?.[0]?.message?.content;
 
     if (!aiResponse) {
-      console.error('❌ Invalid AI response structure:', JSON.stringify(data).slice(0, 200));
-      res.status(502).json({ error: 'Invalid response from AI service' });
+      res.status(502).json({ error: 'Invalid response from DeepSeek' });
       return;
     }
 
     const endTime = Date.now();
     const processingTimeSeconds = Number(((endTime - startTime) / 1000).toFixed(1));
-
-    console.log('✅ Success:', { model: mapped.model, responseLength: aiResponse.length, time: processingTimeSeconds });
 
     res.status(200).json({
       data: {
@@ -130,8 +102,7 @@ export default async function handler(req, res) {
       },
       processingTime: processingTimeSeconds,
     });
-  } catch (err) {
-    console.error('💥 Handler Error:', err?.message || err);
+  } catch (err: any) {
     res.status(500).json({ error: err?.message || 'Internal Server Error' });
   }
 }

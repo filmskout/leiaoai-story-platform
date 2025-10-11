@@ -1,4 +1,4 @@
-// @ts-nocheck
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 /**
  * Vercel Serverless Function: 使用 DALL·E 生成用户头像
@@ -11,7 +11,7 @@
 
 const OPENAI_API_URL = 'https://api.openai.com/v1/images/generations';
 
-export default async function handler(req, res) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   // 只允许 POST 请求
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method Not Allowed' });
@@ -69,40 +69,17 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    // 获取生成的图片 URL
+    // 返回生成的图片 URL
     if (data?.data?.[0]?.url) {
-      const imageUrl = data.data[0].url;
-      
-      // 下载图片并转换为base64
-      try {
-        const imageResponse = await fetch(imageUrl);
-        if (!imageResponse.ok) {
-          throw new Error('Failed to download generated image');
-        }
-        
-        const imageBuffer = await imageResponse.arrayBuffer();
-        const base64Image = Buffer.from(imageBuffer).toString('base64');
-        const base64DataUrl = `data:image/png;base64,${base64Image}`;
-        
-        res.status(200).json({
-          success: true,
-          imageUrl: imageUrl, // 原始URL
-          base64Image: base64DataUrl, // base64编码
-          revisedPrompt: data.data[0].revised_prompt || prompt
-        });
-      } catch (downloadError) {
-        console.error('Error downloading image:', downloadError);
-        // 如果下载失败，仍然返回URL
-        res.status(200).json({
-          success: true,
-          imageUrl: imageUrl,
-          revisedPrompt: data.data[0].revised_prompt || prompt
-        });
-      }
+      res.status(200).json({
+        success: true,
+        imageUrl: data.data[0].url,
+        revisedPrompt: data.data[0].revised_prompt || prompt
+      });
     } else {
       res.status(502).json({ error: 'Invalid response from OpenAI API' });
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error('Error in generate-avatar:', err);
     res.status(500).json({ 
       error: err?.message || 'Internal Server Error' 
