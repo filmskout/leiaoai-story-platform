@@ -351,32 +351,47 @@ export default function Profile() {
     if (!user) return;
 
     try {
-      // 使用正确的表名 'chat_sessions' 而不是 'ai_chat_sessions'
+      console.log('🔵 Profile: Loading chat sessions');
       const { data, error } = await supabase
         .from('chat_sessions')
-        .select('session_id, title, created_at, updated_at')
+        .select('session_id, title, category, created_at, updated_at')
         .eq('user_id', user.id)
         .order('updated_at', { ascending: false })
-        .limit(10);
+        .limit(20);
 
       if (error) {
-        console.error('Error loading chat sessions:', error);
+        console.error('🔴 Profile: Error loading chat sessions:', error);
         return;
       }
 
-      if (data) {
-        // 转换数据格式以匹配UI期望的格式
-        const formattedSessions = data.map(session => ({
-          id: session.session_id,
-          title: session.title || '新的对话',
-          created_at: session.created_at,
-          updated_at: session.updated_at,
-          message_count: 0 // 可以后续优化，从 chat_messages 表统计
-        }));
-        setChatSessions(formattedSessions as any);
+      if (data && data.length > 0) {
+        // 为每个session查询message count
+        const sessionsWithCounts = await Promise.all(
+          data.map(async (session) => {
+            const { count } = await supabase
+              .from('chat_messages')
+              .select('*', { count: 'exact', head: true })
+              .eq('session_id', session.session_id);
+
+            return {
+              id: session.session_id,
+              title: session.title || '新的对话',
+              category: session.category,
+              created_at: session.created_at,
+              updated_at: session.updated_at,
+              message_count: count || 0
+            };
+          })
+        );
+
+        console.log('🟢 Profile: Loaded chat sessions', { count: sessionsWithCounts.length });
+        setChatSessions(sessionsWithCounts as any);
+      } else {
+        console.log('🟡 Profile: No chat sessions found');
+        setChatSessions([]);
       }
     } catch (error) {
-      console.error('Failed to load chat sessions:', error);
+      console.error('🔴 Profile: Failed to load chat sessions:', error);
     }
   };
 
@@ -715,14 +730,24 @@ export default function Profile() {
                 <h1 className="text-2xl font-bold text-gray-900">
                   {user.user_metadata?.full_name || user.email}
                 </h1>
-                <Button 
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigate('/profile/edit')}
-                >
-                  <Edit3 className="w-4 h-4 mr-2" />
-                  {t('profile.edit', 'Edit Profile')}
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate(`/user/${user.id}`)}
+                  >
+                    <Eye className="w-4 h-4 mr-2" />
+                    {t('profile.view_public', 'Public Profile')}
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate('/profile/edit')}
+                  >
+                    <Edit3 className="w-4 h-4 mr-2" />
+                    {t('profile.edit', 'Edit Profile')}
+                  </Button>
+                </div>
               </div>
               
               <p className="text-gray-600 mb-4">
@@ -1259,19 +1284,71 @@ export default function Profile() {
             {/* Chat Sessions */}
             <Card>
               <CardHeader>
-                <CardTitle>{t('profile.chat_sessions', 'AI Chat Sessions')}</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle>{t('profile.chat_sessions', 'AI Chat Sessions')}</CardTitle>
+                  <Button
+                    onClick={() => navigate('/ai-chat')}
+                    size="sm"
+                    variant="outline"
+                  >
+                    <PlusCircle size={16} className="mr-1" />
+                    {t('profile.new_chat', 'New Chat')}
+                  </Button>
+                </div>
+                <CardDescription>
+                  {t('profile.chat_desc', 'Your AI conversation history')}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 {chatSessions.length === 0 ? (
-                  <p className="text-gray-500 text-center py-4">
-                    {t('profile.no_chats', 'No chat sessions yet')}
-                  </p>
+                  <div className="text-center py-8">
+                    <Bot className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground mb-4">
+                      {t('profile.no_chats', 'No chat sessions yet')}
+                    </p>
+                    <Button
+                      onClick={() => navigate('/ai-chat')}
+                      variant="outline"
+                    >
+                      {t('profile.start_chat', 'Start Your First Chat')}
+                    </Button>
+                  </div>
                 ) : (
                   <div className="space-y-3">
                     {chatSessions.map((chat: any) => (
-                      <div key={chat.id} className="border border-gray-200 rounded-lg p-3">
-                        <h4 className="font-medium text-gray-900">{chat.session_title}</h4>
-                        <p className="text-sm text-gray-500">Model: {chat.ai_model} • {formatDate(chat.created_at)}</p>
+                      <div 
+                        key={chat.id} 
+                        className="border border-border rounded-lg p-4 hover:shadow-md transition-shadow bg-card"
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-foreground mb-1">
+                              {chat.title || t('profile.untitled_chat', 'Untitled Chat')}
+                            </h4>
+                            <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                              <span className="flex items-center gap-1">
+                                <Clock size={14} />
+                                {formatDate(chat.created_at)}
+                              </span>
+                              {chat.message_count > 0 && (
+                                <span className="flex items-center gap-1">
+                                  <MessageSquare size={14} />
+                                  {chat.message_count} {t('profile.messages', 'messages')}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => navigate(`/ai-chat?session=${chat.id}`)}
+                            >
+                              <ExternalLink size={14} className="mr-1" />
+                              {t('profile.view', 'View')}
+                            </Button>
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
