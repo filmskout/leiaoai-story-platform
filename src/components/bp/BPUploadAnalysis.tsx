@@ -140,10 +140,17 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
     setError(null);
 
     try {
-      console.log('🔵 BP Upload: Starting upload to Storage');
+      console.log('🔵 BP Upload: Starting upload to Storage', {
+        userId: user.id,
+        fileName: fileToUpload.name,
+        fileSize: fileToUpload.size,
+        fileType: fileToUpload.type
+      });
 
       // 1. 上传到Supabase Storage
       const fileName = `${user.id}/${Date.now()}_${fileToUpload.name}`;
+      console.log('🔵 BP Upload: Uploading to path:', fileName);
+      
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('bp-documents')
         .upload(fileName, fileToUpload, {
@@ -153,13 +160,28 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
         });
 
       if (uploadError) {
-        console.error('🔴 BP Upload: Storage error', uploadError);
+        console.error('🔴 BP Upload: Storage error', {
+          error: uploadError,
+          message: uploadError.message,
+          statusCode: (uploadError as any).statusCode,
+          name: uploadError.name
+        });
+        
         let errorMsg = t('errors.upload_failed', 'Upload failed. Please try again.');
-        if (uploadError.message?.includes('not found')) {
-          errorMsg = 'Storage bucket not found. Please contact support.';
-        } else if (uploadError.message?.includes('policy')) {
-          errorMsg = 'Permission denied. Please check your account settings.';
+        
+        // 更详细的错误消息
+        if (uploadError.message?.includes('not found') || uploadError.message?.includes('Bucket')) {
+          errorMsg = '存储桶不存在。请联系技术支持。';
+        } else if (uploadError.message?.includes('policy') || uploadError.message?.includes('permission') || uploadError.message?.includes('JWT')) {
+          errorMsg = '权限错误：Storage policies未正确配置。请检查Supabase Storage policies。';
+        } else if (uploadError.message?.includes('row-level security') || uploadError.message?.includes('RLS')) {
+          errorMsg = 'RLS权限错误。请检查数据库policies。';
+        } else if (uploadError.message?.includes('size')) {
+          errorMsg = '文件太大。最大支持50MB。';
+        } else {
+          errorMsg = `上传失败: ${uploadError.message}`;
         }
+        
         setError(errorMsg);
         return;
       }
@@ -174,6 +196,7 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
       console.log('🔵 BP Upload: Public URL generated', { url: urlData.publicUrl });
 
       // 3. 保存记录到数据库
+      console.log('🔵 BP Upload: Saving to database...');
       const { data: dbData, error: dbError } = await supabase
         .from('bp_submissions')
         .insert({
@@ -190,8 +213,27 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
         .single();
 
       if (dbError) {
-        console.error('🔴 BP Upload: Database error', dbError);
-        setError(t('errors.upload_failed', 'Upload failed. Please try again.'));
+        console.error('🔴 BP Upload: Database error', {
+          error: dbError,
+          message: dbError.message,
+          code: dbError.code,
+          details: dbError.details,
+          hint: dbError.hint
+        });
+        
+        let errorMsg = t('errors.upload_failed', 'Upload failed. Please try again.');
+        
+        if (dbError.message?.includes('row-level security') || dbError.code === '42501') {
+          errorMsg = '数据库RLS权限错误：请运行 SETUP-ALL-RLS-POLICIES-FIXED.sql';
+        } else if (dbError.message?.includes('foreign key') || dbError.code === '23503') {
+          errorMsg = '数据库关联错误：用户Profile不存在。';
+        } else if (dbError.message?.includes('unique') || dbError.code === '23505') {
+          errorMsg = '记录已存在。';
+        } else {
+          errorMsg = `数据库错误: ${dbError.message}`;
+        }
+        
+        setError(errorMsg);
         return;
       }
 
@@ -199,8 +241,12 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
       setUploadedBpId(dbData.id);
 
     } catch (err: any) {
-      console.error('🔴 BP Upload: Error', err);
-      setError(t('errors.upload_failed', 'Upload failed. Please try again.'));
+      console.error('🔴 BP Upload: Unexpected error', {
+        error: err,
+        message: err.message,
+        stack: err.stack
+      });
+      setError(`上传失败: ${err.message || t('errors.upload_failed', 'Upload failed. Please try again.')}`);
     } finally {
       setIsUploading(false);
     }
