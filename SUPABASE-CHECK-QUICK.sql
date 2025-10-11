@@ -67,10 +67,14 @@ SELECT '=== Storage Buckets检查 ===' as check_type;
 SELECT 
   name as bucket_name,
   CASE WHEN public THEN 'Public' ELSE 'Private' END as access_type,
+  file_size_limit / 1024 / 1024 as size_limit_mb,
   '✅ 存在' as status
 FROM storage.buckets
 WHERE name IN ('bmc-images', 'bp-documents')
 ORDER BY name;
+
+-- 注意: Storage policies需要在Supabase Dashboard手动检查
+-- 路径: Storage → 选择bucket → Policies标签
 
 -- ═══════════════════════════════════════════════════════════════
 -- 5. 检查当前用户
