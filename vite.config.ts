@@ -34,6 +34,8 @@ export default defineConfig({
     }
   },
   build: {
+    // 增加chunk大小限制，避免大文件警告
+    chunkSizeWarningLimit: 1000, // 从默认的500KB增加到1000KB
     // 允许空模块
     rollupOptions: {
       onwarn(warning, warn) {
@@ -43,6 +45,16 @@ export default defineConfig({
           return;
         }
         warn(warning);
+      },
+      output: {
+        // 手动分块，优化大文件
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-ui': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-tabs'],
+          'vendor-markdown': ['react-markdown', 'remark-gfm', 'rehype-highlight'],
+          'vendor-thirdweb': ['thirdweb'],
+          'html2canvas': ['html2canvas'],
+        }
       }
     },
   }
