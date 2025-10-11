@@ -32,7 +32,9 @@ import {
   Flame,
   Bookmark,
   PlusCircle,
-  Download
+  Download,
+  Loader2,
+  ScanText
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -118,6 +120,8 @@ export default function Profile() {
   const [popularTags, setPopularTags] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
+  const [extractingText, setExtractingText] = useState<string | null>(null); // BMC ID being extracted
+  const [extractedTexts, setExtractedTexts] = useState<Record<string, string>>({}); // BMC ID -> extracted text
   const [editForm, setEditForm] = useState({
     full_name: '',
     bio: '',
@@ -481,7 +485,7 @@ export default function Profile() {
       // 使用正确的表名 'bmc_boards' 而不是 'user_bmc_saves'
       const { data, error } = await supabase
         .from('bmc_boards')
-        .select('id, title, image_base64, data, created_at, updated_at')
+        .select('id, title, image_base64, data, extracted_text, created_at, updated_at')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(10);
@@ -493,9 +497,63 @@ export default function Profile() {
 
       if (data) {
         setBmcSaves(data);
+        // 加载已提取的文本到state
+        const texts: Record<string, string> = {};
+        data.forEach((bmc: any) => {
+          if (bmc.extracted_text) {
+            texts[bmc.id] = bmc.extracted_text;
+          }
+        });
+        setExtractedTexts(texts);
       }
     } catch (error) {
       console.error('Failed to load BMC saves:', error);
+    }
+  };
+
+  // OCR提取文本功能
+  const handleExtractText = async (bmcId: string, imageBase64: string) => {
+    if (!imageBase64) {
+      toast.error(t('profile.no_image', 'No image available for extraction'));
+      return;
+    }
+
+    setExtractingText(bmcId);
+
+    try {
+      const response = await fetch('/api/ocr-extract', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ image: imageBase64 }),
+      });
+
+      if (!response.ok) {
+        throw new Error('OCR extraction failed');
+      }
+
+      const data = await response.json();
+      const extractedText = data.text || '';
+
+      // 更新数据库
+      const { error: updateError } = await supabase
+        .from('bmc_boards')
+        .update({ extracted_text: extractedText, updated_at: new Date().toISOString() })
+        .eq('id', bmcId);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      // 更新本地state
+      setExtractedTexts(prev => ({ ...prev, [bmcId]: extractedText }));
+      toast.success(t('profile.text_extracted', 'Text extracted successfully!'));
+    } catch (error) {
+      console.error('Error extracting text:', error);
+      toast.error(t('profile.extraction_failed', 'Failed to extract text. Please try again.'));
+    } finally {
+      setExtractingText(null);
     }
   };
 
@@ -1038,6 +1096,21 @@ export default function Profile() {
                           </div>
                         )}
                         
+                        {/* 显示已提取的文本 */}
+                        {extractedTexts[bmc.id] && (
+                          <div className="mb-3 p-3 bg-muted rounded-lg">
+                            <div className="flex items-center gap-2 mb-2">
+                              <ScanText size={16} className="text-primary-500" />
+                              <span className="text-sm font-semibold text-foreground">
+                                {t('profile.extracted_text', 'Extracted Text')}:
+                              </span>
+                            </div>
+                            <p className="text-xs text-foreground-secondary line-clamp-3">
+                              {extractedTexts[bmc.id]}
+                            </p>
+                          </div>
+                        )}
+                        
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-foreground-secondary">
                             {formatDate(bmc.created_at)}
@@ -1054,7 +1127,26 @@ export default function Profile() {
                                 link.click();
                               }}
                             >
+                              <Download size={14} className="mr-1" />
                               {t('profile.download', 'Download')}
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleExtractText(bmc.id, bmc.image_base64)}
+                              disabled={extractingText === bmc.id}
+                            >
+                              {extractingText === bmc.id ? (
+                                <>
+                                  <Loader2 size={14} className="mr-1 animate-spin" />
+                                  {t('profile.extracting', 'Extracting...')}
+                                </>
+                              ) : (
+                                <>
+                                  <ScanText size={14} className="mr-1" />
+                                  {t('profile.extract_text', 'Extract Text')}
+                                </>
+                              )}
                             </Button>
                             <Button 
                               variant="outline" 

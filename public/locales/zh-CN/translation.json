@@ -396,6 +396,27 @@
     "unavailable": "不可用"
   },
   
+  "profile": {
+    "bp_submissions": "商业计划书提交",
+    "bp_desc": "您上传的商业计划书和分析结果",
+    "no_bp": "还没有商业计划书提交",
+    "upload_bp": "上传您的第一个BP",
+    "view_analysis": "查看分析",
+    "bmc_saves": "商业模式画布保存",
+    "bmc_desc": "您保存的商业模式画布设计",
+    "no_bmc": "还没有BMC保存",
+    "create_bmc": "创建您的第一个BMC",
+    "extracted_text": "已提取文本",
+    "extract_text": "提取文本",
+    "extracting": "提取中...",
+    "no_image": "没有可提取的图片",
+    "text_extracted": "文本提取成功！",
+    "extraction_failed": "文本提取失败，请重试",
+    "download": "下载",
+    "view_edit": "查看/编辑",
+    "load_error": "加载资料数据失败"
+  },
+  
   "tags": {
     "select_tags": "选择标签",
     "max_tags_reached": "最多允许3个标签",

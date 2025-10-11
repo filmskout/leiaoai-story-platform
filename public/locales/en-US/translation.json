@@ -396,6 +396,27 @@
     "unavailable": "Unavailable"
   },
   
+  "profile": {
+    "bp_submissions": "Business Plan Submissions",
+    "bp_desc": "Your uploaded business plans and analysis results",
+    "no_bp": "No business plan submissions yet",
+    "upload_bp": "Upload Your First BP",
+    "view_analysis": "View Analysis",
+    "bmc_saves": "Business Model Canvas Saves",
+    "bmc_desc": "Your saved Business Model Canvas designs",
+    "no_bmc": "No BMC saves yet",
+    "create_bmc": "Create Your First BMC",
+    "extracted_text": "Extracted Text",
+    "extract_text": "Extract Text",
+    "extracting": "Extracting...",
+    "no_image": "No image available for extraction",
+    "text_extracted": "Text extracted successfully!",
+    "extraction_failed": "Failed to extract text. Please try again.",
+    "download": "Download",
+    "view_edit": "View/Edit",
+    "load_error": "Failed to load profile data"
+  },
+  
   "tags": {
     "select_tags": "Select Tags",
     "max_tags_reached": "Maximum 3 tags allowed",
