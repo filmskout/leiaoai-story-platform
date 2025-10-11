@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -10,7 +11,8 @@ import {
   User,
   Calendar,
   Reply,
-  MoreVertical
+  MoreVertical,
+  Trash2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -37,6 +39,7 @@ interface CommentSystemProps {
 
 export function CommentSystem({ storyId, userId, sessionId, onCommentAdded }: CommentSystemProps) {
   const { t } = useTranslation();
+  const { user, profile } = useAuth();
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -82,12 +85,17 @@ export function CommentSystem({ storyId, userId, sessionId, onCommentAdded }: Co
     try {
       setSubmitting(true);
 
+      // Get display name from profile or use input
+      const displayName = user 
+        ? (profile?.display_name || profile?.full_name || user.email?.split('@')[0] || 'User')
+        : (authorName.trim() || 'Anonymous');
+
       const result = await addComment(
         storyId,
         newComment.trim(),
         userId || undefined,
         sessionId,
-        authorName.trim() || 'Anonymous'
+        displayName
       );
 
       if (result.success && result.comment) {
@@ -109,6 +117,30 @@ export function CommentSystem({ storyId, userId, sessionId, onCommentAdded }: Co
       alert('Failed to submit comment. Please try again.');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    if (!confirm('Are you sure you want to delete this comment?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('story_comments')
+        .delete()
+        .eq('id', commentId);
+
+      if (error) throw error;
+
+      // Remove from local state
+      setComments(prev => prev.filter(c => c.id !== commentId));
+
+      // Call callback to update count
+      if (onCommentAdded) {
+        onCommentAdded();
+      }
+    } catch (error) {
+      console.error('Failed to delete comment:', error);
+      alert('Failed to delete comment. Please try again.');
     }
   };
 
@@ -250,9 +282,23 @@ export function CommentSystem({ storyId, userId, sessionId, onCommentAdded }: Co
                             )}
                           </div>
                           
-                          <div className="flex items-center gap-2 text-sm text-foreground-secondary">
-                            <Calendar className="w-3 h-3" />
-                            <span>{formatDate(comment.created_at)}</span>
+                          <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2 text-sm text-foreground-secondary">
+                              <Calendar className="w-3 h-3" />
+                              <span>{formatDate(comment.created_at)}</span>
+                            </div>
+                            
+                            {/* Show delete button if user owns this comment */}
+                            {user && comment.user_id === user.id && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDeleteComment(comment.id)}
+                                className="h-7 px-2 text-error-500 hover:text-error-600 hover:bg-error-50"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </Button>
+                            )}
                           </div>
                         </div>
                         

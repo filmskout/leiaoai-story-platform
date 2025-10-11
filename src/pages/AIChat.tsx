@@ -95,25 +95,35 @@ export default function AIChat() {
       return;
     }
 
-    // 如果正在加载，跳过
-    if (isLoading) {
-      console.log('⏭️ Currently loading, skipping auto-ask');
-      return;
-    }
-
     // 检查路由状态中的问题（优先级更高，因为这是从Professional Services来的）
     if (locationState?.autoAsk && locationState?.question) {
       console.log('🎯 Auto-asking from location state:', locationState.question);
       hasAutoAskedRef.current = true;
       setInputMessage(locationState.question);
       
-      // 稍微延迟确保组件完全初始化
+      // 增加延迟确保所有组件完全初始化
       const timer = setTimeout(() => {
-        console.log('⏰ Executing auto-send now...', { category: locationState.category });
-        sendMessage(locationState.question, undefined, undefined, locationState.category);
-        // 清除状态，防止刷新时重复提问
-        navigate(location.pathname, { replace: true, state: null });
-      }, 800);
+        console.log('⏰ Executing auto-send now...', { 
+          question: locationState.question,
+          category: locationState.category,
+          isLoading 
+        });
+        
+        // 确保不在加载状态下发送
+        if (!isLoading) {
+          sendMessage(locationState.question, undefined, undefined, locationState.category)
+            .then(() => {
+              console.log('✅ Auto-send completed successfully');
+              // 清除状态，防止刷新时重复提问
+              navigate(location.pathname, { replace: true, state: null });
+            })
+            .catch((err) => {
+              console.error('❌ Auto-send failed:', err);
+            });
+        } else {
+          console.warn('⚠️ Still loading, cannot auto-send yet');
+        }
+      }, 1200); // 增加到1.2秒
       
       return () => clearTimeout(timer);
     }
@@ -126,8 +136,12 @@ export default function AIChat() {
       
       const timer = setTimeout(() => {
         console.log('⏰ Executing auto-send now...');
-        sendMessage(questionParam);
-      }, 800);
+        if (!isLoading) {
+          sendMessage(questionParam)
+            .then(() => console.log('✅ Auto-send completed'))
+            .catch((err) => console.error('❌ Auto-send failed:', err));
+        }
+      }, 1200); // 增加到1.2秒
       
       return () => clearTimeout(timer);
     }

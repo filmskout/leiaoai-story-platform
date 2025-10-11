@@ -66,23 +66,30 @@ export async function getUserInteractions(
         likeQuery = likeQuery.eq('session_id', sessionId);
       }
 
-      const { data: likeData } = await likeQuery.single();
-      interactions.hasLiked = !!likeData;
+      const { data: likeData, error: likeError } = await likeQuery.maybeSingle();
+      
+      if (!likeError) {
+        interactions.hasLiked = !!likeData;
+        console.log('🔵 getUserInteractions - Like check:', { hasLiked: interactions.hasLiked, userId, sessionId });
+      }
     }
 
     // Check if user has saved (only for logged-in users)
     if (userId) {
-      const { data: saveData } = await supabase
+      const { data: saveData, error: saveError } = await supabase
         .from('story_saves')
         .select('id')
         .eq('story_id', storyId)
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
 
-      interactions.hasSaved = !!saveData;
+      if (!saveError) {
+        interactions.hasSaved = !!saveData;
+        console.log('🔵 getUserInteractions - Save check:', { hasSaved: interactions.hasSaved, userId });
+      }
     }
   } catch (error) {
-    // Ignore errors (means no interaction found)
+    console.error('❌ getUserInteractions error:', error);
   }
 
   return interactions;
@@ -99,7 +106,7 @@ export async function likeStory(
   try {
     console.log('🔵 likeStory:', { storyId, hasUserId: !!userId, hasSessionId: !!sessionId });
 
-    // Insert like record
+    // Insert like record - trigger will automatically increment count
     const { error: insertError } = await supabase
       .from('story_likes')
       .insert({
@@ -114,21 +121,11 @@ export async function likeStory(
         console.log('🟡 Already liked');
         return { success: false, error: 'Already liked' };
       }
+      console.error('🔴 Insert error:', insertError);
       throw insertError;
     }
 
-    // Increment like count
-    const { error: updateError } = await supabase.rpc(
-      'increment_story_like_count',
-      { p_story_id: storyId }
-    );
-
-    if (updateError) {
-      console.warn('Failed to increment like count:', updateError);
-      // Don't fail the operation
-    }
-
-    console.log('🟢 Story liked successfully');
+    console.log('🟢 Story liked successfully (trigger will update count)');
     return { success: true };
   } catch (error: any) {
     console.error('🔴 Failed to like story:', error);
@@ -147,7 +144,7 @@ export async function unlikeStory(
   try {
     console.log('🔵 unlikeStory:', { storyId, hasUserId: !!userId, hasSessionId: !!sessionId });
 
-    // Delete like record
+    // Delete like record - trigger will automatically decrement count
     let deleteQuery = supabase
       .from('story_likes')
       .delete()
@@ -163,20 +160,12 @@ export async function unlikeStory(
 
     const { error: deleteError } = await deleteQuery;
 
-    if (deleteError) throw deleteError;
-
-    // Decrement like count
-    const { error: updateError } = await supabase.rpc(
-      'decrement_story_like_count',
-      { p_story_id: storyId }
-    );
-
-    if (updateError) {
-      console.warn('Failed to decrement like count:', updateError);
-      // Don't fail the operation
+    if (deleteError) {
+      console.error('🔴 Delete error:', deleteError);
+      throw deleteError;
     }
 
-    console.log('🟢 Story unliked successfully');
+    console.log('🟢 Story unliked successfully (trigger will update count)');
     return { success: true };
   } catch (error: any) {
     console.error('🔴 Failed to unlike story:', error);
@@ -194,22 +183,24 @@ export async function saveStory(
   try {
     console.log('🔵 saveStory:', { storyId, userId });
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('story_saves')
       .insert({
         story_id: storyId,
         user_id: userId
-      });
+      })
+      .select();
 
     if (error) {
       if (error.code === '23505') {
         console.log('🟡 Already saved');
         return { success: false, error: 'Already saved' };
       }
+      console.error('🔴 Insert error:', error);
       throw error;
     }
 
-    console.log('🟢 Story saved successfully');
+    console.log('🟢 Story saved successfully:', data);
     return { success: true };
   } catch (error: any) {
     console.error('🔴 Failed to save story:', error);
@@ -227,15 +218,19 @@ export async function unsaveStory(
   try {
     console.log('🔵 unsaveStory:', { storyId, userId });
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('story_saves')
       .delete()
       .eq('story_id', storyId)
-      .eq('user_id', userId);
+      .eq('user_id', userId)
+      .select();
 
-    if (error) throw error;
+    if (error) {
+      console.error('🔴 Delete error:', error);
+      throw error;
+    }
 
-    console.log('🟢 Story unsaved successfully');
+    console.log('🟢 Story unsaved successfully:', data);
     return { success: true };
   } catch (error: any) {
     console.error('🔴 Failed to unsave story:', error);

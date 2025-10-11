@@ -49,7 +49,7 @@ interface AIProviderProps {
 
 export function AIProvider({ children }: AIProviderProps) {
   const [region, setRegion] = useState('overseas');
-  const [selectedChatModel, setSelectedChatModel] = useState('deepseek');
+  const [selectedChatModel, setSelectedChatModel] = useState('openai'); // 默认使用OpenAI GPT-4o
   const [selectedImageModel, setSelectedImageModel] = useState('dall-e');
   const [modelConfigs, setModelConfigs] = useState<ModelConfigs | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -93,17 +93,17 @@ export function AIProvider({ children }: AIProviderProps) {
       localStorage.setItem('leoai-recommended-model', recommendedChatModel);
     } catch (error) {
       console.error('获取基于地理位置的模型配置失败:', error);
-      // 使用本地兜底配置，提供 deepseek/openai/qwen 三模型
+      // 使用本地兜底配置，提供 openai/qwen/deepseek 三模型
       setRegion('overseas');
-      const defaultModel = 'deepseek';
+      const defaultModel = 'openai'; // GPT-4o 作为默认
       setSelectedChatModel(defaultModel);
       setSelectedImageModel('dall-e');
       setModelConfigs({
         chat: {
           available: [
-            { id: 'deepseek', name: 'DeepSeek', enabled: true, recommended: true },
-            { id: 'openai', name: 'OpenAI GPT-4o', enabled: true, recommended: false },
+            { id: 'openai', name: 'OpenAI GPT-4o', enabled: true, recommended: true },
             { id: 'qwen', name: 'Qwen Turbo', enabled: true, recommended: false },
+            { id: 'deepseek', name: 'DeepSeek', enabled: true, recommended: false },
           ]
         },
         image: {
@@ -145,9 +145,9 @@ export function AIProvider({ children }: AIProviderProps) {
             setModelConfigs({
               chat: {
                 available: [
-                  { id: 'deepseek', name: 'DeepSeek', enabled: true, recommended: true },
-                  { id: 'openai', name: 'OpenAI GPT-4o', enabled: true, recommended: false },
+                  { id: 'openai', name: 'OpenAI GPT-4o', enabled: true, recommended: true },
                   { id: 'qwen', name: 'Qwen Turbo', enabled: true, recommended: false },
+                  { id: 'deepseek', name: 'DeepSeek', enabled: true, recommended: false },
                 ]
               },
               image: {
@@ -241,16 +241,16 @@ export function AIProvider({ children }: AIProviderProps) {
     const isChineseUser = userLanguage.toLowerCase().startsWith('zh');
     
     // 检查是否可能是中国用户 (基于时区和语言等因素)
-    const possibleChineseUser = isChineseUser || 
-                               (new Date().getTimezoneOffset() / -60) === 8; // 中国标准时区是UTC+8
+    const timezone = new Date().getTimezoneOffset() / -60;
+    const possibleChineseUser = isChineseUser || timezone === 8; // 中国标准时区是UTC+8
     
     // 根据不同语言返回不同的模型
-    // 简体及繁体中文用户默认使用 Qwen（阿里通义千问）
-    // 英文和其他语言用户默认使用 OpenAI GPT-4o
-    if (possibleChineseUser) {
+    // 简体及繁体中文用户（中国IP）默认使用 Qwen（阿里通义千问）
+    // 英文和其他语言用户（海外IP）默认使用 OpenAI GPT-4o
+    if (possibleChineseUser && isChineseUser) {
       return 'qwen'; // 中国用户使用Qwen（阿里通义千问）
     } else {
-      return 'openai'; // 海外用户优先使用OpenAI GPT-4o
+      return 'openai'; // 所有其他用户优先使用OpenAI GPT-4o
     }
   };
   
