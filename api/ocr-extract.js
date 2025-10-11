@@ -4,7 +4,7 @@
  * OCR文本提取API
  * 使用OpenAI Vision API从图片中提取文本
  */
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
