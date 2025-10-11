@@ -10,10 +10,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { image } = req.body;
+    const { image, imageUrl } = req.body;
+    const imageData = image || imageUrl; // 支持两种参数名
 
-    if (!image) {
-      return res.status(400).json({ error: 'Image data is required' });
+    if (!imageData) {
+      return res.status(400).json({ error: 'Image data or imageUrl is required' });
     }
 
     const apiKey = process.env.OPENAI_API_KEY;
@@ -42,7 +43,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               {
                 type: 'image_url',
                 image_url: {
-                  url: image
+                  url: imageData
                 }
               }
             ]
@@ -69,7 +70,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log('✅ OCR extraction successful, text length:', extractedText.length);
 
     return res.status(200).json({
-      text: extractedText,
+      extractedText: extractedText, // 前端期望的字段名
+      text: extractedText, // 保留兼容性
       success: true
     });
 

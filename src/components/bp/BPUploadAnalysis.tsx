@@ -266,27 +266,51 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
     try {
       // 对于PDF，使用OCR API
       if (fileType === 'application/pdf') {
+        console.log('🔵 BP OCR: Calling API with URL:', fileUrl);
+        
         const response = await fetch('/api/ocr-extract', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ imageUrl: fileUrl })
         });
 
+        console.log('🔵 BP OCR: API response status:', response.status);
+
         if (!response.ok) {
-          throw new Error('OCR extraction failed');
+          const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+          console.error('🔴 BP OCR: API error', { 
+            status: response.status, 
+            error: errorData 
+          });
+          throw new Error(errorData.error || `OCR extraction failed with status ${response.status}`);
         }
 
         const data = await response.json();
-        console.log('🟢 BP OCR: Text extracted', { length: data.extractedText?.length });
-        return data.extractedText || '';
-      } else {
-        // 对于DOCX，暂时返回空字符串（需要额外的库支持）
+        const extractedText = data.extractedText || data.text || '';
+        
+        console.log('🟢 BP OCR: Text extracted', { 
+          length: extractedText.length,
+          preview: extractedText.substring(0, 100) 
+        });
+        
+        if (!extractedText || extractedText.length === 0) {
+          throw new Error('No text could be extracted from the PDF');
+        }
+        
+        return extractedText;
+      } else if (fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        // 对于DOCX，暂时返回提示信息
         console.log('⚠️ BP OCR: DOCX extraction not yet implemented');
-        return 'DOCX file uploaded. Text extraction for DOCX files will be implemented soon.';
+        return 'DOCX file uploaded. Text extraction for DOCX files will be implemented soon. Please use PDF format for full analysis.';
+      } else {
+        throw new Error(`Unsupported file type: ${fileType}`);
       }
     } catch (err: any) {
-      console.error('🔴 BP OCR: Error', err);
-      throw new Error('Text extraction failed');
+      console.error('🔴 BP OCR: Error', {
+        message: err.message,
+        stack: err.stack
+      });
+      throw new Error(err.message || 'Text extraction failed');
     }
   };
 
@@ -376,14 +400,32 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
       setAnalysisScores(scores);
 
     } catch (err: any) {
-      console.error('🔴 BP Analysis: Error', err);
-      setError(err.message || t('errors.analysis_failed', 'Analysis failed. Please try again.'));
+      console.error('🔴 BP Analysis: Error', {
+        message: err.message,
+        stack: err.stack
+      });
+      
+      let errorMsg = err.message || t('errors.analysis_failed', 'Analysis failed. Please try again.');
+      
+      // 提供更具体的错误消息
+      if (err.message?.includes('OCR extraction failed')) {
+        errorMsg = 'PDF文本提取失败。可能的原因：\n1. PDF文件损坏或加密\n2. OpenAI API配置问题\n3. 网络连接问题\n\n请尝试重新上传或使用其他PDF文件。';
+      } else if (err.message?.includes('No text could be extracted')) {
+        errorMsg = '无法从PDF中提取文本。请确保：\n1. PDF不是扫描版（纯图片）\n2. PDF未加密或受保护\n3. 文件未损坏';
+      } else if (err.message?.includes('Analysis failed')) {
+        errorMsg = 'AI分析失败。请稍后重试。';
+      }
+      
+      setError(errorMsg);
 
       // 更新状态为failed
       if (uploadedBpId) {
         await supabase
           .from('bp_submissions')
-          .update({ analysis_status: 'failed', updated_at: new Date().toISOString() })
+          .update({ 
+            analysis_status: 'failed', 
+            updated_at: new Date().toISOString() 
+          })
           .eq('id', uploadedBpId);
       }
     } finally {
