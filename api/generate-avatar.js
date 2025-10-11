@@ -11,7 +11,7 @@
 
 const OPENAI_API_URL = 'https://api.openai.com/v1/images/generations';
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   // 只允许 POST 请求
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method Not Allowed' });
