@@ -652,7 +652,7 @@ export default function EnhancedSettings() {
             {/* Chat Model */}
             <div>
               <h4 className="font-medium text-foreground mb-3">
-                {t('settings.preferred_chat_model')}
+                {t('settings.preferred_chat_model', 'Preferred Chat Model')}
               </h4>
               <div className="grid grid-cols-2 gap-3">
                 {modelConfigs?.chat.available.map((model) => (
@@ -695,7 +695,7 @@ export default function EnhancedSettings() {
             {/* Image Model */}
             <div>
               <h4 className="font-medium text-foreground mb-3">
-                {t('settings.preferred_image_model')}
+                {t('settings.preferred_image_model', 'Preferred Image Model')}
               </h4>
               <div className="grid grid-cols-2 gap-3">
                 {modelConfigs?.image.available.map((model) => (
