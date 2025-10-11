@@ -1,4 +1,4 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+// @ts-nocheck
 
 // System prompt for AI investment consultant
 const getSystemPrompt = () => `你是一位专业的AI投融资顾问，拥有丰富的商业分析、投资策略和企业咨询经验。你的目标是为用户提供专业、准确且实用的投融资建议。
@@ -19,7 +19,7 @@ const getSystemPrompt = () => `你是一位专业的AI投融资顾问，拥有�
 
 请用用户的语言回复，保持专业且易于理解。`;
 
-const MODEL_MAP: Record<string, { provider: 'deepseek' | 'openai' | 'qwen'; model: string }> = {
+const MODEL_MAP = {
   deepseek: { provider: 'deepseek', model: 'deepseek-chat' },
   'deepseek-chat': { provider: 'deepseek', model: 'deepseek-chat' },
   openai: { provider: 'openai', model: 'gpt-4o' },
@@ -28,7 +28,7 @@ const MODEL_MAP: Record<string, { provider: 'deepseek' | 'openai' | 'qwen'; mode
   'qwen-turbo': { provider: 'qwen', model: 'qwen-turbo' },
 };
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method Not Allowed' });
     return;
@@ -109,8 +109,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    const data: any = await response.json();
-    const aiResponse: string | undefined = data?.choices?.[0]?.message?.content;
+      const data = await response.json();
+    const aiResponse = data?.choices?.[0]?.message?.content;
 
     if (!aiResponse) {
       console.error('❌ Invalid AI response structure:', JSON.stringify(data).slice(0, 200));
@@ -130,7 +130,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       },
       processingTime: processingTimeSeconds,
     });
-  } catch (err: any) {
+  } catch (err) {
     console.error('💥 Handler Error:', err?.message || err);
     res.status(500).json({ error: err?.message || 'Internal Server Error' });
   }

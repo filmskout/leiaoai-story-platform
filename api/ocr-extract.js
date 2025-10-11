@@ -1,10 +1,10 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+// @ts-nocheck
 
 /**
  * OCR文本提取API
  * 使用OpenAI Vision API从图片中提取文本
  */
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
@@ -58,7 +58,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(response.status).json({ error: 'OCR extraction failed' });
     }
 
-    const data: any = await response.json();
+    const data = await response.json();
     const extractedText = data?.choices?.[0]?.message?.content;
 
     if (!extractedText) {
@@ -73,7 +73,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       success: true
     });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('💥 OCR extraction error:', error?.message || error);
     return res.status(500).json({
       error: error?.message || 'Internal Server Error'

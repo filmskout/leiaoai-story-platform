@@ -1,4 +1,4 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+// @ts-nocheck
 
 /**
  * Vercel Serverless Function: 使用 DALL·E 生成用户头像
@@ -11,7 +11,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 const OPENAI_API_URL = 'https://api.openai.com/v1/images/generations';
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+module.exports = async function handler(req, res) {
   // 只允许 POST 请求
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method Not Allowed' });
@@ -67,7 +67,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    const data: any = await response.json();
+    const data = await response.json();
 
     // 获取生成的图片 URL
     if (data?.data?.[0]?.url) {
@@ -102,7 +102,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     } else {
       res.status(502).json({ error: 'Invalid response from OpenAI API' });
     }
-  } catch (err: any) {
+  } catch (err) {
     console.error('Error in generate-avatar:', err);
     res.status(500).json({ 
       error: err?.message || 'Internal Server Error' 
