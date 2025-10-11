@@ -206,10 +206,10 @@ export function QuickAIChatInput({ className, onSubmit }: QuickAIChatInputProps)
             size="sm"
             onClick={handleSubmit}
             disabled={!inputMessage.trim() || isLoading}
-            className="absolute right-2 top-2 h-8 w-8 p-0"
+            className="absolute right-2 top-2 h-8 w-8 p-0 bg-orange-500 hover:bg-orange-600 text-white shadow-lg"
           >
             {isLoading ? (
-              <div className="animate-spin w-4 h-4 border-2 border-primary-200 border-t-primary-600 rounded-full" />
+              <div className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full" />
             ) : (
               <Send size={14} />
             )}

@@ -443,7 +443,7 @@ export function AnswerModule({
                 type="button" 
                 disabled={!inputMessage.trim() || isLoading}
                 onClick={onSendMessage}
-                className="rounded-full w-10 h-10 bg-primary-500 text-white hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="rounded-full w-10 h-10 bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
               >
                 <Send size={16} />
               </Button>

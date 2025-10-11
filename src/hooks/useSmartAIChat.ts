@@ -45,9 +45,21 @@ export function useSmartAIChat() {
   const currentError = error || localError;
 
   // 智能语言匹配的发送消息函数
-  const sendMessage = useCallback(async (messageToSend?: string) => {
+  const sendMessage = useCallback(async (
+    messageToSend?: string, 
+    sessionId?: string, 
+    modelOverride?: string, 
+    category?: string
+  ) => {
     const message = messageToSend || inputMessage;
     if (!message.trim()) return;
+    
+    console.log('🔵 useSmartAIChat: Sending message', { 
+      message: message.substring(0, 50), 
+      category,
+      sessionId,
+      modelOverride 
+    });
     
     try {
       // 1. 检测用户输入的语言
@@ -62,14 +74,16 @@ export function useSmartAIChat() {
       // 4. 为消息添加语言提示
       const enhancedMessage = addLanguagePrompt(message, targetLanguage);
       
-      // 5. 发送增强后的消息
-      await originalSendMessage(enhancedMessage);
+      // 5. 发送增强后的消息（传递所有参数，包括category）
+      await originalSendMessage(enhancedMessage, sessionId, modelOverride, category);
       
       // 6. 清理输入
       setInputMessage('');
       
+      console.log('✅ useSmartAIChat: Message sent successfully');
+      
     } catch (err) {
-      console.error('Error sending message:', err);
+      console.error('🔴 useSmartAIChat: Error sending message:', err);
       setLocalError(err instanceof Error ? err.message : 'Failed to send message');
     }
   }, [inputMessage, originalSendMessage, i18n.language]);
@@ -155,7 +169,8 @@ export function useSmartAIChat() {
     
     // 操作
     setInputMessage,
-    sendMessage: handleSendMessage,
+    sendMessage, // 导出原始的sendMessage，支持category参数
+    handleSendMessage, // 简化版本，用于手动发送
     startNewChat,
     handleVoiceInput,
     regenerateMessage,

@@ -441,7 +441,7 @@ export function AIInvestmentChat({ className, initialQuestion }: AIInvestmentCha
               type="button" 
               disabled={!inputMessage.trim() || isLoading}
               onClick={handleSendMessage}
-              className="rounded-full w-8 h-8 bg-primary-500 text-white hover:bg-primary-600 disabled:opacity-50"
+              className="rounded-full w-8 h-8 bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-50 shadow-lg"
             >
               <Send size={16} />
             </Button>

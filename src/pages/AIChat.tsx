@@ -38,6 +38,7 @@ export default function AIChat() {
     isRecording,
     setInputMessage,
     sendMessage,
+    handleSendMessage,
     startNewChat,
     handleVoiceInput,
     regenerateMessage,
@@ -279,11 +280,11 @@ export default function AIChat() {
                   onRegenerateMessage={regenerateMessage}
                   className="w-full"
                   // 添加输入框相关的props
-                  inputMessage={inputMessage}
-                  onInputChange={setInputMessage}
-                  onSendMessage={sendMessage}
-                  isRecording={isRecording}
-                  onVoiceInput={handleVoiceInput}
+            inputMessage={inputMessage}
+            onInputChange={setInputMessage}
+            onSendMessage={handleSendMessage}
+            isRecording={isRecording}
+            onVoiceInput={handleVoiceInput}
                   onQuestionSelect={selectQuestion}
                 />
               </motion.div>
