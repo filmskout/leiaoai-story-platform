@@ -56,12 +56,14 @@ export function SimpleStoriesWall() {
 
   // Load stories
   useEffect(() => {
+    console.log('🔵 SimpleStoriesWall: Loading stories', { selectedTags, sortBy });
     loadStories();
     loadTags();
   }, [selectedTags, sortBy]);
 
   const loadStories = async () => {
     try {
+      console.log('🔵 SimpleStoriesWall: loadStories started');
       setLoading(true);
 
       // Build query
@@ -102,9 +104,12 @@ export function SimpleStoriesWall() {
       if (error) throw error;
 
       if (!storiesData || storiesData.length === 0) {
+        console.log('🟡 SimpleStoriesWall: No stories found');
         setStories([]);
         return;
       }
+      
+      console.log('🟢 SimpleStoriesWall: Loaded stories', { count: storiesData.length });
 
       // Filter by tags if selected
       if (selectedTags.length > 0) {
@@ -130,10 +135,11 @@ export function SimpleStoriesWall() {
         setStories(storiesData);
       }
     } catch (error) {
-      console.error('Error loading stories:', error);
+      console.error('🔴 SimpleStoriesWall: Error loading stories:', error);
       toast.error('Failed to load stories');
     } finally {
       setLoading(false);
+      console.log('🔵 SimpleStoriesWall: loadStories completed');
     }
   };
 
@@ -149,17 +155,24 @@ export function SimpleStoriesWall() {
 
   const loadTags = async () => {
     try {
+      console.log('🔵 SimpleStoriesWall: Loading tags from tags table');
       const { data, error } = await supabase
-        .from('story_tags')
+        .from('tags')
         .select('id, name, display_name, color, usage_count')
         .eq('is_active', true)
         .order('usage_count', { ascending: false })
         .limit(20);
 
-      if (error) throw error;
+      if (error) {
+        console.error('🔴 SimpleStoriesWall: Error loading tags:', error);
+        throw error;
+      }
+      
+      console.log('🟢 SimpleStoriesWall: Loaded tags', { count: data?.length || 0 });
       if (data) setTags(data);
     } catch (error) {
-      console.error('Error loading tags:', error);
+      console.error('🔴 SimpleStoriesWall: Error in loadTags:', error);
+      // Don't show error to user, just log it
     }
   };
 
