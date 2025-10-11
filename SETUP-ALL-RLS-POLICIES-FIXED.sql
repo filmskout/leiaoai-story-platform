@@ -91,7 +91,7 @@ TO authenticated
 WITH CHECK (
   EXISTS (
     SELECT 1 FROM chat_sessions
-    WHERE chat_sessions.id = chat_messages.session_id
+    WHERE chat_sessions.id::text = chat_messages.session_id::text
     AND chat_sessions.user_id::text = auth.uid()::text
   )
 );
@@ -102,7 +102,7 @@ TO authenticated
 USING (
   EXISTS (
     SELECT 1 FROM chat_sessions
-    WHERE chat_sessions.id = chat_messages.session_id
+    WHERE chat_sessions.id::text = chat_messages.session_id::text
     AND chat_sessions.user_id::text = auth.uid()::text
   )
 );
@@ -113,7 +113,7 @@ TO authenticated
 USING (
   EXISTS (
     SELECT 1 FROM chat_sessions
-    WHERE chat_sessions.id = chat_messages.session_id
+    WHERE chat_sessions.id::text = chat_messages.session_id::text
     AND chat_sessions.user_id::text = auth.uid()::text
   )
 );
@@ -124,7 +124,7 @@ TO authenticated
 USING (
   EXISTS (
     SELECT 1 FROM chat_sessions
-    WHERE chat_sessions.id = chat_messages.session_id
+    WHERE chat_sessions.id::text = chat_messages.session_id::text
     AND chat_sessions.user_id::text = auth.uid()::text
   )
 );
