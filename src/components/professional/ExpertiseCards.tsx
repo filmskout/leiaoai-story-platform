@@ -224,8 +224,14 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
       // 如果有问题选择回调，使用回调
       onQuestionSelect(randomQuestion);
     } else {
-      // 否则跳转到 AI 问答页面，并带上预填充的问题
-      navigate(`/ai-chat?question=${encodeURIComponent(randomQuestion)}&category=${area.key}`);
+      // 跳转到 AI 问答页面，并自动发送问题
+      navigate(`/ai-chat`, { 
+        state: { 
+          autoAsk: true, 
+          question: randomQuestion,
+          category: area.key
+        } 
+      });
     }
   };
 
@@ -238,8 +244,14 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
       // 如果有问题选择回调，使用回调
       onQuestionSelect(question);
     } else {
-      // 否则跳转到 AI 问答页面
-      navigate(`/ai-chat?question=${encodeURIComponent(question)}${category ? `&category=${category}` : ''}`);
+      // 跳转到 AI 问答页面，并自动发送问题
+      navigate(`/ai-chat`, { 
+        state: { 
+          autoAsk: true, 
+          question: question,
+          category: category
+        } 
+      });
     }
   };
 

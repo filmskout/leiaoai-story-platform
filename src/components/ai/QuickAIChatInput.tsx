@@ -168,7 +168,8 @@ export function QuickAIChatInput({ className, onSubmit }: QuickAIChatInputProps)
             <div className="flex items-center justify-center w-full h-full">
               <UnifiedLoader 
                 size="md" 
-                variant="full" 
+                variant="inline"
+                loaderStyle="spinner"
                 text={t('ai_chat.processing')}
               />
             </div>

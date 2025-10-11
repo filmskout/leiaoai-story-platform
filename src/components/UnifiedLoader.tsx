@@ -46,6 +46,9 @@ export interface UnifiedLoaderProps {
   
   // 背景配置
   background?: 'blur' | 'solid' | 'none';
+  
+  // 加载器样式: 'logo' 使用彩色A Logo, 'spinner' 使用标准旋转圆圈
+  loaderStyle?: 'logo' | 'spinner';
 }
 
 export function UnifiedLoader({ 
@@ -60,6 +63,7 @@ export function UnifiedLoader({
   showProgress = variant === 'cover',
   progress: customProgress,
   background = variant === 'fullscreen' ? 'blur' : variant === 'page' ? 'solid' : 'none',
+  loaderStyle = 'spinner', // 默认使用spinner，除非指定logo
 }: UnifiedLoaderProps) {
   const [isVisible, setIsVisible] = useState(show);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -194,6 +198,32 @@ export function UnifiedLoader({
     );
   };
   
+  // 标准Spinner渲染
+  const renderSpinner = () => {
+    const spinnerSizes = {
+      xs: 'w-4 h-4 border-2',
+      sm: 'w-6 h-6 border-2',
+      md: 'w-8 h-8 border-3',
+      lg: 'w-12 h-12 border-4',
+      xl: 'w-16 h-16 border-4',
+    };
+    
+    return (
+      <motion.div
+        className={cn(
+          'rounded-full border-solid border-primary-500 border-t-transparent',
+          spinnerSizes[size]
+        )}
+        animate={{ rotate: 360 }}
+        transition={{
+          duration: 0.8,
+          repeat: Infinity,
+          ease: "linear"
+        }}
+      />
+    );
+  };
+  
   // 内联加载器
   if (variant === 'inline') {
     if (!show) return null;
@@ -209,9 +239,13 @@ export function UnifiedLoader({
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <div className={cn(sizesConfig[size].logo)}>
-          {renderColorfulALogo()}
-        </div>
+        {loaderStyle === 'spinner' ? (
+          renderSpinner()
+        ) : (
+          <div className={cn(sizesConfig[size].logo)}>
+            {renderColorfulALogo()}
+          </div>
+        )}
         
         {text && (
           <motion.div 

@@ -389,14 +389,15 @@ export function AnswerModule({
                       </span>
                     </div>
                     
-                    {/* 使用彩色A Logo特效替代之前的加载动画 */}
+                    {/* 使用标准spinner加载动画 */}
                     <div className="flex justify-center items-center py-6">
-                      <div className="w-20 h-20">
-                        <UnifiedLoader mode="inline" show={true} />
-                      </div>
-                      <div className="text-sm text-foreground-muted ml-4">
-                        {i18n.language.startsWith('zh') ? '响应中...' : 'Processing...'}
-                      </div>
+                      <UnifiedLoader 
+                        variant="inline" 
+                        show={true} 
+                        size="md"
+                        loaderStyle="spinner"
+                        text={i18n.language.startsWith('zh') ? '响应中...' : 'Processing...'}
+                      />
                     </div>
                   </div>
                 </motion.div>
