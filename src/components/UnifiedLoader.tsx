@@ -99,13 +99,13 @@ export function UnifiedLoader({
     }
   }, [show, minDuration, onComplete, variant]);
   
-  // 图片静态切换（无旋转/闪烁特效），每 250ms 切换一次
+  // 图片静态切换（无旋转/闪烁/弹出特效），每 500ms 切换一次（减慢速度避免闪烁）
   useEffect(() => {
     if (!show) return;
 
     const interval = setInterval(() => {
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % logoImages.length);
-    }, 250);
+    }, 500); // 减慢到500ms，避免快速闪烁
     
     return () => {
       clearInterval(interval);
@@ -185,14 +185,20 @@ export function UnifiedLoader({
     ));
   };
   
-  // 彩色A Logo渲染（移除旋转/闪烁/白点等动画，仅静态切换图片）
+  // 彩色A Logo渲染（移除所有动画效果，仅静态切换图片，无弹出/缩放）
   const renderColorfulALogo = () => {
     return (
       <div className="relative h-full w-full flex items-center justify-center">
         <img
+          key={currentImageIndex}
           src={logoImages[currentImageIndex]}
           alt="蕾奥AI Logo"
-          className="w-full h-full object-contain"
+          className="w-full h-full object-contain transition-opacity duration-200"
+          style={{ 
+            opacity: 1,
+            transform: 'none',  // 禁用所有transform
+            animation: 'none'   // 禁用所有animation
+          }}
         />
       </div>
     );

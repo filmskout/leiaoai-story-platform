@@ -78,49 +78,59 @@ export default function AIChat() {
 
   // 自动提问初始问题
   useEffect(() => {
-    // 如果没有会话标识，跳过
-    if (!sessionKey) {
+    console.log('🔵 AIChat: Auto-ask effect triggered', { 
+      hasSessionKey: !!sessionKey,
+      hasQuestionParam: !!questionParam,
+      hasLocationState: !!locationState,
+      autoAsk: locationState?.autoAsk,
+      question: locationState?.question || questionParam,
+      isLoading,
+      hasAutoAsked: hasAutoAskedRef.current
+    });
+
+    // 如果已经自动提问过了，跳过
+    if (hasAutoAskedRef.current) {
+      console.log('⏭️ Already auto-asked, skipping');
       return;
     }
 
-    // 检查是否已经为这个问题自动提问过
-    const alreadyAsked = sessionStorage.getItem(sessionKey);
-    if (alreadyAsked === 'true') {
-      console.log('⏭️ Skipping auto-ask, already asked:', sessionKey);
+    // 如果正在加载，跳过
+    if (isLoading) {
+      console.log('⏭️ Currently loading, skipping auto-ask');
       return;
     }
 
-    // 检查URL参数中的问题
-    if (questionParam && !isLoading) {
-      console.log('🎯 Auto-asking question from URL parameter:', questionParam);
-      console.log('📍 Current model:', selectedChatModel);
-      sessionStorage.setItem(sessionKey, 'true');
-      hasAutoAskedRef.current = true;
-      setInputMessage(questionParam);
-      // 延迟一下发送，让组件充分初始化
-      setTimeout(() => {
-        console.log('⏰ Sending auto-ask message now...');
-        sendMessage(questionParam);
-      }, 1200); // 增加延迟到1.2秒
-      return;
-    }
-    
-    // 检查路由状态中的问题
-    if (locationState?.autoAsk && locationState?.question && !isLoading) {
-      console.log('🎯 Auto-asking question from location state:', locationState.question);
-      console.log('📍 Current model:', selectedChatModel);
-      sessionStorage.setItem(sessionKey, 'true');
+    // 检查路由状态中的问题（优先级更高，因为这是从Professional Services来的）
+    if (locationState?.autoAsk && locationState?.question) {
+      console.log('🎯 Auto-asking from location state:', locationState.question);
       hasAutoAskedRef.current = true;
       setInputMessage(locationState.question);
-      // 延迟一下发送，让组件充分初始化
-      setTimeout(() => {
-        console.log('⏰ Sending auto-ask message now...');
+      
+      // 稍微延迟确保组件完全初始化
+      const timer = setTimeout(() => {
+        console.log('⏰ Executing auto-send now...');
         sendMessage(locationState.question);
         // 清除状态，防止刷新时重复提问
         navigate(location.pathname, { replace: true, state: null });
-      }, 1200); // 增加延迟到1.2秒
+      }, 800);
+      
+      return () => clearTimeout(timer);
     }
-  }, [questionParam, isLoading, locationState, navigate, location.pathname, sendMessage, setInputMessage, sessionKey]);
+    
+    // 检查URL参数中的问题
+    if (questionParam && !hasAutoAskedRef.current) {
+      console.log('🎯 Auto-asking from URL parameter:', questionParam);
+      hasAutoAskedRef.current = true;
+      setInputMessage(questionParam);
+      
+      const timer = setTimeout(() => {
+        console.log('⏰ Executing auto-send now...');
+        sendMessage(questionParam);
+      }, 800);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [questionParam, locationState, isLoading, sendMessage, setInputMessage, navigate, location.pathname]);
 
   // 当用户点击"新对话"时，清除会话标记并重置自动提问标志
   const handleStartNewChat = () => {
