@@ -58,7 +58,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(response.status).json({ error: 'OCR extraction failed' });
     }
 
-    const data = await response.json();
+    const data: any = await response.json();
     const extractedText = data?.choices?.[0]?.message?.content;
 
     if (!extractedText) {

@@ -67,7 +67,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    const data = await response.json();
+    const data: any = await response.json();
 
     // 获取生成的图片 URL
     if (data?.data?.[0]?.url) {
