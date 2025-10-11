@@ -82,10 +82,12 @@ export function SocialInteractions({ storyId, initialStats, className }: SocialI
   const handleInteraction = async (action: string, platform?: string) => {
     if (loading) return;
     
+    console.log('🔵 SocialInteractions: handleInteraction', { action, storyId, hasUser: !!user, sessionId });
+    
     try {
       setLoading(true);
       
-      const { data } = await supabase.functions.invoke('story-interactions', {
+      const { data, error } = await supabase.functions.invoke('story-interactions', {
         body: {
           action,
           storyId,
@@ -95,7 +97,19 @@ export function SocialInteractions({ storyId, initialStats, className }: SocialI
         }
       });
 
+      console.log('🔵 SocialInteractions: Response', { 
+        hasData: !!data, 
+        hasError: !!error,
+        success: data?.data?.success 
+      });
+
+      if (error) {
+        console.error('🔴 SocialInteractions: Supabase function error', error);
+        throw error;
+      }
+
       if (data?.data?.success) {
+        console.log('🟢 SocialInteractions: Action successful', { action });
         // Update local state based on action
         if (action === 'like') {
           setUserInteractions(prev => ({ ...prev, hasLiked: true }));
@@ -108,9 +122,11 @@ export function SocialInteractions({ storyId, initialStats, className }: SocialI
         } else if (action === 'unsave') {
           setUserInteractions(prev => ({ ...prev, hasSaved: false }));
         }
+      } else {
+        console.error('🔴 SocialInteractions: Action not successful', data);
       }
     } catch (error) {
-      console.error(`Failed to ${action}:`, error);
+      console.error(`🔴 SocialInteractions: Failed to ${action}:`, error);
     } finally {
       setLoading(false);
     }
