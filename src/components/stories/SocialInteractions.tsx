@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { 
   Heart, 
@@ -11,27 +10,39 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import { 
+  getStoryStats,
+  getUserInteractions,
+  likeStory,
+  unlikeStory,
+  saveStory,
+  unsaveStory,
+  shareStory,
+  type StoryStats,
+  type UserInteractions
+} from '@/lib/storyInteractions';
 
 interface SocialInteractionsProps {
   storyId: string;
-  initialStats?: {
-    view_count: number;
-    like_count: number;
-    comment_count: number;
-    saves_count: number;
-  };
+  initialStats?: Partial<StoryStats>;
   className?: string;
+  onCommentClick?: () => void;
 }
 
-export function SocialInteractions({ storyId, initialStats, className }: SocialInteractionsProps) {
+export function SocialInteractions({ 
+  storyId, 
+  initialStats, 
+  className,
+  onCommentClick 
+}: SocialInteractionsProps) {
   const { user } = useAuth();
-  const [stats, setStats] = useState(initialStats || {
-    view_count: 0,
-    like_count: 0,
-    comment_count: 0,
-    saves_count: 0
+  const [stats, setStats] = useState<StoryStats>({
+    view_count: initialStats?.view_count || 0,
+    like_count: initialStats?.like_count || 0,
+    comment_count: initialStats?.comment_count || 0,
+    saves_count: initialStats?.saves_count || 0
   });
-  const [userInteractions, setUserInteractions] = useState({
+  const [userInteractions, setUserInteractions] = useState<UserInteractions>({
     hasLiked: false,
     hasSaved: false
   });
@@ -39,94 +50,68 @@ export function SocialInteractions({ storyId, initialStats, className }: SocialI
   const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
 
   useEffect(() => {
-    fetchUserInteractions();
-    fetchStoryStats();
+    loadData();
   }, [storyId, user]);
 
-  const fetchUserInteractions = async () => {
-    try {
-      const { data } = await supabase.functions.invoke('story-interactions', {
-        body: {
-          action: 'get_user_interactions',
-          storyId,
-          userId: user?.id,
-          sessionId
-        }
-      });
-
-      if (data?.data) {
-        setUserInteractions(data.data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch user interactions:', error);
+  const loadData = async () => {
+    // Load story stats
+    const statsData = await getStoryStats(storyId);
+    if (statsData) {
+      setStats(statsData);
     }
+
+    // Load user interactions
+    const interactionsData = await getUserInteractions(storyId, user?.id, sessionId);
+    setUserInteractions(interactionsData);
   };
 
-  const fetchStoryStats = async () => {
-    try {
-      const { data } = await supabase.functions.invoke('story-interactions', {
-        body: {
-          action: 'get_story_stats',
-          storyId
-        }
-      });
-
-      if (data?.data) {
-        setStats(data.data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch story stats:', error);
-    }
-  };
-
-  const handleInteraction = async (action: string, platform?: string) => {
+  const handleLike = async () => {
     if (loading) return;
     
-    console.log('🔵 SocialInteractions: handleInteraction', { action, storyId, hasUser: !!user, sessionId });
-    
+    setLoading(true);
     try {
-      setLoading(true);
-      
-      const { data, error } = await supabase.functions.invoke('story-interactions', {
-        body: {
-          action,
-          storyId,
-          userId: user?.id,
-          sessionId,
-          platform
-        }
-      });
-
-      console.log('🔵 SocialInteractions: Response', { 
-        hasData: !!data, 
-        hasError: !!error,
-        success: data?.data?.success 
-      });
-
-      if (error) {
-        console.error('🔴 SocialInteractions: Supabase function error', error);
-        throw error;
-      }
-
-      if (data?.data?.success) {
-        console.log('🟢 SocialInteractions: Action successful', { action });
-        // Update local state based on action
-        if (action === 'like') {
-          setUserInteractions(prev => ({ ...prev, hasLiked: true }));
-          setStats(prev => ({ ...prev, like_count: prev.like_count + 1 }));
-        } else if (action === 'unlike') {
+      if (userInteractions.hasLiked) {
+        // Unlike
+        const result = await unlikeStory(storyId, user?.id, sessionId);
+        if (result.success) {
           setUserInteractions(prev => ({ ...prev, hasLiked: false }));
           setStats(prev => ({ ...prev, like_count: Math.max(0, prev.like_count - 1) }));
-        } else if (action === 'save') {
-          setUserInteractions(prev => ({ ...prev, hasSaved: true }));
-        } else if (action === 'unsave') {
+        }
+      } else {
+        // Like
+        const result = await likeStory(storyId, user?.id, sessionId);
+        if (result.success) {
+          setUserInteractions(prev => ({ ...prev, hasLiked: true }));
+          setStats(prev => ({ ...prev, like_count: prev.like_count + 1 }));
+        }
+      }
+    } catch (error) {
+      console.error('Failed to toggle like:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (loading || !user) return;
+    
+    setLoading(true);
+    try {
+      if (userInteractions.hasSaved) {
+        // Unsave
+        const result = await unsaveStory(storyId, user.id);
+        if (result.success) {
           setUserInteractions(prev => ({ ...prev, hasSaved: false }));
         }
       } else {
-        console.error('🔴 SocialInteractions: Action not successful', data);
+        // Save
+        const result = await saveStory(storyId, user.id);
+        if (result.success) {
+          setUserInteractions(prev => ({ ...prev, hasSaved: true }));
+        }
       }
     } catch (error) {
-      console.error(`🔴 SocialInteractions: Failed to ${action}:`, error);
+      console.error('Failed to toggle save:', error);
     } finally {
       setLoading(false);
     }
@@ -135,103 +120,98 @@ export function SocialInteractions({ storyId, initialStats, className }: SocialI
   const handleShare = async () => {
     const url = window.location.href;
     
-    if (navigator.share) {
-      try {
+    try {
+      if (navigator.share) {
         await navigator.share({
           title: 'Check out this story',
-          text: 'I found this interesting story',
-          url: url
+          url: url,
         });
-        handleInteraction('share', 'native');
-      } catch (error) {
-        // User cancelled sharing
-      }
-    } else {
-      // Fallback to copying URL
-      try {
+        // Record share
+        await shareStory(storyId, 'native', user?.id, sessionId);
+      } else {
+        // Fallback: copy to clipboard
         await navigator.clipboard.writeText(url);
-        handleInteraction('share', 'clipboard');
-        // You might want to show a toast notification here
-      } catch (error) {
-        console.error('Failed to copy URL:', error);
+        alert('Link copied to clipboard!');
+        await shareStory(storyId, 'clipboard', user?.id, sessionId);
       }
+    } catch (error) {
+      console.error('Failed to share:', error);
     }
   };
 
   return (
-    <div className={cn("flex items-center justify-between", className)}>
-      <div className="flex items-center gap-4">
-        {/* Like button */}
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => handleInteraction(userInteractions.hasLiked ? 'unlike' : 'like')}
-          disabled={loading}
-          className={cn(
-            "flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors",
-            userInteractions.hasLiked 
-              ? "bg-red-100 text-red-600 hover:bg-red-200" 
-              : "bg-gray-100 text-gray-600 hover:bg-gray-200",
-            loading && "opacity-50 cursor-not-allowed"
-          )}
-        >
-          <Heart className={cn("w-4 h-4", userInteractions.hasLiked && "fill-current")} />
-          <span className="text-sm font-medium">
-            {stats.like_count.toLocaleString()}
-          </span>
-        </motion.button>
-
-        {/* Save button */}
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => handleInteraction(userInteractions.hasSaved ? 'unsave' : 'save')}
-          disabled={loading}
-          className={cn(
-            "flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors",
-            userInteractions.hasSaved 
-              ? "bg-blue-100 text-blue-600 hover:bg-blue-200" 
-              : "bg-gray-100 text-gray-600 hover:bg-gray-200",
-            loading && "opacity-50 cursor-not-allowed"
-          )}
-        >
-          <Bookmark className={cn("w-4 h-4", userInteractions.hasSaved && "fill-current")} />
-          <span className="text-sm font-medium">
-            {userInteractions.hasSaved ? 'Saved' : 'Save'}
-          </span>
-        </motion.button>
-
-        {/* Comments display */}
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 text-gray-600">
-          <MessageSquare className="w-4 h-4" />
-          <span className="text-sm font-medium">
-            {stats.comment_count.toLocaleString()}
-          </span>
-        </div>
-
-        {/* Views display */}
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 text-gray-600">
-          <Eye className="w-4 h-4" />
-          <span className="text-sm font-medium">
-            {stats.view_count.toLocaleString()}
-          </span>
-        </div>
+    <div className={cn('flex items-center gap-4', className)}>
+      {/* Views */}
+      <div className="flex items-center gap-1.5 text-muted-foreground">
+        <Eye className="w-4 h-4" />
+        <span className="text-sm">{stats.view_count.toLocaleString()}</span>
       </div>
 
-      {/* Share button */}
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
+      {/* Like Button */}
+      <motion.div whileTap={{ scale: 0.95 }}>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleLike}
+          disabled={loading}
+          className={cn(
+            'flex items-center gap-1.5 px-3',
+            userInteractions.hasLiked && 'text-error-500'
+          )}
+        >
+          <Heart 
+            className={cn(
+              'w-4 h-4 transition-all',
+              userInteractions.hasLiked && 'fill-current'
+            )} 
+          />
+          <span className="text-sm">{stats.like_count.toLocaleString()}</span>
+        </Button>
+      </motion.div>
+
+      {/* Comment Button */}
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={onCommentClick}
+        className="flex items-center gap-1.5 px-3"
+      >
+        <MessageSquare className="w-4 h-4" />
+        <span className="text-sm">{stats.comment_count.toLocaleString()}</span>
+      </Button>
+
+      {/* Save Button (only for logged-in users) */}
+      {user && (
+        <motion.div whileTap={{ scale: 0.95 }}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleSave}
+            disabled={loading}
+            className={cn(
+              'flex items-center gap-1.5 px-3',
+              userInteractions.hasSaved && 'text-primary-500'
+            )}
+          >
+            <Bookmark 
+              className={cn(
+                'w-4 h-4 transition-all',
+                userInteractions.hasSaved && 'fill-current'
+              )} 
+            />
+          </Button>
+        </motion.div>
+      )}
+
+      {/* Share Button */}
+      <Button
+        variant="ghost"
+        size="sm"
         onClick={handleShare}
-        disabled={loading}
-        className={cn(
-          "flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors",
-          loading && "opacity-50 cursor-not-allowed"
-        )}
+        className="flex items-center gap-1.5 px-3"
       >
         <Share2 className="w-4 h-4" />
-        <span className="text-sm font-medium">Share</span>
-      </motion.button>
+      </Button>
     </div>
   );
 }

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getComments, addComment } from '@/lib/storyInteractions';
 
 interface Comment {
   id: string;
@@ -81,22 +82,17 @@ export function CommentSystem({ storyId, userId, sessionId, onCommentAdded }: Co
     try {
       setSubmitting(true);
 
-      const { data } = await supabase.functions.invoke('story-interactions', {
-        body: {
-          action: 'comment',
-          storyId,
-          userId,
-          sessionId,
-          content: newComment.trim(),
-          authorName: authorName.trim() || 'Anonymous'
-        }
-      });
+      const result = await addComment(
+        storyId,
+        newComment.trim(),
+        userId || undefined,
+        sessionId,
+        authorName.trim() || 'Anonymous'
+      );
 
-      if (data?.data?.success) {
+      if (result.success && result.comment) {
         // Add new comment to local state
-        if (data.data.comment) {
-          setComments(prev => [...prev, data.data.comment]);
-        }
+        setComments(prev => [result.comment, ...prev]);
         
         // Reset form
         setNewComment('');
@@ -105,6 +101,8 @@ export function CommentSystem({ storyId, userId, sessionId, onCommentAdded }: Co
         if (onCommentAdded) {
           onCommentAdded();
         }
+      } else {
+        alert('Failed to submit comment. Please try again.');
       }
     } catch (error) {
       console.error('Failed to submit comment:', error);
