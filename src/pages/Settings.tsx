@@ -306,7 +306,7 @@ export default function EnhancedSettings() {
             <SettingsIcon className="text-primary-500" size={32} />
             {t('settings.title')}
           </h1>
-          <p className="text-lg text-foreground-secondary">
+          <p className="text-lg text-muted-foreground">
             {t('settings.description', 'Personalize your LeoAI experience')}
           </p>
         </div>
@@ -345,7 +345,7 @@ export default function EnhancedSettings() {
               </div>
               <div>
                 <h3 className="font-medium text-foreground mb-1">{t('settings.profile_photo', 'Profile Photo')}</h3>
-                <p className="text-sm text-foreground-muted mb-2">
+                <p className="text-sm text-muted-foreground mb-2">
                   {t('settings.photo_requirements', 'JPG, PNG or GIF. Max size 5MB.')}
                 </p>
                 <Button 
@@ -396,7 +396,7 @@ export default function EnhancedSettings() {
                 rows={3}
                 maxLength={500}
               />
-              <p className="text-xs text-foreground-muted mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 {profileForm.bio.length}/500 {t('common.characters', 'characters')}
               </p>
             </div>
@@ -470,12 +470,12 @@ export default function EnhancedSettings() {
           </CardHeader>
           <CardContent>
             {badges.length === 0 ? (
-              <p className="text-foreground-muted text-center py-8">
+              <p className="text-muted-foreground text-center py-8">
                 {t('settings.no_badges', 'No badges earned yet. Complete activities to earn badges!')}
               </p>
             ) : (
               <div className="space-y-4">
-                <div className="text-sm text-foreground-muted">
+                <div className="text-sm text-muted-foreground">
                   {t('settings.selected_badges', 'Selected badges')}: {selectedBadges.length}/3
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -501,7 +501,7 @@ export default function EnhancedSettings() {
                               <Check className="text-primary-500" size={16} />
                             )}
                           </div>
-                          <p className="text-sm text-foreground-muted">{badge.badge_description}</p>
+                          <p className="text-sm text-muted-foreground">{badge.badge_description}</p>
                         </div>
                       </div>
                     </div>
@@ -525,7 +525,7 @@ export default function EnhancedSettings() {
           </CardHeader>
           <CardContent>
             {popularTags.length === 0 ? (
-              <p className="text-foreground-muted text-center py-8">
+              <p className="text-muted-foreground text-center py-8">
                 {t('settings.no_tags', 'No tags used yet. Publish stories to see your tag usage!')}
               </p>
             ) : (
@@ -578,7 +578,7 @@ export default function EnhancedSettings() {
                       <div className="font-medium text-foreground">
                         {lang.flag} {lang.name}
                       </div>
-                      <div className="text-xs text-foreground-muted">
+                      <div className="text-xs text-muted-foreground">
                         {lang.code}
                       </div>
                     </div>
@@ -626,7 +626,7 @@ export default function EnhancedSettings() {
                       <Check className="text-primary-500 ml-auto" size={16} />
                     )}
                   </div>
-                  <div className="text-xs text-foreground-muted">
+                  <div className="text-xs text-muted-foreground">
                     {option.value === 'auto' && (
                       `${t('settings.current')}: ${actualTheme === 'light' ? t('settings.light') : t('settings.dark')}`
                     )}
@@ -683,7 +683,7 @@ export default function EnhancedSettings() {
                           {t('settings.recommended', 'Recommended')}
                         </span>
                       )}
-                      <span className="text-xs text-foreground-muted">
+                      <span className="text-xs text-muted-foreground">
                         {model.enabled ? t('settings.available', 'Available') : t('settings.unavailable', 'Unavailable')}
                       </span>
                     </div>
@@ -726,7 +726,7 @@ export default function EnhancedSettings() {
                           {t('settings.recommended', 'Recommended')}
                         </span>
                       )}
-                      <span className="text-xs text-foreground-muted">
+                      <span className="text-xs text-muted-foreground">
                         {model.enabled ? t('settings.available', 'Available') : t('settings.unavailable', 'Unavailable')}
                       </span>
                     </div>

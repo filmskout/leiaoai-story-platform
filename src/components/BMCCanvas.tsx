@@ -501,8 +501,9 @@ export default function BMCCanvas() {
     console.log('🔵 BMC Save: Starting', { hasUser: !!user, sectionsCount: Object.keys(bmcData).length });
     
     if (!user) {
-      console.log('🔴 BMC Save: No user, redirecting to auth');
-      return navigate('/auth');
+      console.log('🔴 BMC Save: No user, cannot save');
+      alert(t('bmc.login_required', 'Please sign in to save your BMC.'));
+      return;
     }
 
     try {
@@ -514,7 +515,7 @@ export default function BMCCanvas() {
       
       console.log('🔵 BMC Save: Data prepared', { sections: Object.keys(dataToSave).length });
 
-      // 生成PNG图片的base64
+      // 生成PNG图片
       const canvasElement = document.getElementById('bmc-canvas');
       if (!canvasElement) {
         console.error('🔴 BMC Save: Canvas element not found');
@@ -533,16 +534,44 @@ export default function BMCCanvas() {
         useCORS: true,
       });
 
-      // 转换为base64
-      const imageBase64 = canvas.toDataURL('image/png');
-      console.log('🟢 BMC Save: Image generated', { size: imageBase64.length });
+      // 转换为Blob
+      const blob = await new Promise<Blob>((resolve) => {
+        canvas.toBlob((blob) => {
+          resolve(blob!);
+        }, 'image/png');
+      });
+      
+      console.log('🟢 BMC Save: Image generated', { size: blob.size });
 
-      // 保存到数据库（包含JSON数据和PNG图片）
+      // 上传到Supabase Storage
+      const fileName = `bmc_${user.id}_${Date.now()}.png`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('bmc-images')
+        .upload(fileName, blob, {
+          contentType: 'image/png',
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) {
+        console.error('🔴 BMC Save: Upload error', uploadError);
+        alert(t('bmc.save_failed', 'Failed to save. Please try again later.'));
+        return;
+      }
+
+      console.log('🟢 BMC Save: Image uploaded', { path: uploadData.path });
+
+      // 获取公开URL
+      const { data: urlData } = supabase.storage
+        .from('bmc-images')
+        .getPublicUrl(fileName);
+
+      // 保存到数据库（包含JSON数据和图片URL）
       console.log('🔵 BMC Save: Saving to database...');
       const { error } = await supabase.from('bmc_boards').insert({
         user_id: user.id,
         data: dataToSave,
-        image_base64: imageBase64,
+        image_url: urlData.publicUrl,
         title: t('bmc.title', 'Business Model Canvas'),
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
@@ -573,24 +602,18 @@ export default function BMCCanvas() {
         </div>
         <div className="flex gap-2">
           {/* 隐藏 JSON 导入/导出按钮，不在 UI 暴露 */}
-          {user ? (
-            <>
-              <Button variant="outline" onClick={handleSaveToDashboard}>
-                <Save size={16} className="mr-2" />
-                {t('bmc.save_to_dashboard', 'Save to Dashboard')}
-              </Button>
-              <Button variant="outline" onClick={handleExportPNG}>
-                <Image size={16} className="mr-2" />
-                {t('bmc.export_png', 'Export as Image')}
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button onClick={() => navigate('/auth')} className="bg-orange-500 hover:bg-orange-600 text-white">
-                {t('auth.sign_in', 'Sign in to Save/Export')}
-              </Button>
-            </>
-          )}
+          <Button 
+            variant="outline" 
+            onClick={handleSaveToDashboard}
+            disabled={!user}
+          >
+            <Save size={16} className="mr-2" />
+            {t('bmc.save_to_dashboard', 'Save to Dashboard')}
+          </Button>
+          <Button variant="outline" onClick={handleExportPNG}>
+            <Image size={16} className="mr-2" />
+            {t('bmc.export_png', 'Export as Image')}
+          </Button>
         </div>
       </div>
 

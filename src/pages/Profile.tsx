@@ -485,7 +485,7 @@ export default function Profile() {
       // 使用正确的表名 'bmc_boards' 而不是 'user_bmc_saves'
       const { data, error } = await supabase
         .from('bmc_boards')
-        .select('id, title, image_base64, data, extracted_text, created_at, updated_at')
+        .select('id, title, image_url, data, extracted_text, created_at, updated_at')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(10);
@@ -1086,10 +1086,10 @@ export default function Profile() {
                         <h4 className="font-semibold text-foreground mb-2">{bmc.title || 'Untitled BMC'}</h4>
                         
                         {/* 显示BMC图片预览 */}
-                        {bmc.image_base64 && (
+                        {bmc.image_url && (
                           <div className="mb-3 rounded-lg overflow-hidden border border-border">
                             <img 
-                              src={bmc.image_base64} 
+                              src={bmc.image_url} 
                               alt={bmc.title || 'BMC Preview'}
                               className="w-full h-auto object-contain bg-background"
                             />
@@ -1122,7 +1122,7 @@ export default function Profile() {
                               onClick={() => {
                                 // 下载图片
                                 const link = document.createElement('a');
-                                link.href = bmc.image_base64;
+                                link.href = bmc.image_url;
                                 link.download = `${bmc.title || 'BMC'}_${new Date().toISOString().split('T')[0]}.png`;
                                 link.click();
                               }}
@@ -1133,7 +1133,7 @@ export default function Profile() {
                             <Button 
                               variant="outline" 
                               size="sm"
-                              onClick={() => handleExtractText(bmc.id, bmc.image_base64)}
+                              onClick={() => handleExtractText(bmc.id, bmc.image_url)}
                               disabled={extractingText === bmc.id}
                             >
                               {extractingText === bmc.id ? (
