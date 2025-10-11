@@ -498,7 +498,12 @@ export default function BMCCanvas() {
   }, [bmcData, actualTheme, user, t]);
 
   const handleSaveToDashboard = useCallback(async () => {
-    if (!user) return navigate('/auth');
+    console.log('🔵 BMC Save: Starting', { hasUser: !!user, sectionsCount: Object.keys(bmcData).length });
+    
+    if (!user) {
+      console.log('🔴 BMC Save: No user, redirecting to auth');
+      return navigate('/auth');
+    }
 
     try {
       // 准备JSON数据
@@ -506,13 +511,18 @@ export default function BMCCanvas() {
         acc[section.id] = section.items;
         return acc;
       }, {} as Record<string, string[]>);
+      
+      console.log('🔵 BMC Save: Data prepared', { sections: Object.keys(dataToSave).length });
 
       // 生成PNG图片的base64
       const canvasElement = document.getElementById('bmc-canvas');
       if (!canvasElement) {
+        console.error('🔴 BMC Save: Canvas element not found');
         alert(t('bmc.save_failed', 'Failed to save. Please try again later.'));
         return;
       }
+      
+      console.log('🔵 BMC Save: Generating image...');
 
       // 使用html2canvas生成PNG
       const html2canvas = (await import('html2canvas')).default;
@@ -525,8 +535,10 @@ export default function BMCCanvas() {
 
       // 转换为base64
       const imageBase64 = canvas.toDataURL('image/png');
+      console.log('🟢 BMC Save: Image generated', { size: imageBase64.length });
 
       // 保存到数据库（包含JSON数据和PNG图片）
+      console.log('🔵 BMC Save: Saving to database...');
       const { error } = await supabase.from('bmc_boards').insert({
         user_id: user.id,
         data: dataToSave,
@@ -537,15 +549,16 @@ export default function BMCCanvas() {
       });
 
       if (error) {
-        console.error('Save BMC failed:', error);
+        console.error('🔴 BMC Save: Database error', error);
         alert(t('bmc.save_failed', 'Failed to save. Please try again later.'));
         return;
       }
       
+      console.log('🟢 BMC Save: Success!');
       alert(t('bmc.save_success', 'Saved to your dashboard.'));
       navigate('/dashboard');
     } catch (e) {
-      console.error('Error saving BMC:', e);
+      console.error('🔴 BMC Save: Error', e);
       alert(t('bmc.save_failed', 'Failed to save. Please try again later.'));
     }
   }, [user, bmcData, actualTheme, navigate, t]);

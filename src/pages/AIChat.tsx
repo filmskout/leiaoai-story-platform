@@ -108,8 +108,8 @@ export default function AIChat() {
       
       // 稍微延迟确保组件完全初始化
       const timer = setTimeout(() => {
-        console.log('⏰ Executing auto-send now...');
-        sendMessage(locationState.question);
+        console.log('⏰ Executing auto-send now...', { category: locationState.category });
+        sendMessage(locationState.question, undefined, undefined, locationState.category);
         // 清除状态，防止刷新时重复提问
         navigate(location.pathname, { replace: true, state: null });
       }, 800);

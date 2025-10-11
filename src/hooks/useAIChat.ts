@@ -21,6 +21,7 @@ export interface ChatSession {
   messages: ChatMessage[];
   createdAt: Date;
   updatedAt: Date;
+  category?: string; // 来源分类（从哪个专业服务区来的）
 }
 
 export function useAIChat() {
@@ -93,9 +94,11 @@ export function useAIChat() {
   }, [user]);
 
   // 创建新对话
-  const createNewSession = async (title?: string) => {
+  const createNewSession = async (title?: string, category?: string) => {
     const sessionId = crypto.randomUUID();
     const sessionTitle = title || '新的投融资咨询';
+    
+    console.log('🔵 Creating new chat session', { sessionId, title: sessionTitle, category });
     
     try {
       // 在数据库中创建新会话
@@ -144,8 +147,14 @@ export function useAIChat() {
   };
 
   // 发送消息
-  const sendMessage = async (content: string, sessionId?: string, modelOverride?: string) => {
+  const sendMessage = async (content: string, sessionId?: string, modelOverride?: string, category?: string) => {
     if (!content.trim()) return;
+    
+    console.log('🔵 Sending message', { 
+      hasSession: !!currentSession, 
+      model: modelOverride || selectedChatModel,
+      category 
+    });
     
     setIsLoading(true);
     setError(null);
@@ -154,7 +163,16 @@ export function useAIChat() {
       // 使用当前会话或创建新会话
       let session = currentSession;
       if (!session) {
-        session = await createNewSession();
+        session = await createNewSession(undefined, category);
+        
+        // 增加会话统计（如果是新会话）
+        try {
+          const { updateResponseTime } = await import('./useWebsiteStats');
+          // 这里应该调用 incrementStat，但我们需要重新设计
+          console.log('🔵 New session created, should increment stats');
+        } catch (err) {
+          console.warn('Failed to increment session stats', err);
+        }
       }
       
       // 添加用户消息
