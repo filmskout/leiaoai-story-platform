@@ -85,8 +85,11 @@ CREATE POLICY "Users can insert chat messages in their sessions"
     )
   );
 
--- 8. 创建视图：按category统计sessions
-CREATE OR REPLACE VIEW sessions_by_category AS
+-- 8. 删除旧视图（如果存在）
+DROP VIEW IF EXISTS sessions_by_category;
+
+-- 9. 创建视图：按category统计sessions
+CREATE VIEW sessions_by_category AS
 SELECT 
   category,
   COUNT(*) as session_count,
