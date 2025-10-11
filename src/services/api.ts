@@ -45,7 +45,43 @@ export async function fetchAIResponse(
     if (!resp.ok) {
       const txt = await resp.text();
       console.error('🔴 Frontend: API Error Response', txt.slice(0, 200));
-      throw new Error(txt || 'AI service temporarily unavailable');
+      
+      // 解析错误消息
+      let errorObj;
+      try {
+        errorObj = JSON.parse(txt);
+      } catch {
+        errorObj = { error: txt };
+      }
+      
+      const errorMsg = errorObj.error || txt || 'AI service temporarily unavailable';
+      
+      // 检查是否是API密钥配置错误
+      if (errorMsg.includes('missing OPENAI_API_KEY')) {
+        throw new Error(
+          language.startsWith('zh') 
+            ? '❌ OpenAI模型未配置。请切换到Qwen模型，或联系管理员配置OPENAI_API_KEY。'
+            : '❌ OpenAI model not configured. Please switch to Qwen, or contact admin to configure OPENAI_API_KEY.'
+        );
+      }
+      
+      if (errorMsg.includes('missing DEEPSEEK_API_KEY')) {
+        throw new Error(
+          language.startsWith('zh') 
+            ? '❌ DeepSeek模型未配置。请切换到Qwen模型，或联系管理员配置DEEPSEEK_API_KEY。'
+            : '❌ DeepSeek model not configured. Please switch to Qwen, or contact admin to configure DEEPSEEK_API_KEY.'
+        );
+      }
+      
+      if (errorMsg.includes('missing QWEN_API_KEY')) {
+        throw new Error(
+          language.startsWith('zh') 
+            ? '❌ Qwen模型未配置。请联系管理员配置QWEN_API_KEY。'
+            : '❌ Qwen model not configured. Please contact admin to configure QWEN_API_KEY.'
+        );
+      }
+      
+      throw new Error(errorMsg);
     }
 
     const data = await resp.json();
