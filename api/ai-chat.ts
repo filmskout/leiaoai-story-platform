@@ -36,12 +36,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const { message, model = 'deepseek', sessionId } = req.body || {};
+    
+    console.log('🔵 API: Received request', { model, messageLength: message?.length, hasSessionId: !!sessionId });
+    
     if (!message || typeof message !== 'string') {
       res.status(400).json({ error: 'Invalid request: message is required' });
       return;
     }
 
     const mapped = MODEL_MAP[model] || MODEL_MAP['deepseek'];
+    console.log('🔵 API: Mapped to provider', { provider: mapped.provider, model: mapped.model });
 
     // 选择上游与密钥
     let url = '';
@@ -51,6 +55,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       url = 'https://api.deepseek.com/chat/completions';
       apiKey = process.env.DEEPSEEK_API_KEY || '';
       authHeader = `Bearer ${apiKey}`;
+      console.log('🔵 API: DeepSeek key present:', !!apiKey, 'length:', apiKey?.length || 0);
       if (!apiKey) {
         res.status(500).json({ error: 'Server misconfigured: missing DEEPSEEK_API_KEY' });
         return;
@@ -59,6 +64,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       url = 'https://api.openai.com/v1/chat/completions';
       apiKey = process.env.OPENAI_API_KEY || '';
       authHeader = `Bearer ${apiKey}`;
+      console.log('🔵 API: OpenAI key present:', !!apiKey, 'length:', apiKey?.length || 0);
       if (!apiKey) {
         res.status(500).json({ error: 'Server misconfigured: missing OPENAI_API_KEY' });
         return;
@@ -68,6 +74,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       url = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
       apiKey = process.env.QWEN_API_KEY || '';
       authHeader = `Bearer ${apiKey}`;
+      console.log('🔵 API: Qwen key present:', !!apiKey, 'length:', apiKey?.length || 0);
       if (!apiKey) {
         res.status(500).json({ error: 'Server misconfigured: missing QWEN_API_KEY' });
         return;
@@ -76,28 +83,42 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const startTime = Date.now();
 
+    // 构建请求体 - 不同API支持不同的参数
+    const requestBody: any = {
+      model: mapped.model,
+      messages: [
+        { role: 'system', content: getSystemPrompt() },
+        { role: 'user', content: message },
+      ],
+      temperature: 0.7,
+      max_tokens: 2000,
+      stream: false,
+    };
+
+    // 只为DeepSeek添加top_p和session_id
+    if (mapped.provider === 'deepseek') {
+      requestBody.top_p = 0.9;
+      if (sessionId) {
+        requestBody.session_id = sessionId;
+      }
+    }
+
+    console.log(`🔵 API: Calling ${mapped.provider} (${mapped.model})`);
+
     const response = await fetch(url, {
       method: 'POST',
       headers: {
         Authorization: authHeader,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        model: mapped.model,
-        messages: [
-          { role: 'system', content: getSystemPrompt() },
-          { role: 'user', content: message },
-        ],
-        temperature: 0.7,
-        max_tokens: 2000,
-        top_p: 0.9,
-        stream: false,
-        session_id: sessionId,
-      }),
+      body: JSON.stringify(requestBody),
     });
+
+    console.log(`🔵 API: ${mapped.provider} response status: ${response.status}`);
 
     if (!response.ok) {
       const errorText = await response.text();
+      console.error(`🔴 API: ${mapped.provider} error:`, errorText.slice(0, 500));
       res.status(response.status).json({ error: errorText.slice(0, 500) });
       return;
     }
@@ -106,9 +127,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const aiResponse: string | undefined = data?.choices?.[0]?.message?.content;
 
     if (!aiResponse) {
-      res.status(502).json({ error: 'Invalid response from DeepSeek' });
+      console.error(`🔴 API: Invalid response from ${mapped.provider}:`, JSON.stringify(data).slice(0, 200));
+      res.status(502).json({ error: `Invalid response from ${mapped.provider}` });
       return;
     }
+
+    console.log(`🟢 API: ${mapped.provider} success, response length: ${aiResponse.length}`);
 
     const endTime = Date.now();
     const processingTimeSeconds = Number(((endTime - startTime) / 1000).toFixed(1));
