@@ -1,13 +1,14 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 /**
  * 文本提取API
  * 支持三种模式：
  * 1. URL模式：直接使用imageUrl（用于BMC图片，使用OpenAI Vision）
- * 2. PDF文件路径模式：从Supabase下载PDF并提取文本（用于BP PDF，使用pdfjs-dist）
+ * 2. PDF文件路径模式：从Supabase下载PDF并使用GPT-4o提取文本（用于BP PDF）
  * 3. 图片文件路径模式：从Supabase下载图片并OCR（使用OpenAI Vision）
+ * 
+ * 注意：PDF处理使用GPT-4o的128K上下文窗口直接处理PDF文件
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
@@ -82,70 +83,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const mimeType = fileData.type || fileType || 'application/pdf';
       
       if (mimeType === 'application/pdf' || filePath.toLowerCase().endsWith('.pdf')) {
-        // PDF文件：使用pdfjs-dist提取文本
-        console.log('🔵 PDF detected: Using pdfjs-dist for text extraction');
+        // PDF文件：转换为Base64，使用GPT-4o提取文本
+        console.log('🔵 PDF detected: Converting to Base64 for GPT-4o');
         
-        try {
-          const arrayBuffer = await fileData.arrayBuffer();
-          const uint8Array = new Uint8Array(arrayBuffer);
-          
-          console.log('🔵 Loading PDF document...');
-          
-          // 加载PDF文档
-          const loadingTask = pdfjsLib.getDocument({
-            data: uint8Array,
-            useSystemFonts: true,
-            standardFontDataUrl: 'https://unpkg.com/pdfjs-dist@3.11.174/standard_fonts/'
-          });
-          
-          const pdfDocument = await loadingTask.promise;
-          const numPages = pdfDocument.numPages;
-          
-          console.log('✅ PDF loaded successfully');
-          console.log('   Pages:', numPages);
-          
-          // 提取所有页面的文本
-          const textPromises: Promise<string>[] = [];
-          for (let pageNum = 1; pageNum <= numPages; pageNum++) {
-            textPromises.push(
-              pdfDocument.getPage(pageNum).then(async (page) => {
-                const textContent = await page.getTextContent();
-                return textContent.items.map((item: any) => item.str).join(' ');
-              })
-            );
-          }
-          
-          console.log('🔵 Extracting text from all pages...');
-          const pageTexts = await Promise.all(textPromises);
-          extractedText = pageTexts.join('\n\n').trim();
-          
-          console.log('✅ PDF text extracted successfully');
-          console.log('   Text length:', extractedText.length);
-          console.log('   Text preview:', extractedText.substring(0, 200));
-          
-          if (!extractedText || extractedText.trim().length === 0) {
-            console.warn('⚠️ PDF contains no extractable text');
-            return res.status(400).json({
-              error: 'PDF不包含可提取的文本',
-              details: 'This PDF appears to be empty or is a scanned image. Please use a PDF with selectable text.'
-            });
-          }
-          
-          // 直接返回提取的文本
-          return res.status(200).json({
-            extractedText,
-            text: extractedText,
-            source: 'pdfjs-dist',
-            pages: numPages
-          });
-          
-        } catch (pdfError: any) {
-          console.error('❌ PDF extraction failed:', pdfError);
-          return res.status(500).json({
-            error: 'PDF文本提取失败',
-            details: pdfError.message || 'Failed to extract text from PDF'
-          });
-        }
+        const arrayBuffer = await fileData.arrayBuffer();
+        const base64 = Buffer.from(arrayBuffer).toString('base64');
+        const sizeInMB = (base64.length / (1024 * 1024)).toFixed(2);
+        
+        console.log('✅ PDF converted to Base64');
+        console.log('   Base64 size:', sizeInMB, 'MB');
+        
+        // GPT-4o可以直接处理PDF
+        imageData = `data:application/pdf;base64,${base64}`;
+        
+        // 注意：我们不在这里返回，而是继续到下面的OpenAI调用
+        // 这样PDF会被当作"image"处理，但GPT-4o可以理解PDF
       } else {
         // 图片文件：转换为Base64供OpenAI Vision使用
         console.log('🔵 Image detected: Converting to Base64 for OpenAI Vision');
@@ -209,7 +161,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             content: [
               {
                 type: 'text',
-                text: 'Extract all text from this PDF document or image. Please return ONLY the extracted text, without any additional commentary or formatting. Extract all readable text you can see.'
+                text: imageData.startsWith('data:application/pdf')
+                  ? 'Extract all text content from this PDF document. Return ONLY the extracted text, preserving the structure and paragraphs. Do not add any commentary, explanations, or formatting. Just the raw text from the PDF.'
+                  : 'Extract all text from this image. Please return ONLY the extracted text, without any additional commentary or formatting. Extract all readable text you can see.'
               },
               {
                 type: 'image_url',
@@ -221,7 +175,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             ]
           }
         ],
-        max_tokens: 4000 // 增加token限制以支持更长的文档
+        max_tokens: 16000 // 大幅增加token限制以支持更长的PDF文档
       })
     });
 
