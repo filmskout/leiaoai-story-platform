@@ -30,6 +30,7 @@ const AIChat = lazy(() => import('@/pages/AIChat'));
 const BPAnalysis = lazy(() => import('@/pages/BPAnalysis'));
 const Settings = lazy(() => import('@/pages/Settings'));
 const DebugStories = lazy(() => import('@/pages/DebugStories'));
+const About = lazy(() => import('@/pages/About'));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -194,6 +195,7 @@ function AppRoutes() {
         {/* Main app routes with Layout */}
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
+          <Route path="about" element={<About />} />
           <Route path="ai-chat" element={<AIChat />} />
           <Route path="bp-analysis" element={<BPAnalysis />} />
           <Route path="stories" element={<Stories />} />

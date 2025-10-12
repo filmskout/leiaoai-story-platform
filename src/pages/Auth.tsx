@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
-import { AlertCircle, Loader2, Eye, EyeOff, Mail, Chrome } from 'lucide-react';
+import { AlertCircle, Loader2, Eye, EyeOff, Mail, Chrome, ArrowLeft } from 'lucide-react';
 import { WalletConnect } from '@/components/auth/WalletConnect';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -128,6 +128,20 @@ const AuthPage: React.FC = () => {
         : "bg-gradient-to-br from-blue-50 via-white to-indigo-100"
     )}>
       <div className="max-w-md w-full space-y-8">
+        {/* Back Button */}
+        <button
+          onClick={() => navigate('/')}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 rounded-lg transition-colors",
+            actualTheme === 'dark'
+              ? "text-gray-300 hover:text-white hover:bg-gray-800"
+              : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+          )}
+        >
+          <ArrowLeft size={20} />
+          <span>{t('common.back_to_home', 'Back to Home')}</span>
+        </button>
+
         {/* Header */}
         <div className="text-center">
           {/* LeiaoAI Logo */}
@@ -190,56 +204,6 @@ const AuthPage: React.FC = () => {
           >
             {t('auth.signup', 'Sign Up')}
           </button>
-        </div>
-
-        {/* Social/Web3 Login Section */}
-        <div className="space-y-4">
-          {/* Google Sign In */}
-          <button
-            onClick={handleGoogleSignIn}
-            disabled={loading}
-            className={cn(
-              "w-full flex items-center justify-center gap-3 px-4 py-3 border rounded-lg transition-all duration-200 disabled:opacity-50 group",
-              actualTheme === 'dark'
-                ? "border-gray-600 bg-gray-800 hover:bg-gray-700 text-white hover:border-gray-500"
-                : "border-gray-300 bg-white hover:bg-gray-50 text-gray-900 hover:border-gray-400 shadow-sm"
-            )}
-          >
-            {loading ? (
-              <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
-            ) : (
-              <Chrome className="w-5 h-5 text-blue-500 group-hover:scale-110 transition-transform" />
-            )}
-            <span className="text-sm font-medium">
-              {t('auth.google_signin', 'Continue with Google')}
-            </span>
-          </button>
-
-          {/* Wallet Connection */}
-          <WalletConnect 
-            onSuccess={handleWalletSuccess}
-            onError={handleWalletError}
-          />
-        </div>
-
-        {/* Divider */}
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className={cn(
-              "w-full border-t",
-              actualTheme === 'dark' ? "border-gray-600" : "border-gray-300"
-            )} />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className={cn(
-              "px-2",
-              actualTheme === 'dark' 
-                ? "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-400"
-                : "bg-gradient-to-br from-blue-50 to-indigo-100 text-gray-500"
-            )}>
-              {t('auth.divider_or', 'Or')}
-            </span>
-          </div>
         </div>
 
         {/* Email/Password Form */}
@@ -387,6 +351,56 @@ const AuthPage: React.FC = () => {
             )}
           </button>
         </form>
+
+        {/* Divider */}
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <span className={cn(
+              "w-full border-t",
+              actualTheme === 'dark' ? "border-gray-600" : "border-gray-300"
+            )} />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className={cn(
+              "px-2",
+              actualTheme === 'dark' 
+                ? "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-400"
+                : "bg-gradient-to-br from-blue-50 to-indigo-100 text-gray-500"
+            )}>
+              {t('auth.divider_or', 'Or continue with')}
+            </span>
+          </div>
+        </div>
+
+        {/* Social/Web3 Login Section */}
+        <div className="space-y-4">
+          {/* Google Sign In */}
+          <button
+            onClick={handleGoogleSignIn}
+            disabled={loading}
+            className={cn(
+              "w-full flex items-center justify-center gap-3 px-4 py-3 border rounded-lg transition-all duration-200 disabled:opacity-50 group",
+              actualTheme === 'dark'
+                ? "border-gray-600 bg-gray-800 hover:bg-gray-700 text-white hover:border-gray-500"
+                : "border-gray-300 bg-white hover:bg-gray-50 text-gray-900 hover:border-gray-400 shadow-sm"
+            )}
+          >
+            {loading ? (
+              <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
+            ) : (
+              <Chrome className="w-5 h-5 text-blue-500 group-hover:scale-110 transition-transform" />
+            )}
+            <span className="text-sm font-medium">
+              {t('auth.google_signin', 'Continue with Google')}
+            </span>
+          </button>
+
+          {/* Wallet Connection */}
+          <WalletConnect 
+            onSuccess={handleWalletSuccess}
+            onError={handleWalletError}
+          />
+        </div>
         
         {/* Footer */}
         <div className={cn(
