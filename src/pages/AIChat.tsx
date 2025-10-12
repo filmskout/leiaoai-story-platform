@@ -77,6 +77,9 @@ export default function AIChat() {
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
   };
 
+  // 保存待发送的消息引用
+  const pendingQuestionRef = useRef<{ question: string; category?: string } | null>(null);
+
   // 自动提问初始问题
   useEffect(() => {
     console.log('🔵 AIChat: Auto-ask effect triggered', { 
@@ -85,7 +88,8 @@ export default function AIChat() {
       hasLocationState: !!locationState,
       autoAsk: locationState?.autoAsk,
       question: locationState?.question || questionParam,
-      hasAutoAsked: hasAutoAskedRef.current
+      hasAutoAsked: hasAutoAskedRef.current,
+      isLoading
     });
 
     // 如果已经自动提问过了，跳过
@@ -99,29 +103,14 @@ export default function AIChat() {
       console.log('🎯 Auto-asking from location state:', locationState.question);
       hasAutoAskedRef.current = true;
       setInputMessage(locationState.question);
+      pendingQuestionRef.current = {
+        question: locationState.question,
+        category: locationState.category
+      };
       
-      // 短延迟确保组件初始化，但立即发送不检查isLoading
-      const timer = setTimeout(() => {
-        console.log('⏰ Executing auto-send now...', { 
-          question: locationState.question,
-          category: locationState.category
-        });
-        
-        // 直接发送，不检查isLoading状态
-        sendMessage(locationState.question, undefined, undefined, locationState.category)
-          .then(() => {
-            console.log('✅ Auto-send completed successfully');
-            // 清除状态，防止刷新时重复提问
-            navigate(location.pathname, { replace: true, state: null });
-          })
-          .catch((err) => {
-            console.error('❌ Auto-send failed:', err);
-            // 重置标志，允许用户手动重试
-            hasAutoAskedRef.current = false;
-          });
-      }, 500); // 减少到500ms，更快响应
-      
-      return () => clearTimeout(timer);
+      // 清除状态，防止刷新时重复提问
+      navigate(location.pathname, { replace: true, state: null });
+      return;
     }
     
     // 检查URL参数中的问题
@@ -129,20 +118,37 @@ export default function AIChat() {
       console.log('🎯 Auto-asking from URL parameter:', questionParam);
       hasAutoAskedRef.current = true;
       setInputMessage(questionParam);
+      pendingQuestionRef.current = {
+        question: questionParam
+      };
+      return;
+    }
+  }, [questionParam, locationState, setInputMessage, navigate, location.pathname, isLoading]);
+
+  // 当组件完全加载后，发送待处理的问题
+  useEffect(() => {
+    if (pendingQuestionRef.current && !isLoading) {
+      const { question, category } = pendingQuestionRef.current;
+      console.log('⏰ Executing auto-send now...', { question, category });
       
+      // 短延迟确保所有状态已更新
       const timer = setTimeout(() => {
-        console.log('⏰ Executing auto-send now...');
-        sendMessage(questionParam)
-          .then(() => console.log('✅ Auto-send completed'))
+        sendMessage(question, undefined, undefined, category)
+          .then(() => {
+            console.log('✅ Auto-send completed successfully');
+            pendingQuestionRef.current = null;
+          })
           .catch((err) => {
             console.error('❌ Auto-send failed:', err);
+            // 重置标志，允许用户手动重试
             hasAutoAskedRef.current = false;
+            pendingQuestionRef.current = null;
           });
-      }, 500); // 减少到500ms
+      }, 300);
       
       return () => clearTimeout(timer);
     }
-  }, [questionParam, locationState, sendMessage, setInputMessage, navigate, location.pathname]);
+  }, [isLoading, sendMessage]);
 
   // 当用户点击"新对话"时，清除会话标记并重置自动提问标志
   const handleStartNewChat = () => {

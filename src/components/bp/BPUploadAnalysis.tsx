@@ -71,6 +71,7 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
   const [file, setFile] = useState<File | null>(null);
   const [websiteUrl, setWebsiteUrl] = useState<string>('');
   const [websiteData, setWebsiteData] = useState<any | null>(null);
+  const [sources, setSources] = useState<Array<{ type: 'file' | 'website'; data: any; id: string }>>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isExtractingWebsite, setIsExtractingWebsite] = useState(false);

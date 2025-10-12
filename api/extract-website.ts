@@ -35,13 +35,38 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // 获取网页内容
-    const response = await fetch(validUrl.toString(), {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; LeiaoAI-BP-Analyzer/1.0; +https://leiaoai.com)'
-      },
-      timeout: 15000 // 15秒超时
-    });
+    // 获取网页内容（使用AbortController实现超时）
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15秒超时
+
+    let response;
+    try {
+      response = await fetch(validUrl.toString(), {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; LeiaoAI-BP-Analyzer/1.0; +https://leiaoai.com)',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7'
+        },
+        signal: controller.signal
+      });
+    } catch (fetchError: any) {
+      clearTimeout(timeoutId);
+      console.error('🔴 Website Extract: Fetch error', fetchError);
+      
+      if (fetchError.name === 'AbortError') {
+        return res.status(408).json({ 
+          error: 'Request timeout',
+          details: 'The website took too long to respond (>15s)' 
+        });
+      }
+      
+      return res.status(400).json({ 
+        error: 'Failed to fetch website',
+        details: fetchError.message || 'Network error occurred' 
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
     if (!response.ok) {
       console.error('🔴 Website Extract: HTTP error', response.status);
