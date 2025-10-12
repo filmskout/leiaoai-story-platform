@@ -355,7 +355,7 @@ export default function Profile() {
       console.log('🔵 Profile: Loading chat sessions');
       const { data, error } = await supabase
         .from('chat_sessions')
-        .select('session_id, title, category, created_at, updated_at')
+        .select('session_id, title, category, created_at, updated_at, markdown_file_url, markdown_file_path')
         .eq('user_id', user.id)
         .order('updated_at', { ascending: false })
         .limit(20);
@@ -380,7 +380,9 @@ export default function Profile() {
               category: session.category,
               created_at: session.created_at,
               updated_at: session.updated_at,
-              message_count: count || 0
+              message_count: count || 0,
+              markdown_file_url: session.markdown_file_url,
+              markdown_file_path: session.markdown_file_path
             };
           })
         );
@@ -550,6 +552,66 @@ export default function Profile() {
     } catch (error: any) {
       console.error('🔴 Profile: Delete error', error);
       toast.error(error.message || t('profile.delete_failed', 'Failed to delete BP'));
+    }
+  };
+
+  // 删除AI Chat Session
+  const deleteChatSession = async (sessionId: string, markdown_file_path: string | null) => {
+    if (!user) return;
+    
+    if (!confirm(t('profile.confirm_delete_chat', 'Are you sure you want to delete this chat session?'))) {
+      return;
+    }
+
+    try {
+      console.log('🔵 Profile: Deleting chat session', { sessionId });
+      
+      // 1. 如果有Markdown文件，从Storage删除
+      if (markdown_file_path) {
+        console.log('🔵 Profile: Deleting Markdown file from Storage', { markdown_file_path });
+        const { error: storageError } = await supabase.storage
+          .from('chat-sessions')
+          .remove([markdown_file_path]);
+
+        if (storageError) {
+          console.error('🔴 Profile: Storage delete error', storageError);
+        } else {
+          console.log('🟢 Profile: Markdown file deleted from Storage');
+        }
+      }
+
+      // 2. 删除数据库中的消息
+      const { error: messagesError } = await supabase
+        .from('chat_messages')
+        .delete()
+        .eq('session_id', sessionId);
+
+      if (messagesError) {
+        console.error('🔴 Profile: Messages delete error', messagesError);
+      }
+
+      // 3. 从数据库删除会话记录
+      const { error: dbError } = await supabase
+        .from('chat_sessions')
+        .delete()
+        .eq('session_id', sessionId)
+        .eq('user_id', user.id);
+
+      if (dbError) {
+        console.error('🔴 Profile: Database delete error', dbError);
+        toast.error(t('profile.delete_failed', 'Failed to delete chat session'));
+        return;
+      }
+
+      console.log('🟢 Profile: Chat session deleted successfully');
+      toast.success(t('profile.delete_success', 'Chat session deleted successfully'));
+
+      // 4. 重新加载列表
+      loadChatSessions();
+      loadUserStats();
+    } catch (error: any) {
+      console.error('🔴 Profile: Delete error', error);
+      toast.error(error.message || t('profile.delete_failed', 'Failed to delete chat session'));
     }
   };
 
@@ -1347,6 +1409,39 @@ export default function Profile() {
                             >
                               <ExternalLink size={14} className="mr-1" />
                               {t('profile.view', 'View')}
+                            </Button>
+                            {chat.markdown_file_url && (
+                              <>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => window.open(chat.markdown_file_url, '_blank')}
+                                  title={t('profile.view_markdown', 'View Markdown')}
+                                >
+                                  <FileText size={14} />
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    const a = document.createElement('a');
+                                    a.href = chat.markdown_file_url;
+                                    a.download = `${chat.title || 'chat'}.md`;
+                                    a.click();
+                                  }}
+                                  title={t('profile.download_markdown', 'Download Markdown')}
+                                >
+                                  <Download size={14} />
+                                </Button>
+                              </>
+                            )}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => deleteChatSession(chat.id, chat.markdown_file_path)}
+                              title={t('profile.delete', 'Delete')}
+                            >
+                              <X size={14} className="text-destructive" />
                             </Button>
                           </div>
                         </div>

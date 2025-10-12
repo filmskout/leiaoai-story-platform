@@ -5,6 +5,7 @@ import { fetchAIResponse } from '../services/api';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { useWebsiteStats } from './useWebsiteStats';
+import { sessionToMarkdown, generateMarkdownFilename } from '@/lib/chatMarkdown';
 
 export interface ChatMessage {
   id: string;
@@ -94,6 +95,64 @@ export function useAIChat() {
   useEffect(() => {
     loadChatSessions();
   }, [user]);
+
+  // 保存会话为Markdown文件到Storage
+  const saveSessionAsMarkdown = async (session: ChatSession) => {
+    if (!user) return;
+    
+    try {
+      console.log('🔵 Saving session as Markdown', { sessionId: session.id });
+      
+      // 获取当前最新的session状态（包含最新消息）
+      const currentSessionState = currentSession?.id === session.id ? currentSession : session;
+      
+      // 生成Markdown内容
+      const markdown = sessionToMarkdown(currentSessionState);
+      const filename = generateMarkdownFilename(currentSessionState);
+      const filePath = `${user.id}/${filename}`;
+      
+      // 转换为Blob
+      const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' });
+      
+      // 上传到Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('chat-sessions')
+        .upload(filePath, blob, {
+          contentType: 'text/markdown',
+          upsert: true // 覆盖已存在的文件
+        });
+      
+      if (uploadError) {
+        console.error('🔴 Failed to upload Markdown:', uploadError);
+        return;
+      }
+      
+      console.log('🟢 Markdown uploaded successfully', { filePath });
+      
+      // 获取公开URL
+      const { data: urlData } = supabase.storage
+        .from('chat-sessions')
+        .getPublicUrl(filePath);
+      
+      // 更新数据库中的markdown_file_url字段
+      const { error: updateError } = await supabase
+        .from('chat_sessions')
+        .update({ 
+          markdown_file_url: urlData.publicUrl,
+          markdown_file_path: filePath
+        })
+        .eq('session_id', session.id);
+      
+      if (updateError) {
+        console.error('🔴 Failed to update session with Markdown URL:', updateError);
+      } else {
+        console.log('✅ Session updated with Markdown URL');
+      }
+      
+    } catch (error) {
+      console.error('🔴 Error saving session as Markdown:', error);
+    }
+  };
 
   // 创建新对话
   const createNewSession = async (title?: string, category?: string) => {
@@ -299,6 +358,10 @@ export function useAIChat() {
               processing_time: response.processingTime
             }
           ]);
+          
+          // 保存会话为Markdown文件
+          await saveSessionAsMarkdown(session);
+          
         } catch (dbError) {
           console.warn('保存消息到数据库失败:', dbError);
           // 不影响用户体验，只是无法持久化
@@ -341,10 +404,66 @@ export function useAIChat() {
   };
 
   // 删除会话
-  const deleteSession = (sessionId: string) => {
-    setSessions(prev => prev.filter(s => s.id !== sessionId));
-    if (currentSession?.id === sessionId) {
-      setCurrentSession(null);
+  const deleteSession = async (sessionId: string) => {
+    if (!user) return;
+    
+    try {
+      console.log('🔵 Deleting session', { sessionId });
+      
+      // 1. 从数据库获取session信息（包含markdown_file_path）
+      const { data: sessionData } = await supabase
+        .from('chat_sessions')
+        .select('markdown_file_path')
+        .eq('session_id', sessionId)
+        .eq('user_id', user.id)
+        .single();
+      
+      // 2. 如果有Markdown文件，从Storage删除
+      if (sessionData?.markdown_file_path) {
+        const { error: storageError } = await supabase.storage
+          .from('chat-sessions')
+          .remove([sessionData.markdown_file_path]);
+        
+        if (storageError) {
+          console.error('🔴 Failed to delete Markdown file:', storageError);
+        } else {
+          console.log('✅ Markdown file deleted');
+        }
+      }
+      
+      // 3. 删除数据库中的消息
+      const { error: messagesError } = await supabase
+        .from('chat_messages')
+        .delete()
+        .eq('session_id', sessionId);
+      
+      if (messagesError) {
+        console.error('🔴 Failed to delete messages:', messagesError);
+      }
+      
+      // 4. 删除数据库中的会话
+      const { error: sessionError } = await supabase
+        .from('chat_sessions')
+        .delete()
+        .eq('session_id', sessionId)
+        .eq('user_id', user.id);
+      
+      if (sessionError) {
+        console.error('🔴 Failed to delete session:', sessionError);
+        throw sessionError;
+      }
+      
+      // 5. 更新本地状态
+      setSessions(prev => prev.filter(s => s.id !== sessionId));
+      if (currentSession?.id === sessionId) {
+        setCurrentSession(null);
+      }
+      
+      console.log('✅ Session deleted successfully');
+      
+    } catch (error) {
+      console.error('🔴 Error deleting session:', error);
+      throw error;
     }
   };
 

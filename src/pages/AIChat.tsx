@@ -85,7 +85,6 @@ export default function AIChat() {
       hasLocationState: !!locationState,
       autoAsk: locationState?.autoAsk,
       question: locationState?.question || questionParam,
-      isLoading,
       hasAutoAsked: hasAutoAskedRef.current
     });
 
@@ -101,29 +100,26 @@ export default function AIChat() {
       hasAutoAskedRef.current = true;
       setInputMessage(locationState.question);
       
-      // 增加延迟确保所有组件完全初始化
+      // 短延迟确保组件初始化，但立即发送不检查isLoading
       const timer = setTimeout(() => {
         console.log('⏰ Executing auto-send now...', { 
           question: locationState.question,
-          category: locationState.category,
-          isLoading 
+          category: locationState.category
         });
         
-        // 确保不在加载状态下发送
-        if (!isLoading) {
-          sendMessage(locationState.question, undefined, undefined, locationState.category)
-            .then(() => {
-              console.log('✅ Auto-send completed successfully');
-              // 清除状态，防止刷新时重复提问
-              navigate(location.pathname, { replace: true, state: null });
-            })
-            .catch((err) => {
-              console.error('❌ Auto-send failed:', err);
-            });
-        } else {
-          console.warn('⚠️ Still loading, cannot auto-send yet');
-        }
-      }, 1200); // 增加到1.2秒
+        // 直接发送，不检查isLoading状态
+        sendMessage(locationState.question, undefined, undefined, locationState.category)
+          .then(() => {
+            console.log('✅ Auto-send completed successfully');
+            // 清除状态，防止刷新时重复提问
+            navigate(location.pathname, { replace: true, state: null });
+          })
+          .catch((err) => {
+            console.error('❌ Auto-send failed:', err);
+            // 重置标志，允许用户手动重试
+            hasAutoAskedRef.current = false;
+          });
+      }, 500); // 减少到500ms，更快响应
       
       return () => clearTimeout(timer);
     }
@@ -136,16 +132,17 @@ export default function AIChat() {
       
       const timer = setTimeout(() => {
         console.log('⏰ Executing auto-send now...');
-        if (!isLoading) {
-          sendMessage(questionParam)
-            .then(() => console.log('✅ Auto-send completed'))
-            .catch((err) => console.error('❌ Auto-send failed:', err));
-        }
-      }, 1200); // 增加到1.2秒
+        sendMessage(questionParam)
+          .then(() => console.log('✅ Auto-send completed'))
+          .catch((err) => {
+            console.error('❌ Auto-send failed:', err);
+            hasAutoAskedRef.current = false;
+          });
+      }, 500); // 减少到500ms
       
       return () => clearTimeout(timer);
     }
-  }, [questionParam, locationState, isLoading, sendMessage, setInputMessage, navigate, location.pathname]);
+  }, [questionParam, locationState, sendMessage, setInputMessage, navigate, location.pathname]);
 
   // 当用户点击"新对话"时，清除会话标记并重置自动提问标志
   const handleStartNewChat = () => {
