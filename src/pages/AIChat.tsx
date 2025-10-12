@@ -7,8 +7,10 @@ import { ScrollToBottomButton } from '@/components/ui/ScrollToBottomButton';
 import { PageHero } from '@/components/PageHero';
 import { useSmartAIChat } from '@/hooks/useSmartAIChat';
 import { useAI } from '@/contexts/AIContext';
+import { downloadMarkdown } from '@/lib/chatMarkdown';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Home, MessageSquare, ArrowUp, ArrowDown, Sparkles, ChevronDown } from 'lucide-react';
+import { ArrowLeft, Home, MessageSquare, ArrowUp, ArrowDown, Sparkles, ChevronDown, Save, Download } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useMobileLayout } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
@@ -159,6 +161,22 @@ export default function AIChat() {
     startNewChat();
   };
 
+  // 手动下载当前会话为Markdown
+  const handleDownloadMarkdown = () => {
+    if (!currentSession || currentMessages.length === 0) {
+      toast.error(t('ai_chat.no_messages_to_save', 'No messages to save'));
+      return;
+    }
+
+    try {
+      downloadMarkdown(currentSession);
+      toast.success(t('ai_chat.download_success', 'Chat downloaded successfully'));
+    } catch (error) {
+      console.error('Failed to download markdown:', error);
+      toast.error(t('ai_chat.download_failed', 'Failed to download chat'));
+    }
+  };
+
   // 页面动画
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -271,14 +289,29 @@ export default function AIChat() {
                     <Home size={16} className="sm:hidden" />
                   </Button>
                   
-                  <Button 
-                    variant="outline" 
-                    onClick={handleStartNewChat}
-                    className="flex items-center gap-2 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
-                  >
-                    <MessageSquare size={18} />
-                    <span className="hidden sm:inline">{t('ai_chat.new_chat')}</span>
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    {/* 下载Markdown按钮 - 仅在有消息时显示 */}
+                    {currentMessages.length > 0 && (
+                      <Button 
+                        variant="outline" 
+                        onClick={handleDownloadMarkdown}
+                        className="flex items-center gap-2 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors border-green-300 dark:border-green-700 text-green-700 dark:text-green-300"
+                        title={t('ai_chat.download_chat', 'Download chat as Markdown')}
+                      >
+                        <Download size={18} />
+                        <span className="hidden sm:inline">{t('ai_chat.download', 'Download')}</span>
+                      </Button>
+                    )}
+                    
+                    <Button 
+                      variant="outline" 
+                      onClick={handleStartNewChat}
+                      className="flex items-center gap-2 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
+                    >
+                      <MessageSquare size={18} />
+                      <span className="hidden sm:inline">{t('ai_chat.new_chat')}</span>
+                    </Button>
+                  </div>
                 </div>
               </motion.div>
 

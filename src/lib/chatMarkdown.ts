@@ -54,13 +54,17 @@ export function markdownToBlob(markdown: string): Blob {
 }
 
 /**
- * 生成Markdown文件名
+ * 生成Markdown文件名（仅使用英文字母、数字、下划线和连字符）
  */
 export function generateMarkdownFilename(session: ChatSession): string {
   const timestamp = session.createdAt.getTime();
+  // 移除所有非ASCII字符，只保留字母、数字、下划线和连字符
   const cleanTitle = session.title
-    .replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_')
-    .substring(0, 50);
+    .replace(/[^a-zA-Z0-9_-]/g, '_')
+    .replace(/_+/g, '_')  // 将连续的下划线替换为单个
+    .replace(/^_|_$/g, '') // 移除首尾的下划线
+    .substring(0, 50)
+    || 'chat'; // 如果标题为空，使用默认名称
   return `${timestamp}_${cleanTitle}.md`;
 }
 
