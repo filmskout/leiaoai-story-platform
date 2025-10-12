@@ -1,8 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { createClient } from '@supabase/supabase-js';
 
 /**
  * OCR文本提取API
- * 使用OpenAI Vision API从图片中提取文本
+ * 支持两种模式：
+ * 1. URL模式：直接使用imageUrl（用于BMC图片）
+ * 2. 文件路径模式：从Supabase Storage下载并转Base64（用于BP PDF）
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
@@ -10,11 +13,79 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { image, imageUrl } = req.body;
-    const imageData = image || imageUrl; // 支持两种参数名
-
+    const { image, imageUrl, filePath } = req.body;
+    
+    let imageData = image || imageUrl;
+    
+    // 如果提供的是Supabase文件路径，从Storage下载并转为Base64
+    if (filePath && !imageData) {
+      console.log('🔵 OCR: Using server-side download mode');
+      console.log('   File path:', filePath);
+      
+      const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+      const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      
+      if (!supabaseUrl) {
+        console.error('❌ OCR: Missing SUPABASE_URL');
+        return res.status(500).json({ 
+          error: 'Server misconfigured: missing SUPABASE_URL' 
+        });
+      }
+      
+      if (!serviceKey) {
+        console.error('❌ OCR: Missing SUPABASE_SERVICE_ROLE_KEY');
+        return res.status(500).json({ 
+          error: 'Server misconfigured: missing SUPABASE_SERVICE_ROLE_KEY. Please add this to Vercel environment variables.' 
+        });
+      }
+      
+      // 使用service_role_key创建Supabase客户端（绕过RLS）
+      const supabase = createClient(supabaseUrl, serviceKey, {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false
+        }
+      });
+      
+      console.log('🔵 OCR: Downloading file from Supabase Storage...');
+      
+      // 从Storage下载文件
+      const { data: fileData, error: downloadError } = await supabase.storage
+        .from('bp-documents')
+        .download(filePath);
+      
+      if (downloadError) {
+        console.error('❌ OCR: Failed to download file', {
+          error: downloadError.message,
+          filePath
+        });
+        return res.status(500).json({ 
+          error: 'Failed to download file from storage',
+          details: downloadError.message 
+        });
+      }
+      
+      console.log('✅ OCR: File downloaded successfully');
+      console.log('   File size:', fileData.size, 'bytes');
+      console.log('   File type:', fileData.type);
+      
+      // 转换为Base64
+      const arrayBuffer = await fileData.arrayBuffer();
+      const base64 = Buffer.from(arrayBuffer).toString('base64');
+      
+      console.log('✅ OCR: Converted to Base64');
+      console.log('   Base64 length:', base64.length);
+      
+      // 根据文件类型设置data URL
+      const mimeType = fileData.type || 'application/pdf';
+      imageData = `data:${mimeType};base64,${base64}`;
+    }
+    
+    // 验证imageData
     if (!imageData) {
-      return res.status(400).json({ error: 'Image data or imageUrl is required' });
+      return res.status(400).json({ 
+        error: 'Either imageUrl or filePath is required' 
+      });
     }
 
     const apiKey = process.env.OPENAI_API_KEY;

@@ -270,19 +270,22 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
     }
   };
 
-  // OCR提取文本（简化版 - 直接调用OpenAI Vision API）
-  const extractText = async (fileUrl: string, fileType: string): Promise<string> => {
-    console.log('🔵 BP OCR: Extracting text', { fileUrl, fileType });
+  // OCR提取文本（服务器端下载模式）
+  const extractText = async (filePath: string, fileType: string): Promise<string> => {
+    console.log('🔵 BP OCR: Extracting text', { filePath, fileType });
 
     try {
-      // 对于PDF，使用OCR API
+      // 对于PDF，使用OCR API（服务器端下载模式）
       if (fileType === 'application/pdf') {
-        console.log('🔵 BP OCR: Calling API with URL:', fileUrl);
+        console.log('🔵 BP OCR: Using server-side download mode');
+        console.log('   File path:', filePath);
         
         const response = await fetch('/api/ocr-extract', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ imageUrl: fileUrl })
+          body: JSON.stringify({ 
+            filePath: filePath  // 传递文件路径，让服务器下载
+          })
         });
 
         console.log('🔵 BP OCR: API response status:', response.status);
@@ -358,32 +361,18 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
         throw new Error('BP submission not found');
       }
 
-      // 3. 生成签名URL用于OCR（24小时有效）
-      console.log('🔵 BP Analysis: Creating signed URL for OCR...');
-      const { data: signedUrlData, error: signedUrlError } = await supabase.storage
-        .from('bp-documents')
-        .createSignedUrl(bpData.file_url, 86400);
+      // 3. OCR提取文本（直接使用文件路径，让服务器端下载）
+      console.log('🔵 BP Analysis: Extracting text using server-side download...');
+      console.log('   File path:', bpData.file_url);
+      const extractedText = await extractText(bpData.file_url, bpData.file_type);
 
-      if (signedUrlError || !signedUrlData) {
-        console.error('🔴 BP Analysis: Failed to create signed URL', signedUrlError);
-        throw new Error('无法生成文件访问链接');
-      }
-
-      console.log('🔵 BP Analysis: Signed URL created', {
-        urlPreview: signedUrlData.signedUrl.substring(0, 100) + '...'
-      });
-
-      // 4. OCR提取文本
-      console.log('🔵 BP Analysis: Extracting text...');
-      const extractedText = await extractText(signedUrlData.signedUrl, bpData.file_type);
-
-      // 5. 更新extracted_text到数据库
+      // 4. 更新extracted_text到数据库
       await supabase
         .from('bp_submissions')
         .update({ extracted_text: extractedText })
         .eq('id', uploadedBpId);
 
-      // 6. 调用分析API
+      // 5. 调用分析API
       console.log('🔵 BP Analysis: Calling analysis API...');
       const response = await fetch('/api/bp-analysis', {
         method: 'POST',
@@ -404,7 +393,7 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
 
       console.log('🟢 BP Analysis: Success!', scores);
 
-      // 7. 计算总分（4个维度的平均值）
+      // 6. 计算总分（4个维度的平均值）
       const overallScore = Math.round(
         (scores.aiInsight.overall +
           scores.marketInsights.overall +
@@ -412,7 +401,7 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
           scores.growthProjections.overall) / 4
       );
 
-      // 8. 保存分析结果到数据库
+      // 7. 保存分析结果到数据库
       await supabase
         .from('bp_submissions')
         .update({
