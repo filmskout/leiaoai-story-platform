@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { 
   Upload, 
   FileText, 
@@ -11,7 +12,9 @@ import {
   TrendingUp,
   Shield,
   Lightbulb,
-  X
+  X,
+  Globe,
+  Plus
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatFileSize } from '@/lib/utils';
@@ -66,11 +69,15 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
   const navigate = useNavigate();
   const [dragActive, setDragActive] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [websiteUrl, setWebsiteUrl] = useState<string>('');
+  const [websiteData, setWebsiteData] = useState<any | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isExtractingWebsite, setIsExtractingWebsite] = useState(false);
   const [analysisScores, setAnalysisScores] = useState<AnalysisScores | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [uploadedBpId, setUploadedBpId] = useState<string | null>(null);
+  const [showWebsiteInput, setShowWebsiteInput] = useState(false);
 
   // 处理文件拖拽
   const handleDrag = useCallback((e: React.DragEvent) => {
@@ -469,13 +476,104 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
   };
 
   // 重置
+  // 提取网站内容
+  const extractWebsite = async () => {
+    if (!websiteUrl.trim()) {
+      setError(t('bp_analysis.enter_website', 'Please enter a valid website URL'));
+      return;
+    }
+
+    if (!user) {
+      setError(t('bp_analysis.login_required', 'Please log in to analyze websites'));
+      navigate('/auth');
+      return;
+    }
+
+    setIsExtractingWebsite(true);
+    setError(null);
+
+    try {
+      console.log('🔵 BP Website: Extracting content from', websiteUrl);
+
+      const response = await fetch('/api/extract-website', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: websiteUrl })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to extract website content');
+      }
+
+      const result = await response.json();
+      console.log('🟢 BP Website: Content extracted', {
+        title: result.data.title,
+        contentLength: result.textSummary.length
+      });
+
+      setWebsiteData(result);
+      
+      // 自动触发分析
+      await analyzeWebsite(result.textSummary);
+
+    } catch (error: any) {
+      console.error('🔴 BP Website: Extraction error', error);
+      setError(error.message || t('bp_analysis.extract_failed', 'Failed to extract website content'));
+    } finally {
+      setIsExtractingWebsite(false);
+    }
+  };
+
+  // 分析网站内容
+  const analyzeWebsite = async (websiteContent: string) => {
+    if (!user || !websiteContent) return;
+
+    setIsAnalyzing(true);
+    setError(null);
+
+    try {
+      console.log('🔵 BP Analysis: Analyzing website content');
+
+      const response = await fetch('/api/bp-analysis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          extractedText: websiteContent,
+          sourceType: 'website',
+          sourceUrl: websiteUrl
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Analysis failed');
+      }
+
+      const result = await response.json();
+      console.log('🟢 BP Analysis: Analysis complete', result.scores);
+
+      setAnalysisScores(result.scores);
+
+    } catch (error: any) {
+      console.error('🔴 BP Analysis: Analysis error', error);
+      setError(error.message || t('bp_analysis.analysis_failed', 'Analysis failed'));
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   const resetUpload = () => {
     setFile(null);
+    setWebsiteUrl('');
+    setWebsiteData(null);
     setAnalysisScores(null);
     setError(null);
     setIsUploading(false);
     setIsAnalyzing(false);
+    setIsExtractingWebsite(false);
     setUploadedBpId(null);
+    setShowWebsiteInput(false);
   };
 
   // 得分颜色
@@ -508,63 +606,139 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
         </CardHeader>
         
         <CardContent>
-          {!file ? (
-            <div
-              className={cn(
-                'border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-200',
-                dragActive 
-                  ? 'border-primary-400 bg-primary-50 dark:bg-primary-900/20' 
-                  : 'border-border hover:border-primary-300 hover:bg-primary-50/50 dark:hover:bg-primary-900/10'
-              )}
-              onDragEnter={handleDrag}
-              onDragLeave={handleDrag}
-              onDragOver={handleDrag}
-              onDrop={handleDrop}
-            >
-              <div className="space-y-4">
-                <div className="mx-auto w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center">
-                  <FileText className="text-primary-500" size={32} />
+          {!file && !websiteData ? (
+            <div className="space-y-6">
+              {/* 文件上传区域 */}
+              <div
+                className={cn(
+                  'border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-200',
+                  dragActive 
+                    ? 'border-primary-400 bg-primary-50 dark:bg-primary-900/20' 
+                    : 'border-border hover:border-primary-300 hover:bg-primary-50/50 dark:hover:bg-primary-900/10'
+                )}
+                onDragEnter={handleDrag}
+                onDragLeave={handleDrag}
+                onDragOver={handleDrag}
+                onDrop={handleDrop}
+              >
+                <div className="space-y-4">
+                  <div className="mx-auto w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center">
+                    <FileText className="text-primary-500" size={32} />
+                  </div>
+                  
+                  <div>
+                    <p className="text-lg font-medium text-foreground mb-2">
+                      {t('bp_analysis.drag_drop', 'Drag & drop your file here')}
+                    </p>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      {t('bp_analysis.supported_formats', 'PDF or DOCX format')}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {t('bp_analysis.max_size', 'Maximum file size: 50MB')}
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <Button asChild>
+                      <label className="cursor-pointer">
+                        <input
+                          type="file"
+                          accept=".pdf,.docx"
+                          onChange={(e) => handleFileSelect(e.target.files?.[0])}
+                          className="hidden"
+                        />
+                        {t('bp_analysis.upload_bp', 'Upload BP')}
+                      </label>
+                    </Button>
+                  </div>
                 </div>
-                
-                <div>
-                  <p className="text-lg font-medium text-foreground mb-2">
-                    {t('bp_analysis.drag_drop', 'Drag & drop your file here')}
-                  </p>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {t('bp_analysis.supported_formats', 'PDF or DOCX format')}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {t('bp_analysis.max_size', 'Maximum file size: 50MB')}
-                  </p>
+              </div>
+
+              {/* 分隔线 */}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-border"></div>
                 </div>
-                
-                <div>
-                  <Button asChild>
-                    <label className="cursor-pointer">
-                      <input
-                        type="file"
-                        accept=".pdf,.docx"
-                        onChange={(e) => handleFileSelect(e.target.files?.[0])}
-                        className="hidden"
-                      />
-                      {t('bp_analysis.upload_bp', 'Upload BP')}
-                    </label>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">
+                    {t('bp_analysis.or', 'Or')}
+                  </span>
+                </div>
+              </div>
+
+              {/* 网站链接输入 */}
+              <div className="space-y-3">
+                {!showWebsiteInput ? (
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => setShowWebsiteInput(true)}
+                  >
+                    <Globe size={16} className="mr-2" />
+                    {t('bp_analysis.add_website', 'Add Website Link')}
                   </Button>
-                </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex gap-2">
+                      <Input
+                        type="url"
+                        placeholder={t('bp_analysis.website_placeholder', 'https://example.com')}
+                        value={websiteUrl}
+                        onChange={(e) => setWebsiteUrl(e.target.value)}
+                        disabled={isExtractingWebsite}
+                      />
+                      <Button
+                        onClick={extractWebsite}
+                        disabled={isExtractingWebsite || !websiteUrl.trim()}
+                        className="min-w-24"
+                      >
+                        {isExtractingWebsite ? (
+                          <UnifiedLoader variant="inline" show={true} size="sm" loaderStyle="spinner" />
+                        ) : (
+                          <>{t('bp_analysis.analyze', 'Analyze')}</>
+                        )}
+                      </Button>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setShowWebsiteInput(false);
+                        setWebsiteUrl('');
+                      }}
+                    >
+                      {t('common.cancel', 'Cancel')}
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           ) : (
             <div className="space-y-4">
-              {/* 文件信息 */}
+              {/* 文件或网站信息 */}
               <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg border border-border">
-                <FileText className="text-primary-500" size={24} />
-                <div className="flex-1">
-                  <p className="font-medium text-foreground">{file.name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {formatFileSize(file.size)} • {t('bp_analysis.uploaded', 'Uploaded')}
-                  </p>
-                </div>
-                {!isUploading && !isAnalyzing && (
+                {file ? (
+                  <>
+                    <FileText className="text-primary-500" size={24} />
+                    <div className="flex-1">
+                      <p className="font-medium text-foreground">{file.name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {formatFileSize(file.size)} • {t('bp_analysis.uploaded', 'Uploaded')}
+                      </p>
+                    </div>
+                  </>
+                ) : websiteData ? (
+                  <>
+                    <Globe className="text-primary-500" size={24} />
+                    <div className="flex-1">
+                      <p className="font-medium text-foreground">{websiteData.data.title || websiteUrl}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {websiteUrl} • {t('bp_analysis.website_extracted', 'Website content extracted')}
+                      </p>
+                    </div>
+                  </>
+                ) : null}
+                {!isUploading && !isAnalyzing && !isExtractingWebsite && (
                   <Button
                     variant="ghost"
                     size="sm"
@@ -575,36 +749,41 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
                 )}
               </div>
 
-              {/* 上传中 */}
-              {isUploading && (
+              {/* 上传中/提取中 */}
+              {(isUploading || isExtractingWebsite) && (
                 <div className="flex justify-center py-4">
                   <UnifiedLoader 
                     variant="inline" 
                     show={true} 
                     size="md"
                     loaderStyle="spinner"
-                    text={t('bp_analysis.uploading', 'Uploading...')}
+                    text={isUploading ? t('bp_analysis.uploading', 'Uploading...') : t('bp_analysis.extracting_website', 'Extracting website content...')}
                   />
                 </div>
               )}
               
-              {/* 分析按钮 */}
-              {!isUploading && uploadedBpId && !analysisScores && (
+              {/* 分析中 */}
+              {isAnalyzing && (
+                <div className="flex justify-center py-4">
+                  <UnifiedLoader 
+                    variant="inline" 
+                    show={true} 
+                    size="md"
+                    loaderStyle="spinner"
+                    text={t('bp_analysis.analyzing', 'Analyzing...')}
+                  />
+                </div>
+              )}
+              
+              {/* 分析按钮（仅文件上传显示） */}
+              {!isUploading && !isExtractingWebsite && !isAnalyzing && uploadedBpId && !analysisScores && file && (
                 <div className="flex justify-center">
                   <Button
                     onClick={analyzeBP}
-                    disabled={isAnalyzing}
                     className="min-w-48 bg-primary-500 hover:bg-primary-600"
                     size="lg"
                   >
-                    {isAnalyzing ? (
-                      <>
-                        <div className="mr-2 w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        {t('bp_analysis.analyzing', 'Analyzing...')}
-                      </>
-                    ) : (
-                      t('bp_analysis.analysis_report', 'Analyze BP')
-                    )}
+                    {t('bp_analysis.analysis_report', 'Analyze BP')}
                   </Button>
                 </div>
               )}
