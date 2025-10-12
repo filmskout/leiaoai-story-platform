@@ -246,7 +246,7 @@ class AuthService {
         
         // Update profile with wallet info
         await supabase
-          .from('user_profiles')
+          .from('profiles')
           .update({
             wallet_address: walletAddress,
             wallet_type: walletType,

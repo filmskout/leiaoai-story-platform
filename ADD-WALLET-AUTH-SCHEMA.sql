@@ -1,48 +1,48 @@
 -- ============================================================================
 -- 添加Web3钱包认证支持到数据库Schema
 -- ============================================================================
--- 为user_profiles表添加钱包地址和类型字段
+-- 为profiles表添加钱包地址和类型字段
 -- ============================================================================
 
--- 步骤1: 添加钱包相关列到user_profiles表
+-- 步骤1: 添加钱包相关列到profiles表
 -- ============================================================================
 
-ALTER TABLE user_profiles 
+ALTER TABLE profiles 
 ADD COLUMN IF NOT EXISTS wallet_address TEXT;
 
-ALTER TABLE user_profiles 
+ALTER TABLE profiles 
 ADD COLUMN IF NOT EXISTS wallet_type TEXT CHECK (wallet_type IN ('ethereum', 'solana', NULL));
 
 -- 步骤2: 添加索引以提高钱包查询性能
 -- ============================================================================
 
-CREATE INDEX IF NOT EXISTS idx_user_profiles_wallet_address 
-ON user_profiles(wallet_address) 
+CREATE INDEX IF NOT EXISTS idx_profiles_wallet_address 
+ON profiles(wallet_address) 
 WHERE wallet_address IS NOT NULL;
 
-CREATE INDEX IF NOT EXISTS idx_user_profiles_wallet_type 
-ON user_profiles(wallet_type) 
+CREATE INDEX IF NOT EXISTS idx_profiles_wallet_type 
+ON profiles(wallet_type) 
 WHERE wallet_type IS NOT NULL;
 
 -- 步骤3: 添加唯一约束确保每个钱包地址只能关联一个账户
 -- ============================================================================
 
 -- 注意：如果已有重复数据，需要先清理
-CREATE UNIQUE INDEX IF NOT EXISTS idx_user_profiles_wallet_unique 
-ON user_profiles(wallet_address) 
+CREATE UNIQUE INDEX IF NOT EXISTS idx_profiles_wallet_unique 
+ON profiles(wallet_address) 
 WHERE wallet_address IS NOT NULL;
 
 -- 步骤4: 验证修改
 -- ============================================================================
 
--- 查看user_profiles表结构
+-- 查看profiles表结构
 SELECT 
     column_name, 
     data_type,
     is_nullable,
     column_default
 FROM information_schema.columns
-WHERE table_name = 'user_profiles'
+WHERE table_name = 'profiles'
 AND column_name IN ('wallet_address', 'wallet_type')
 ORDER BY ordinal_position;
 
@@ -51,17 +51,17 @@ SELECT
     indexname,
     indexdef
 FROM pg_indexes
-WHERE tablename = 'user_profiles'
+WHERE tablename = 'profiles'
 AND indexname LIKE '%wallet%';
 
 -- 步骤5: 更新现有的RLS策略（如果需要）
 -- ============================================================================
 
--- user_profiles表的RLS策略应该已经存在
+-- profiles表的RLS策略应该已经存在
 -- 检查现有策略
 SELECT schemaname, tablename, policyname, cmd, permissive
 FROM pg_policies
-WHERE tablename = 'user_profiles'
+WHERE tablename = 'profiles'
 ORDER BY policyname;
 
 -- 如果需要，可以添加特定的钱包访问策略
@@ -72,7 +72,7 @@ ORDER BY policyname;
 -- ============================================================================
 
 /*
-运行完这些SQL后，user_profiles表将支持：
+运行完这些SQL后，profiles表将支持：
 
 1. ✅ wallet_address - 存储Ethereum或Solana钱包地址
 2. ✅ wallet_type - 钱包类型（'ethereum' 或 'solana'）
@@ -96,10 +96,10 @@ ORDER BY policyname;
 SELECT 
     '✅ Wallet authentication schema added' as status,
     (SELECT COUNT(*) FROM information_schema.columns 
-     WHERE table_name = 'user_profiles' 
+     WHERE table_name = 'profiles' 
      AND column_name IN ('wallet_address', 'wallet_type')) as column_count,
     (SELECT COUNT(*) FROM pg_indexes 
-     WHERE tablename = 'user_profiles' 
+     WHERE tablename = 'profiles' 
      AND indexname LIKE '%wallet%') as index_count;
 
 -- ============================================================================
@@ -119,7 +119,7 @@ Google OAuth集成不需要额外的数据库字段，因为：
    - email: 从Google获取
    - full_name: 从Google显示名称
    - avatar_url: 从Google头像URL
-   - 这些都存储在user_profiles表中
+   - 这些都存储在profiles表中
 
 3. Supabase Dashboard配置:
    需要在Supabase Dashboard中启用Google OAuth：
@@ -141,12 +141,12 @@ Google OAuth集成不需要额外的数据库字段，因为：
 --     wallet_address,
 --     wallet_type,
 --     created_at
--- FROM user_profiles
+-- FROM profiles
 -- WHERE wallet_address IS NOT NULL
 -- ORDER BY created_at DESC;
 
 -- 查询特定钱包地址的用户
--- SELECT * FROM user_profiles 
+-- SELECT * FROM profiles 
 -- WHERE wallet_address = '0x...' -- 替换为实际钱包地址
 -- LIMIT 1;
 
@@ -158,7 +158,7 @@ Google OAuth集成不需要额外的数据库字段，因为：
 --         ELSE 'Email/Password'
 --     END as auth_method,
 --     COUNT(*) as user_count
--- FROM user_profiles
+-- FROM profiles
 -- GROUP BY auth_method
 -- ORDER BY user_count DESC;
 
