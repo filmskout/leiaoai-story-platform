@@ -52,7 +52,6 @@ export default defineConfig({
           'vendor-react': ['react', 'react-dom', 'react-router-dom'],
           'vendor-ui': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-tabs'],
           'vendor-markdown': ['react-markdown', 'remark-gfm', 'rehype-highlight'],
-          'vendor-thirdweb': ['thirdweb'],
           'html2canvas': ['html2canvas'],
         }
       }
