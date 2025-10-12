@@ -242,7 +242,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const data = await response.json();
-    const extractedText = data?.choices?.[0]?.message?.content;
+    extractedText = data?.choices?.[0]?.message?.content; // 使用已声明的变量
 
     if (!extractedText) {
       console.error('❌ Invalid response from OpenAI');
