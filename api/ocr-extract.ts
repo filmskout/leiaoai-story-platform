@@ -1,11 +1,13 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
+import pdf from 'pdf-parse';
 
 /**
- * OCR文本提取API
- * 支持两种模式：
- * 1. URL模式：直接使用imageUrl（用于BMC图片）
- * 2. 文件路径模式：从Supabase Storage下载并转Base64（用于BP PDF）
+ * 文本提取API
+ * 支持三种模式：
+ * 1. URL模式：直接使用imageUrl（用于BMC图片，使用OpenAI Vision）
+ * 2. PDF文件路径模式：从Supabase下载PDF并提取文本（用于BP PDF，使用pdf-parse）
+ * 3. 图片文件路径模式：从Supabase下载图片并OCR（使用OpenAI Vision）
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
@@ -13,36 +15,36 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { image, imageUrl, filePath } = req.body;
+    const { image, imageUrl, filePath, fileType } = req.body;
     
     let imageData = image || imageUrl;
+    let extractedText: string | null = null;
     
-    // 如果提供的是Supabase文件路径，从Storage下载并转为Base64
+    // 如果提供的是Supabase文件路径，从Storage下载
     if (filePath && !imageData) {
-      console.log('🔵 OCR: Using server-side download mode');
+      console.log('🔵 Text Extract: Using server-side download mode');
       console.log('   File path:', filePath);
+      console.log('   File type:', fileType);
       
       const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-      // 优先使用新的Secret Key，回退到旧的Service Role Key
       const secretKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
       
       if (!supabaseUrl) {
-        console.error('❌ OCR: Missing SUPABASE_URL');
+        console.error('❌ Missing SUPABASE_URL');
         return res.status(500).json({ 
           error: 'Server misconfigured: missing SUPABASE_URL' 
         });
       }
       
       if (!secretKey) {
-        console.error('❌ OCR: Missing SUPABASE_SECRET_KEY');
+        console.error('❌ Missing SUPABASE_SECRET_KEY');
         return res.status(500).json({ 
-          error: 'Server misconfigured: missing SUPABASE_SECRET_KEY. Please add this to Vercel environment variables.' 
+          error: 'Server misconfigured: missing SUPABASE_SECRET_KEY' 
         });
       }
       
-      console.log('🔵 OCR: Using Supabase Secret Key authentication');
+      console.log('🔵 Using Supabase Secret Key authentication');
       
-      // 使用Secret Key创建Supabase客户端（绕过RLS）
       const supabase = createClient(supabaseUrl, secretKey, {
         auth: {
           persistSession: false,
@@ -50,20 +52,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         },
         global: {
           headers: {
-            'X-Client-Info': 'leoai-ocr-api'
+            'X-Client-Info': 'leoai-text-extract-api'
           }
         }
       });
       
-      console.log('🔵 OCR: Downloading file from Supabase Storage...');
+      console.log('🔵 Downloading file from Supabase Storage...');
       
-      // 从Storage下载文件
       const { data: fileData, error: downloadError } = await supabase.storage
         .from('bp-documents')
         .download(filePath);
       
       if (downloadError) {
-        console.error('❌ OCR: Failed to download file', {
+        console.error('❌ Failed to download file', {
           error: downloadError.message,
           filePath
         });
@@ -73,20 +74,64 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
       
-      console.log('✅ OCR: File downloaded successfully');
+      console.log('✅ File downloaded successfully');
       console.log('   File size:', fileData.size, 'bytes');
       console.log('   File type:', fileData.type);
       
-      // 转换为Base64
-      const arrayBuffer = await fileData.arrayBuffer();
-      const base64 = Buffer.from(arrayBuffer).toString('base64');
+      // 判断文件类型：PDF使用pdf-parse，图片使用OpenAI Vision
+      const mimeType = fileData.type || fileType || 'application/pdf';
       
-      console.log('✅ OCR: Converted to Base64');
-      console.log('   Base64 length:', base64.length);
-      
-      // 根据文件类型设置data URL
-      const mimeType = fileData.type || 'application/pdf';
-      imageData = `data:${mimeType};base64,${base64}`;
+      if (mimeType === 'application/pdf' || filePath.toLowerCase().endsWith('.pdf')) {
+        // PDF文件：使用pdf-parse直接提取文本
+        console.log('🔵 PDF detected: Using pdf-parse for text extraction');
+        
+        try {
+          const arrayBuffer = await fileData.arrayBuffer();
+          const buffer = Buffer.from(arrayBuffer);
+          
+          console.log('🔵 Parsing PDF...');
+          const pdfData = await pdf(buffer);
+          
+          extractedText = pdfData.text;
+          console.log('✅ PDF parsed successfully');
+          console.log('   Pages:', pdfData.numpages);
+          console.log('   Text length:', extractedText.length);
+          console.log('   Text preview:', extractedText.substring(0, 200));
+          
+          if (!extractedText || extractedText.trim().length === 0) {
+            console.warn('⚠️ PDF contains no extractable text');
+            return res.status(400).json({
+              error: 'PDF不包含可提取的文本',
+              details: 'This PDF appears to be empty or is a scanned image. Please use a PDF with selectable text.'
+            });
+          }
+          
+          // 直接返回提取的文本
+          return res.status(200).json({
+            extractedText,
+            text: extractedText,
+            source: 'pdf-parse',
+            pages: pdfData.numpages
+          });
+          
+        } catch (pdfError: any) {
+          console.error('❌ PDF parsing failed:', pdfError);
+          return res.status(500).json({
+            error: 'PDF解析失败',
+            details: pdfError.message || 'Failed to parse PDF file'
+          });
+        }
+      } else {
+        // 图片文件：转换为Base64供OpenAI Vision使用
+        console.log('🔵 Image detected: Converting to Base64 for OpenAI Vision');
+        const arrayBuffer = await fileData.arrayBuffer();
+        const base64 = Buffer.from(arrayBuffer).toString('base64');
+        
+        console.log('✅ Converted to Base64');
+        console.log('   Base64 length:', base64.length);
+        
+        imageData = `data:${mimeType};base64,${base64}`;
+      }
     }
     
     // 验证imageData

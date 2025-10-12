@@ -284,7 +284,8 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
-            filePath: filePath  // 传递文件路径，让服务器下载
+            filePath: filePath,  // 传递文件路径，让服务器下载
+            fileType: fileType   // 传递文件类型，让服务器选择正确的提取方法
           })
         });
 
