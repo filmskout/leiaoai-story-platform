@@ -294,9 +294,17 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
           const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
           console.error('🔴 BP OCR: API error', { 
             status: response.status, 
-            error: errorData 
+            error: errorData,
+            details: errorData.details,
+            fullResponse: errorData
           });
-          throw new Error(errorData.error || `OCR extraction failed with status ${response.status}`);
+          
+          // 显示更详细的错误信息
+          const errorMsg = errorData.details 
+            ? `${errorData.error}\n详情: ${errorData.details}`
+            : errorData.error || `OCR extraction failed with status ${response.status}`;
+          
+          throw new Error(errorMsg);
         }
 
         const data = await response.json();

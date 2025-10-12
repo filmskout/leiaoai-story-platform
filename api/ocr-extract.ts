@@ -105,8 +105,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       urlLength: imageData.length,
       urlPreview: imageData.substring(0, 100),
       isDataUrl: imageData.startsWith('data:'),
-      isHttpUrl: imageData.startsWith('http')
+      isHttpUrl: imageData.startsWith('http'),
+      sizeInMB: (imageData.length / (1024 * 1024)).toFixed(2)
     });
+
+    // OpenAI Vision API限制：Base64不能超过20MB
+    const maxSize = 20 * 1024 * 1024; // 20MB
+    if (imageData.length > maxSize) {
+      console.error('❌ OCR: File too large for OpenAI Vision API', {
+        size: imageData.length,
+        maxSize,
+        sizeInMB: (imageData.length / (1024 * 1024)).toFixed(2)
+      });
+      return res.status(400).json({ 
+        error: `文件太大。OpenAI Vision API限制为20MB，当前文件为 ${(imageData.length / (1024 * 1024)).toFixed(2)}MB`,
+        details: 'Please upload a smaller file or reduce the PDF quality'
+      });
+    }
+
+    console.log('🔵 OCR: Calling OpenAI Vision API...');
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -142,24 +159,40 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('❌ OpenAI API error:', {
-        status: response.status,
-        error: errorText.slice(0, 500)
-      });
+      let errorDetail = errorText;
+      
+      // 尝试解析JSON错误
+      try {
+        const errorJson = JSON.parse(errorText);
+        errorDetail = errorJson.error?.message || errorText;
+        console.error('❌ OpenAI API error:', {
+          status: response.status,
+          error: errorJson,
+          fullError: errorText.slice(0, 1000)
+        });
+      } catch (e) {
+        console.error('❌ OpenAI API error (raw):', {
+          status: response.status,
+          error: errorText.slice(0, 1000)
+        });
+      }
       
       // 提供更具体的错误消息
       let errorMessage = 'OCR extraction failed';
       if (response.status === 401) {
-        errorMessage = 'OpenAI API key is invalid or missing';
+        errorMessage = 'OpenAI API key无效或缺失';
       } else if (response.status === 400) {
-        errorMessage = 'Invalid request to OpenAI API - URL may not be accessible';
+        errorMessage = `OpenAI API请求无效: ${errorDetail}`;
       } else if (response.status === 429) {
-        errorMessage = 'OpenAI API rate limit exceeded';
+        errorMessage = 'OpenAI API请求频率超限';
+      } else if (response.status === 413) {
+        errorMessage = '文件太大，OpenAI无法处理';
       }
       
       return res.status(response.status).json({ 
         error: errorMessage,
-        details: errorText.slice(0, 200)
+        details: errorDetail.slice(0, 500),
+        status: response.status
       });
     }
 
