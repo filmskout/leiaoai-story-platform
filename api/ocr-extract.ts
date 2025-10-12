@@ -23,7 +23,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.log('   File path:', filePath);
       
       const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-      const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      // 优先使用新的Secret Key，回退到旧的Service Role Key
+      const secretKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
       
       if (!supabaseUrl) {
         console.error('❌ OCR: Missing SUPABASE_URL');
@@ -32,18 +33,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
       
-      if (!serviceKey) {
-        console.error('❌ OCR: Missing SUPABASE_SERVICE_ROLE_KEY');
+      if (!secretKey) {
+        console.error('❌ OCR: Missing SUPABASE_SECRET_KEY');
         return res.status(500).json({ 
-          error: 'Server misconfigured: missing SUPABASE_SERVICE_ROLE_KEY. Please add this to Vercel environment variables.' 
+          error: 'Server misconfigured: missing SUPABASE_SECRET_KEY. Please add this to Vercel environment variables.' 
         });
       }
       
-      // 使用service_role_key创建Supabase客户端（绕过RLS）
-      const supabase = createClient(supabaseUrl, serviceKey, {
+      console.log('🔵 OCR: Using Supabase Secret Key authentication');
+      
+      // 使用Secret Key创建Supabase客户端（绕过RLS）
+      const supabase = createClient(supabaseUrl, secretKey, {
         auth: {
           persistSession: false,
           autoRefreshToken: false
+        },
+        global: {
+          headers: {
+            'X-Client-Info': 'leoai-ocr-api'
+          }
         }
       });
       
