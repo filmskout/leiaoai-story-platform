@@ -159,7 +159,13 @@ export function useAIChat() {
     const sessionId = crypto.randomUUID();
     const sessionTitle = title || '新的投融资咨询';
     
-    console.log('🔵 Creating new chat session', { sessionId, title: sessionTitle, category });
+    console.log('🔵 Creating new chat session', { 
+      sessionId, 
+      title: sessionTitle, 
+      category,
+      userId: user?.id,
+      isUserLoggedIn: !!user 
+    });
     
     try {
       // 在数据库中创建新会话
@@ -176,16 +182,25 @@ export function useAIChat() {
         .maybeSingle();
         
       if (sessionError) {
-        console.error('Failed to create session in database:', sessionError);
+        console.error('🔴 Failed to create session in database:', sessionError);
+        console.error('🔴 Session data attempted:', {
+          session_id: sessionId,
+          user_id: user?.id || null,
+          title: sessionTitle,
+          category: category || null
+        });
         throw new Error('创建会话失败');
       }
+      
+      console.log('✅ Session created in database:', newSessionData);
       
       const newSession: ChatSession = {
         id: sessionId,
         title: sessionTitle,
         messages: [],
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
+        category: category
       };
       
       setSessions(prev => [newSession, ...prev]);

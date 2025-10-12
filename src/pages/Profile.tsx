@@ -349,10 +349,13 @@ export default function Profile() {
   };
 
   const loadChatSessions = async () => {
-    if (!user) return;
+    if (!user) {
+      console.warn('⚠️ Profile: Cannot load chat sessions - user not logged in');
+      return;
+    }
 
     try {
-      console.log('🔵 Profile: Loading chat sessions');
+      console.log('🔵 Profile: Loading chat sessions', { userId: user.id });
       const { data, error } = await supabase
         .from('chat_sessions')
         .select('session_id, title, category, created_at, updated_at, markdown_file_url, markdown_file_path')
@@ -362,17 +365,24 @@ export default function Profile() {
 
       if (error) {
         console.error('🔴 Profile: Error loading chat sessions:', error);
+        console.error('🔴 Query details:', { userId: user.id, errorCode: error.code, errorMessage: error.message });
         return;
       }
+
+      console.log('🔵 Profile: Query returned', { rowCount: data?.length || 0, data });
 
       if (data && data.length > 0) {
         // 为每个session查询message count
         const sessionsWithCounts = await Promise.all(
           data.map(async (session) => {
-            const { count } = await supabase
+            const { count, error: countError } = await supabase
               .from('chat_messages')
               .select('*', { count: 'exact', head: true })
               .eq('session_id', session.session_id);
+
+            if (countError) {
+              console.error('🔴 Profile: Error counting messages for session', session.session_id, countError);
+            }
 
             return {
               id: session.session_id,
@@ -387,10 +397,18 @@ export default function Profile() {
           })
         );
 
-        console.log('🟢 Profile: Loaded chat sessions', { count: sessionsWithCounts.length });
+        console.log('🟢 Profile: Loaded chat sessions with counts', { 
+          count: sessionsWithCounts.length,
+          sessions: sessionsWithCounts.map(s => ({ 
+            id: s.id, 
+            title: s.title, 
+            category: s.category, 
+            messages: s.message_count 
+          }))
+        });
         setChatSessions(sessionsWithCounts as any);
       } else {
-        console.log('🟡 Profile: No chat sessions found');
+        console.log('🟡 Profile: No chat sessions found for user', user.id);
         setChatSessions([]);
       }
     } catch (error) {
