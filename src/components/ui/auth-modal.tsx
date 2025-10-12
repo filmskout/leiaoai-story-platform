@@ -1,9 +1,10 @@
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { User, Wallet } from 'lucide-react';
+import { User, Chrome, Wallet } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useThirdwebAuth } from '@/lib/thirdweb';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -14,19 +15,20 @@ interface AuthModalProps {
 
 export function AuthModal({ isOpen, onClose, title, description }: AuthModalProps) {
   const navigate = useNavigate();
-  const { connectWallet, isLoading: isConnecting } = useThirdwebAuth();
+  const { signInWithGoogle } = useAuth();
 
   const handleSignIn = () => {
     onClose();
     navigate('/auth');
   };
 
-  const handleConnectWallet = async () => {
+  const handleGoogleSignIn = async () => {
     try {
-      await connectWallet();
+      await signInWithGoogle();
       onClose();
-    } catch (error) {
-      console.error('Wallet connection failed:', error);
+    } catch (error: any) {
+      console.error('Google sign in failed:', error);
+      toast.error('Google sign in failed');
     }
   };
 
@@ -43,7 +45,8 @@ export function AuthModal({ isOpen, onClose, title, description }: AuthModalProp
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
+          {/* Email/Password Sign In */}
           <Button
             onClick={handleSignIn}
             className="w-full flex items-center gap-2"
@@ -53,26 +56,29 @@ export function AuthModal({ isOpen, onClose, title, description }: AuthModalProp
             Sign In with Email
           </Button>
 
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                Or
-              </span>
-            </div>
-          </div>
-
+          {/* Google Sign In */}
           <Button
-            onClick={handleConnectWallet}
-            disabled={isConnecting}
+            onClick={handleGoogleSignIn}
+            className="w-full flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-900 border border-gray-300"
             variant="outline"
+          >
+            <Chrome className="h-4 w-4 text-blue-500" />
+            Continue with Google
+          </Button>
+
+          {/* Web3 Wallet */}
+          <Button
+            onClick={handleSignIn}
             className="w-full flex items-center gap-2"
+            variant="outline"
           >
             <Wallet className="h-4 w-4" />
-            {isConnecting ? 'Connecting...' : 'Connect Wallet'}
+            Connect Wallet
           </Button>
+
+          <p className="text-xs text-center text-gray-500 mt-2">
+            Choose your preferred sign in method
+          </p>
         </div>
       </DialogContent>
     </Dialog>

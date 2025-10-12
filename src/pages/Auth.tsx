@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useThirdwebAuth } from '@/lib/thirdweb';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
-import { AlertCircle, Loader2, Eye, EyeOff, Wallet, Mail } from 'lucide-react';
+import { AlertCircle, Loader2, Eye, EyeOff, Mail, Chrome } from 'lucide-react';
+import { WalletConnect } from '@/components/auth/WalletConnect';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -18,8 +18,7 @@ const AuthPage: React.FC = () => {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   
-  const { signIn, signUp, isAuthenticated } = useAuth();
-  const { connectWallet, isLoading: walletLoading, error: walletError } = useThirdwebAuth();
+  const { signIn, signUp, signInWithGoogle, isAuthenticated } = useAuth();
   const { actualTheme } = useTheme();
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -39,17 +38,17 @@ const AuthPage: React.FC = () => {
     
     // Validation
     if (!email || !password) {
-      setError('Please fill in all required fields');
+      setError(t('auth.error_required_fields', 'Please fill in all required fields'));
       return;
     }
     
     if (activeTab === 'signup' && password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('auth.error_password_mismatch', 'Passwords do not match'));
       return;
     }
     
     if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError(t('auth.error_password_length', 'Password must be at least 6 characters'));
       return;
     }
     
@@ -58,34 +57,57 @@ const AuthPage: React.FC = () => {
     try {
       if (activeTab === 'signin') {
         const { error } = await signIn(email, password);
-        if (!error) {
+        if (error) {
+          setError(error.message || t('auth.error_signin_failed', 'Sign in failed'));
+        } else {
+          toast.success(t('auth.success_signin', 'Signed in successfully!'));
           navigate('/');
         }
       } else {
         const { error } = await signUp(email, password, {
           full_name: email.split('@')[0] // Use email prefix as default name
         });
-        if (!error) {
-          setSuccessMessage('Account created successfully! You can now sign in.');
+        if (error) {
+          setError(error.message || t('auth.error_signup_failed', 'Sign up failed'));
+        } else {
+          setSuccessMessage(t('auth.success_signup', 'Account created successfully! You can now sign in.'));
           setActiveTab('signin');
+          setPassword('');
+          setConfirmPassword('');
         }
       }
     } catch (error: any) {
-      setError(error.message || 'Authentication failed');
+      setError(error.message || t('auth.error_unexpected', 'An unexpected error occurred'));
     } finally {
       setLoading(false);
     }
   };
 
-  // Handle wallet connection
-  const handleWalletConnect = async () => {
+  // Handle Google Sign In
+  const handleGoogleSignIn = async () => {
     try {
-      await connectWallet();
-      toast.success('Wallet connected successfully!');
-      navigate('/');
+      setLoading(true);
+      setError('');
+      await signInWithGoogle();
+      // Navigation handled by redirect
     } catch (error: any) {
-      setError(error.message || 'Wallet connection failed');
+      console.error('Google sign in error:', error);
+      setError(error.message || t('auth.error_google_failed', 'Google sign in failed'));
+      toast.error(t('auth.error_google_failed', 'Google sign in failed'));
+    } finally {
+      setLoading(false);
     }
+  };
+
+  // Handle successful wallet connection
+  const handleWalletSuccess = () => {
+    toast.success(t('auth.success_wallet', 'Wallet connected successfully!'));
+    navigate('/');
+  };
+
+  // Handle wallet connection error
+  const handleWalletError = (error: Error) => {
+    setError(error.message || t('auth.error_wallet_failed', 'Wallet connection failed'));
   };
 
   // Reset form when switching tabs
@@ -97,8 +119,6 @@ const AuthPage: React.FC = () => {
     setPassword('');
     setConfirmPassword('');
   };
-
-
 
   return (
     <div className={cn(
@@ -172,109 +192,157 @@ const AuthPage: React.FC = () => {
           </button>
         </div>
 
-        {/* Form */}
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            {/* Email Field */}
-            <div>
-              <label htmlFor="email" className={cn(
-                "block text-sm font-medium mb-1",
-                actualTheme === 'dark' ? "text-gray-200" : "text-gray-700"
-              )}>
-                {t('auth.email_label', 'Email Address')}
-              </label>
-              <div className="relative">
-                <Mail className={cn(
-                  "absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5",
-                  actualTheme === 'dark' ? "text-gray-400" : "text-gray-400"
-                )} />
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className={cn(
-                    "pl-10 w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors",
-                    actualTheme === 'dark'
-                      ? "bg-gray-800 border-gray-600 text-white placeholder-gray-400"
-                      : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-                  )}
-                  placeholder={t('auth.email_placeholder', 'Enter your email')}
-                />
-              </div>
-            </div>
-            
-            {/* Password Field */}
-            <div>
-              <label htmlFor="password" className={cn(
-                "block text-sm font-medium mb-1",
-                actualTheme === 'dark' ? "text-gray-200" : "text-gray-700"
-              )}>
-                {t('auth.password_label', 'Password')}
-              </label>
-              <div className="relative">
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete={activeTab === 'signin' ? 'current-password' : 'new-password'}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className={cn(
-                    "w-full px-3 py-3 pr-10 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors",
-                    actualTheme === 'dark'
-                      ? "bg-gray-800 border-gray-600 text-white placeholder-gray-400"
-                      : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-                  )}
-                  placeholder={t('auth.password_placeholder', 'Enter your password')}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className={cn(
-                    "absolute right-3 top-1/2 transform -translate-y-1/2 transition-colors",
-                    actualTheme === 'dark' 
-                      ? "text-gray-400 hover:text-gray-200" 
-                      : "text-gray-400 hover:text-gray-600"
-                  )}
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-            </div>
-            
-            {/* Confirm Password Field (Sign Up Only) */}
-            {activeTab === 'signup' && (
-              <div>
-                <label htmlFor="confirmPassword" className={cn(
-                  "block text-sm font-medium mb-1",
-                  actualTheme === 'dark' ? "text-gray-200" : "text-gray-700"
-                )}>
-                  {t('auth.confirm_password_label', 'Confirm Password')}
-                </label>
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className={cn(
-                    "w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors",
-                    actualTheme === 'dark'
-                      ? "bg-gray-800 border-gray-600 text-white placeholder-gray-400"
-                      : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-                  )}
-                  placeholder={t('auth.confirm_password_placeholder', 'Confirm your password')}
-                />
-              </div>
+        {/* Social/Web3 Login Section */}
+        <div className="space-y-4">
+          {/* Google Sign In */}
+          <button
+            onClick={handleGoogleSignIn}
+            disabled={loading}
+            className={cn(
+              "w-full flex items-center justify-center gap-3 px-4 py-3 border rounded-lg transition-all duration-200 disabled:opacity-50 group",
+              actualTheme === 'dark'
+                ? "border-gray-600 bg-gray-800 hover:bg-gray-700 text-white hover:border-gray-500"
+                : "border-gray-300 bg-white hover:bg-gray-50 text-gray-900 hover:border-gray-400 shadow-sm"
             )}
+          >
+            {loading ? (
+              <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
+            ) : (
+              <Chrome className="w-5 h-5 text-blue-500 group-hover:scale-110 transition-transform" />
+            )}
+            <span className="text-sm font-medium">
+              {t('auth.google_signin', 'Continue with Google')}
+            </span>
+          </button>
+
+          {/* Wallet Connection */}
+          <WalletConnect 
+            onSuccess={handleWalletSuccess}
+            onError={handleWalletError}
+          />
+        </div>
+
+        {/* Divider */}
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <span className={cn(
+              "w-full border-t",
+              actualTheme === 'dark' ? "border-gray-600" : "border-gray-300"
+            )} />
           </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className={cn(
+              "px-2",
+              actualTheme === 'dark' 
+                ? "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-400"
+                : "bg-gradient-to-br from-blue-50 to-indigo-100 text-gray-500"
+            )}>
+              {t('auth.divider_or', 'Or')}
+            </span>
+          </div>
+        </div>
+
+        {/* Email/Password Form */}
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          {/* Email Field */}
+          <div>
+            <label htmlFor="email" className={cn(
+              "block text-sm font-medium mb-1",
+              actualTheme === 'dark' ? "text-gray-200" : "text-gray-700"
+            )}>
+              {t('auth.email_label', 'Email Address')}
+            </label>
+            <div className="relative">
+              <Mail className={cn(
+                "absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5",
+                actualTheme === 'dark' ? "text-gray-400" : "text-gray-400"
+              )} />
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={cn(
+                  "pl-10 w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors",
+                  actualTheme === 'dark'
+                    ? "bg-gray-800 border-gray-600 text-white placeholder-gray-400"
+                    : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
+                )}
+                placeholder={t('auth.email_placeholder', 'Enter your email')}
+              />
+            </div>
+          </div>
+          
+          {/* Password Field */}
+          <div>
+            <label htmlFor="password" className={cn(
+              "block text-sm font-medium mb-1",
+              actualTheme === 'dark' ? "text-gray-200" : "text-gray-700"
+            )}>
+              {t('auth.password_label', 'Password')}
+            </label>
+            <div className="relative">
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete={activeTab === 'signin' ? 'current-password' : 'new-password'}
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className={cn(
+                  "w-full px-3 py-3 pr-10 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors",
+                  actualTheme === 'dark'
+                    ? "bg-gray-800 border-gray-600 text-white placeholder-gray-400"
+                    : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
+                )}
+                placeholder={t('auth.password_placeholder', 'Enter your password')}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className={cn(
+                  "absolute right-3 top-1/2 transform -translate-y-1/2 transition-colors",
+                  actualTheme === 'dark' 
+                    ? "text-gray-400 hover:text-gray-200" 
+                    : "text-gray-400 hover:text-gray-600"
+                )}
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
+          </div>
+          
+          {/* Confirm Password Field (Sign Up Only) */}
+          {activeTab === 'signup' && (
+            <div>
+              <label htmlFor="confirmPassword" className={cn(
+                "block text-sm font-medium mb-1",
+                actualTheme === 'dark' ? "text-gray-200" : "text-gray-700"
+              )}>
+                {t('auth.confirm_password_label', 'Confirm Password')}
+              </label>
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                autoComplete="new-password"
+                required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className={cn(
+                  "w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors",
+                  actualTheme === 'dark'
+                    ? "bg-gray-800 border-gray-600 text-white placeholder-gray-400"
+                    : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
+                )}
+                placeholder={t('auth.confirm_password_placeholder', 'Confirm your password')}
+              />
+            </div>
+          )}
 
           {/* Error Message */}
           {error && (
@@ -320,80 +388,23 @@ const AuthPage: React.FC = () => {
           </button>
         </form>
         
-        {/* Divider */}
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className={cn(
-              "w-full border-t",
-              actualTheme === 'dark' ? "border-gray-600" : "border-gray-300"
-            )} />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className={cn(
-              "px-2",
-              actualTheme === 'dark' 
-                ? "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-400"
-                : "bg-gradient-to-br from-blue-50 to-indigo-100 text-gray-500"
-            )}>
-              {t('auth.divider_text', 'Or continue with')}
-            </span>
-          </div>
-        </div>
-
-        {/* Wallet Connection */}
-        <div className="space-y-3">
-          <button
-            onClick={handleWalletConnect}
-            disabled={walletLoading}
-            className={cn(
-              "w-full flex items-center justify-center gap-3 px-4 py-3 border rounded-lg transition-colors disabled:opacity-50 group",
-              actualTheme === 'dark'
-                ? "border-gray-600 bg-gray-800 hover:bg-gray-700 text-white"
-                : "border-gray-300 bg-white hover:bg-gray-50 text-gray-900"
-            )}
-          >
-            {walletLoading ? (
-              <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
-            ) : (
-              <Wallet className="w-5 h-5 text-blue-500 group-hover:scale-110 transition-transform" />
-            )}
-            <span className="text-sm font-medium">
-              {walletLoading 
-                ? t('auth.wallet_connecting', 'Connecting...')
-                : t('auth.wallet_connect', 'Connect Wallet & Social Login')
-              }
-            </span>
-          </button>
-          
-          {walletError && (
-            <div className={cn(
-              "p-3 rounded-lg border flex items-center space-x-2",
-              actualTheme === 'dark'
-                ? "bg-red-900/20 border-red-800 text-red-400"
-                : "bg-red-50 border-red-200 text-red-600"
-            )}>
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              <p className="text-xs">{walletError}</p>
-            </div>
-          )}
-          
-          <p className={cn(
-            "text-xs text-center",
-            actualTheme === 'dark' ? "text-gray-400" : "text-gray-500"
-          )}>
-            {t('auth.wallet_supported', 'Supports Google, Discord, Telegram, GitHub, Facebook, Apple, MetaMask & more')}
-          </p>
-        </div>
-
-
-        
         {/* Footer */}
-        <div className="text-center text-sm text-gray-600">
+        <div className={cn(
+          "text-center text-sm",
+          actualTheme === 'dark' ? "text-gray-400" : "text-gray-600"
+        )}>
           <p>
-            By {activeTab === 'signin' ? 'signing in' : 'creating an account'}, you agree to our{' '}
-            <a href="#" className="text-blue-600 hover:text-blue-500">Terms of Service</a>
+            {activeTab === 'signin' 
+              ? t('auth.footer_signin', 'By signing in, you agree to our')
+              : t('auth.footer_signup', 'By creating an account, you agree to our')
+            }{' '}
+            <a href="/terms" className="text-blue-600 hover:text-blue-500">
+              {t('auth.terms', 'Terms of Service')}
+            </a>
             {' '}and{' '}
-            <a href="#" className="text-blue-600 hover:text-blue-500">Privacy Policy</a>
+            <a href="/privacy" className="text-blue-600 hover:text-blue-500">
+              {t('auth.privacy', 'Privacy Policy')}
+            </a>
           </p>
         </div>
       </div>
