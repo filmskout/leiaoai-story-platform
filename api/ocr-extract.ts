@@ -1,14 +1,14 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
+import mammoth from 'mammoth';
 
 /**
  * 文本提取API
- * 支持三种模式：
+ * 支持多种模式：
  * 1. URL模式：直接使用imageUrl（用于BMC图片，使用OpenAI Vision）
- * 2. PDF文件路径模式：从Supabase下载PDF并使用GPT-4o提取文本（用于BP PDF）
- * 3. 图片文件路径模式：从Supabase下载图片并OCR（使用OpenAI Vision）
- * 
- * 注意：PDF处理使用GPT-4o的128K上下文窗口直接处理PDF文件
+ * 2. DOCX文件：从Supabase下载并提取文本（使用mammoth）
+ * 3. PDF文件：返回友好错误提示，建议转换为DOCX或文本
+ * 4. 图片文件：从Supabase下载并OCR（使用OpenAI Vision）
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
@@ -83,21 +83,53 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const mimeType = fileData.type || fileType || 'application/pdf';
       
       if (mimeType === 'application/pdf' || filePath.toLowerCase().endsWith('.pdf')) {
-        // PDF文件：转换为Base64，使用GPT-4o提取文本
-        console.log('🔵 PDF detected: Converting to Base64 for GPT-4o');
+        // PDF文件：OpenAI Vision不支持，返回友好提示
+        console.log('⚠️ PDF detected: Vision API does not support PDF');
         
-        const arrayBuffer = await fileData.arrayBuffer();
-        const base64 = Buffer.from(arrayBuffer).toString('base64');
-        const sizeInMB = (base64.length / (1024 * 1024)).toFixed(2);
+        return res.status(400).json({
+          error: 'PDF文件暂不支持自动文本提取',
+          details: '由于技术限制，我们暂时无法直接处理PDF文件。\n\n请选择以下任一方式：\n1. 将PDF转换为Word文档（.docx）后上传\n2. 复制PDF中的文本内容，直接粘贴到文本框中\n3. 使用其他在线工具将PDF转换为文本\n\n我们正在努力添加PDF支持。',
+          suggestion: '建议：使用 .docx 文件或直接粘贴文本'
+        });
+      } else if (mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || filePath.toLowerCase().endsWith('.docx')) {
+        // DOCX文件：使用mammoth提取文本
+        console.log('🔵 DOCX detected: Using mammoth for text extraction');
         
-        console.log('✅ PDF converted to Base64');
-        console.log('   Base64 size:', sizeInMB, 'MB');
-        
-        // GPT-4o可以直接处理PDF
-        imageData = `data:application/pdf;base64,${base64}`;
-        
-        // 注意：我们不在这里返回，而是继续到下面的OpenAI调用
-        // 这样PDF会被当作"image"处理，但GPT-4o可以理解PDF
+        try {
+          const arrayBuffer = await fileData.arrayBuffer();
+          const buffer = Buffer.from(arrayBuffer);
+          
+          console.log('🔵 Extracting text from DOCX...');
+          const result = await mammoth.extractRawText({ buffer });
+          
+          extractedText = result.value.trim();
+          
+          console.log('✅ DOCX text extracted successfully');
+          console.log('   Text length:', extractedText.length);
+          console.log('   Text preview:', extractedText.substring(0, 200));
+          
+          if (!extractedText || extractedText.length === 0) {
+            return res.status(400).json({
+              error: 'DOCX文件为空',
+              details: 'The DOCX file contains no readable text.'
+            });
+          }
+          
+          // 直接返回提取的文本
+          return res.status(200).json({
+            extractedText,
+            text: extractedText,
+            source: 'mammoth',
+            success: true
+          });
+          
+        } catch (docxError: any) {
+          console.error('❌ DOCX extraction failed:', docxError);
+          return res.status(500).json({
+            error: 'DOCX文本提取失败',
+            details: docxError.message || 'Failed to extract text from DOCX'
+          });
+        }
       } else {
         // 图片文件：转换为Base64供OpenAI Vision使用
         console.log('🔵 Image detected: Converting to Base64 for OpenAI Vision');
