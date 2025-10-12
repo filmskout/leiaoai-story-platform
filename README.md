@@ -1,267 +1,237 @@
-# LeiaoAI Story Platform - Restored
+# LeiaoAI - AI-Powered Story & Investment Platform
 
-A comprehensive AI-powered investment consulting platform with multilingual support and advanced AI chat capabilities.
+> 🚀 A comprehensive platform combining AI-driven social storytelling with professional investment consulting services.
 
-## Features Restored
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-✅ **Complete Multilingual Support (13 Languages)**
-- Chinese (Simplified & Traditional)
-- English, Japanese, Korean
-- French, German, Spanish, Portuguese, Italian
-- Russian, Arabic, Hindi
+**Live Site**: [leiao.ai](https://leiao.ai)
+
+---
+
+## ✨ Key Features
+
+### 🤖 Multi-AI Chat System
+- **3 LLM Models**: OpenAI GPT-4o, Qwen Turbo, DeepSeek
+- **Smart Model Selection**: Geo-location based recommendations
+- **Response Time Tracking**: Real-time performance monitoring
+- **Rich Markdown**: Code highlighting, math formulas (KaTeX)
+
+### 🔐 Multi-Authentication
+- Email/Password
+- Google OAuth
+- Ethereum Wallet (MetaMask)
+- Solana Wallet (Phantom)
+
+### 📖 Social Storytelling
+- AI-powered story generation
+- Community interactions (like, save, comment, share)
+- Public/Private user profiles
+- Story tagging system
+
+### 💼 Professional Services
+- **12 Expertise Areas**: CVC, M&A, IPO (A/HK/US), etc.
+- Business Plan analysis with AI insights
+- BMC (Business Model Canvas) generator
+- Document OCR and analysis
+
+### 🌐 Internationalization
+- 13 languages supported
 - RTL support for Arabic
-- Dynamic language switching with persistence
+- Dynamic language switching
 
-✅ **Advanced AI Chat System**
-- 3 LLM Models: DeepSeek, OpenAI, Qwen
-- Intelligent geo-location based model selection
-- Performance tracking and optimization
-- Complete markdown rendering with syntax highlighting
-- Code blocks with copy functionality
-- Mathematical formula support (KaTeX)
+---
 
-✅ **Professional Services Integration**
-- 12 Expertise Areas: CVC Investment, M&A, IPO (A/HK/US), SPAC, etc.
-- Interactive carousel with touch/swipe navigation
-- Direct AI chat integration with pre-filled questions
-- Mobile-optimized responsive design
-
-✅ **Enhanced UI/UX**
-- Fixed dark/light theme logo switching
-- Professional investment platform aesthetics
-- Smooth theme transitions (light/dark/auto)
-- Mobile responsive design
-- Error boundaries and fallback systems
-
-## Quick Start
+## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+ 
-- pnpm (recommended) or npm
-- Supabase project setup
+- Node.js 18+ and npm
+- Supabase account
+- At least one AI API key (OpenAI, DeepSeek, or Qwen)
 
 ### Installation
 
 ```bash
-# Clone the repository
+# Clone and install
 git clone <repository-url>
 cd leiaoai-story-platform
+npm install
 
-# Install dependencies
-pnpm install
-
-# Copy environment variables
+# Configure environment
 cp .env.example .env.local
+# Edit .env.local with your credentials
 
-Security notes:
-- Vite 会在构建时将 `VITE_*` 前缀变量注入到客户端，请勿在其中放置生产密钥。
-- 生产环境下请通过受保护的后端代理获取临时令牌，不要在浏览器暴露真实密钥。
-- `src/lib/apiConfig.ts` 中的 `getAPIKey` 将优先使用 `window.__API_KEY__`，其次使用 `import.meta.env.VITE_DEEPSEEK_API_KEY`；若均未配置会返回空字符串，请在调用处提示配置或走后端代理。
-
-# Configure your environment variables in .env.local
-# See Environment Configuration section below
-
-# Start development server
-pnpm dev
+# Start development
+npm run dev
 ```
 
-更多部署细节请参考文档：
-- `docs/vercel-setup.md` - Vercel部署指南
-- `docs/API-KEYS-SETUP.md` - API Keys配置和测试指南
-
-## Environment Configuration
-
-Create a `.env.local` file with the following variables:
+### Environment Variables
 
 ```env
-# Supabase Configuration (Required)
-VITE_SUPABASE_URL=https://fwjerftzoosqmijmnkyb.supabase.co
+# Required
+VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 
-# AI Model APIs (At least one required)
-VITE_OPENAI_API_KEY=your_openai_api_key
-VITE_DEEPSEEK_API_KEY=your_deepseek_api_key  
-VITE_QWEN_API_KEY=your_qwen_api_key
+# At least one AI API (required for chat)
+VITE_OPENAI_API_KEY=your_openai_key
+VITE_DEEPSEEK_API_KEY=your_deepseek_key
+VITE_QWEN_API_KEY=your_qwen_key
 
 # Optional
-VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
-VITE_APP_URL=https://your-app-url.vercel.app
+CLOUDCONVERT_API_KEY=your_cloudconvert_key  # For PDF conversion
 ```
-
-## Deployment to Vercel
-
-### Method 1: GitHub Integration (Recommended)
-
-1. **Push to GitHub**:
-   ```bash
-   git add .
-   git commit -m "Initial commit - LeiaoAI Platform Restored"
-   git push origin main
-   ```
-
-2. **Connect to Vercel**:
-   - Go to [Vercel Dashboard](https://vercel.com/dashboard)
-   - Click "New Project"
-   - Import your GitHub repository
-   - Configure the following settings:
-
-3. **Vercel Configuration**:
-   - **Framework Preset**: Vite
-   - **Build Command**: `pnpm build` or `npm run build`
-   - **Output Directory**: `dist`
-   - **Install Command**: `pnpm install` or `npm install`
-
-4. **Environment Variables in Vercel**:
-   Go to Project Settings > Environment Variables and add:
-   ```
-   VITE_SUPABASE_URL=https://fwjerftzoosqmijmnkyb.supabase.co
-   VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-   VITE_OPENAI_API_KEY=sk-...
-   VITE_DEEPSEEK_API_KEY=...
-   VITE_QWEN_API_KEY=...
-   VITE_GOOGLE_MAPS_API_KEY=AIzaSyCO0kKndUNlmQi3B5mxy4dblg_8WYcuKuk
-   ```
-
-### Method 2: Vercel CLI
-
-1. **Install Vercel CLI**:
-   ```bash
-   npm i -g vercel
-   ```
-
-2. **Login and Deploy**:
-   ```bash
-   vercel login
-   vercel --prod
-   ```
-
-3. **Configure Environment Variables**:
-   ```bash
-   vercel env add VITE_SUPABASE_URL
-   vercel env add VITE_SUPABASE_ANON_KEY
-   # Add other environment variables...
-   ```
-
-## Build and Scripts
-
-```bash
-# Development
-pnpm dev          # Start development server
-pnpm build        # Build for production
-pnpm preview      # Preview production build
-pnpm lint         # Run ESLint
-
-# Type checking
-pnpm type-check   # Run TypeScript compiler check
-```
-
-## Tech Stack
-
-- **Frontend**: React 18 + TypeScript
-- **Build Tool**: Vite
-- **Styling**: TailwindCSS
-- **UI Components**: Radix UI + Custom components
-- **Routing**: React Router v6
-- **State Management**: React Context API
-- **Internationalization**: i18next
-- **Animations**: Framer Motion
-- **Markdown**: ReactMarkdown + Syntax Highlighting
-- **Backend**: Supabase (Database, Auth, Edge Functions)
-
-## Project Structure
-
-```
-src/
-├── components/          # Reusable UI components
-│   ├── ai/             # AI chat related components
-│   ├── professional/   # Professional services components
-│   └── ui/             # Base UI components
-├── contexts/           # React contexts (Theme, Language, AI, Auth)
-├── hooks/              # Custom React hooks
-├── i18n/               # Internationalization configuration
-├── lib/                # Utility libraries and configurations
-├── pages/              # Page components
-├── services/           # API services and integrations
-├── styles/             # Global styles and theme definitions
-└── utils/              # Helper functions
-
-public/
-├── locales/            # Translation files (13 languages)
-├── images/             # Static images and assets
-└── ...                 # Other static assets
-
-supabase/
-├── functions/          # Edge functions
-├── migrations/         # Database migrations
-└── types.ts           # Generated TypeScript types
-```
-
-## Features
-
-### 🌐 Multilingual Support
-- 13 languages with complete translations
-- RTL support for Arabic
-- Dynamic language switching
-- Language-based AI model recommendations
-
-### 🤖 AI Chat System
-- Multiple LLM integration (DeepSeek, OpenAI, Qwen)
-- Intelligent model selection based on geography
-- Performance tracking and optimization
-- Rich markdown rendering with syntax highlighting
-- Professional question bank
-
-### 💼 Professional Services
-- 12 specialized investment expertise areas
-- Interactive carousel interface
-- Direct AI consultation integration
-- Mobile-optimized design
-
-### 🎨 UI/UX
-- Dark/Light/Auto theme support
-- Professional investment platform design
-- Mobile-first responsive design
-- Smooth animations and transitions
-- Accessibility features
-
-## Environment Variables Reference
-
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `VITE_SUPABASE_URL` | Supabase project URL | Yes |
-| `VITE_SUPABASE_ANON_KEY` | Supabase anonymous key | Yes |
-| `VITE_OPENAI_API_KEY` | OpenAI API key | Optional* |
-| `VITE_DEEPSEEK_API_KEY` | DeepSeek API key | Optional* |
-| `VITE_QWEN_API_KEY` | Qwen API key | Optional* |
-| `VITE_GOOGLE_MAPS_API_KEY` | Google Maps API key | Optional |
-| `VITE_APP_URL` | Application URL | Optional |
-
-*At least one AI model API key is required for chat functionality.
-
-## 📚 Documentation
-
-- [Vercel Deployment Guide](docs/vercel-setup.md)
-- [AI Chat Testing Guide](docs/AI-CHAT-TESTING.md)
-- [Admin Account Setup](docs/ADMIN-SETUP.md)
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## License
-
-MIT License - see LICENSE file for details
-
-## Support
-
-For issues and questions, please check the documentation or create an issue in the repository.
 
 ---
 
-**Status**: ✅ Fully Restored and Production Ready  
-**Last Updated**: October 10, 2025  
-**Version**: 2.0.0 (Restored)
+## 📦 Deployment
+
+### Deploy to Vercel
+
+1. Connect your GitHub repository to Vercel
+2. Configure build settings:
+   - Framework: **Vite**
+   - Build Command: `npm run build`
+   - Output Directory: `dist`
+3. Add environment variables in Vercel dashboard
+4. Deploy!
+
+### Database Setup
+
+Run these SQL scripts in Supabase SQL Editor:
+
+```bash
+# 1. Chat Sessions (required for AI Chat)
+docs/setup/chat-sessions-setup.sql
+
+# 2. Wallet Authentication (required for Web3 login)
+docs/setup/wallet-auth-setup.sql
+
+# 3. RLS Policies (required for data security)
+docs/setup/rls-policies-setup.sql
+```
+
+### Verification
+
+Run the verification script to ensure everything is configured:
+
+```sql
+-- In Supabase SQL Editor
+-- Copy and run: VERIFY-ALL-FEATURES.sql
+```
+
+---
+
+## 🏗️ Tech Stack
+
+- **Frontend**: React 18 + TypeScript + Vite
+- **Styling**: TailwindCSS + Radix UI
+- **Backend**: Supabase (PostgreSQL, Auth, Storage)
+- **AI**: OpenAI, DeepSeek, Qwen APIs
+- **Blockchain**: Web3.js (MetaMask, Phantom)
+- **i18n**: i18next (13 languages)
+- **Animations**: Framer Motion
+
+---
+
+## 📚 Documentation
+
+### Setup Guides
+- [Domain Configuration](docs/setup/domain-configuration.md)
+- [Wallet Authentication](docs/setup/wallet-auth-setup.md)
+- [Chat Sessions](docs/setup/chat-sessions-setup.md)
+- [Supabase Keys](docs/setup/supabase-keys.md)
+
+### User Guides
+- [Authentication System](docs/guides/authentication.md)
+- [Chat Sessions](docs/guides/chat-sessions.md)
+- [BP Analysis](docs/guides/bp-analysis.md)
+
+### Project Info
+- [Project Status](docs/PROJECT-STATUS.md) - Current progress (40%)
+- [Documentation Structure](docs/DOCUMENTATION-STRUCTURE.md)
+
+---
+
+## 📁 Project Structure
+
+```
+leiaoai-story-platform/
+├── src/
+│   ├── components/      # React components
+│   ├── contexts/        # Global state (Auth, Theme, AI)
+│   ├── hooks/           # Custom hooks
+│   ├── pages/           # Page components
+│   └── lib/             # Utilities & configs
+├── api/                 # Vercel Serverless Functions
+├── docs/                # Documentation
+│   ├── setup/          # Setup guides
+│   ├── guides/         # Usage guides
+│   └── archive/        # Archived docs
+├── public/
+│   └── locales/        # Translation files
+└── VERIFY-ALL-FEATURES.sql  # Database verification
+```
+
+---
+
+## 🛠️ Available Scripts
+
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run preview      # Preview production build
+npm run lint         # Run ESLint
+```
+
+---
+
+## 🔒 Security Notes
+
+- ⚠️ Never commit `.env.local` or API keys
+- 🔐 Use environment variables in Vercel for production
+- 🛡️ RLS policies protect all database tables
+- 🔑 Web3 wallets use signature verification
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📧 Contact
+
+- **Website**: [leiao.ai](https://leiao.ai)
+- **Email**: support@leiao.ai
+- **Offices**: Shenzhen, Hong Kong, San Jose
+
+---
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) file for details
+
+---
+
+## 🎯 Roadmap
+
+- [x] Multi-authentication (Email, Google, Web3)
+- [x] AI Chat with 3 LLM models
+- [x] BP Analysis with OCR
+- [x] BMC Generator
+- [ ] About/Privacy/Terms pages (In Progress)
+- [ ] Enhanced BP multi-source analysis
+- [ ] Mobile app (React Native)
+
+---
+
+**Status**: 🚧 Active Development  
+**Version**: 2.0.0  
+**Last Updated**: January 2025
+
+Made with ❤️ by LeiaoAI Team
