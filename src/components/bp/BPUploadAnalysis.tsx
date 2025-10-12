@@ -292,7 +292,18 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
         console.log('🔵 BP OCR: API response status:', response.status);
 
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+          // 先获取原始响应文本，以便调试
+          const responseText = await response.text();
+          console.error('🔴 BP OCR: Raw response:', responseText);
+          
+          let errorData: any = { error: 'Unknown error' };
+          try {
+            errorData = JSON.parse(responseText);
+          } catch (e) {
+            console.error('🔴 BP OCR: Failed to parse error response as JSON');
+            errorData = { error: 'Server error', details: responseText.substring(0, 200) };
+          }
+          
           console.error('🔴 BP OCR: API error', { 
             status: response.status, 
             error: errorData,
