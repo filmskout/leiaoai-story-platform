@@ -83,14 +83,72 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const mimeType = fileData.type || fileType || 'application/pdf';
       
       if (mimeType === 'application/pdf' || filePath.toLowerCase().endsWith('.pdf')) {
-        // PDF文件：OpenAI Vision不支持，返回友好提示
-        console.log('⚠️ PDF detected: Vision API does not support PDF');
+        // PDF文件：尝试使用pdf-to-docx转换服务
+        console.log('🔵 PDF detected: Attempting auto-conversion to DOCX...');
         
-        return res.status(400).json({
-          error: 'PDF文件暂不支持自动文本提取',
-          details: '由于技术限制，我们暂时无法直接处理PDF文件。\n\n请选择以下任一方式：\n1. 将PDF转换为Word文档（.docx）后上传\n2. 复制PDF中的文本内容，直接粘贴到文本框中\n3. 使用其他在线工具将PDF转换为文本\n\n我们正在努力添加PDF支持。',
-          suggestion: '建议：使用 .docx 文件或直接粘贴文本'
-        });
+        try {
+          // 调用PDF转DOCX服务
+          const conversionResponse = await fetch(`${req.headers.origin || 'https://leiaoai-story-platform.vercel.app'}/api/pdf-to-docx`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filePath })
+          });
+
+          if (conversionResponse.ok) {
+            const conversionData = await conversionResponse.json();
+            console.log('✅ PDF converted to DOCX, downloading...');
+
+            // 下载转换后的DOCX
+            const docxResponse = await fetch(conversionData.docxUrl);
+            const docxBlob = await docxResponse.arrayBuffer();
+            const docxBuffer = Buffer.from(docxBlob);
+
+            // 使用mammoth提取文本
+            console.log('🔵 Extracting text from converted DOCX...');
+            const result = await mammoth.extractRawText({ buffer: docxBuffer });
+            extractedText = result.value.trim();
+
+            console.log('✅ Text extracted from converted DOCX');
+            console.log('   Text length:', extractedText.length);
+
+            if (!extractedText || extractedText.length === 0) {
+              throw new Error('Converted DOCX contains no text');
+            }
+
+            return res.status(200).json({
+              extractedText,
+              text: extractedText,
+              source: 'pdf-to-docx-auto-conversion',
+              success: true,
+              message: 'PDF已自动转换为DOCX并提取文本'
+            });
+          } else {
+            // 转换服务不可用，返回友好提示
+            const errorData = await conversionResponse.json().catch(() => ({}));
+            
+            if (errorData.configured === false) {
+              console.log('⚠️ PDF conversion service not configured');
+              return res.status(400).json({
+                error: 'PDF文件需要转换',
+                details: '自动PDF转换服务未配置。\n\n请选择以下任一方式：\n1. 将PDF转换为Word文档（.docx）后上传\n2. 复制PDF中的文本内容，直接粘贴\n\n在线转换工具: https://www.ilovepdf.com/pdf_to_word',
+                suggestion: '建议：使用 .docx 文件或在线转换工具',
+                canAutoConvert: false
+              });
+            }
+
+            throw new Error(`Conversion failed: ${errorData.error || 'Unknown error'}`);
+          }
+        } catch (conversionError: any) {
+          console.error('❌ PDF conversion failed:', conversionError.message);
+          
+          // 返回友好的错误提示
+          return res.status(400).json({
+            error: 'PDF自动转换失败',
+            details: `无法自动转换PDF文件。\n\n请手动操作：\n1. 将PDF转换为Word文档（.docx）后上传\n2. 或使用在线工具: https://www.ilovepdf.com/pdf_to_word\n3. 或复制PDF中的文本内容直接粘贴\n\n错误详情: ${conversionError.message}`,
+            suggestion: '建议：手动转换为 .docx 文件',
+            canAutoConvert: false
+          });
+        }
       } else if (mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || filePath.toLowerCase().endsWith('.docx')) {
         // DOCX文件：使用mammoth提取文本
         console.log('🔵 DOCX detected: Using mammoth for text extraction');
