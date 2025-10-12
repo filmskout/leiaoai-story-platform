@@ -30,6 +30,8 @@ export interface UserProfile {
   bio: string | null;
   location: string | null;
   website: string | null;
+  wallet_address: string | null;
+  wallet_type: 'ethereum' | 'solana' | null;
   social_links: Record<string, any> | null;
   preferences: Record<string, any> | null;
   is_verified: boolean;
@@ -170,6 +172,91 @@ class AuthService {
       return { data, error: null };
     } catch (error: any) {
       console.error('Sign up failed:', error);
+      return { data: null, error };
+    }
+  }
+
+  // Sign in with Google OAuth
+  public async signInWithGoogle() {
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      return { data, error: null };
+    } catch (error: any) {
+      console.error('Google sign in failed:', error);
+      return { data: null, error };
+    }
+  }
+
+  // Sign in with Web3 wallet
+  public async signInWithWallet(walletAddress: string, walletType: 'ethereum' | 'solana', signature: string) {
+    try {
+      // Verify the signature (simplified - in production, verify on server)
+      const message = `Sign in to LeiaoAI with ${walletType} wallet: ${walletAddress}`;
+      
+      // Create or login with wallet address as email
+      const email = `${walletAddress.toLowerCase()}@wallet.leiaoai.local`;
+      const password = signature; // Use signature as password
+      
+      // Try to sign in first
+      let { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      // If user doesn't exist, create account
+      if (error && error.message.includes('Invalid login credentials')) {
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              wallet_address: walletAddress,
+              wallet_type: walletType,
+              auth_method: 'wallet',
+            },
+          },
+        });
+
+        if (signUpError) {
+          throw signUpError;
+        }
+
+        data = signUpData;
+        error = null;
+      } else if (error) {
+        throw error;
+      }
+
+      if (data?.user) {
+        await this.ensureProfileExists(data.user);
+        
+        // Update profile with wallet info
+        await supabase
+          .from('user_profiles')
+          .update({
+            wallet_address: walletAddress,
+            wallet_type: walletType,
+          })
+          .eq('user_id', data.user.id);
+      }
+
+      return { data, error: null };
+    } catch (error: any) {
+      console.error('Wallet sign in failed:', error);
       return { data: null, error };
     }
   }

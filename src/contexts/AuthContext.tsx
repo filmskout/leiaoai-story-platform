@@ -11,6 +11,8 @@ interface AuthContextType {
   isAuthenticated: boolean;
   signIn: (email: string, password: string) => Promise<{ error?: any }>;
   signUp: (email: string, password: string, metadata?: Record<string, any>) => Promise<{ error?: any }>;
+  signInWithGoogle: () => Promise<{ error?: any }>;
+  signInWithWallet: (walletAddress: string, walletType: 'ethereum' | 'solana', signature: string) => Promise<{ error?: any }>;
   signOut: () => Promise<void>;
   updateProfile: (updates: Partial<UserProfile>) => Promise<{ error?: any }>;
   refreshProfile: () => Promise<void>;
@@ -127,6 +129,52 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  // Sign in with Google
+  const signInWithGoogle = async () => {
+    try {
+      setLoading(true);
+      const { error } = await authService.signInWithGoogle();
+      
+      if (error) {
+        toast.error(error.message || 'Google login failed');
+        return { error };
+      }
+      
+      // Success toast will be shown after redirect
+      return { error: null };
+    } catch (error: any) {
+      toast.error(error.message || 'Google login failed');
+      return { error };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Sign in with Web3 wallet
+  const signInWithWallet = async (walletAddress: string, walletType: 'ethereum' | 'solana', signature: string) => {
+    try {
+      setLoading(true);
+      const { data, error } = await authService.signInWithWallet(walletAddress, walletType, signature);
+      
+      if (error) {
+        toast.error(error.message || 'Wallet login failed');
+        return { error };
+      }
+      
+      if (data?.user) {
+        toast.success('Successfully logged in with wallet!');
+        return { error: null };
+      }
+      
+      return { error: new Error('Wallet login failed') };
+    } catch (error: any) {
+      toast.error(error.message || 'Wallet login failed');
+      return { error };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Sign out function
   const signOut = async () => {
     try {
@@ -201,6 +249,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     isAuthenticated: !!user,
     signIn,
     signUp,
+    signInWithGoogle,
+    signInWithWallet,
     signOut,
     updateProfile,
     refreshProfile
