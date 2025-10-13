@@ -59,7 +59,7 @@ const About: React.FC = () => {
                 ? 'Shenzhen Leiao Artificial Intelligence Operations Limited' 
                 : '深圳市蕾奥人工智能运营有限公司'
               }
-            </div>
+            </p>
           </div>
         </div>
       </div>
