@@ -292,11 +292,13 @@ export default function Home() {
         )}
       >
         <div className="container-custom">
-          {/* 标题与操作区：左侧标题，右侧 Create Story */}
-          <div className={cn("max-w-6xl mx-auto flex items-center justify-between mb-4")}> 
+          {/* 标题与操作区：左侧标题，右侧 Create Story（与上方“专业服务领域”对齐） */}
+          <div className={cn("max-w-6xl mx-auto flex items-center justify-between mb-3")}> 
             <div>
               <h2 className={cn(isMobile ? "text-xl" : "text-2xl", "font-bold text-foreground")}>{t('stories.latest', 'Latest Stories')}</h2>
-              <p className="text-foreground-muted text-sm">Discover the latest insights and experiences from our community.</p>
+              <p className="text-foreground-muted text-sm">
+                {t('stories.latest_subtitle', 'Discover the latest insights and experiences from our community.')}
+              </p>
             </div>
             <div>
               <Link to={user ? "/create-story" : "/auth"}>
