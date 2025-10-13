@@ -6,6 +6,8 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import enTranslation from '../locales/en.json';
 import zhCNTranslation from '../locales/zh-CN.json';
 import zhHKTranslation from '../locales/zh-HK.json';
+import jaJPTranslation from '../locales/ja-JP.json';
+import koKRTranslation from '../locales/ko-KR.json';
 
 // Create resources object with proper structure
 const resources = {
@@ -13,8 +15,8 @@ const resources = {
   'en': { translation: enTranslation },
   'zh-CN': { translation: zhCNTranslation },
   'zh-HK': { translation: zhHKTranslation },
-  'ja-JP': { translation: enTranslation }, // Fallback to English
-  'ko-KR': { translation: enTranslation }, // Fallback to English
+  'ja-JP': { translation: jaJPTranslation },
+  'ko-KR': { translation: koKRTranslation },
   'fr-FR': { translation: enTranslation }, // Fallback to English
   'de-DE': { translation: enTranslation }, // Fallback to English
   'es-ES': { translation: enTranslation }, // Fallback to English
@@ -32,6 +34,8 @@ i18n
     resources,
     lng: 'en-US', // Default language
     fallbackLng: {
+      'zh-HK': ['zh-HK'],
+      'zh-CN': ['zh-CN'],
       'zh': ['zh-CN'],
       'default': ['en-US']
     },

@@ -1,92 +1,74 @@
 {
   "app_name": "LeiaoAI",
-  "loading": "読み込み中...",
-  "error": "エラー",
-  "cancel": "キャンセル",
-  "confirm": "確認",
-  "save": "保存",
-  "delete": "削除",
-  "edit": "編集",
-  "submit": "送信",
-  "back": "戻る",
-  "next": "次へ",
-  "previous": "前へ",
-  "search": "検索",
-  "filter": "フィルター",
-  "sort": "並び替え",
-  "refresh": "更新",
-  "upload": "アップロード",
-  "download": "ダウンロード",
-  "view": "表示",
-  "share": "共有",
-  "like": "いいね",
-  "comment": "コメント",
-  "follow": "フォロー",
-  "unfollow": "フォロー解除",
-  "login": "ログイン",
-  "logout": "ログアウト",
-  "register": "登録",
-  "profile": "プロフィール",
-  "help": "ヘルプ",
-  "about": "について",
-  "contact": "お問い合わせ",
-  "privacy": "プライバシーポリシー",
-  "terms": "利用規約",
-  "success": "成功",
-  
-  "app_description": "プロフェッショナルAI投資プラットフォーム",
-  "footer": {
-    "developed_by": "LeiaoAI Agentによって開発"
-  },
+  "app_description": "Professional AI Investment Platform",
   
   "nav": {
     "home": "ホーム",
+    "about": "について",
+    "contact": "お問い合わせ",
+    "privacy": "プライバシー",
+    "terms": "利用規約",
     "ai_chat": "AIチャット",
     "stories": "ストーリー",
     "questions": "質問",
     "bp_analysis": "BP分析",
     "profile": "プロフィール",
-    "settings": "設定"
+    "settings": "設定",
+    "dashboard": "ダッシュボード"
   },
-  
-  "home": {
-    "hero": {
-      "title_1": "プロフェッショナル",
-      "title_2": "AI投資",
-      "title_3": "プラットフォーム",
-      "description": "先進的なAI技術に基づいて、プロフェッショナルな投資分析、ビジネスプラン評価、インテリジェント意思決定サポートを提供",
-      "mobile_description": "スマートなビジネス意思決定のためのAIインテリジェント投資分析"
-    },
-    "cta": {
-      "title": "プロフェッショナルAI投資コンサルティング体験を開始",
-      "subtitle": "ビジネスプランをアップロードしてAI分析を受けるか、投資・資金調達の問題について直接相談してください",
-      "mobile_title": "AI投資コンサルティングを開始",
-      "mobile_subtitle": "BP分析をアップロードまたは直接相談",
-      "upload_bp": "BP分析をアップロード",
-      "ai_chat": "AI Q&Aコンサルティング"
-    },
-    "stats": {
-      "total_users": "プラットフォームユーザー",
-      "total_qa": "Q&Aセッション",
-      "bp_analysis": "BP分析",
-      "avg_response": "平均応答"
-    }
+
+  "auth": {
+    "sign_in": "サインイン",
+    "sign_out": "サインアウト",
+    "sign_up": "サインアップ",
+    "email": "メール",
+    "password": "パスワード",
+    "confirm_password": "パスワード確認",
+    "forgot_password": "パスワードを忘れた場合",
+    "remember_me": "ログイン状態を保持",
+    "or_continue_with": "または以下で続行",
+    "already_have_account": "アカウントをお持ちの場合",
+    "dont_have_account": "アカウントをお持ちでない場合",
+    "create_account": "アカウント作成",
+    "back_to_home": "ホームに戻る",
+    "welcome": "LeiaoAIへようこそ",
+    "signin_subtitle": "アカウントにサインイン",
+    "signup_subtitle": "新しいアカウントを作成",
+    "signin": "サインイン",
+    "signup": "サインアップ",
+    "email_label": "メールアドレス",
+    "email_placeholder": "メールアドレスを入力",
+    "password_label": "パスワード",
+    "password_placeholder": "パスワードを入力",
+    "confirm_password_label": "パスワード確認",
+    "confirm_password_placeholder": "パスワードを確認",
+    "processing": "処理中...",
+    "signin_button": "サインイン",
+    "signup_button": "アカウント作成",
+    "divider_or": "または以下で続行",
+    "google_signin": "Googleで続行",
+    "footer_signin": "サインインすることで、以下に同意したことになります",
+    "footer_signup": "アカウント作成することで、以下に同意したことになります",
+    "terms": "利用規約",
+    "privacy": "プライバシーポリシー"
   },
-  
-  "professional_services": {
-    "title": "プロフェッショナルサービス分野",
-    "subtitle": "分野カードをクリックしてプロフェッショナルな投資アドバイスを受けてください",
-    "refresh_suggestions": "提案を更新",
-    "suggested_questions": "おすすめの質問",
-    "click_for_advice": "プロフェッショナルなアドバイスを受けるにはクリック",
-    "bottom_description": "毎回3つのランダムな提案質問を表示します。新しいコンサルティング方向について「提案を更新」をクリックしてください",
-    "enter_full_chat": "完全なAIチャットに入る"
+
+  "user": {
+    "avatar": "ユーザーアバター"
   },
-  
+
+  "search": "検索",
+
   "ai_chat": {
-    "title": "AI投資エキスパート",
-    "subtitle": "あなたのビジネス決定を強化するプロフェッショナルな投資コンサルティングサービス",
-    "placeholder": "投資関連の質問を入力してください...",
+    "title": "AI投資専門家",
+    "subtitle": "プロフェッショナルな投資コンサルティングサービスで、ビジネス判断をサポート",
+    "page_title": "AI投資専門家",
+    "page_subtitle": "プロフェッショナルな投資コンサルティングサービスで、ビジネス判断をサポート",
+    "mobile_page_title": "AI専門家",
+    "mobile_page_subtitle": "プロフェッショナルな投資コンサルティング",
+    "placeholder": "投資に関する質問を入力してください...",
+    "answer_placeholder": "AIがプロフェッショナルな投資分析と推奨事項をここに提供します...",
+    "direct_input_hint": "以下に直接投資に関する質問を入力できます",
     "send": "送信",
     "voice_input": "音声入力",
     "stop_recording": "録音停止",
@@ -97,108 +79,46 @@
     "model_recommended": "推奨",
     "model_china_optimized": "中国最適化",
     "model_overseas_optimized": "海外最適化",
-    "model_responses": {
-      "deepseek": "現在の経済トレンドに基づいて、ESG投資、人工知能、グリーンエネルギーに焦点を当てることをお勧めします。新興市場については、十分な流動性を持つ多様化された投資戦略を検討してください。",
-      "openai": "投資方向を検討する際は、デジタル変革、野生動物の大規模モデル、プロセス自動化に焦点を当ててください。これらの分野は今後5年間で急速な成長の準備ができており、潜在的なユニコーン企業がすでに出現しています。",
-      "qwen": "現在の投資環境については、「階層配分」戦略をお勧めします - 低ボラティリティ高利回り商品のベース層、AI、バイオテクノロジー、クリーンエネルギーの革新的企業に焦点を当てた機会層、および防御的現金準備。",
-      "default": "現在の市場分析に基づいて、投資戦略は多様化されるべきであり、従来資産と新興資産のバランスの取れた配分が必要です。ESG投資、AI、グリーンエネルギーに焦点を当てることをお勧めします。特定の業界についてより詳細な投資アドバイスを提供できます。"
-    },
-    "sample_questions": {
-      "q1": "2025年の中国STAR市場上場企業の評価トレンドは何ですか？",
-      "q2": "スタートアップはシリーズA資金調達戦略をどのように最適化できますか？",
-      "q3": "米国と中国のVC投資環境の違いは何ですか？"
-    },
-    "expertise_areas": {
-      "cvc_investment": "CVC産業投資",
-      "ma_restructuring": "M&Aリストラクチャリング",
-      "ipo_a_share": "IPO上場（A株）",
-      "ipo_hk_share": "IPO上場（HK株）",
-      "ipo_us_share": "IPO上場（US株）",
-      "spac_listing": "SPACシェル上場",
-      "macro_analysis": "マクロ経済分析",
-      "investment_environment": "投資環境",
-      "valuation_adjustment": "評価調整契約",
-      "exit_strategy": "退出戦略計画",
-      "valuation_model": "評価モデル",
-      "due_diligence": "デューデリジェンス"
-    }
+    "download": "ダウンロード",
+    "download_chat": "チャットをMarkdownとしてダウンロード",
+    "download_success": "チャットのダウンロードが成功しました",
+    "download_failed": "チャットのダウンロードに失敗しました",
+    "no_messages_to_save": "保存するメッセージがありません"
   },
-  
-  "bp_analysis": {
-    "title": "ビジネスプラン分析",
-    "subtitle": "ビジネスプランをアップロードしてプロフェッショナルなAI分析レポートを受け取ってください",
-    "upload_bp": "BPをアップロード",
-    "drag_drop": "ファイルをここにドラッグするかクリックしてアップロード",
-    "supported_formats": "PDF、DOCX形式をサポート",
-    "max_size": "最大ファイルサイズ50MB",
-    "analyzing": "分析中...",
-    "analysis_complete": "分析完了",
-    "analysis_report": "分析レポート",
-    "score": "総合スコア",
-    "recommendations": "改善提案",
-    "market_analysis": "市場分析",
-    "business_model": "ビジネスモデル",
-    "team_assessment": "チーム評価",
-    "financial_projection": "財務予測",
-    "risk_assessment": "リスク評価",
-    "investment_value": "投資価値"
+
+  "about": {
+    "title": "LeiaoAIについて",
+    "company_name_en": "Shenzhen Leiao Artificial Intelligence Operations Limited",
+    "company_name_cn": "深圳市蕾奥人工智能运营有限公司",
+    "vision_mission": "ビジョンとミッション",
+    "vision_content": "LeiaoAIは、人工知能、金融、クリエイティブ産業を橋渡しするAI-Opsおよび投資インテリジェンスプラットフォームです。深圳で生まれ、グローバルなマインドセットで構築された私たちのミッションは、AIを独立した技術からスケーラブルな産業力に変えることです。データ、資本、人間の洞察を組み合わせることで、創業者、企業、投資家がイノベーションを分析、評価、運用できるよう支援します。グローバルCEOナビゲータープログラムを通じて、先見性のあるリーダー、投資家、クリエイターを結びつけます。私たちは、将来のAI企業が単に製品を構築するだけでなく、創造性と資本が出会うインテリジェントなエコシステムを設計すると信じています。"
   },
-  
-  "stories": {
-    "title": "ストーリー",
-    "create_story": "ストーリーを共有",
-    "story_title": "ストーリータイトル",
-    "story_content": "ストーリー内容",
-    "category": "カテゴリー",
-    "public": "公開",
-    "private": "非公開",
-    "publish": "公開",
-    "draft": "下書き",
-    "view_count": "表示数",
-    "like_count": "いいね数",
-    "comment_count": "コメント数",
-    "section_title": "ユーザーストーリーとコミュニティ",
-    "section_subtitle": "投資経験を共有し、成功事例から学びましょう",
-    "create_button": "ストーリーを共有",
-    "no_stories": {
-      "title": "まだストーリーがありません",
-      "desc": "このカテゴリーにはまだユーザーストーリーが共有されていません"
-    },
-    "be_first_share": "最初に共有する人になりましょう",
-    "categories": {
-      "all": "すべて",
-      "ai_tools": "AIツール体験",
-      "startup_interview": "スタートアップインタビュー",
-      "investment_outlook": "投資展望",
-      "finance_ai": "金融AI応用",
-      "video_generation": "ビデオ生成体験",
-      "domestic_ai": "国内AIツール",
-      "overseas_ai": "海外AIプラットフォーム"
-    }
+
+  "privacy": {
+    "title": "プライバシーポリシー",
+    "last_updated": "最終更新: 2025年1月12日",
+    "introduction": "LeiaoAI（以下「当社」）は、ユーザーのプライバシーを保護することを最優先に考えています。このプライバシーポリシーは、当社のAI駆動投資インテリジェンスプラットフォーム（leiao.aiウェブサイトを含む）の使用時に、当社がどのように情報を収集、使用、開示、保護するかについて説明します。"
   },
-  
-  "quick_ai_consultation_title": "迅速AI投資コンサルティング",
-  "ai_expert_greeting": "こんにちは！私はLeiaoAI投資エキスパートです。プロフェッショナルな投資コンサルティングサービスに特化しています。",
-  "view_complete_ai_chat": "完全なAIチャットを表示",
-  "auto_select_model": "自動選択",
-  "select_model": "モデルを選択",
-  "model_fastest": "最速",
-  "avg_response_time": "{{time}}秒平均",
-  "avg_response_time_title": "平均応答時間：{{time}}秒",
-  "analyzing_question": "質問を分析中...",
-  "export": "エクスポート",
-  "regenerate": "再生成",
-  "feedback": "フィードバック",
-  
-  "date": {
-    "today": "今日",
-    "days_ago": "{{days}}日前",
-    "months_ago": "{{months}}ヶ月前",
-    "years_ago": "{{years}}年前"
+
+  "terms": {
+    "title": "利用規約",
+    "last_updated": "最終更新: 2025年1月12日",
+    "introduction": "LeiaoAIウェブサイト（leiao.ai）および関連サービス（以下「サービス」）へのアクセスおよび使用は、これらの利用規約（以下「規約」）に従うことを条件とします。これらのサービスを使用することにより、これらの規約に拘束されることに同意したことになります。"
+  },
+
+  "contact": {
+    "title": "お問い合わせ",
+    "subtitle": "お気軽にお問い合わせください",
+    "form_title": "メッセージを送信",
+    "name_label": "お名前",
+    "name_placeholder": "お名前を入力",
+    "email_label": "メールアドレス",
+    "email_placeholder": "メールアドレスを入力",
+    "subject_label": "件名",
+    "subject_placeholder": "どのようなお手伝いができますか？",
+    "message_label": "メッセージ",
+    "message_placeholder": "お問い合わせ内容をお聞かせください...",
+    "send_button": "メッセージを送信",
+    "response_time": "通常24時間以内に返信いたします"
   }
-,
-  "placeholder_response": "Ask investment-related questions to get professional AI advice"
-,
-  "footer_description": "LeiaoAI professional investment consulting services, providing intelligent investment analysis and decision support",
-  "footer_provider": "Powered by LeiaoAI Agent"
 }
