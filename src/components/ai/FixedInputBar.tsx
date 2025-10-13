@@ -133,10 +133,10 @@ export function FixedInputBar({
             {/* 底部信息 */}
             <div className="flex justify-between items-center mt-3 text-xs text-foreground-muted">
               <div>
-                <p>{t('ai_chat.footer_description')}</p>
+                <p>{t('footer_description')}</p>
               </div>
               <div>
-                <p>{t('ai_chat.footer_provider')}</p>
+                <p>{t('footer_provider')}</p>
               </div>
             </div>
           </div>

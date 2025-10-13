@@ -83,8 +83,9 @@ export default function NewStories() {
               "font-bold text-foreground leading-tight",
               isMobile ? "text-3xl" : "text-5xl md:text-6xl"
             )}>
-              Community
-              <span className="text-primary-600 ml-3">Stories</span>
+              {isMobile 
+                ? t('stories.mobile_page_title', 'User Stories')
+                : t('stories.page_title', 'User Stories and Community')}
             </h1>
             
             {/* Subtitle */}
@@ -93,9 +94,8 @@ export default function NewStories() {
               isMobile ? "text-base" : "text-xl max-w-3xl mx-auto"
             )}>
               {isMobile 
-                ? "Discover real experiences, insights, and success stories from our community of innovators."
-                : "Explore authentic experiences, valuable insights, and inspiring success stories shared by our vibrant community of entrepreneurs, investors, and innovators."
-              }
+                ? t('stories.mobile_page_subtitle', 'Share experiences, learn cases')
+                : t('stories.page_subtitle', 'Share investment experiences, learn from success cases')}
             </p>
             
             {/* CTA Buttons */}
@@ -112,7 +112,7 @@ export default function NewStories() {
                 )}
               >
                 <PlusCircle size={18} className="mr-2" />
-                Share Your Story
+                {t('stories.cta_title', 'Share Your Story')}
                 <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
               
@@ -128,7 +128,7 @@ export default function NewStories() {
                   }}
                 >
                   <Sparkles size={16} className="mr-2" />
-                  Browse Stories
+                  {t('stories.view_all_stories', 'View All Stories')}
                 </Button>
               )}
             </div>
@@ -156,16 +156,13 @@ export default function NewStories() {
                 "font-bold text-foreground",
                 isMobile ? "text-2xl" : "text-4xl"
               )}>
-                Latest Stories
+                {t('stories.latest', 'Latest Stories')}
               </h2>
               <p className={cn(
                 "text-muted-foreground",
                 isMobile ? "text-sm" : "text-lg max-w-2xl mx-auto"
               )}>
-                {isMobile 
-                  ? "Real experiences from real people in AI, investment, and innovation."
-                  : "Dive into authentic narratives from entrepreneurs, investors, and innovators shaping the future of technology and business."
-                }
+                {t('stories.latest_subtitle', 'Discover the latest insights and experiences from our community.')}
               </p>
             </div>
             
@@ -193,16 +190,13 @@ export default function NewStories() {
                 "font-bold mb-4",
                 isMobile ? "text-2xl" : "text-4xl"
               )}>
-                Share Your Story
+                {t('stories.cta_title', 'Share Your Story')}
               </h2>
               <p className={cn(
                 "text-white/90 mb-6 mx-auto",
                 isMobile ? "text-base max-w-sm" : "text-xl mb-8 max-w-3xl"
               )}>
-                {isMobile 
-                  ? "Your experience could inspire others. Join our community and share your journey."
-                  : "Your experiences and insights could inspire the next generation of innovators. Join our community of storytellers and make an impact."
-                }
+                {t('stories.cta_subtitle', 'Your experiences and insights could inspire the next generation of innovators. Join our community of storytellers and make an impact.')}
               </p>
               <div className={cn(
                 "justify-center gap-3",
@@ -219,7 +213,7 @@ export default function NewStories() {
                   )}
                 >
                   <PlusCircle size={18} className="mr-2" />
-                  Create Story
+                  {t('stories.create_story', 'Create Story')}
                   <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
                 
@@ -232,7 +226,7 @@ export default function NewStories() {
                     actualTheme === 'dark' ? 'bg-black text-white hover:bg-neutral-900' : 'bg-white text-neutral-500 hover:text-neutral-700'
                   )}
                 >
-                  Need Ideas? Chat with AI
+                  {t('stories.need_ideas', 'Need Ideas? Chat with AI')}
                   <Sparkles size={16} className="ml-2" />
                 </Button>
               </div>
