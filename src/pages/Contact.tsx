@@ -36,10 +36,10 @@ const Contact: React.FC = () => {
 
     const configs = {
       shenzhen: {
-        // Google Maps: English address, public embed with specific location
-        google: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3684.1234567890!2d113.764020!3d22.543099!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjLCsDMyJzM1LjEiTiAxMTPCsDQ1JzUwLjUiRQ!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus&q=1175+Nanshan+Blvd,+南油+Nanshan,+Shenzhen,+Guangdong+Province,+China,+518061',
+        // Google Maps: English address, public embed with specific coordinates
+        google: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3684.1234567890!2d113.943139!3d22.520361!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjLCsDMxJzEzLjMiTiAxMTNCsDU2JzM1LjMiRQ!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus',
         // Gaode: Chinese address, public embed without search bar and popup
-        gaode: 'https://uri.amap.com/marker?position=113.76401959277344,22.543099199999998&name=深圳市南山区后海阳光金融大厦&src=leiaoai&hide=1'
+        gaode: 'https://uri.amap.com/marker?position=113.943139,22.520361&name=深圳市南山区后海阳光金融大厦&src=leiaoai&hide=1'
       },
       hong_kong: {
         // Google Maps: English address, public embed
@@ -63,10 +63,10 @@ const Contact: React.FC = () => {
   const getMapClickUrl = (officeType: 'shenzhen' | 'hong_kong' | 'san_jose') => {
     const configs = {
       shenzhen: {
-        // Google Maps: English address, dynamic map with specific location
-        google: 'https://www.google.com/maps/search/?api=1&query=1175+Nanshan+Blvd,+南油+Nanshan,+Shenzhen,+Guangdong+Province,+China,+518061',
+        // Google Maps: English address, dynamic map with specific coordinates
+        google: 'https://www.google.com/maps/search/?api=1&query=22.520361,113.943139',
         // Gaode: Chinese address, dynamic map
-        gaode: 'https://uri.amap.com/marker?position=113.76401959277344,22.543099199999998&name=深圳市南山区后海阳光金融大厦&src=leiaoai'
+        gaode: 'https://uri.amap.com/marker?position=113.943139,22.520361&name=深圳市南山区后海阳光金融大厦&src=leiaoai'
       },
       hong_kong: {
         // Google Maps: English address, dynamic map
