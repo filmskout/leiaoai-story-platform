@@ -267,7 +267,7 @@ const About: React.FC = () => {
               title={t('about.start_ai_chat_desc', 'Open AI chat for quick answers and guidance')}
             >
               <MessageSquare className="mr-2" size={20} />
-              {t('about.start_ai_chat', isEnglish ? 'Start AI Chat' : '启动AI问答')}
+              {t('ai_chat.title', 'Start AI Chat')}
             </Button>
             <Button
               onClick={() => navigate('/bp-analysis')}
@@ -281,7 +281,7 @@ const About: React.FC = () => {
               title={t('about.upload_bp_desc', 'Upload BP for AI analysis and insights')}
             >
               <Upload className="mr-2" size={20} />
-              {t('about.upload_bp', isEnglish ? 'Upload Your BP' : '上传BP分析')}
+              {t('bp_analysis.upload_bp', 'Upload BP')}
             </Button>
             <Button
               onClick={() => navigate('/stories')}
@@ -295,7 +295,7 @@ const About: React.FC = () => {
               title={t('about.share_story_desc', 'Share your story with the community')}
             >
               <Share2 className="mr-2" size={20} />
-              {t('about.share_story', isEnglish ? 'Share Your Story' : '分享故事')}
+              {t('stories.create_story', 'Share Your Story')}
             </Button>
           </div>
         </div>

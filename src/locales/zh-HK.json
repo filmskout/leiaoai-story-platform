@@ -339,18 +339,18 @@
       ]
     },
     "expertise_areas": {
-      "cvc_investment": "CVC产业投资",
-      "ma_restructuring": "并购重组",
-      "ipo_a_share": "IPO上市（A股）",
-      "ipo_hk_share": "IPO上市（港股）",
-      "ipo_us_share": "IPO上市（美股）",
-      "spac_listing": "SPAC壳上市",
-      "macro_analysis": "宏观经济分析",
-      "investment_environment": "投资环境",
-      "valuation_adjustment": "估值调整协议",
-      "exit_strategy": "退出策略规划",
+      "cvc_investment": "CVC 產業投資",
+      "ma_restructuring": "併購重組",
+      "ipo_a_share": "IPO 上市（A 股）",
+      "ipo_hk_share": "IPO 上市（港股）",
+      "ipo_us_share": "IPO 上市（美股）",
+      "spac_listing": "SPAC 殼上市",
+      "macro_analysis": "宏觀經濟分析",
+      "investment_environment": "投資環境",
+      "valuation_adjustment": "估值調整協議",
+      "exit_strategy": "退出策略規劃",
       "valuation_model": "估值模型",
-      "due_diligence": "尽职调查"
+      "due_diligence": "盡職調查"
     },
     "welcome_message": "欢迎使用AI智能投资问答系统，请选择专业领域或直接输入您的问题",
     "direct_input_hint": "或者您也可以在底部直接输入您的投资相关问题",
@@ -389,6 +389,8 @@
       "canvas": "商業模式畫布",
       "canvas_short": "BMC"
     },
+    "tab_upload": "文件上傳",
+    "tab_canvas": "商業模式畫布",
     "features": {
       "ai_analysis": "AI分析",
       "ai_analysis_desc": "商業計劃書結構和內容的綜合分析",
@@ -400,6 +402,9 @@
       "growth_projections_desc": "未來增長潛力和可擴展性分析"
     }
   },
+
+  "bp_analysis_tab_upload": "文件上傳",
+  "bp_analysis_tab_canvas": "商業模式畫布",
   
   "stories": {
     "title": "故事",
@@ -414,19 +419,19 @@
     "cta_subtitle": "你的經驗與洞見，能啟發下一代創新者。加入說書人的社群，創造影響。",
     "need_ideas": "需要靈感？與AI對話",
     "view_all_stories": "檢視所有故事",
-    "story_title": "故事标题",
-    "story_content": "故事内容",
-    "category": "分类",
-    "public": "公开",
+    "story_title": "故事標題",
+    "story_content": "故事內容",
+    "category": "分類",
+    "public": "公開",
     "private": "私密",
-    "publish": "发布",
+    "publish": "發布",
     "draft": "草稿",
-    "view_count": "浏览量",
-    "like_count": "点赞数",
-    "comment_count": "评论数",
-    "section_title": "用户故事与社区",
-    "section_subtitle": "分享投资经验，学习成功案例",
-    "create_button": "发布故事",
+    "view_count": "瀏覽量",
+    "like_count": "按讚數",
+    "comment_count": "評論數",
+    "section_title": "用戶故事與社區",
+    "section_subtitle": "分享投資經驗，學習成功案例",
+    "create_button": "發布故事",
     "no_stories": {
       "title": "暂无故事",
       "desc": "该分类下还没有用户分享的故事"
@@ -439,14 +444,18 @@
     "start_writing": "开始创作",
     "categories": {
       "all": "全部",
-      "ai_tools": "AI工具体验",
-      "startup_interview": "创业访谈",
-      "investment_outlook": "投资展望",
-      "finance_ai": "金融AI应用",
-      "video_generation": "视频生成体验",
-      "domestic_ai": "国内AI工具",
+      "ai_tools": "AI工具體驗",
+      "startup_interview": "創業訪談",
+      "investment_outlook": "投資展望",
+      "finance_ai": "金融AI應用",
+      "video_generation": "影片生成體驗",
+      "domestic_ai": "國內AI工具",
       "overseas_ai": "海外AI平台"
     }
+  },
+
+  "stories": {
+    "filter_by_tags": "按標籤篩選"
   },
 
   "tags": {
