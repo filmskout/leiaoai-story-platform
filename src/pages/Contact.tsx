@@ -35,18 +35,18 @@ const Contact: React.FC = () => {
 
     const configs = {
       shenzhen: {
-        // 深圳市南山区后海阳光金融大厦 - 更精确的坐标
-        google: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d235527.43633136366!2d113.76401959277344!3d22.543099199999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3403f032e9d4f36d%3A0x6660c0765b5e2c8e!2sHouhai%20Sunshine%20Financial%20Building%2C%20Nanshan%20District%2C%20Shenzhen%2C%20Guangdong%20Province%2C%20China!5e0!3m2!1sen!2sus!4v1673958300000!5m2!1sen!2sus',
+        // Sunshine Financial Tower, Nanshan, Shenzhen, China
+        google: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d235527.43633136366!2d113.76401959277344!3d22.543099199999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3403f032e9d4f36d%3A0x6660c0765b5e2c8e!2sSunshine%20Financial%20Tower%2C%20Nanshan%2C%20Shenzhen%2C%20China!5e0!3m2!1sen!2sus!4v1673958300000!5m2!1sen!2sus',
         gaode: `https://uri.amap.com/marker?position=113.76401959277344,22.543099199999998&name=${encodeURIComponent('深圳市南山区后海阳光金融大厦')}&src=leiaoai`
       },
       hong_kong: {
-        // 香港灣仔盧押道23號The Phoenix 21樓.The Hive Wanchai - 更精确的坐标
-        google: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d29537.14883614609!2d114.14988455!3d22.281337!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3404007ec82c012d%3A0xc4941d8d8901de8f!2s23%20Luya%20Road%2C%20Wanchai%2C%20The%20Phoenix%2021F.The%20Hive%20Wanchai%2C%20Hong%20Kong!5e0!3m2!1sen!2sus!4v1673958400000!5m2!1sen!2sus',
+        // The Hive, 21/F, The Phoenix, 23 Luard Rd, Wan Chai, Hong Kong
+        google: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d29537.14883614609!2d114.14988455!3d22.281337!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3404007ec82c012d%3A0xc4941d8d8901de8f!2sThe%20Hive%2C%2021%2FF%2C%20The%20Phoenix%2C%2023%20Luard%20Rd%2C%20Wan%20Chai%2C%20Hong%20Kong!5e0!3m2!1sen!2sus!4v1673958400000!5m2!1sen!2sus',
         gaode: `https://uri.amap.com/marker?position=114.14988455,22.281337&name=${encodeURIComponent('香港灣仔盧押道23號The Phoenix 21樓.The Hive Wanchai')}&src=leiaoai`
       },
       san_jose: {
-        // 1814 Brighten Avenue, San Jose, California, USA - 精确坐标
-        google: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d202740.94456270126!2d-122.00822085!3d37.3352372!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x808fcae48af93ff5%3A0x20a0dfd0d1d0b!2s1814%20Brighten%20Avenue%2C%20San%20Jose%2C%20CA%2C%20USA!5e0!3m2!1sen!2sus!4v1673958500000!5m2!1sen!2sus',
+        // 1814 Brighten Avenue, San Jose, CA95124, USA
+        google: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d202740.94456270126!2d-122.00822085!3d37.3352372!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x808fcae48af93ff5%3A0x20a0dfd0d1d0b!2s1814%20Brighten%20Avenue%2C%20San%20Jose%2C%20CA95124%2C%20USA!5e0!3m2!1sen!2sus!4v1673958500000!5m2!1sen!2sus',
         gaode: `https://uri.amap.com/marker?position=-122.00822085,37.3352372&name=${encodeURIComponent('美国加州圣荷西1814 Brighten Avenue')}&src=leiaoai`
       }
     };
