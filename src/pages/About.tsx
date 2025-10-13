@@ -264,6 +264,7 @@ const About: React.FC = () => {
             <Button
               onClick={() => navigate('/ai-chat')}
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 text-lg"
+              title={t('about.start_ai_chat_desc', 'Open AI chat for quick answers and guidance')}
             >
               <MessageSquare className="mr-2" size={20} />
               {t('about.start_ai_chat', isEnglish ? 'Start AI Chat' : '启动AI问答')}
@@ -277,6 +278,7 @@ const About: React.FC = () => {
                   ? "border-gray-600 text-white hover:bg-gray-800"
                   : "border-gray-300 text-gray-900 hover:bg-gray-50"
               )}
+              title={t('about.upload_bp_desc', 'Upload BP for AI analysis and insights')}
             >
               <Upload className="mr-2" size={20} />
               {t('about.upload_bp', isEnglish ? 'Upload Your BP' : '上传BP分析')}
@@ -290,6 +292,7 @@ const About: React.FC = () => {
                   ? "border-gray-600 text-white hover:bg-gray-800"
                   : "border-gray-300 text-gray-900 hover:bg-gray-50"
               )}
+              title={t('about.share_story_desc', 'Share your story with the community')}
             >
               <Share2 className="mr-2" size={20} />
               {t('about.share_story', isEnglish ? 'Share Your Story' : '分享故事')}
