@@ -272,6 +272,7 @@
     "vision_mission": "ビジョンとミッション",
     "vision_content": "LeiaoAIは、人工知能、金融、クリエイティブ産業を橋渡しするAI-Opsおよび投資インテリジェンスプラットフォームです。深圳で生まれ、グローバルなマインドセットで構築された私たちのミッションは、AIを独立した技術からスケーラブルな産業力に変えることです。データ、資本、人間の洞察を組み合わせることで、創業者、企業、投資家がイノベーションを分析、評価、運用できるよう支援します。グローバルCEOナビゲータープログラムを通じて、先見性のあるリーダー、投資家、クリエイターを結びつけます。私たちは、将来のAI企業が単に製品を構築するだけでなく、創造性と資本が出会うインテリジェントなエコシステムを設計すると信じています。",
     "what_platform_does": "プラットフォームの機能",
+    "slogan_short": "AI × ファイナンス × クリエイティブ産業",
     "ai_investment_expert_title": "AI投資専門家",
     "professional_service_domains_title": "プロフェッショナルサービス領域",
     "ai_bp_analysis_title": "AIビジネスプラン分析",
@@ -279,7 +280,14 @@
     "stories_community_title": "ストーリーとコミュニティ",
     "start_ai_chat_desc": "AIチャットを開いて、迅速な回答と戦略ガイダンスを取得",
     "upload_bp_desc": "BPをアップロードしてAI分析を受け取る",
-    "share_story_desc": "あなたの体験をコミュニティで共有"
+    "share_story_desc": "あなたの体験をコミュニティで共有",
+    "ready_experience": "資金調達の未来を体験する準備はできましたか？",
+    "tagline": "LeiaoAI — 知性・洞察・誠実さで、AI経済の未来に力を。",
+    "ai_investment_expert": "AI投資専門家（チャット + 音声対話）— マクロ経済、CVC投資、M&A戦略、IPO計画などのテーマに関する投資関連の質問に、即時かつモデル最適化された回答を提供します。推奨モデル・高速モデル・ローカライズモデルから選択でき、音声入力や会話履歴にも対応。",
+    "professional_service_domains": "プロフェッショナルサービス領域 — マクロ経済分析、投資環境、CVC産業投資、バリュエーションモデル、退出戦略、ESGコンプライアンスなど、多様なテーマをカバー。各領域カードでは、すばやく論点に到達できる推奨質問と実践的な助言を提示します。",
+    "ai_bp_analysis": "AIビジネスプラン分析 — BP（PDF/DOCX）をアップロードすると、構成・市場ポテンシャル・リスクエクスポージャー・成長トラジェクトリなどを総合評価し、スコアと改善提案を提供します。",
+    "business_model_canvas": "ビジネスモデルキャンバスとAI洞察 — ドキュメントのアップロードに加え、ビジネスモデルキャンバスの改善をAIが支援。静的なフレームワークを、データドリブンで進化する動的な青写真へと拡張します。",
+    "stories_community": "ストーリーとコミュニティ — 投資分析、財務モデリング、起業の実践でのAI活用体験を共有。AIツール体験、起業インタビュー、投資見通し、金融AIアプリケーションなど、多様なストーリーから集合知を育みます。"
   },
 
   "footer": {
@@ -337,5 +345,36 @@
       "growth_projections": "成長予測",
       "growth_projections_desc": "将来の成長ポテンシャルとスケーラビリティの分析"
     }
+  }
+  ,
+  "contact": {
+    "title": "お問い合わせ",
+    "subtitle": "ご質問やご要望をお聞かせください",
+    "general": "一般:",
+    "support": "サポート:",
+    "phone": "電話",
+    "business_hours": "営業時間",
+    "monday_friday": "月曜日 - 金曜日:",
+    "weekend": "週末:",
+    "closed": "休業",
+    "local_time_note": "(各拠点の現地時間)",
+    "offices": "オフィス",
+    "shenzhen": "深圳オフィス",
+    "shenzhen_address": "中国 広東省 深圳市",
+    "hong_kong": "香港オフィス",
+    "hong_kong_address": "中国 香港特別行政区",
+    "san_jose": "サンノゼオフィス",
+    "san_jose_address": "米国 カリフォルニア州 サンノゼ",
+    "send_message": "メッセージを送信",
+    "name": "お名前",
+    "email": "メール",
+    "subject": "件名",
+    "message": "メッセージ",
+    "name_placeholder": "お名前を入力",
+    "email_placeholder": "your@email.com",
+    "subject_placeholder": "どのようにお手伝いできますか？",
+    "message_placeholder": "お問い合わせ内容を詳しくご記入ください...",
+    "send": "メッセージを送信",
+    "response_time": "通常24時間以内に返信いたします"
   }
 }

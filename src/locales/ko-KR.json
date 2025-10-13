@@ -270,6 +270,7 @@
     "vision_mission": "비전과 미션",
     "vision_content": "LeiaoAI는 인공지능, 금융, 창의 산업을 연결하는 AI-Ops 및 투자 인텔리전스 플랫폼입니다. 심천에서 태어났지만 글로벌 마인드셋으로 구축된 우리의 미션은 AI를 독립적인 기술에서 확장 가능한 산업력으로 전환하는 것입니다. 데이터, 자본, 인간의 통찰력을 결합하여 창업자, 기업, 투자자가 혁신을 분석, 평가, 운영할 수 있도록 지원합니다. 글로벌 CEO 네비게이터 프로그램을 통해 비전 있는 리더, 투자자, 창작자를 연결합니다. 우리는 미래의 AI 기업이 단순히 제품을 구축하는 것이 아니라 창의성과 자본이 만나는 지능형 생태계를 설계할 것이라고 믿습니다.",
     "what_platform_does": "플랫폼 기능",
+    "slogan_short": "AI × 금융 × 크리에이티브 산업",
     "ai_investment_expert_title": "AI 투자 전문가",
     "professional_service_domains_title": "전문 서비스 영역",
     "ai_bp_analysis_title": "AI 사업계획서 분석",
@@ -277,7 +278,14 @@
     "stories_community_title": "스토리와 커뮤니티",
     "start_ai_chat_desc": "AI 채팅을 열어 빠른 답변과 전략 가이드를 얻으세요",
     "upload_bp_desc": "BP를 업로드하여 AI 분석을 받으세요",
-    "share_story_desc": "커뮤니티에 당신의 경험을 공유하세요"
+    "share_story_desc": "커뮤니티에 당신의 경험을 공유하세요",
+    "ready_experience": "자금조달의 미래를 경험할 준비가 되었나요?",
+    "tagline": "LeiaoAI — 지성, 통찰, 성실로 AI 경제의 미래를 지원합니다.",
+    "ai_investment_expert": "AI 투자 전문가(채팅 + 음성 상호작용) — 거시경제, CVC 투자, M&A 전략, IPO 계획 등 주제에 대해 즉각적이고 모델 최적화된 답변을 제공합니다. 추천/초고속/로컬라이즈드 모델 선택 가능, 음성 입력과 대화 기록 지원.",
+    "professional_service_domains": "전문 서비스 영역 — 거시경제 분석, 투자 환경, CVC 산업 투자, 밸류에이션 모델, 엑시트 전략, ESG 컴플라이언스 등 다양한 주제를 포괄합니다. 각 영역 카드에서 핵심 질문과 실용적 조언을 제공하여 빠르게 쟁점을 파악할 수 있도록 돕습니다.",
+    "ai_bp_analysis": "AI 사업계획서 분석 — BP(PDF/DOCX)를 업로드하면 구조, 시장 잠재력, 리스크 노출, 성장 경로 등을 종합 평가하고 점수와 개선 제안을 제공합니다.",
+    "business_model_canvas": "비즈니스 모델 캔버스와 AI 인사이트 — 문서 업로드에 더해, AI가 비즈니스 모델 캔버스의 고도화를 지원합니다. 정적 프레임워크를 데이터 기반의 동적 청사진으로 확장합니다.",
+    "stories_community": "스토리와 커뮤니티 — 투자 분석, 재무 모델링, 창업 실무에서의 AI 활용 경험을 공유합니다. AI 도구 체험, 창업 인터뷰, 투자 전망, 금융 AI 응용 등 다양한 스토리로 집단 지성을 형성합니다."
   },
 
   "privacy": {
@@ -331,5 +339,36 @@
       "growth_projections": "성장 예측",
       "growth_projections_desc": "미래 성장 잠재력과 확장성 분석"
     }
+  }
+  ,
+  "contact": {
+    "title": "문의하기",
+    "subtitle": "문의 사항을 알려주세요",
+    "general": "일반:",
+    "support": "지원:",
+    "phone": "전화",
+    "business_hours": "영업시간",
+    "monday_friday": "월요일 - 금요일:",
+    "weekend": "주말:",
+    "closed": "휴무",
+    "local_time_note": "(각 지사의 현지 시간)",
+    "offices": "우리의 오피스",
+    "shenzhen": "선전 오피스",
+    "shenzhen_address": "중국 광둥성 선전시",
+    "hong_kong": "홍콩 오피스",
+    "hong_kong_address": "중국 홍콩특별행정구",
+    "san_jose": "산호세 오피스",
+    "san_jose_address": "미국 캘리포니아주 산호세",
+    "send_message": "메시지 보내기",
+    "name": "이름",
+    "email": "이메일",
+    "subject": "제목",
+    "message": "메시지",
+    "name_placeholder": "이름을 입력하세요",
+    "email_placeholder": "your@email.com",
+    "subject_placeholder": "어떻게 도와드릴까요?",
+    "message_placeholder": "문의 내용을 자세히 적어주세요...",
+    "send": "메시지 보내기",
+    "response_time": "보통 24시간 이내에 응답합니다"
   }
 }
