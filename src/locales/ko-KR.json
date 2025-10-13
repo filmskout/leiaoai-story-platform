@@ -370,4 +370,8 @@
     "subject_placeholder": "어떻게 도와드릴까요?",
     "message_placeholder": "문의 내용을 자세히 적어주세요...",
     "send": "메시지 보내기",
-    "response_time": "보통 24시간 이내에 응답합니다"
+    "response_time": "보통 24시간 이내에 응답합니다",
+    "email_title": "이메일",
+    "consultation": "문의:"
+  }
+}
