@@ -87,7 +87,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
       
       if (data?.user) {
-        toast.success('Successfully signed in!');
+        // Success toast will be handled by the calling component
         return { error: null };
       }
       
@@ -112,11 +112,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
       
       if (data?.user) {
-        if (data.user.email_confirmed_at) {
-          toast.success('Account created successfully!');
-        } else {
-          toast.success('Account created! Please check your email for verification.');
-        }
+        // Success message will be handled by the calling component
         return { error: null };
       }
       
