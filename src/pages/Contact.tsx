@@ -11,11 +11,8 @@ const Contact: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [isChina, setIsChina] = useState<boolean | null>(null);
-  // Get API keys from environment variables
-  const googleMapsApiKey = import.meta.env.GOOGLE_MAPS_API_KEY;
-  const gaodeApiKey = import.meta.env.GAODE_MAPS_API_KEY;
 
-  // Detect if user is in China based on IP and fetch Google Maps API key
+  // Detect if user is in China based on IP
   useEffect(() => {
     const detectLocation = async () => {
       try {
@@ -29,81 +26,36 @@ const Contact: React.FC = () => {
       }
     };
 
-    const fetchGoogleMapsApiKey = async () => {
-      // If we already have a client-side API key, use it
-      if (googleMapsApiKey) {
-        console.log('🔵 Contact: Using client-side Google Maps API key');
-        return;
-      }
-
-      try {
-        console.log('🔵 Contact: Fetching Google Maps API key from server...');
-        const response = await fetch('/api/google-maps-key');
-        console.log('🔵 Contact: API response status:', response.status);
-        
-        if (response.ok) {
-          const data = await response.json();
-          console.log('🔵 Contact: Google Maps API key received:', data.apiKey ? 'Yes' : 'No');
-        } else {
-          const errorData = await response.json().catch(() => ({}));
-          console.warn('🔴 Contact: Failed to fetch Google Maps API key:', response.status, errorData);
-        }
-      } catch (error) {
-        console.warn('🔴 Contact: Failed to fetch Google Maps API key:', error);
-      }
-    };
-
     detectLocation();
-    fetchGoogleMapsApiKey();
   }, []);
 
 
-  // Map configurations - Gaode uses Chinese addresses, Google Maps uses English addresses
+  // Map configurations - Public access versions without API keys
   const getMapConfig = (officeType: 'shenzhen' | 'hong_kong' | 'san_jose') => {
     if (isChina === null) return null; // Still loading
 
-    console.log('🔵 Contact: Getting map config for', officeType, {
-      isChina,
-      hasApiKey: !!googleMapsApiKey,
-      apiKeyLength: googleMapsApiKey?.length || 0
-    });
-
     const configs = {
       shenzhen: {
-        // Google Maps: English address, static image
-        google: googleMapsApiKey 
-          ? `https://maps.googleapis.com/maps/api/staticmap?center=22.543099,113.764020&zoom=16&size=400x300&maptype=roadmap&markers=color:red%7C22.543099,113.764020&key=${googleMapsApiKey}`
-          : null,
-        // Gaode: Chinese address, static image
-        gaode: gaodeApiKey 
-          ? `https://restapi.amap.com/v3/staticmap?location=113.764020,22.543099&zoom=16&size=400*300&markers=mid,,A:113.764020,22.543099&key=${gaodeApiKey}`
-          : null
+        // Google Maps: English address, public embed
+        google: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3684.1234567890!2d113.764020!3d22.543099!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjLCsDMyJzM1LjEiTiAxMTPCsDQ1JzUwLjUiRQ!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus',
+        // Gaode: Chinese address, public embed
+        gaode: 'https://uri.amap.com/marker?position=113.76401959277344,22.543099199999998&name=深圳市南山区后海阳光金融大厦&src=leiaoai'
       },
       hong_kong: {
-        // Google Maps: English address, static image
-        google: googleMapsApiKey 
-          ? `https://maps.googleapis.com/maps/api/staticmap?center=22.281337,114.149885&zoom=16&size=400x300&maptype=roadmap&markers=color:red%7C22.281337,114.149885&key=${googleMapsApiKey}`
-          : null,
-        // Gaode: Chinese address, static image
-        gaode: gaodeApiKey 
-          ? `https://restapi.amap.com/v3/staticmap?location=114.149885,22.281337&zoom=16&size=400*300&markers=mid,,A:114.149885,22.281337&key=${gaodeApiKey}`
-          : null
+        // Google Maps: English address, public embed
+        google: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3684.1234567890!2d114.149885!3d22.281337!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjLCsDE2JzUyLjgiTiAxMTTCsDA4JzU5LjYiRQ!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus',
+        // Gaode: Chinese address, public embed
+        gaode: 'https://uri.amap.com/marker?position=114.14988455,22.281337&name=香港灣仔盧押道23號The Phoenix 21樓.The Hive Wanchai&src=leiaoai'
       },
       san_jose: {
-        // Google Maps: English address, static image
-        google: googleMapsApiKey 
-          ? `https://maps.googleapis.com/maps/api/staticmap?center=37.335237,-122.008221&zoom=16&size=400x300&maptype=roadmap&markers=color:red%7C37.335237,-122.008221&key=${googleMapsApiKey}`
-          : null,
-        // Gaode: Chinese address, static image
-        gaode: gaodeApiKey 
-          ? `https://restapi.amap.com/v3/staticmap?location=-122.008221,37.335237&zoom=16&size=400*300&markers=mid,,A:-122.008221,37.335237&key=${gaodeApiKey}`
-          : null
+        // Google Maps: English address, public embed
+        google: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3684.1234567890!2d-122.008221!3d37.335237!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzfCsDIwJzA2LjkiTiAxMjLCsDAwJzI5LjYiVw!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus',
+        // Gaode: Chinese address, public embed
+        gaode: 'https://uri.amap.com/marker?position=-122.00822085,37.3352372&name=美国加州圣荷西1814 Brighten Avenue&src=leiaoai'
       }
     };
 
     const selectedConfig = isChina ? configs[officeType].gaode : configs[officeType].google;
-    console.log('🔵 Contact: Selected map config:', selectedConfig ? 'Available' : 'Not available');
-    
     return selectedConfig;
   };
 
@@ -112,21 +64,21 @@ const Contact: React.FC = () => {
     const configs = {
       shenzhen: {
         // Google Maps: English address, dynamic map
-        google: `https://www.google.com/maps/search/?api=1&query=Sunshine+Financial+Tower,+Nanshan,+Shenzhen,+China`,
+        google: 'https://www.google.com/maps/search/?api=1&query=Sunshine+Financial+Tower,+Nanshan,+Shenzhen,+China',
         // Gaode: Chinese address, dynamic map
-        gaode: `https://uri.amap.com/marker?position=113.76401959277344,22.543099199999998&name=${encodeURIComponent('深圳市南山区后海阳光金融大厦')}&src=leiaoai`
+        gaode: 'https://uri.amap.com/marker?position=113.76401959277344,22.543099199999998&name=深圳市南山区后海阳光金融大厦&src=leiaoai'
       },
       hong_kong: {
         // Google Maps: English address, dynamic map
-        google: `https://www.google.com/maps/search/?api=1&query=The+Hive,+21%2FF,+The+Phoenix,+23+Luard+Rd,+Wan+Chai,+Hong+Kong`,
+        google: 'https://www.google.com/maps/search/?api=1&query=The+Hive,+21%2FF,+The+Phoenix,+23+Luard+Rd,+Wan+Chai,+Hong+Kong',
         // Gaode: Chinese address, dynamic map
-        gaode: `https://uri.amap.com/marker?position=114.14988455,22.281337&name=${encodeURIComponent('香港灣仔盧押道23號The Phoenix 21樓.The Hive Wanchai')}&src=leiaoai`
+        gaode: 'https://uri.amap.com/marker?position=114.14988455,22.281337&name=香港灣仔盧押道23號The Phoenix 21樓.The Hive Wanchai&src=leiaoai'
       },
       san_jose: {
         // Google Maps: English address, dynamic map
-        google: `https://www.google.com/maps/search/?api=1&query=1814+Brighten+Avenue,+San+Jose,+CA95124,+USA`,
+        google: 'https://www.google.com/maps/search/?api=1&query=1814+Brighten+Avenue,+San+Jose,+CA95124,+USA',
         // Gaode: Chinese address, dynamic map
-        gaode: `https://uri.amap.com/marker?position=-122.00822085,37.3352372&name=${encodeURIComponent('美国加州圣荷西1814 Brighten Avenue')}&src=leiaoai`
+        gaode: 'https://uri.amap.com/marker?position=-122.00822085,37.3352372&name=美国加州圣荷西1814 Brighten Avenue&src=leiaoai'
       }
     };
 
@@ -432,23 +384,28 @@ const Contact: React.FC = () => {
                   {/* Map */}
                   <div className="aspect-video w-full">
                     {mapUrl ? (
-                      <a
-                        href={getMapClickUrl(office.type)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block w-full h-full relative group cursor-pointer"
-                      >
-                        <img
+                      <div className="relative w-full h-full">
+                        <iframe
                           src={mapUrl}
-                          alt={`${office.city} Office Location`}
-                          className="w-full h-full object-cover rounded-b-xl"
+                          width="100%"
+                          height="100%"
+                          style={{ border: 0 }}
+                          allowFullScreen
                           loading="lazy"
+                          referrerPolicy="no-referrer-when-downgrade"
+                          title={`${office.city} Office Location`}
+                          className="rounded-b-xl"
                         />
-                        {/* Overlay with click hint */}
-                        <div className={cn(
-                          "absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center",
-                          "rounded-b-xl"
-                        )}>
+                        {/* Click overlay to open full map */}
+                        <a
+                          href={getMapClickUrl(office.type)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={cn(
+                            "absolute inset-0 bg-transparent hover:bg-black hover:bg-opacity-10 transition-all duration-300",
+                            "flex items-center justify-center rounded-b-xl group"
+                          )}
+                        >
                           <div className={cn(
                             "opacity-0 group-hover:opacity-100 transition-opacity duration-300",
                             "bg-white bg-opacity-90 px-4 py-2 rounded-lg shadow-lg"
@@ -460,8 +417,8 @@ const Contact: React.FC = () => {
                               {isChina ? '点击查看高德地图' : 'Click to view in Google Maps'}
                             </p>
                           </div>
-                        </div>
-                      </a>
+                        </a>
+                      </div>
                     ) : (
                       <div className={cn(
                         "w-full h-full flex items-center justify-center",
@@ -488,8 +445,7 @@ const Contact: React.FC = () => {
                             "text-xs mt-4",
                             actualTheme === 'dark' ? "text-gray-400" : "text-gray-500"
                           )}>
-                            {!googleMapsApiKey && !isChina ? 'Google Maps API key not configured' : 
-                             !gaodeApiKey && isChina ? 'Gaode Maps API key not configured' : 'Map loading...'}
+                            Map loading...
                           </p>
                         </div>
                       </div>
