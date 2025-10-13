@@ -14,7 +14,7 @@ vercel env add VITE_SUPABASE_ANON_KEY <your_supabase_anon_key> production
 # vercel env add VITE_DEEPSEEK_API_KEY <dev_only_key> preview
 # vercel env add VITE_OPENAI_API_KEY <dev_only_key> preview
 # vercel env add VITE_QWEN_API_KEY <dev_only_key> preview
-# vercel env add VITE_GOOGLE_MAPS_API_KEY <maps_key> production
+# vercel env add GOOGLE_MAPS_API_KEY <maps_key> production
 # vercel env add VITE_APP_URL https://leiaoai-story-platform.vercel.app production
 
 echo "Vercel env template applied (placeholders). Please replace with real values in CI or local."

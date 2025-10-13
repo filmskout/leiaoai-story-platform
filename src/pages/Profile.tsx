@@ -443,7 +443,7 @@ export default function Profile() {
         });
         
         dailyStats.push({
-          date: dayStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          date: dayStart.toLocaleDateString('en', { month: 'short', day: 'numeric' }),
           stories: dayStats.length,
           views: dayStats.reduce((sum, story) => sum + (story.views_count || 0), 0),
           engagement: dayStats.reduce((sum, story) => sum + (story.likes_count || 0), 0)

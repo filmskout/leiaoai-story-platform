@@ -11,7 +11,10 @@ const Contact: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [isChina, setIsChina] = useState<boolean | null>(null);
-  const [googleMapsApiKey, setGoogleMapsApiKey] = useState<string | null>(null);
+  // Get Google Maps API key from environment variables
+  // Use GOOGLE_MAPS_API_KEY for both client-side and server-side
+  const clientApiKey = import.meta.env.GOOGLE_MAPS_API_KEY;
+  const [googleMapsApiKey, setGoogleMapsApiKey] = useState<string | null>(clientApiKey || null);
 
   // Detect if user is in China based on IP and fetch Google Maps API key
   useEffect(() => {
@@ -28,16 +31,27 @@ const Contact: React.FC = () => {
     };
 
     const fetchGoogleMapsApiKey = async () => {
+      // If we already have a client-side API key, use it
+      if (clientApiKey) {
+        console.log('🔵 Contact: Using client-side API key');
+        return;
+      }
+
       try {
+        console.log('🔵 Contact: Fetching Google Maps API key from server...');
         const response = await fetch('/api/google-maps-key');
+        console.log('🔵 Contact: API response status:', response.status);
+        
         if (response.ok) {
           const data = await response.json();
+          console.log('🔵 Contact: API key received:', data.apiKey ? 'Yes' : 'No');
           setGoogleMapsApiKey(data.apiKey);
         } else {
-          console.warn('Failed to fetch Google Maps API key');
+          const errorData = await response.json().catch(() => ({}));
+          console.warn('🔴 Contact: Failed to fetch Google Maps API key:', response.status, errorData);
         }
       } catch (error) {
-        console.warn('Failed to fetch Google Maps API key:', error);
+        console.warn('🔴 Contact: Failed to fetch Google Maps API key:', error);
       }
     };
 
@@ -50,31 +64,40 @@ const Contact: React.FC = () => {
   const getMapConfig = (officeType: 'shenzhen' | 'hong_kong' | 'san_jose') => {
     if (isChina === null) return null; // Still loading
 
+    console.log('🔵 Contact: Getting map config for', officeType, {
+      isChina,
+      hasApiKey: !!googleMapsApiKey,
+      apiKeyLength: googleMapsApiKey?.length || 0
+    });
+
     const configs = {
       shenzhen: {
         // Sunshine Financial Tower, Nanshan, Shenzhen, China
         google: googleMapsApiKey 
           ? `https://www.google.com/maps/embed/v1/view?key=${googleMapsApiKey}&center=22.543099,113.764020&zoom=18&maptype=roadmap`
           : null,
-        gaode: `https://uri.amap.com/marker?position=113.76401959277344,22.543099199999998&name=${encodeURIComponent('深圳市南山区后海阳光金融大厦')}&src=leiaoai`
+        gaode: `https://uri.amap.com/marker?position=113.76401959277344,22.543099199999998&name=${encodeURIComponent('Sunshine Financial Tower, Nanshan, Shenzhen, China')}&src=leiaoai`
       },
       hong_kong: {
         // The Hive, 21/F, The Phoenix, 23 Luard Rd, Wan Chai, Hong Kong
         google: googleMapsApiKey 
           ? `https://www.google.com/maps/embed/v1/view?key=${googleMapsApiKey}&center=22.281337,114.149885&zoom=18&maptype=roadmap`
           : null,
-        gaode: `https://uri.amap.com/marker?position=114.14988455,22.281337&name=${encodeURIComponent('香港灣仔盧押道23號The Phoenix 21樓.The Hive Wanchai')}&src=leiaoai`
+        gaode: `https://uri.amap.com/marker?position=114.14988455,22.281337&name=${encodeURIComponent('The Hive, 21/F, The Phoenix, 23 Luard Rd, Wan Chai, Hong Kong')}&src=leiaoai`
       },
       san_jose: {
         // 1814 Brighten Avenue, San Jose, CA95124, USA
         google: googleMapsApiKey 
           ? `https://www.google.com/maps/embed/v1/view?key=${googleMapsApiKey}&center=37.335237,-122.008221&zoom=18&maptype=roadmap`
           : null,
-        gaode: `https://uri.amap.com/marker?position=-122.00822085,37.3352372&name=${encodeURIComponent('美国加州圣荷西1814 Brighten Avenue')}&src=leiaoai`
+        gaode: `https://uri.amap.com/marker?position=-122.00822085,37.3352372&name=${encodeURIComponent('1814 Brighten Avenue, San Jose, CA95124, USA')}&src=leiaoai`
       }
     };
 
-    return isChina ? configs[officeType].gaode : configs[officeType].google;
+    const selectedConfig = isChina ? configs[officeType].gaode : configs[officeType].google;
+    console.log('🔵 Contact: Selected map config:', selectedConfig ? 'Available' : 'Not available');
+    
+    return selectedConfig;
   };
 
   const offices = [

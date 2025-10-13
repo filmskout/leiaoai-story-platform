@@ -11,8 +11,8 @@ import koKRTranslation from '../locales/ko-KR.json';
 
 // Create resources object with proper structure
 const resources = {
-  'en-US': { translation: enTranslation },
   'en': { translation: enTranslation },
+  'en-US': { translation: enTranslation }, // Alias for en
   'zh-CN': { translation: zhCNTranslation },
   'zh-HK': { translation: zhHKTranslation },
   'ja-JP': { translation: jaJPTranslation },
@@ -32,14 +32,14 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: 'en-US', // Default language
+    lng: 'en', // Default language
     fallbackLng: {
       'zh-HK': ['zh-HK'],
       'zh-CN': ['zh-CN'],
       'zh': ['zh-CN'],
-      'default': ['en-US']
+      'default': ['en']
     },
-    supportedLngs: ['zh-CN', 'en-US', 'zh-HK', 'ja-JP', 'ko-KR', 'fr-FR', 'de-DE', 'es-ES', 'it-IT', 'pt-PT', 'ru-RU', 'ar-SA', 'hi-IN'],
+    supportedLngs: ['zh-CN', 'en', 'en-US', 'zh-HK', 'ja-JP', 'ko-KR', 'fr-FR', 'de-DE', 'es-ES', 'it-IT', 'pt-PT', 'ru-RU', 'ar-SA', 'hi-IN'],
     interpolation: {
       escapeValue: false,
     },

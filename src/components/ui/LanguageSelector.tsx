@@ -25,7 +25,7 @@ const supportedLanguages = [
     flag: '🇭🇰'
   },
   {
-    code: 'en-US',
+    code: 'en',
     name: 'English',
     nativeName: 'English',
     flag: '🇺🇸'
@@ -144,7 +144,7 @@ export function LanguageSelector({ className, variant = 'default' }: LanguageSel
           'SA': 'ar-SA', 'AE': 'ar-SA', 'EG': 'ar-SA', 'IT': 'it-IT'
         };
         
-        const detectedLanguage = countryToLanguage[countryCode] || 'en-US';
+        const detectedLanguage = countryToLanguage[countryCode] || 'en';
         
         // 如果没有用户保存的语言选择，使用检测到的语言
         const savedLanguage = localStorage.getItem('leoai-language');
