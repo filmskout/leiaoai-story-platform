@@ -118,7 +118,7 @@ const About: React.FC = () => {
                 "text-xl font-semibold mb-3",
                 actualTheme === 'dark' ? "text-white" : "text-gray-900"
               )}>
-                {t('about.ai_investment_expert_title', isEnglish ? 'AI Investment Expert' : 'AI投资专家')}
+                {t('about.ai_investment_expert_title', isEnglish ? 'AI Investment Expert' : 'AI投資專家')}
               </h3>
               <p className={cn(
                 "text-sm leading-relaxed",
@@ -145,7 +145,7 @@ const About: React.FC = () => {
                 "text-xl font-semibold mb-3",
                 actualTheme === 'dark' ? "text-white" : "text-gray-900"
               )}>
-                {t('about.professional_service_domains_title', isEnglish ? 'Professional Service Domains' : '专业服务领域')}
+                {t('about.professional_service_domains_title', isEnglish ? 'Professional Service Domains' : '專業服務領域')}
               </h3>
               <p className={cn(
                 "text-sm leading-relaxed",
@@ -172,7 +172,7 @@ const About: React.FC = () => {
                 "text-xl font-semibold mb-3",
                 actualTheme === 'dark' ? "text-white" : "text-gray-900"
               )}>
-                {t('about.ai_bp_analysis_title', isEnglish ? 'AI‑Powered Business Plan Analysis' : 'AI商业计划书分析')}
+                {t('about.ai_bp_analysis_title', isEnglish ? 'AI‑Powered Business Plan Analysis' : 'AI商業計劃書分析')}
               </h3>
               <p className={cn(
                 "text-sm leading-relaxed",
@@ -199,7 +199,7 @@ const About: React.FC = () => {
                 "text-xl font-semibold mb-3",
                 actualTheme === 'dark' ? "text-white" : "text-gray-900"
               )}>
-                {t('about.business_model_canvas_title', isEnglish ? 'Business Model Canvas & AI' : '商业模式画布与AI洞察')}
+                {t('about.business_model_canvas_title', isEnglish ? 'Business Model Canvas & AI' : '商業模式畫布與AI洞察')}
               </h3>
               <p className={cn(
                 "text-sm leading-relaxed",
@@ -226,7 +226,7 @@ const About: React.FC = () => {
                 "text-xl font-semibold mb-3",
                 actualTheme === 'dark' ? "text-white" : "text-gray-900"
               )}>
-                {t('about.stories_community_title', isEnglish ? 'Stories & Community' : '用户故事与社区')}
+                {t('about.stories_community_title', isEnglish ? 'Stories & Community' : '用戶故事與社區')}
               </h3>
               <p className={cn(
                 "text-sm leading-relaxed",

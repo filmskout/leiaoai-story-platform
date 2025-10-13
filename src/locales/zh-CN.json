@@ -542,6 +542,25 @@
     "san_jose": "圣何塞办公室",
     "san_jose_address": "美国加利福尼亚州圣何塞",
     "company_full_name": "Shenzhen Leiao Artificial Intelligence Operations Limited",
-    "company_full_name_cn": "深圳市蕾奥人工智能运营有限公司"
+    "company_full_name_cn": "深圳市蕾奥人工智能运营有限公司",
+    "general": "一般:",
+    "support": "支持:",
+    "phone": "电话",
+    "business_hours": "营业时间",
+    "monday_friday": "星期一 - 星期五:",
+    "weekend": "周末:",
+    "closed": "休息",
+    "local_time_note": "(各办公室的当地时间)",
+    "send_message": "发送消息给我们",
+    "name": "姓名",
+    "email": "邮箱",
+    "subject": "主题",
+    "message": "消息",
+    "name_placeholder": "您的姓名",
+    "email_placeholder": "your@email.com",
+    "subject_placeholder": "我们如何帮助您？",
+    "message_placeholder": "请详细告诉我们您的查询...",
+    "send": "发送消息",
+    "response_time": "我们通常会在24小时内回复"
   }
 }

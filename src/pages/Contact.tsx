@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
@@ -10,22 +10,62 @@ const Contact: React.FC = () => {
   const { actualTheme } = useTheme();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [isChina, setIsChina] = useState<boolean | null>(null);
+
+  // Detect if user is in China based on IP
+  useEffect(() => {
+    const detectLocation = async () => {
+      try {
+        // Use a simple IP geolocation service
+        const response = await fetch('https://ipapi.co/json/');
+        const data = await response.json();
+        setIsChina(data.country_code === 'CN');
+      } catch (error) {
+        console.warn('Failed to detect location, defaulting to Google Maps:', error);
+        setIsChina(false); // Default to Google Maps if detection fails
+      }
+    };
+
+    detectLocation();
+  }, []);
+
+  // Map configurations for different services
+  const getMapConfig = (officeType: 'shenzhen' | 'hong_kong' | 'san_jose') => {
+    if (isChina === null) return null; // Still loading
+
+    const configs = {
+      shenzhen: {
+        google: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d235527.43633136366!2d113.76401959277344!3d22.543099199999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3403f032e9d4f36d%3A0x6660c0765b5e2c8e!2sNanshan%20District%2C%20Shenzhen%2C%20Guangdong%20Province%2C%20China!5e0!3m2!1sen!2sus!4v1673958300000!5m2!1sen!2sus',
+        gaode: `https://uri.amap.com/marker?position=113.76401959277344,22.543099199999998&name=${encodeURIComponent('深圳市南山区')}&src=leiaoai`
+      },
+      hong_kong: {
+        google: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d29537.14883614609!2d114.14988455!3d22.281337!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3404007ec82c012d%3A0xc4941d8d8901de8f!2sCentral%2C%20Hong%20Kong!5e0!3m2!1sen!2sus!4v1673958400000!5m2!1sen!2sus',
+        gaode: `https://uri.amap.com/marker?position=114.14988455,22.281337&name=${encodeURIComponent('香港中环')}&src=leiaoai`
+      },
+      san_jose: {
+        google: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d202740.94456270126!2d-122.00822085!3d37.3352372!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x808fcae48af93ff5%3A0x20a0dfd0d1d0b!2sSan%20Jose%2C%20CA%2C%20USA!5e0!3m2!1sen!2sus!4v1673958500000!5m2!1sen!2sus',
+        gaode: `https://uri.amap.com/marker?position=-122.00822085,37.3352372&name=${encodeURIComponent('美国圣何塞')}&src=leiaoai`
+      }
+    };
+
+    return isChina ? configs[officeType].gaode : configs[officeType].google;
+  };
 
   const offices = [
     {
       city: t('contact.shenzhen', 'Shenzhen, China'),
       address: t('contact.shenzhen_address', 'Nanshan District, Shenzhen, Guangdong'),
-      mapUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d235527.43633136366!2d113.76401959277344!3d22.543099199999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3403f032e9d4f36d%3A0x6660c0765b5e2c8e!2sNanshan%20District%2C%20Shenzhen%2C%20Guangdong%20Province%2C%20China!5e0!3m2!1sen!2sus!4v1673958300000!5m2!1sen!2sus',
+      type: 'shenzhen' as const,
     },
     {
       city: t('contact.hong_kong', 'Hong Kong'),
       address: t('contact.hong_kong_address', 'Central, Hong Kong SAR'),
-      mapUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d29537.14883614609!2d114.14988455!3d22.281337!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3404007ec82c012d%3A0xc4941d8d8901de8f!2sCentral%2C%20Hong%20Kong!5e0!3m2!1sen!2sus!4v1673958400000!5m2!1sen!2sus',
+      type: 'hong_kong' as const,
     },
     {
       city: t('contact.san_jose', 'San Jose, California'),
       address: t('contact.san_jose_address', 'Silicon Valley, San Jose, CA, USA'),
-      mapUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d202740.94456270126!2d-122.00822085!3d37.3352372!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x808fcae48af93ff5%3A0x20a0dfd0d1d0b!2sSan%20Jose%2C%20CA%2C%20USA!5e0!3m2!1sen!2sus!4v1673958500000!5m2!1sen!2sus',
+      type: 'san_jose' as const,
     },
   ];
 
@@ -183,7 +223,7 @@ const Contact: React.FC = () => {
         </div>
 
         {/* Office Locations with Maps */}
-        <div className="space-y-12">
+        <div className="space-y-8">
           <h2 className={cn(
             "text-2xl font-bold text-center mb-8",
             actualTheme === 'dark' ? "text-white" : "text-gray-900"
@@ -191,55 +231,79 @@ const Contact: React.FC = () => {
             {t('contact.offices', 'Our Offices')}
           </h2>
 
-          {offices.map((office, index) => (
-            <div
-              key={index}
-              className={cn(
-                "rounded-xl overflow-hidden",
-                actualTheme === 'dark'
-                  ? "bg-gray-800 border border-gray-700"
-                  : "bg-white border border-gray-200 shadow-lg"
-              )}
-            >
-              <div className="p-6">
-                <div className="flex items-start gap-3 mb-4">
-                  <div className={cn(
-                    "p-2 rounded-lg",
-                    actualTheme === 'dark' ? "bg-orange-900/30" : "bg-orange-100"
-                  )}>
-                    <MapPin className="text-orange-500" size={24} />
+          {/* Desktop: 3 maps in a row, Mobile: 1 map per row */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {offices.map((office, index) => {
+              const mapUrl = getMapConfig(office.type);
+              
+              return (
+                <div
+                  key={index}
+                  className={cn(
+                    "rounded-xl overflow-hidden",
+                    actualTheme === 'dark'
+                      ? "bg-gray-800 border border-gray-700"
+                      : "bg-white border border-gray-200 shadow-lg"
+                  )}
+                >
+                  <div className="p-6">
+                    <div className="flex items-start gap-3 mb-4">
+                      <div className={cn(
+                        "p-2 rounded-lg",
+                        actualTheme === 'dark' ? "bg-orange-900/30" : "bg-orange-100"
+                      )}>
+                        <MapPin className="text-orange-500" size={24} />
+                      </div>
+                      <div>
+                        <h3 className={cn(
+                          "text-xl font-bold mb-1",
+                          actualTheme === 'dark' ? "text-white" : "text-gray-900"
+                        )}>
+                          {office.city}
+                        </h3>
+                        <p className={cn(
+                          actualTheme === 'dark' ? "text-gray-300" : "text-gray-600"
+                        )}>
+                          {office.address}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className={cn(
-                      "text-xl font-bold mb-1",
-                      actualTheme === 'dark' ? "text-white" : "text-gray-900"
-                    )}>
-                      {office.city}
-                    </h3>
-                    <p className={cn(
-                      actualTheme === 'dark' ? "text-gray-300" : "text-gray-600"
-                    )}>
-                      {office.address}
-                    </p>
+                  
+                  {/* Map */}
+                  <div className="aspect-video w-full">
+                    {mapUrl ? (
+                      <iframe
+                        src={mapUrl}
+                        width="100%"
+                        height="100%"
+                        style={{ border: 0 }}
+                        allowFullScreen
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        title={`${office.city} Office Location`}
+                      />
+                    ) : (
+                      <div className={cn(
+                        "w-full h-full flex items-center justify-center",
+                        actualTheme === 'dark' ? "bg-gray-700" : "bg-gray-100"
+                      )}>
+                        <div className="text-center">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto mb-2"></div>
+                          <p className={cn(
+                            "text-sm",
+                            actualTheme === 'dark' ? "text-gray-300" : "text-gray-600"
+                          )}>
+                            {t('common.loading', 'Loading map...')}
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
-              </div>
-              
-              {/* Map */}
-              <div className="aspect-video w-full">
-                <iframe
-                  src={office.mapUrl}
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title={`${office.city} Office Location`}
-                />
-              </div>
-            </div>
-          ))}
+              );
+            })}
+          </div>
         </div>
 
         {/* Contact Form */}
