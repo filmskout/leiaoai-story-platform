@@ -295,7 +295,7 @@ const About: React.FC = () => {
               title={t('about.share_story_desc', 'Share your story with the community')}
             >
               <Share2 className="mr-2" size={20} />
-              {t('stories.create_story', 'Share Your Story')}
+              {t('about.share_your_story', 'Share Your Story')}
             </Button>
           </div>
         </div>
