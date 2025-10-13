@@ -11,8 +11,9 @@ const Contact: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [isChina, setIsChina] = useState<boolean | null>(null);
+  const [googleMapsApiKey, setGoogleMapsApiKey] = useState<string | null>(null);
 
-  // Detect if user is in China based on IP
+  // Detect if user is in China based on IP and fetch Google Maps API key
   useEffect(() => {
     const detectLocation = async () => {
       try {
@@ -26,11 +27,24 @@ const Contact: React.FC = () => {
       }
     };
 
+    const fetchGoogleMapsApiKey = async () => {
+      try {
+        const response = await fetch('/api/google-maps-key');
+        if (response.ok) {
+          const data = await response.json();
+          setGoogleMapsApiKey(data.apiKey);
+        } else {
+          console.warn('Failed to fetch Google Maps API key');
+        }
+      } catch (error) {
+        console.warn('Failed to fetch Google Maps API key:', error);
+      }
+    };
+
     detectLocation();
+    fetchGoogleMapsApiKey();
   }, []);
 
-  // Get Google Maps API key from Vercel environment variables
-  const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
   // Map configurations using Google Maps API with specific coordinates
   const getMapConfig = (officeType: 'shenzhen' | 'hong_kong' | 'san_jose') => {
@@ -316,7 +330,7 @@ const Contact: React.FC = () => {
             "text-2xl font-bold text-center mb-8",
             actualTheme === 'dark' ? "text-white" : "text-gray-900"
           )}>
-            {t('contact.offices', '我们的办公室')}
+            {t('contact.offices', 'Our Offices')}
           </h2>
 
           {/* Desktop: 3 maps in a row, Mobile: 1 map per row */}
