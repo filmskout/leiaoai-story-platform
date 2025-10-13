@@ -36,22 +36,22 @@ const Contact: React.FC = () => {
 
     const configs = {
       shenzhen: {
-        // Google Maps: English address, public embed
-        google: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3684.1234567890!2d113.764020!3d22.543099!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjLCsDMyJzM1LjEiTiAxMTPCsDQ1JzUwLjUiRQ!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus',
-        // Gaode: Chinese address, public embed
-        gaode: 'https://uri.amap.com/marker?position=113.76401959277344,22.543099199999998&name=深圳市南山区后海阳光金融大厦&src=leiaoai'
+        // Google Maps: English address, public embed with specific location
+        google: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3684.1234567890!2d113.764020!3d22.543099!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjLCsDMyJzM1LjEiTiAxMTPCsDQ1JzUwLjUiRQ!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus&q=1175+Nanshan+Blvd,+南油+Nanshan,+Shenzhen,+Guangdong+Province,+China,+518061',
+        // Gaode: Chinese address, public embed without search bar and popup
+        gaode: 'https://uri.amap.com/marker?position=113.76401959277344,22.543099199999998&name=深圳市南山区后海阳光金融大厦&src=leiaoai&hide=1'
       },
       hong_kong: {
         // Google Maps: English address, public embed
         google: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3684.1234567890!2d114.149885!3d22.281337!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjLCsDE2JzUyLjgiTiAxMTTCsDA4JzU5LjYiRQ!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus',
-        // Gaode: Chinese address, public embed
-        gaode: 'https://uri.amap.com/marker?position=114.14988455,22.281337&name=香港灣仔盧押道23號The Phoenix 21樓.The Hive Wanchai&src=leiaoai'
+        // Gaode: Chinese address, public embed without search bar and popup
+        gaode: 'https://uri.amap.com/marker?position=114.14988455,22.281337&name=香港灣仔盧押道23號The Phoenix 21樓.The Hive Wanchai&src=leiaoai&hide=1'
       },
       san_jose: {
         // Google Maps: English address, public embed
         google: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3684.1234567890!2d-122.008221!3d37.335237!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzfCsDIwJzA2LjkiTiAxMjLCsDAwJzI5LjYiVw!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus',
-        // Gaode: Chinese address, public embed
-        gaode: 'https://uri.amap.com/marker?position=-122.00822085,37.3352372&name=美国加州圣荷西1814 Brighten Avenue&src=leiaoai'
+        // Gaode: Chinese address, public embed without search bar and popup
+        gaode: 'https://uri.amap.com/marker?position=-122.00822085,37.3352372&name=美国加州圣荷西1814 Brighten Avenue&src=leiaoai&hide=1'
       }
     };
 
@@ -63,8 +63,8 @@ const Contact: React.FC = () => {
   const getMapClickUrl = (officeType: 'shenzhen' | 'hong_kong' | 'san_jose') => {
     const configs = {
       shenzhen: {
-        // Google Maps: English address, dynamic map
-        google: 'https://www.google.com/maps/search/?api=1&query=Sunshine+Financial+Tower,+Nanshan,+Shenzhen,+China',
+        // Google Maps: English address, dynamic map with specific location
+        google: 'https://www.google.com/maps/search/?api=1&query=1175+Nanshan+Blvd,+南油+Nanshan,+Shenzhen,+Guangdong+Province,+China,+518061',
         // Gaode: Chinese address, dynamic map
         gaode: 'https://uri.amap.com/marker?position=113.76401959277344,22.543099199999998&name=深圳市南山区后海阳光金融大厦&src=leiaoai'
       },
