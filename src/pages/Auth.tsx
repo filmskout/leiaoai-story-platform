@@ -218,7 +218,7 @@ const AuthPage: React.FC = () => {
             </label>
             <div className="relative">
               <Mail className={cn(
-                "absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 pointer-events-none z-20",
+                "absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 pointer-events-none z-20",
                 actualTheme === 'dark' ? "text-gray-400" : "text-gray-400"
               )} />
               <input
@@ -230,7 +230,7 @@ const AuthPage: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className={cn(
-                  "pl-12 w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors",
+                  "pr-12 w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors",
                   actualTheme === 'dark'
                     ? "bg-gray-800 border-gray-600 text-white placeholder-gray-400"
                     : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
