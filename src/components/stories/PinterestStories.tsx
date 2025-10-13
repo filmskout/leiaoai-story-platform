@@ -98,9 +98,9 @@ export function PinterestStories({ className, initialCategory = 'all', initialTa
 
   // Sorting options
   const sortOptions = [
-    { key: 'newest', label: t('stories.sort.newest', 'Newest First') },
-    { key: 'oldest', label: t('stories.sort.oldest', 'Oldest First') },
-    { key: 'popular', label: t('stories.sort.popular', 'Most Popular') },
+    { key: 'newest', label: t('stories.sort.newest', 'Newest') },
+    { key: 'oldest', label: t('stories.sort.oldest', 'Oldest') },
+    { key: 'popular', label: t('stories.sort.popular', 'Popular') },
     { key: 'views', label: t('stories.sort.views', 'Most Viewed') }
   ];
 

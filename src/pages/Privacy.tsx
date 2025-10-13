@@ -35,7 +35,7 @@ const Privacy: React.FC = () => {
             )}
           >
             <ArrowLeft size={20} />
-            <span>{i18n.language.startsWith('zh') ? '返回主页' : 'Back to Home'}</span>
+            <span>{t('common.back_to_home', 'Back to Home')}</span>
           </button>
           
           <div className="flex items-center gap-3 mb-4">

@@ -119,8 +119,8 @@ export default function BPAnalysis() {
               <TabsList className="grid w-full grid-cols-2 h-14 mb-8">
                 <TabsTrigger value="upload" className="flex items-center gap-2 text-sm px-4">
                   <Upload size={16} />
-                  <span className="hidden sm:inline">Document Upload</span>
-                  <span className="sm:hidden">BP</span>
+                  <span className="hidden sm:inline">{t('bp_analysis_tab_upload', t('bp_analysis.tabs.upload', 'Document Upload'))}</span>
+                  <span className="sm:hidden">{t('bp_analysis.tabs.upload_short', 'Upload')}</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="canvas" 
@@ -131,8 +131,8 @@ export default function BPAnalysis() {
                   }}
                 >
                   <Layers size={16} />
-                  <span className="hidden sm:inline">Business Model Canvas</span>
-                  <span className="sm:hidden">Canvas</span>
+                  <span className="hidden sm:inline">{t('bp_analysis_tab_canvas', t('bp_analysis.tabs.canvas', 'Business Model Canvas'))}</span>
+                  <span className="sm:hidden">{t('bp_analysis.tabs.canvas_short', 'BMC')}</span>
                 </TabsTrigger>
               </TabsList>
 

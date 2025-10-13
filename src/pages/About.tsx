@@ -48,17 +48,14 @@ const About: React.FC = () => {
             )}>
               <Globe2 size={20} />
               <span className="text-sm font-medium">
-                {i18n.language.startsWith('zh') ? 'AI × 金融 × 创意产业' : 'AI × Finance × Creative Industries'}
+                {t('about.slogan_short', i18n.language.startsWith('zh') ? 'AI × 金融 × 创意产业' : 'AI × Finance × Creative Industries')}
               </span>
             </div>
             <p className={cn(
               "text-sm text-center mb-8",
               actualTheme === 'dark' ? "text-gray-400" : "text-gray-600"
             )}>
-              {i18n.language.startsWith('zh')
-                ? t('about.company_name_cn')
-                : t('about.company_name_en')
-              }
+              {i18n.language.startsWith('zh') ? t('about.company_name_cn') : t('about.company_name_en')}
             </p>
           </div>
         </div>
@@ -121,16 +118,13 @@ const About: React.FC = () => {
                 "text-xl font-semibold mb-3",
                 actualTheme === 'dark' ? "text-white" : "text-gray-900"
               )}>
-                {isEnglish ? 'AI Investment Expert' : 'AI投资专家'}
+                {t('about.ai_investment_expert_title', isEnglish ? 'AI Investment Expert' : 'AI投资专家')}
               </h3>
               <p className={cn(
                 "text-sm leading-relaxed",
                 actualTheme === 'dark' ? "text-gray-300" : "text-gray-600"
               )}>
-                {isEnglish 
-                  ? 'Ask any investment‑related question and get immediate, model‑optimized answers. Choose from recommended, fastest or localised models for topics such as macroeconomic trends, CVC investment, M&A strategy and IPO planning. Support for voice input and chat history makes getting advice as simple as a conversation.'
-                  : '针对宏观经济、CVC投资、并购策略、IPO规划等问题，提供即时的模型优化解答。可选择推荐模型、极速模型或本地化模型，并支持语音输入和对话历史。'
-                }
+                {t('about.ai_investment_expert')}
               </p>
             </div>
 
@@ -151,16 +145,13 @@ const About: React.FC = () => {
                 "text-xl font-semibold mb-3",
                 actualTheme === 'dark' ? "text-white" : "text-gray-900"
               )}>
-                {isEnglish ? 'Professional Service Domains' : '专业服务领域'}
+                {t('about.professional_service_domains_title', isEnglish ? 'Professional Service Domains' : '专业服务领域')}
               </h3>
               <p className={cn(
                 "text-sm leading-relaxed",
                 actualTheme === 'dark' ? "text-gray-300" : "text-gray-600"
               )}>
-                {isEnglish
-                  ? 'Dive into curated areas covering macroeconomic analysis, investment environments, CVC investment, valuation models, exit strategies, ESG compliance and more. Each domain card suggests targeted questions to help you explore relevant issues quickly.'
-                  : '包含宏观经济分析、投资环境、CVC产业投资、估值模型、退出策略、ESG合规等多个主题。每个领域卡片都提供针对性的建议和推荐问题，帮助用户快速聚焦。'
-                }
+                {t('about.professional_service_domains')}
               </p>
             </div>
 
@@ -181,16 +172,13 @@ const About: React.FC = () => {
                 "text-xl font-semibold mb-3",
                 actualTheme === 'dark' ? "text-white" : "text-gray-900"
               )}>
-                {isEnglish ? 'AI-Powered BP Analysis' : 'AI商业计划书分析'}
+                {t('about.ai_bp_analysis_title', isEnglish ? 'AI‑Powered Business Plan Analysis' : 'AI商业计划书分析')}
               </h3>
               <p className={cn(
                 "text-sm leading-relaxed",
                 actualTheme === 'dark' ? "text-gray-300" : "text-gray-600"
               )}>
-                {isEnglish
-                  ? 'Upload your business plan (PDF or DOCX) to receive an AI‑generated report on structure, market potential, risk exposure and growth trajectory. The system scores each section and offers actionable recommendations for improvement.'
-                  : '上传您的BP（PDF或DOCX），系统将从结构、市场潜力、风险敞口和成长路径等方面进行AI分析，并提供综合评分和改进建议。'
-                }
+                {t('about.ai_bp_analysis')}
               </p>
             </div>
 
@@ -211,16 +199,13 @@ const About: React.FC = () => {
                 "text-xl font-semibold mb-3",
                 actualTheme === 'dark' ? "text-white" : "text-gray-900"
               )}>
-                {isEnglish ? 'Business Model Canvas & AI' : '商业模式画布与AI洞察'}
+                {t('about.business_model_canvas_title', isEnglish ? 'Business Model Canvas & AI' : '商业模式画布与AI洞察')}
               </h3>
               <p className={cn(
                 "text-sm leading-relaxed",
                 actualTheme === 'dark' ? "text-gray-300" : "text-gray-600"
               )}>
-                {isEnglish
-                  ? 'Beyond document upload, our AI helps you refine your business model canvas, turning a static framework into a dynamic, data‑driven blueprint.'
-                  : '除文件上传外，AI还可帮助您优化商业模式画布，让静态框架成为动态的数据驱动蓝图。'
-                }
+                {t('about.business_model_canvas')}
               </p>
             </div>
 
@@ -241,16 +226,13 @@ const About: React.FC = () => {
                 "text-xl font-semibold mb-3",
                 actualTheme === 'dark' ? "text-white" : "text-gray-900"
               )}>
-                {isEnglish ? 'Stories & Community' : '用户故事与社区'}
+                {t('about.stories_community_title', isEnglish ? 'Stories & Community' : '用户故事与社区')}
               </h3>
               <p className={cn(
                 "text-sm leading-relaxed",
                 actualTheme === 'dark' ? "text-gray-300" : "text-gray-600"
               )}>
-                {isEnglish
-                  ? 'Share your journey using AI for investment analysis, financial modelling or entrepreneurship. Discover stories on AI tools, startup interviews, investment outlooks and financial AI applications. Our community turns individual experiences into collective intelligence.'
-                  : '分享您在投资分析、财务建模或创业过程中使用AI的经验。浏览AI工具体验、创业访谈、投资展望和金融AI应用等类别的故事，让个体经验汇聚成集体智慧。'
-                }
+                {t('about.stories_community')}
               </p>
             </div>
           </div>
@@ -269,16 +251,13 @@ const About: React.FC = () => {
             "text-3xl font-bold mb-4",
             actualTheme === 'dark' ? "text-white" : "text-gray-900"
           )}>
-            {isEnglish ? 'Ready to Experience the Future of Financing?' : '准备开启融资未来体验？'}
+            {t('about.ready_experience', isEnglish ? 'Ready to experience the future of financing?' : '准备开启融资未来体验？')}
           </h2>
           <p className={cn(
             "text-lg mb-8",
             actualTheme === 'dark' ? "text-gray-300" : "text-gray-600"
           )}>
-            {isEnglish 
-              ? 'LeiaoAI — empowering the AI economy with intelligence, insight and integrity.'
-              : '蕾奥AI——以智能、洞察与诚信，赋能AI经济的未来。'
-            }
+            {t('about.tagline', 'LeiaoAI — empowering the AI economy with intelligence, insight and integrity.')}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -287,7 +266,7 @@ const About: React.FC = () => {
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 text-lg"
             >
               <MessageSquare className="mr-2" size={20} />
-              {isEnglish ? 'Start AI Chat' : '启动AI问答'}
+              {t('about.start_ai_chat', isEnglish ? 'Start AI Chat' : '启动AI问答')}
             </Button>
             <Button
               onClick={() => navigate('/bp-analysis')}
@@ -300,7 +279,7 @@ const About: React.FC = () => {
               )}
             >
               <Upload className="mr-2" size={20} />
-              {isEnglish ? 'Upload Your BP' : '上传BP分析'}
+              {t('about.upload_bp', isEnglish ? 'Upload Your BP' : '上传BP分析')}
             </Button>
             <Button
               onClick={() => navigate('/stories')}
@@ -313,7 +292,7 @@ const About: React.FC = () => {
               )}
             >
               <Share2 className="mr-2" size={20} />
-              {isEnglish ? 'Share Your Story' : '分享故事'}
+              {t('about.share_story', isEnglish ? 'Share Your Story' : '分享故事')}
             </Button>
           </div>
         </div>

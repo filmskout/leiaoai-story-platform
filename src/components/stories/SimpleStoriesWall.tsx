@@ -296,30 +296,30 @@ export function SimpleStoriesWall() {
 
         {/* Sort Options */}
         <div className="flex items-center gap-2">
-          <span className="text-sm text-foreground-secondary">
+            <span className="text-sm text-foreground-secondary">
             {t('stories.sort_by', 'Sort by')}:
-          </span>
+            </span>
           <div className="flex gap-2">
             <Button
               variant={sortBy === 'newest' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setSortBy('newest')}
             >
-              {t('stories.newest', 'Newest')}
+              {t('stories.sort.newest', 'Newest')}
             </Button>
             <Button
               variant={sortBy === 'popular' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setSortBy('popular')}
             >
-              {t('stories.popular', 'Popular')}
+              {t('stories.sort.popular', 'Popular')}
             </Button>
             <Button
               variant={sortBy === 'views' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setSortBy('views')}
             >
-              {t('stories.most_viewed', 'Most Viewed')}
+              {t('stories.sort.views', 'Most Viewed')}
             </Button>
           </div>
         </div>
