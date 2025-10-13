@@ -116,10 +116,11 @@ export default function BPAnalysis() {
               className="w-full"
               style={{ zIndex: 1000 }}
             >
-              <TabsList className="grid w-full grid-cols-3 h-14 mb-8">
+              <TabsList className="grid w-full grid-cols-2 h-14 mb-8">
                 <TabsTrigger value="upload" className="flex items-center gap-2 text-sm px-4">
                   <Upload size={16} />
-                  <span>Document Upload</span>
+                  <span className="hidden sm:inline">Document Upload</span>
+                  <span className="sm:hidden">BP</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="canvas" 
@@ -130,11 +131,8 @@ export default function BPAnalysis() {
                   }}
                 >
                   <Layers size={16} />
-                  <span>Business Model Canvas</span>
-                </TabsTrigger>
-                <TabsTrigger value="insights" className="flex items-center gap-2 text-sm px-4">
-                  <Lightbulb size={16} />
-                  <span>AI Insights</span>
+                  <span className="hidden sm:inline">Business Model Canvas</span>
+                  <span className="sm:hidden">Canvas</span>
                 </TabsTrigger>
               </TabsList>
 
@@ -145,28 +143,6 @@ export default function BPAnalysis() {
               <TabsContent value="canvas" className="space-y-6">
                 <div className="bg-background rounded-xl border border-border p-4">
                   <BMCCanvas />
-                </div>
-              </TabsContent>
-
-              <TabsContent value="insights" className="space-y-6">
-                <div className="grid gap-6 md:grid-cols-2">
-                  {features.map((feature, index) => (
-                    <Card key={index} className="group hover:shadow-lg transition-all duration-300">
-                      <CardHeader>
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center group-hover:bg-primary-200 dark:group-hover:bg-primary-900/50 transition-colors">
-                            <feature.icon size={20} className="text-primary-600" />
-                          </div>
-                          <CardTitle className="text-lg">{feature.title}</CardTitle>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <CardDescription className="text-sm leading-relaxed">
-                          {feature.description}
-                        </CardDescription>
-                      </CardContent>
-                    </Card>
-                  ))}
                 </div>
               </TabsContent>
             </Tabs>

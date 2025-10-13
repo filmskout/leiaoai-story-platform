@@ -34,8 +34,9 @@ const About: React.FC = () => {
               />
             </div>
             <h1 className={cn(
-              "text-5xl font-bold mb-6",
-              actualTheme === 'dark' ? "text-white" : "text-gray-900"
+              "font-bold mb-6",
+              actualTheme === 'dark' ? "text-white" : "text-gray-900",
+              "text-3xl sm:text-4xl lg:text-5xl"
             )}>
               {isEnglish ? 'About LeiaoAI' : '关于蕾奥AI'}
             </h1>
@@ -49,6 +50,15 @@ const About: React.FC = () => {
               <span className="text-sm font-medium">
                 {isEnglish ? 'AI × Finance × Creative Industries' : 'AI × 金融 × 创意产业'}
               </span>
+            </div>
+            <p className={cn(
+              "text-sm text-center mb-8",
+              actualTheme === 'dark' ? "text-gray-400" : "text-gray-600"
+            )}>
+              {isEnglish 
+                ? 'Shenzhen Leiao Artificial Intelligence Operations Limited' 
+                : '深圳市蕾奥人工智能运营有限公司'
+              }
             </div>
           </div>
         </div>

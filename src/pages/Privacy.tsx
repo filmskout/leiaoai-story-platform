@@ -78,7 +78,7 @@ const Privacy: React.FC = () => {
                   Introduction
                 </h2>
                 <p className={cn("leading-relaxed", actualTheme === 'dark' ? "text-gray-300" : "text-gray-700")}>
-                  LeiaoAI ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our AI-powered investment intelligence platform, including our website leiao.ai and related services (collectively, the "Services").
+                  Shenzhen Leiao Artificial Intelligence Operations Limited ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our AI-powered investment intelligence platform, including our website leiao.ai and related services (collectively, the "Services").
                 </p>
                 <p className={cn("leading-relaxed", actualTheme === 'dark' ? "text-gray-300" : "text-gray-700")}>
                   By accessing or using our Services, you agree to this Privacy Policy. If you do not agree with our practices, please do not use our Services.
@@ -188,6 +188,28 @@ const Privacy: React.FC = () => {
 
               <section className="mb-12">
                 <h2 className={cn("text-2xl font-bold mb-4", actualTheme === 'dark' ? "text-white" : "text-gray-900")}>
+                  <Database className="inline mr-2 mb-1" size={24} />
+                  Business Plan Privacy
+                </h2>
+                <p className={cn("leading-relaxed", actualTheme === 'dark' ? "text-gray-300" : "text-gray-700")}>
+                  <strong>Important:</strong> Business plans uploaded to our platform will not be made public under any circumstances. They are used exclusively for:
+                </p>
+                <ul className={cn("space-y-2 mt-4", actualTheme === 'dark' ? "text-gray-300" : "text-gray-700")}>
+                  <li>• Internal research and analysis purposes</li>
+                  <li>• Investor introduction purposes when explicitly requested by the user</li>
+                  <li>• AI-powered business plan analysis and scoring</li>
+                </ul>
+                <p className={cn("leading-relaxed mt-4", actualTheme === 'dark' ? "text-gray-300" : "text-gray-700")}>
+                  All business plan records will be permanently deleted when:
+                </p>
+                <ul className={cn("space-y-2 mt-2", actualTheme === 'dark' ? "text-gray-300" : "text-gray-700")}>
+                  <li>• User manually deletes them via the dashboard</li>
+                  <li>• User account is closed (within 6 months)</li>
+                </ul>
+              </section>
+
+              <section className="mb-12">
+                <h2 className={cn("text-2xl font-bold mb-4", actualTheme === 'dark' ? "text-white" : "text-gray-900")}>
                   <UserCheck className="inline mr-2 mb-1" size={24} />
                   Your Rights and Choices
                 </h2>
@@ -249,7 +271,12 @@ const Privacy: React.FC = () => {
                   If you have questions or concerns about this Privacy Policy or our privacy practices, please contact us:
                 </p>
                 <div className={cn("mt-4 p-4 rounded-lg", actualTheme === 'dark' ? "bg-gray-800" : "bg-gray-100")}>
-                  <p className={cn("font-medium", actualTheme === 'dark' ? "text-white" : "text-gray-900")}>LeiaoAI Privacy Team</p>
+                  <p className={cn("font-medium", actualTheme === 'dark' ? "text-white" : "text-gray-900")}>
+                    {isEnglish ? 'LeiaoAI Privacy Team' : '蕾奥AI隐私团队'}
+                  </p>
+                  <p className={cn("text-sm", actualTheme === 'dark' ? "text-gray-300" : "text-gray-700")}>
+                    {isEnglish ? 'Shenzhen Leiao Artificial Intelligence Operations Limited' : '深圳市蕾奥人工智能运营有限公司'}
+                  </p>
                   <p className={cn(actualTheme === 'dark' ? "text-gray-300" : "text-gray-700")}>
                     Email: <a href="mailto:privacy@leiao.ai" className="text-blue-500 hover:underline">privacy@leiao.ai</a>
                   </p>
@@ -257,7 +284,7 @@ const Privacy: React.FC = () => {
                     Website: <a href="https://leiao.ai" className="text-blue-500 hover:underline">leiao.ai</a>
                   </p>
                   <p className={cn("mt-2", actualTheme === 'dark' ? "text-gray-300" : "text-gray-700")}>
-                    Offices: Shenzhen, Hong Kong, San Jose, California
+                    {isEnglish ? 'Offices: Shenzhen, Hong Kong, San Jose, California' : '办公室：深圳、香港、圣何塞（加利福尼亚）'}
                   </p>
                 </div>
               </section>

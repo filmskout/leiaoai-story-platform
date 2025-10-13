@@ -36,7 +36,7 @@ export default function Layout() {
   const { user, profile, isAuthenticated, signOut } = useAuth();
   const { isAdmin, adminSessionValid } = useAdmin();
   const { theme, actualTheme, toggleTheme } = useTheme();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const isMobile = useMobileLayout();
@@ -114,16 +114,6 @@ export default function Layout() {
 
   const navItems = [
     {
-      path: '/',
-      label: t('nav.home'),
-      icon: <HomeIcon size={18} />
-    },
-    {
-      path: '/about',
-      label: t('nav.about'),
-      icon: <Globe size={18} />
-    },
-    {
       path: '/ai-chat',
       label: t('nav.ai_chat'),
       icon: <Bot size={18} />
@@ -137,6 +127,26 @@ export default function Layout() {
       path: '/bp-analysis',
       label: t('nav.bp_analysis'),
       icon: <FileText size={18} />
+    }
+  ];
+
+  // Mobile-only navigation items
+  const mobileNavItems = [
+    {
+      path: '/',
+      label: t('nav.home'),
+      icon: <HomeIcon size={18} />
+    },
+    {
+      path: '/about',
+      label: t('nav.about'),
+      icon: <Globe size={18} />
+    },
+    ...navItems,
+    {
+      path: '/contact',
+      label: t('nav.contact'),
+      icon: <Mail size={18} />
     }
   ];
 
@@ -370,7 +380,7 @@ export default function Layout() {
               "container-custom space-y-1",
               isMobile ? "py-2" : "py-4"
             )}>
-              {navItems.map((item) => (
+              {mobileNavItems.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
@@ -443,22 +453,31 @@ export default function Layout() {
             
             <div className="flex items-center space-x-6 text-sm text-foreground-muted">
               <Link to="/about" className="hover:text-foreground transition-colors">
-                {t('about')}
+                <span className="hidden sm:inline">{t('about')}</span>
+                <span className="sm:hidden">About</span>
               </Link>
               <Link to="/privacy" className="hover:text-foreground transition-colors">
-                {t('privacy')}
+                <span className="hidden sm:inline">{t('privacy')}</span>
+                <span className="sm:hidden">Privacy</span>
               </Link>
               <Link to="/terms" className="hover:text-foreground transition-colors">
-                {t('terms')}
+                <span className="hidden sm:inline">{t('terms')}</span>
+                <span className="sm:hidden">Terms</span>
               </Link>
               <Link to="/contact" className="hover:text-foreground transition-colors">
-                {t('contact')}
+                <span className="hidden sm:inline">{t('contact')}</span>
+                <span className="sm:hidden">Contact</span>
               </Link>
             </div>
           </div>
           
           <div className="mt-6 pt-6 border-t border-border text-center text-xs text-foreground-muted">
-            <p>{t('copyright_info')}. {t('footer.developed_by')}.</p>
+            <p>
+              © 2025 {i18n.language.startsWith('zh') 
+                ? '深圳市蕾奥人工智能运营有限公司' 
+                : 'Shenzhen Leiao Artificial Intelligence Operations Limited'
+              }. All rights reserved.
+            </p>
           </div>
         </div>
       </footer>
