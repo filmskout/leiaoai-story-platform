@@ -448,7 +448,7 @@ export default function Layout() {
                 className="h-6 w-auto object-contain"
               />
               <span className="text-foreground-muted text-sm">
-                {t('app_description', 'Professional AI Investment Platform')}
+                {t('footer.slogan', t('app_description', 'Professional AI Investment Platform'))}
               </span>
             </div>
             
