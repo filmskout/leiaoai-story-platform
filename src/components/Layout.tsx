@@ -119,6 +119,11 @@ export default function Layout() {
       icon: <HomeIcon size={18} />
     },
     {
+      path: '/about',
+      label: t('nav.about'),
+      icon: <Globe size={18} />
+    },
+    {
       path: '/ai-chat',
       label: t('nav.ai_chat'),
       icon: <Bot size={18} />
