@@ -205,6 +205,7 @@
     "placeholder": "Please enter your investment-related questions...",
     "answer_placeholder": "AI will provide professional investment analysis and recommendations here...",
     "direct_input_hint": "You can directly input your investment questions below",
+    "click_to_consult": "Click to get professional consultation about {{area}}",
     "send": "Send",
     "voice_input": "Voice Input",
     "stop_recording": "Stop Recording",
