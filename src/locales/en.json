@@ -367,6 +367,8 @@
     "financial_projection": "Financial Projection",
     "risk_assessment": "Risk Assessment",
     "investment_value": "Investment Value",
+    "add_website": "Add Website Link",
+    "or": "OR",
     "features": {
       "ai_analysis": "AI Analysis",
       "ai_analysis_desc": "Comprehensive analysis of business plan structure and content",

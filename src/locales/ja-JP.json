@@ -83,6 +83,10 @@
     }
   },
 
+  "bp_analysis_add_website_link": "ウェブサイトのリンクを追加",
+  "bp_analysis_tab_upload": "ドキュメントアップロード",
+  "bp_analysis_tab_canvas": "ビジネスモデルキャンバス",
+
   "professional_services": {
     "title": "プロフェッショナルサービス領域",
     "subtitle": "プロフェッショナルな投資コンサルティングアドバイスのために領域カードをクリック",
@@ -137,6 +141,9 @@
     "no_messages_to_save": "保存するメッセージがありません"
   },
 
+  "footer_description": "LeiaoAIのプロフェッショナル投資コンサルティングサービス。インテリジェントな投資分析と意思決定支援を提供します。",
+  "footer_provider": "Powered by LeiaoAI Agent",
+
   "about": {
     "title": "LeiaoAIについて",
     "company_name_en": "Shenzhen Leiao Artificial Intelligence Operations Limited",
@@ -188,6 +195,8 @@
     "financial_projection": "財務予測",
     "risk_assessment": "リスク評価",
     "investment_value": "投資価値",
+    "add_website": "ウェブサイトのリンクを追加",
+    "or": "または",
     "features": {
       "ai_analysis": "AI分析",
       "ai_analysis_desc": "ビジネスプランの構造と内容の包括的分析",
