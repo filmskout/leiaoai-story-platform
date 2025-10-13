@@ -34,6 +34,13 @@
   "terms": "服务条款",
   "success": "成功",
   
+  "common": {
+    "back": "返回",
+    "cancel": "取消",
+    "characters": "字符",
+    "back_to_home": "返回首頁"
+  },
+  
   "app_description": "专业AI投资平台",
   "footer": {
     "developed_by": "由 LeiaoAI Agent 开发"
@@ -68,6 +75,10 @@
   
   "nav": {
     "home": "首頁",
+    "about": "關於",
+    "contact": "聯繫",
+    "privacy": "隱私",
+    "terms": "條款",
     "ai_chat": "AI對話",
     "stories": "故事",
     "questions": "問題",
@@ -76,6 +87,59 @@
     "settings": "設置",
     "dashboard": "儀表板"
   },
+
+  "auth": {
+    "sign_in": "登入",
+    "sign_out": "登出",
+    "sign_up": "註冊",
+    "email": "電郵",
+    "password": "密碼",
+    "confirm_password": "確認密碼",
+    "forgot_password": "忘記密碼？",
+    "remember_me": "記住我",
+    "or_continue_with": "或使用以下方式繼續",
+    "already_have_account": "已有帳戶？",
+    "dont_have_account": "沒有帳戶？",
+    "create_account": "創建帳戶",
+    "back_to_home": "返回首頁",
+    "welcome": "歡迎來到蕾奧AI",
+    "signin_subtitle": "登入您的帳戶",
+    "signup_subtitle": "創建新帳戶",
+    "signin": "登入",
+    "signup": "註冊",
+    "email_label": "電郵地址",
+    "email_placeholder": "請輸入您的電郵",
+    "password_label": "密碼",
+    "password_placeholder": "請輸入您的密碼",
+    "confirm_password_label": "確認密碼",
+    "confirm_password_placeholder": "請確認您的密碼",
+    "processing": "處理中...",
+    "signin_button": "登入",
+    "signup_button": "創建帳戶",
+    "divider_or": "或使用以下方式繼續",
+    "google_signin": "使用Google繼續",
+    "footer_signin": "登入即表示您同意我們的",
+    "footer_signup": "創建帳戶即表示您同意我們的",
+    "terms": "服務條款",
+    "privacy": "隱私政策",
+    "error_required_fields": "請填寫所有必填欄位",
+    "error_password_mismatch": "密碼不匹配",
+    "error_password_length": "密碼至少需要6個字符",
+    "error_signin_failed": "登入失敗",
+    "error_signup_failed": "註冊失敗",
+    "error_unexpected": "發生意外錯誤",
+    "error_google_failed": "Google登入失敗",
+    "error_wallet_failed": "錢包連接失敗",
+    "success_signin": "登入成功！",
+    "success_signup": "帳戶創建成功！您現在可以登入了。",
+    "success_wallet": "錢包連接成功！"
+  },
+
+  "user": {
+    "avatar": "用戶頭像"
+  },
+
+  "search": "搜索",
   
   "home": {
     "hero": {

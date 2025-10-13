@@ -53,10 +53,10 @@ i18n
       transSupportBasicHtmlNodes: true,
       transKeepBasicHtmlNodesFor: ['br', 'strong', 'i']
     },
-    debug: false,
+    debug: true, // Enable debug to see what's happening
     saveMissing: false,
     updateMissing: false,
-    initImmediate: false
+    initImmediate: true // Change to true for immediate initialization
   });
 
 export default i18n;
