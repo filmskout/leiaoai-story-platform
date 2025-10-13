@@ -376,6 +376,8 @@
     "subject_placeholder": "どのようにお手伝いできますか？",
     "message_placeholder": "お問い合わせ内容を詳しくご記入ください...",
     "send": "メッセージを送信",
-    "response_time": "通常24時間以内に返信いたします"
+    "response_time": "通常24時間以内に返信いたします",
+    "email_title": "メール",
+    "consultation": "お問い合わせ:",
   }
 }

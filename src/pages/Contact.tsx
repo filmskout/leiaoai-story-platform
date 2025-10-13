@@ -121,7 +121,7 @@ const Contact: React.FC = () => {
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Contact Info Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
+        <div className="grid md:grid-cols-2 gap-6 mb-12">
           {/* Email */}
           <div className={cn(
             "p-6 rounded-xl",
@@ -139,19 +139,15 @@ const Contact: React.FC = () => {
               "text-lg font-semibold mb-2",
               actualTheme === 'dark' ? "text-white" : "text-gray-900"
             )}>
-              {t('nav.contact', 'Contact')}
+              {t('contact.email_title', '邮箱')}
             </h3>
             <div className={cn(
               "space-y-1",
               actualTheme === 'dark' ? "text-gray-300" : "text-gray-600"
             )}>
-              <p><strong>{t('contact.general', 'General:')}</strong></p>
+              <p><strong>{t('contact.consultation', '咨询:')}</strong></p>
               <a href="mailto:info@leiao.ai" className="text-blue-500 hover:underline block">
                 info@leiao.ai
-              </a>
-              <p className="mt-3"><strong>{t('contact.support', 'Support:')}</strong></p>
-              <a href="mailto:support@leiao.ai" className="text-blue-500 hover:underline block">
-                support@leiao.ai
               </a>
             </div>
           </div>
@@ -173,62 +169,137 @@ const Contact: React.FC = () => {
               "text-lg font-semibold mb-2",
               actualTheme === 'dark' ? "text-white" : "text-gray-900"
             )}>
-              {t('contact.phone', 'Phone')}
+              {t('contact.phone', '电话')}
             </h3>
             <div className={cn(
               "space-y-1",
               actualTheme === 'dark' ? "text-gray-300" : "text-gray-600"
             )}>
-              <p><strong>{t('contact.shenzhen', 'Shenzhen:')}</strong></p>
+              <p><strong>{t('contact.shenzhen', '深圳:')}</strong></p>
               <p>+86 755 xxxx xxxx</p>
-              <p className="mt-3"><strong>{t('contact.hong_kong', 'Hong Kong:')}</strong></p>
+              <p className="mt-3"><strong>{t('contact.hong_kong', '香港:')}</strong></p>
               <p>+852 xxxx xxxx</p>
-              <p className="mt-3"><strong>{t('contact.san_jose', 'San Jose:')}</strong></p>
-              <p>+1 (408) xxx-xxxx</p>
-            </div>
-          </div>
-
-          {/* Business Hours */}
-          <div className={cn(
-            "p-6 rounded-xl",
-            actualTheme === 'dark'
-              ? "bg-gray-800 border border-gray-700"
-              : "bg-white border border-gray-200 shadow-sm"
-          )}>
-            <div className={cn(
-              "w-12 h-12 rounded-lg flex items-center justify-center mb-4",
-              actualTheme === 'dark' ? "bg-purple-900/30" : "bg-purple-100"
-            )}>
-              <Clock className="text-purple-500" size={24} />
-            </div>
-            <h3 className={cn(
-              "text-lg font-semibold mb-2",
-              actualTheme === 'dark' ? "text-white" : "text-gray-900"
-            )}>
-              {t('contact.business_hours', 'Business Hours')}
-            </h3>
-            <div className={cn(
-              "space-y-2",
-              actualTheme === 'dark' ? "text-gray-300" : "text-gray-600"
-            )}>
-              <p><strong>{t('contact.monday_friday', 'Monday - Friday:')}</strong></p>
-              <p>9:00 AM - 6:00 PM</p>
-              <p className="mt-3"><strong>{t('contact.weekend', 'Weekend:')}</strong></p>
-              <p>{t('contact.closed', 'Closed')}</p>
-              <p className="mt-3 text-sm">
-                {t('contact.local_time_note', '(Local time in each office)')}
-              </p>
             </div>
           </div>
         </div>
 
+        {/* Contact Form */}
+        <div className={cn(
+          "mt-16 p-8 rounded-xl",
+          actualTheme === 'dark'
+            ? "bg-gray-800 border border-gray-700"
+            : "bg-white border border-gray-200 shadow-lg"
+        )}>
+          <h2 className={cn(
+            "text-2xl font-bold mb-6 text-center",
+            actualTheme === 'dark' ? "text-white" : "text-gray-900"
+          )}>
+            {t('contact.send_message', '发送消息给我们')}
+          </h2>
+          
+          <form className="max-w-2xl mx-auto space-y-6">
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <label className={cn(
+                  "block text-sm font-medium mb-2",
+                  actualTheme === 'dark' ? "text-gray-200" : "text-gray-700"
+                )}>
+                  {t('contact.name', '姓名')}
+                </label>
+                <input
+                  type="text"
+                  className={cn(
+                    "w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors",
+                    actualTheme === 'dark'
+                      ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                      : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
+                  )}
+                  placeholder={t('contact.name_placeholder', '您的姓名')}
+                />
+              </div>
+              
+              <div>
+                <label className={cn(
+                  "block text-sm font-medium mb-2",
+                  actualTheme === 'dark' ? "text-gray-200" : "text-gray-700"
+                )}>
+                  {t('contact.email', '邮箱')}
+                </label>
+                <input
+                  type="email"
+                  className={cn(
+                    "w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors",
+                    actualTheme === 'dark'
+                      ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                      : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
+                  )}
+                  placeholder={t('contact.email_placeholder', 'your@email.com')}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className={cn(
+                "block text-sm font-medium mb-2",
+                actualTheme === 'dark' ? "text-gray-200" : "text-gray-700"
+              )}>
+                {t('contact.subject', '主题')}
+              </label>
+              <input
+                type="text"
+                className={cn(
+                  "w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors",
+                  actualTheme === 'dark'
+                    ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                    : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
+                )}
+                placeholder={t('contact.subject_placeholder', '我们如何帮助您？')}
+              />
+            </div>
+
+            <div>
+              <label className={cn(
+                "block text-sm font-medium mb-2",
+                actualTheme === 'dark' ? "text-gray-200" : "text-gray-700"
+              )}>
+                {t('contact.message', '消息')}
+              </label>
+              <textarea
+                rows={6}
+                className={cn(
+                  "w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none",
+                  actualTheme === 'dark'
+                    ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                    : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
+                )}
+                placeholder={t('contact.message_placeholder', '请详细告诉我们您的查询...')}
+              />
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 text-lg flex items-center justify-center gap-2"
+            >
+              <Send size={20} />
+              {t('contact.send', '发送消息')}
+            </Button>
+
+            <p className={cn(
+              "text-center text-sm",
+              actualTheme === 'dark' ? "text-gray-400" : "text-gray-500"
+            )}>
+              {t('contact.response_time', '我们通常会在24小时内回复')}
+            </p>
+          </form>
+        </div>
+
         {/* Office Locations with Maps */}
-        <div className="space-y-8">
+        <div className="space-y-8 mt-16">
           <h2 className={cn(
             "text-2xl font-bold text-center mb-8",
             actualTheme === 'dark' ? "text-white" : "text-gray-900"
           )}>
-            {t('contact.offices', 'Our Offices')}
+            {t('contact.offices', '我们的办公室')}
           </h2>
 
           {/* Desktop: 3 maps in a row, Mobile: 1 map per row */}
@@ -304,116 +375,6 @@ const Contact: React.FC = () => {
               );
             })}
           </div>
-        </div>
-
-        {/* Contact Form */}
-        <div className={cn(
-          "mt-16 p-8 rounded-xl",
-          actualTheme === 'dark'
-            ? "bg-gray-800 border border-gray-700"
-            : "bg-white border border-gray-200 shadow-lg"
-        )}>
-          <h2 className={cn(
-            "text-2xl font-bold mb-6 text-center",
-            actualTheme === 'dark' ? "text-white" : "text-gray-900"
-          )}>
-            {t('contact.send_message', 'Send Us a Message')}
-          </h2>
-          
-          <form className="max-w-2xl mx-auto space-y-6">
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <label className={cn(
-                  "block text-sm font-medium mb-2",
-                  actualTheme === 'dark' ? "text-gray-200" : "text-gray-700"
-                )}>
-                  {t('contact.name', 'Name')}
-                </label>
-                <input
-                  type="text"
-                  className={cn(
-                    "w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors",
-                    actualTheme === 'dark'
-                      ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                      : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-                  )}
-                  placeholder={t('contact.name_placeholder', 'Your name')}
-                />
-              </div>
-              
-              <div>
-                <label className={cn(
-                  "block text-sm font-medium mb-2",
-                  actualTheme === 'dark' ? "text-gray-200" : "text-gray-700"
-                )}>
-                  {t('contact.email', 'Email')}
-                </label>
-                <input
-                  type="email"
-                  className={cn(
-                    "w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors",
-                    actualTheme === 'dark'
-                      ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                      : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-                  )}
-                  placeholder={t('contact.email_placeholder', 'your@email.com')}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className={cn(
-                "block text-sm font-medium mb-2",
-                actualTheme === 'dark' ? "text-gray-200" : "text-gray-700"
-              )}>
-                {t('contact.subject', 'Subject')}
-              </label>
-              <input
-                type="text"
-                className={cn(
-                  "w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors",
-                  actualTheme === 'dark'
-                    ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                    : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-                )}
-                placeholder={t('contact.subject_placeholder', 'How can we help?')}
-              />
-            </div>
-
-            <div>
-              <label className={cn(
-                "block text-sm font-medium mb-2",
-                actualTheme === 'dark' ? "text-gray-200" : "text-gray-700"
-              )}>
-                {t('contact.message', 'Message')}
-              </label>
-              <textarea
-                rows={6}
-                className={cn(
-                  "w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none",
-                  actualTheme === 'dark'
-                    ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                    : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-                )}
-                placeholder={t('contact.message_placeholder', 'Tell us more about your inquiry...')}
-              />
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 text-lg flex items-center justify-center gap-2"
-            >
-              <Send size={20} />
-              {t('contact.send', 'Send Message')}
-            </Button>
-
-            <p className={cn(
-              "text-center text-sm",
-              actualTheme === 'dark' ? "text-gray-400" : "text-gray-500"
-            )}>
-              {t('contact.response_time', 'We typically respond within 24 hours')}
-            </p>
-          </form>
         </div>
       </div>
     </div>
