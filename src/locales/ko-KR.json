@@ -268,7 +268,16 @@
     "company_name_en": "Shenzhen Leiao Artificial Intelligence Operations Limited",
     "company_name_cn": "深圳市蕾奥人工智能运营有限公司",
     "vision_mission": "비전과 미션",
-    "vision_content": "LeiaoAI는 인공지능, 금융, 창의 산업을 연결하는 AI-Ops 및 투자 인텔리전스 플랫폼입니다. 심천에서 태어났지만 글로벌 마인드셋으로 구축된 우리의 미션은 AI를 독립적인 기술에서 확장 가능한 산업력으로 전환하는 것입니다. 데이터, 자본, 인간의 통찰력을 결합하여 창업자, 기업, 투자자가 혁신을 분석, 평가, 운영할 수 있도록 지원합니다. 글로벌 CEO 네비게이터 프로그램을 통해 비전 있는 리더, 투자자, 창작자를 연결합니다. 우리는 미래의 AI 기업이 단순히 제품을 구축하는 것이 아니라 창의성과 자본이 만나는 지능형 생태계를 설계할 것이라고 믿습니다."
+    "vision_content": "LeiaoAI는 인공지능, 금융, 창의 산업을 연결하는 AI-Ops 및 투자 인텔리전스 플랫폼입니다. 심천에서 태어났지만 글로벌 마인드셋으로 구축된 우리의 미션은 AI를 독립적인 기술에서 확장 가능한 산업력으로 전환하는 것입니다. 데이터, 자본, 인간의 통찰력을 결합하여 창업자, 기업, 투자자가 혁신을 분석, 평가, 운영할 수 있도록 지원합니다. 글로벌 CEO 네비게이터 프로그램을 통해 비전 있는 리더, 투자자, 창작자를 연결합니다. 우리는 미래의 AI 기업이 단순히 제품을 구축하는 것이 아니라 창의성과 자본이 만나는 지능형 생태계를 설계할 것이라고 믿습니다.",
+    "what_platform_does": "플랫폼 기능",
+    "ai_investment_expert_title": "AI 투자 전문가",
+    "professional_service_domains_title": "전문 서비스 영역",
+    "ai_bp_analysis_title": "AI 사업계획서 분석",
+    "business_model_canvas_title": "비즈니스 모델 캔버스와 AI",
+    "stories_community_title": "스토리와 커뮤니티",
+    "start_ai_chat_desc": "AI 채팅을 열어 빠른 답변과 전략 가이드를 얻으세요",
+    "upload_bp_desc": "BP를 업로드하여 AI 분석을 받으세요",
+    "share_story_desc": "커뮤니티에 당신의 경험을 공유하세요"
   },
 
   "privacy": {

@@ -413,7 +413,7 @@
     "cta_title": "分享你的故事",
     "cta_subtitle": "你的經驗與洞見，能啟發下一代創新者。加入說書人的社群，創造影響。",
     "need_ideas": "需要靈感？與AI對話",
-    "view_all_stories": "查看所有故事",
+    "view_all_stories": "檢視所有故事",
     "story_title": "故事标题",
     "story_content": "故事内容",
     "category": "分类",
@@ -447,6 +447,22 @@
       "domestic_ai": "国内AI工具",
       "overseas_ai": "海外AI平台"
     }
+  },
+
+  "tags": {
+    "popular_tags": "熱門標籤"
+  },
+
+  "stories_filter": {
+    "filter_by_tags": "按標籤篩選"
+  },
+
+  "stories_sort": {
+    "sort_by": "排序方式",
+    "newest": "最新",
+    "oldest": "最舊",
+    "popular": "最受歡迎",
+    "views": "最多瀏覽"
   },
   
   "quick_ai_consultation_title": "快速AI投資諮詢",
