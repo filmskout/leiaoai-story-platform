@@ -145,40 +145,40 @@
   
   "home": {
     "hero": {
-      "title_1": "专业",
-      "title_2": "AI投资",
-      "title_3": "咨询平台",
-      "description": "基于先进AI技术，为您提供专业投资分析、商业计划书评估和智能决策支持",
-      "mobile_description": "AI智能投资分析，助力商业决策"
+      "title_1": "專業",
+      "title_2": "AI投資",
+      "title_3": "平台",
+      "description": "基於先進AI技術，為您提供專業投資分析、商業計劃書評估和智能決策支援",
+      "mobile_description": "AI智能投資分析，助力商業決策"
     },
     "cta": {
-      "title": "开始体验专业AI投资咨询",
-      "subtitle": "上传您的商业计划书进行AI分析，或直接咨询投融资问题",
-      "mobile_title": "开始AI投资咨询",
-      "mobile_subtitle": "上传BP分析或直接咨询",
-      "upload_bp": "上传BP分析",
-      "ai_chat": "AI问答咨询"
+      "title": "開始體驗專業AI投資諮詢",
+      "subtitle": "上傳您的商業計劃書進行AI分析，或直接諮詢投融資問題",
+      "mobile_title": "開始AI投資諮詢",
+      "mobile_subtitle": "上傳BP分析或直接諮詢",
+      "upload_bp": "上傳BP分析",
+      "ai_chat": "AI問答諮詢"
     },
     "stats": {
-      "total_users": "平台用户",
-      "total_qa": "问答数量",
+      "total_users": "平台用戶",
+      "total_qa": "問答數量",
       "bp_analysis": "BP分析",
-      "avg_response": "平均响应"
+      "avg_response": "平均回應"
     }
   },
   
   "professional_services": {
-    "title": "专业服务领域",
-    "subtitle": "点击领域卡片获取专业投资咨询建议",
-    "mobile_title": "专业服务",
-    "mobile_subtitle": "选择领域获取专业建议",
-    "refresh_suggestions": "刷新建议",
-    "suggested_questions": "推荐问题",
-    "mobile_suggested_questions": "推荐",
-    "click_for_advice": "点击获取专业建议",
-    "bottom_description": "每次显示3个随机推荐问题，点击'刷新建议'获取新的咨询方向",
-    "mobile_bottom_description": "点击'刷新'获取新建议",
-    "enter_full_chat": "进入完整AI问答"
+    "title": "專業服務領域",
+    "subtitle": "點擊領域卡片獲取專業投資諮詢建議",
+    "mobile_title": "專業服務",
+    "mobile_subtitle": "選擇領域獲取專家建議",
+    "refresh_suggestions": "重新整理建議",
+    "suggested_questions": "推薦問題",
+    "mobile_suggested_questions": "推薦",
+    "click_for_advice": "點擊獲取專業建議",
+    "bottom_description": "每次顯示3個隨機推薦問題，點擊『重新整理建議』以獲取新的諮詢方向",
+    "mobile_bottom_description": "點擊『重新整理』以獲取新建議",
+    "enter_full_chat": "進入完整AI問答"
   },
   
   "ai_chat": {
@@ -222,9 +222,9 @@
       "default": "根据当前市场分析，投资策略应该多元化，平衡配置传统资产和新兴资产。我建议关注ESG投资、人工智能和绿色能源。我可以为特定行业提供更详细的投资建议。"
     },
     "sample_questions": {
-      "q1": "请分析当前股市的投资机会",
-      "q2": "创业公司如何进行A轮融资？",
-      "q3": "什么是ESG投资策略？"
+      "q1": "請分析當前股市的投資機會",
+      "q2": "創業公司如何進行A輪融資？",
+      "q3": "什麼是ESG投資策略？"
     },
     "expertise_categories": {
       "macroeconomic": "宏观经济",
@@ -383,6 +383,12 @@
     "investment_value": "投資價值",
     "add_website": "新增網站連結",
     "or": "或",
+    "tabs": {
+      "upload": "文件上傳",
+      "upload_short": "上傳",
+      "canvas": "商業模式畫布",
+      "canvas_short": "BMC"
+    },
     "features": {
       "ai_analysis": "AI分析",
       "ai_analysis_desc": "商業計劃書結構和內容的綜合分析",
@@ -407,6 +413,7 @@
     "cta_title": "分享你的故事",
     "cta_subtitle": "你的經驗與洞見，能啟發下一代創新者。加入說書人的社群，創造影響。",
     "need_ideas": "需要靈感？與AI對話",
+    "view_all_stories": "查看所有故事",
     "story_title": "故事标题",
     "story_content": "故事内容",
     "category": "分类",
@@ -550,6 +557,11 @@
     "san_jose": "圣何塞办公室",
     "san_jose_address": "美国加利福尼亚州圣何塞",
     "company_full_name": "Shenzhen Leiao Artificial Intelligence Operations Limited",
-    "company_full_name_cn": "深圳市蕾奥人工智能运营有限公司"
+    "company_full_name_cn": "深圳市蕾奥人工智能运营有限公司",
+    "ai_investment_expert_title": "AI投資專家",
+    "professional_service_domains_title": "專業服務領域",
+    "ai_bp_analysis_title": "AI商業計劃書分析",
+    "business_model_canvas_title": "商業模式畫布與AI洞察",
+    "stories_community_title": "用戶故事與社區"
   }
 }
