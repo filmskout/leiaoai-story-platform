@@ -514,6 +514,9 @@
     "start_ai_chat": "啟動AI問答 – 打開智能問答，獲取快速解答和戰略指導。",
     "upload_bp": "上傳BP分析 – 讓AI分析您的商業計劃書，發現潛在機會。",
     "share_story": "分享故事 – 在社區中分享您的經歷，並從他人故事中學習。",
+    "start_ai_chat_desc": "開啟AI問答以獲取快速解答與策略指引",
+    "upload_bp_desc": "上傳BP以獲取AI分析與洞察",
+    "share_story_desc": "在社區分享你的故事與經驗",
     "tagline": "蕾奧AI——以智能、洞察與誠信，賦能AI經濟的未來。"
   },
   
