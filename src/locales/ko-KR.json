@@ -59,6 +59,55 @@
 
   "search": "검색",
 
+  "home": {
+    "hero": {
+      "title_1": "전문",
+      "title_2": "AI 투자",
+      "title_3": "플랫폼",
+      "description": "고급 AI 기술을 기반으로 전문 투자 분석, 사업계획서 평가 및 지능형 의사결정 지원 제공",
+      "mobile_description": "스마트한 비즈니스 의사결정을 위한 AI 투자 분석"
+    },
+    "cta": {
+      "title": "전문 AI 투자 컨설팅 경험 시작",
+      "subtitle": "AI 분석을 위해 사업계획서를 업로드하거나 투자 및 자금 조달 문제에 대해 직접 상담",
+      "mobile_title": "AI 투자 컨설팅 시작",
+      "mobile_subtitle": "BP 분석 업로드 또는 직접 상담",
+      "upload_bp": "BP 분석 업로드",
+      "ai_chat": "AI Q&A 컨설팅"
+    },
+    "stats": {
+      "total_users": "플랫폼 사용자",
+      "total_qa": "Q&A 수",
+      "bp_analysis": "BP 분석",
+      "avg_response": "평균 응답 시간"
+    }
+  },
+
+  "professional_services": {
+    "title": "전문 서비스 영역",
+    "subtitle": "전문 투자 컨설팅 조언을 위해 영역 카드를 클릭하세요",
+    "mobile_title": "전문 서비스",
+    "mobile_subtitle": "전문가 조언을 위해 영역을 선택하세요",
+    "refresh_suggestions": "제안 새로고침",
+    "suggested_questions": "제안된 질문",
+    "mobile_suggested_questions": "제안",
+    "click_for_advice": "전문 조언을 위해 클릭",
+    "bottom_description": "매번 3개의 무작위 제안 질문을 표시하며, 새로운 컨설팅 방향을 위해 '제안 새로고침'을 클릭하세요",
+    "mobile_bottom_description": "새로운 제안을 위해 '새로고침'을 클릭하세요",
+    "enter_full_chat": "전체 AI 채팅으로 이동"
+  },
+
+  "stories": {
+    "title": "스토리",
+    "page_title": "사용자 스토리 및 커뮤니티",
+    "page_subtitle": "투자 경험을 공유하고 성공 사례에서 배우세요",
+    "mobile_page_title": "사용자 스토리",
+    "mobile_page_subtitle": "경험을 공유하고 사례에서 배우세요",
+    "create_story": "스토리 공유",
+    "latest": "최신 스토리",
+    "view_all_stories": "모든 스토리 보기"
+  },
+
   "ai_chat": {
     "title": "AI 투자 전문가",
     "subtitle": "비즈니스 결정을 지원하는 전문 투자 컨설팅 서비스",
@@ -106,19 +155,37 @@
     "introduction": "LeiaoAI 웹사이트(leiao.ai) 및 관련 서비스(이하 '서비스')에 대한 액세스 및 사용은 이 이용약관(이하 '약관')에 따라 조건부입니다. 이 서비스를 사용함으로써 귀하는 이 약관에 구속되는 것에 동의합니다."
   },
 
-  "contact": {
-    "title": "연락처",
-    "subtitle": "언제든지 문의하세요",
-    "form_title": "메시지 보내기",
-    "name_label": "이름",
-    "name_placeholder": "이름을 입력하세요",
-    "email_label": "이메일 주소",
-    "email_placeholder": "이메일을 입력하세요",
-    "subject_label": "제목",
-    "subject_placeholder": "어떻게 도와드릴까요?",
-    "message_label": "메시지",
-    "message_placeholder": "문의사항을 알려주세요...",
-    "send_button": "메시지 보내기",
-    "response_time": "보통 24시간 이내에 답변드립니다"
+  "bp_analysis": {
+    "title": "사업계획서 분석",
+    "subtitle": "사업계획서를 업로드하여 전문 AI 분석 리포트를 받으세요",
+    "page_title": "사업계획서 분석",
+    "page_subtitle": "사업계획서를 업로드하여 전문 AI 분석 리포트를 받으세요",
+    "mobile_page_title": "BP 분석",
+    "mobile_page_subtitle": "AI 기반 사업계획서 분석",
+    "upload_bp": "BP 업로드",
+    "drag_drop": "파일을 여기에 드래그하거나 클릭하여 업로드",
+    "supported_formats": "PDF, DOCX 형식 지원",
+    "max_size": "최대 파일 크기 50MB",
+    "analyzing": "분석 중...",
+    "analysis_complete": "분석 완료",
+    "analysis_report": "분석 리포트",
+    "score": "종합 점수",
+    "recommendations": "개선 제안",
+    "market_analysis": "시장 분석",
+    "business_model": "비즈니스 모델",
+    "team_assessment": "팀 평가",
+    "financial_projection": "재무 예측",
+    "risk_assessment": "위험 평가",
+    "investment_value": "투자 가치",
+    "features": {
+      "ai_analysis": "AI 분석",
+      "ai_analysis_desc": "사업계획서 구조와 내용의 종합 분석",
+      "market_insights": "시장 인사이트",
+      "market_insights_desc": "시장 잠재력과 경쟁 환경 분석",
+      "risk_assessment": "위험 평가",
+      "risk_assessment_desc": "잠재적 위험의 식별과 평가",
+      "growth_projections": "성장 예측",
+      "growth_projections_desc": "미래 성장 잠재력과 확장성 분석"
+    }
   }
 }

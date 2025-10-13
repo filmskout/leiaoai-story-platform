@@ -19,7 +19,7 @@ const supportedLanguages = [
     flag: '🇨🇳'
   },
   {
-    code: 'zh-TW', 
+    code: 'zh-HK', 
     name: '繁體中文',
     nativeName: '繁體中文',
     flag: '🇭🇰'
@@ -138,7 +138,7 @@ export function LanguageSelector({ className, variant = 'default' }: LanguageSel
         
         // 国家代码到语言的映射
         const countryToLanguage: { [key: string]: string } = {
-          'CN': 'zh-CN', 'TW': 'zh-TW', 'HK': 'zh-TW', 'MO': 'zh-TW',
+          'CN': 'zh-CN', 'TW': 'zh-HK', 'HK': 'zh-HK', 'MO': 'zh-HK',
           'JP': 'ja-JP', 'KR': 'ko-KR', 'FR': 'fr-FR', 'DE': 'de-DE', 'ES': 'es-ES',
           'PT': 'pt-PT', 'BR': 'pt-PT', 'RU': 'ru-RU', 'IN': 'hi-IN',
           'SA': 'ar-SA', 'AE': 'ar-SA', 'EG': 'ar-SA', 'IT': 'it-IT'

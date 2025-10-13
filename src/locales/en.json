@@ -346,6 +346,10 @@
   "bp_analysis": {
     "title": "Business Plan Analysis",
     "subtitle": "Upload your business plan to get a professional AI analysis report",
+    "page_title": "Business Plan Analysis",
+    "page_subtitle": "Upload your business plan to get a professional AI analysis report",
+    "mobile_page_title": "BP Analysis",
+    "mobile_page_subtitle": "AI-powered business plan analysis",
     "upload_bp": "Upload BP",
     "drag_drop": "Drag files here or click to upload",
     "supported_formats": "Supports PDF, DOCX formats",
@@ -360,7 +364,17 @@
     "team_assessment": "Team Assessment",
     "financial_projection": "Financial Projection",
     "risk_assessment": "Risk Assessment",
-    "investment_value": "Investment Value"
+    "investment_value": "Investment Value",
+    "features": {
+      "ai_analysis": "AI Analysis",
+      "ai_analysis_desc": "Comprehensive analysis of business plan structure and content",
+      "market_insights": "Market Insights",
+      "market_insights_desc": "Market potential and competitive landscape analysis",
+      "risk_assessment": "Risk Assessment",
+      "risk_assessment_desc": "Identification and evaluation of potential risks",
+      "growth_projections": "Growth Projections",
+      "growth_projections_desc": "Future growth potential and scalability analysis"
+    }
   },
   
   "stories": {

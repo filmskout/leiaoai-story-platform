@@ -59,6 +59,55 @@
 
   "search": "検索",
 
+  "home": {
+    "hero": {
+      "title_1": "プロフェッショナル",
+      "title_2": "AI投資",
+      "title_3": "プラットフォーム",
+      "description": "先進的なAI技術に基づき、プロフェッショナルな投資分析、ビジネスプラン評価、インテリジェントな意思決定サポートを提供",
+      "mobile_description": "スマートなビジネス意思決定のためのAI投資分析"
+    },
+    "cta": {
+      "title": "プロフェッショナルAI投資コンサルティングを体験開始",
+      "subtitle": "AI分析のためにビジネスプランをアップロードするか、投資・資金調達の問題について直接相談",
+      "mobile_title": "AI投資コンサルティング開始",
+      "mobile_subtitle": "BP分析をアップロードするか直接相談",
+      "upload_bp": "BP分析アップロード",
+      "ai_chat": "AI Q&Aコンサルティング"
+    },
+    "stats": {
+      "total_users": "プラットフォームユーザー",
+      "total_qa": "Q&A数",
+      "bp_analysis": "BP分析",
+      "avg_response": "平均応答時間"
+    }
+  },
+
+  "professional_services": {
+    "title": "プロフェッショナルサービス領域",
+    "subtitle": "プロフェッショナルな投資コンサルティングアドバイスのために領域カードをクリック",
+    "mobile_title": "プロフェッショナルサービス",
+    "mobile_subtitle": "専門家アドバイスのために領域を選択",
+    "refresh_suggestions": "提案を更新",
+    "suggested_questions": "推奨質問",
+    "mobile_suggested_questions": "推奨",
+    "click_for_advice": "プロフェッショナルアドバイスをクリック",
+    "bottom_description": "毎回3つのランダムな提案質問を表示、新しいコンサルティング方向のために「提案を更新」をクリック",
+    "mobile_bottom_description": "新しい提案のために「更新」をクリック",
+    "enter_full_chat": "完全AIチャットに入る"
+  },
+
+  "stories": {
+    "title": "ストーリー",
+    "page_title": "ユーザーストーリーとコミュニティ",
+    "page_subtitle": "投資経験を共有し、成功事例から学ぶ",
+    "mobile_page_title": "ユーザーストーリー",
+    "mobile_page_subtitle": "経験を共有し、事例から学ぶ",
+    "create_story": "ストーリーを共有",
+    "latest": "最新ストーリー",
+    "view_all_stories": "すべてのストーリーを見る"
+  },
+
   "ai_chat": {
     "title": "AI投資専門家",
     "subtitle": "プロフェッショナルな投資コンサルティングサービスで、ビジネス判断をサポート",
@@ -106,19 +155,37 @@
     "introduction": "LeiaoAIウェブサイト（leiao.ai）および関連サービス（以下「サービス」）へのアクセスおよび使用は、これらの利用規約（以下「規約」）に従うことを条件とします。これらのサービスを使用することにより、これらの規約に拘束されることに同意したことになります。"
   },
 
-  "contact": {
-    "title": "お問い合わせ",
-    "subtitle": "お気軽にお問い合わせください",
-    "form_title": "メッセージを送信",
-    "name_label": "お名前",
-    "name_placeholder": "お名前を入力",
-    "email_label": "メールアドレス",
-    "email_placeholder": "メールアドレスを入力",
-    "subject_label": "件名",
-    "subject_placeholder": "どのようなお手伝いができますか？",
-    "message_label": "メッセージ",
-    "message_placeholder": "お問い合わせ内容をお聞かせください...",
-    "send_button": "メッセージを送信",
-    "response_time": "通常24時間以内に返信いたします"
+  "bp_analysis": {
+    "title": "ビジネスプラン分析",
+    "subtitle": "ビジネスプランをアップロードしてプロフェッショナルなAI分析レポートを取得",
+    "page_title": "ビジネスプラン分析",
+    "page_subtitle": "ビジネスプランをアップロードしてプロフェッショナルなAI分析レポートを取得",
+    "mobile_page_title": "BP分析",
+    "mobile_page_subtitle": "AI駆動のビジネスプラン分析",
+    "upload_bp": "BPアップロード",
+    "drag_drop": "ファイルをここにドラッグするか、クリックしてアップロード",
+    "supported_formats": "PDF、DOCX形式をサポート",
+    "max_size": "最大ファイルサイズ50MB",
+    "analyzing": "分析中...",
+    "analysis_complete": "分析完了",
+    "analysis_report": "分析レポート",
+    "score": "総合スコア",
+    "recommendations": "改善提案",
+    "market_analysis": "市場分析",
+    "business_model": "ビジネスモデル",
+    "team_assessment": "チーム評価",
+    "financial_projection": "財務予測",
+    "risk_assessment": "リスク評価",
+    "investment_value": "投資価値",
+    "features": {
+      "ai_analysis": "AI分析",
+      "ai_analysis_desc": "ビジネスプランの構造と内容の包括的分析",
+      "market_insights": "市場インサイト",
+      "market_insights_desc": "市場ポテンシャルと競争環境の分析",
+      "risk_assessment": "リスク評価",
+      "risk_assessment_desc": "潜在リスクの特定と評価",
+      "growth_projections": "成長予測",
+      "growth_projections_desc": "将来の成長ポテンシャルとスケーラビリティの分析"
+    }
   }
 }
