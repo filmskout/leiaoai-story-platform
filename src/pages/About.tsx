@@ -38,7 +38,7 @@ const About: React.FC = () => {
               actualTheme === 'dark' ? "text-white" : "text-gray-900",
               "text-3xl sm:text-4xl lg:text-5xl"
             )}>
-              {isEnglish ? 'About LeiaoAI' : '关于蕾奥AI'}
+              {t('about.title')}
             </h1>
             <div className={cn(
               "inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8",
@@ -48,16 +48,16 @@ const About: React.FC = () => {
             )}>
               <Globe2 size={20} />
               <span className="text-sm font-medium">
-                {isEnglish ? 'AI × Finance × Creative Industries' : 'AI × 金融 × 创意产业'}
+                {i18n.language.startsWith('zh') ? 'AI × 金融 × 创意产业' : 'AI × Finance × Creative Industries'}
               </span>
             </div>
             <p className={cn(
               "text-sm text-center mb-8",
               actualTheme === 'dark' ? "text-gray-400" : "text-gray-600"
             )}>
-              {isEnglish 
-                ? 'Shenzhen Leiao Artificial Intelligence Operations Limited' 
-                : '深圳市蕾奥人工智能运营有限公司'
+              {i18n.language.startsWith('zh')
+                ? t('about.company_name_cn')
+                : t('about.company_name_en')
               }
             </p>
           </div>
@@ -76,34 +76,16 @@ const About: React.FC = () => {
             "text-3xl font-bold mb-6",
             actualTheme === 'dark' ? "text-white" : "text-gray-900"
           )}>
-            {isEnglish ? 'Vision & Mission' : '愿景与使命'}
+            {t('about.vision_mission')}
           </h2>
           
           <div className={cn(
             "prose max-w-none",
             actualTheme === 'dark' ? "prose-invert" : "prose-gray"
           )}>
-            {isEnglish ? (
-              <>
-                <p className="text-lg leading-relaxed">
-                  LeiaoAI is an AI‑Ops and investment intelligence platform that bridges artificial intelligence, finance and creative industries. Born in Shenzhen but built with a global mindset, our mission is to turn AI from a standalone technology into a scalable industrial force. We empower founders, enterprises and investors to analyse, evaluate and operationalise innovation by combining data, capital and human insight.
-                </p>
-                <p className="text-lg leading-relaxed mt-4">
-                  Through our <strong>Global CEO Navigator Program</strong> we connect visionary leaders, investors and creators. We believe that future AI enterprises won't just build products – they will design intelligent ecosystems where creativity meets capital.
-                </p>
-              </>
-            ) : (
-              <>
-                <p className="text-lg leading-relaxed">
-                  蕾奥AI（LeiaoAI） 是一个融合 <strong>人工智能×金融×创意产业</strong> 的智能运营与投资决策平台。
-                  诞生于深圳，面向全球，我们的使命是把AI从独立技术转化为 <strong>可规模化的产业力量</strong>，通过 <strong>数据、资本与人才</strong> 的融合，帮助企业、创业者与投资机构实现从分析到决策再到落地的智能化升级。
-                </p>
-                <p className="text-lg leading-relaxed mt-4">
-                  在 <strong>全球CEO领航者计划</strong> 的推动下，我们连接全球创新领袖、投资人和创作者。
-                  我们相信，下一代AI企业不只是造产品，而是构建 <strong>让创意与资本共振的智能生态</strong>。
-                </p>
-              </>
-            )}
+            <p className="text-lg leading-relaxed">
+              {t('about.vision_content')}
+            </p>
           </div>
         </div>
       </div>
@@ -118,7 +100,7 @@ const About: React.FC = () => {
             "text-3xl font-bold text-center mb-12",
             actualTheme === 'dark' ? "text-white" : "text-gray-900"
           )}>
-            {isEnglish ? 'What the Platform Does' : '平台功能'}
+            {t('about.what_platform_does')}
           </h2>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

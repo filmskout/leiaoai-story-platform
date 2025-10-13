@@ -296,7 +296,7 @@ export default function Home() {
           <div className={cn("max-w-6xl mx-auto flex items-center justify-between mb-4")}> 
             <div>
               <h2 className={cn(isMobile ? "text-xl" : "text-2xl", "font-bold text-foreground")}>{t('stories.latest', 'Latest Stories')}</h2>
-              <p className="text-foreground-muted text-sm">{t('stories.subtitle', 'Fresh insights and updates')}</p>
+              <p className="text-foreground-muted text-sm">Discover the latest insights and experiences from our community.</p>
             </div>
             <div>
               <Link to={user ? "/create-story" : "/auth"}>

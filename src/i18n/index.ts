@@ -11,7 +11,7 @@ i18n
     // 使用中文作为备用语言
     fallbackLng: 'zh-CN',
     // 简化为主要语言，避免复杂性
-    supportedLngs: ['zh-CN', 'en-US', 'zh-TW', 'ja-JP', 'ko-KR', 'fr-FR', 'de-DE', 'es-ES', 'it-IT', 'pt-PT', 'ru-RU', 'ar-SA', 'hi-IN'],
+    supportedLngs: ['zh-CN', 'en-US', 'zh-HK', 'ja-JP', 'ko-KR', 'fr-FR', 'de-DE', 'es-ES', 'it-IT', 'pt-PT', 'ru-RU', 'ar-SA', 'hi-IN'],
     interpolation: {
       escapeValue: false, // React already escapes values
     },

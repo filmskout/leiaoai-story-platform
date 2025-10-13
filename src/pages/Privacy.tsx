@@ -9,7 +9,7 @@ const Privacy: React.FC = () => {
   const { actualTheme } = useTheme();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const isEnglish = i18n.language.startsWith('en');
+  const isEnglish = i18n.language.startsWith('en') || (!i18n.language.startsWith('zh'));
 
   const lastUpdated = 'January 12, 2025';
   const lastUpdatedCN = '2025年1月12日';
@@ -35,7 +35,7 @@ const Privacy: React.FC = () => {
             )}
           >
             <ArrowLeft size={20} />
-            <span>{isEnglish ? 'Back to Home' : '返回主页'}</span>
+            <span>{i18n.language.startsWith('zh') ? '返回主页' : 'Back to Home'}</span>
           </button>
           
           <div className="flex items-center gap-3 mb-4">
@@ -50,13 +50,13 @@ const Privacy: React.FC = () => {
                 "text-3xl font-bold",
                 actualTheme === 'dark' ? "text-white" : "text-gray-900"
               )}>
-                {isEnglish ? 'Privacy Policy' : '隐私政策'}
+                {t('privacy.title')}
               </h1>
               <p className={cn(
                 "text-sm mt-1",
                 actualTheme === 'dark' ? "text-gray-400" : "text-gray-500"
               )}>
-                {isEnglish ? `Last Updated: ${lastUpdated}` : `最后更新：${lastUpdatedCN}`}
+                {t('privacy.last_updated')}
               </p>
             </div>
           </div>
