@@ -43,7 +43,9 @@
   
   "app_description": "專業AI投資平台",
   "footer": {
-    "developed_by": "由 LeiaoAI Agent 开发"
+    "slogan": "專業AI投資平台",
+    "developed_by": "由 LeiaoAI Agent 開發",
+    "copyright": "© 2025 深圳市蕾奧人工智能運營有限公司. All rights reserved."
   },
   
   "auth": {

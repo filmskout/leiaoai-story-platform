@@ -473,12 +473,7 @@ export default function Layout() {
           </div>
           
           <div className="mt-6 pt-6 border-t border-border text-center text-xs text-foreground-muted">
-            <p>
-              © 2025 {i18n.language.startsWith('zh') 
-                ? '深圳市蕾奥人工智能运营有限公司' 
-                : 'Shenzhen Leiao Artificial Intelligence Operations Limited'
-              }. All rights reserved.
-            </p>
+            <p>{t('footer.copyright', '© 2025 Shenzhen Leiao Artificial Intelligence Operations Limited. All rights reserved.')}</p>
           </div>
         </div>
       </footer>

@@ -44,7 +44,9 @@
   
   "app_description": "Professional AI Investment Platform",
   "footer": {
-    "developed_by": "Developed by LeiaoAI Agent"
+    "slogan": "Professional AI Investment Platform",
+    "developed_by": "Developed by LeiaoAI Agent",
+    "copyright": "© 2025 Shenzhen Leiao Artificial Intelligence Operations Limited. All rights reserved."
   },
   
   "nav": {
