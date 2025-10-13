@@ -67,13 +67,14 @@
   },
   
   "nav": {
-    "home": "首页",
-    "ai_chat": "AI问答",
+    "home": "首頁",
+    "ai_chat": "AI對話",
     "stories": "故事",
-    "questions": "问题",
+    "questions": "問題",
     "bp_analysis": "BP分析",
-    "profile": "个人中心",
-    "settings": "设置"
+    "profile": "個人中心",
+    "settings": "設置",
+    "dashboard": "儀表板"
   },
   
   "home": {

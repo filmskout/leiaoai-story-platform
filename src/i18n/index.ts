@@ -7,7 +7,7 @@ import enTranslation from '../locales/en.json';
 import zhCNTranslation from '../locales/zh-CN.json';
 import zhHKTranslation from '../locales/zh-HK.json';
 
-// Create resources object
+// Create resources object with proper structure
 const resources = {
   'en-US': { translation: enTranslation },
   'en': { translation: enTranslation },
@@ -30,14 +30,14 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    // 设置回退语言：英文和简体中文
+    lng: 'en-US', // Default language
     fallbackLng: {
       'zh': ['zh-CN'],
-      'default': ['en-US', 'zh-CN']
+      'default': ['en-US']
     },
     supportedLngs: ['zh-CN', 'en-US', 'zh-HK', 'ja-JP', 'ko-KR', 'fr-FR', 'de-DE', 'es-ES', 'it-IT', 'pt-PT', 'ru-RU', 'ar-SA', 'hi-IN'],
     interpolation: {
-      escapeValue: false, // React already escapes values
+      escapeValue: false,
     },
     detection: {
       order: ['localStorage', 'navigator', 'htmlTag'],

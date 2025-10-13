@@ -55,7 +55,8 @@
     "questions": "Questions",
     "bp_analysis": "BP Analysis",
     "profile": "Profile",
-    "settings": "Settings"
+    "settings": "Settings",
+    "dashboard": "Dashboard"
   },
   
   "settings": {
@@ -174,6 +175,104 @@
       "exit_strategy": "Exit Strategy Planning",
       "valuation_model": "Valuation Model",
       "due_diligence": "Due Diligence"
+    },
+    "expertise_questions": {
+      "cvc_investment": [
+        "What are the strategic differences between CVC and traditional VC investments?",
+        "How to evaluate the strategic synergy value of CVC investments?",
+        "How do large enterprises build effective CVC investment systems?",
+        "What are the key success factors for corporate venture capital?",
+        "How to balance financial returns with strategic objectives in CVC?",
+        "Best practices for CVC investment portfolio management and governance"
+      ],
+      "ma_restructuring": [
+        "Valuation methods and pricing strategies in M&A transactions",
+        "How to identify and evaluate synergy effects of M&A targets?",
+        "Main risks and response strategies for cross-border M&A",
+        "Strategic points for successful post-merger integration",
+        "Cultural due diligence in international M&A",
+        "Regulatory approval process for large-scale M&A"
+      ],
+      "ipo_a_share": [
+        "Comparison of listing conditions between STAR Market and ChiNext",
+        "Key factors analysis for IPO valuation and pricing",
+        "Market considerations for IPO timing selection",
+        "IPO preparation assessment and timeline planning",
+        "Compliance requirements and procedures for A-share listing",
+        "Investor relations strategies for newly listed companies"
+      ],
+      "ipo_hk_share": [
+        "HKEX listing requirements and procedures explained",
+        "Advantages and challenges of dual listing",
+        "How to respond to Hong Kong market regulatory environment?",
+        "Currency hedging strategies for Hong Kong-listed companies",
+        "Cross-border capital allocation optimization",
+        "Maintaining international investor confidence"
+      ],
+      "ipo_us_share": [
+        "US market IPO preparation and compliance requirements",
+        "SEC reporting and disclosure obligations",
+        "Successful US public offering strategies",
+        "Sarbanes-Oxley Act compliance for overseas issuers",
+        "Managing currency and political risks in US listing",
+        "Building institutional investor base in US market"
+      ],
+      "spac_listing": [
+        "SPAC vs Traditional IPO: Pros and cons comparison",
+        "Due diligence considerations for SPAC transactions",
+        "How to structure and negotiate SPAC transactions?",
+        "SPAC sponsor economics and alignment mechanisms",
+        "Regulatory changes affecting SPAC market dynamics",
+        "Post-merger integration planning for SPAC transactions"
+      ],
+      "macro_analysis": [
+        "How does the current global economic situation affect China's investment market?",
+        "How will macroeconomic policies in 2025 affect investment strategies?",
+        "What is the optimal investment allocation in an inflationary environment?",
+        "Central bank policy divergence and cross-border capital flows",
+        "Impact of geopolitical tensions on global investment patterns",
+        "Emerging market opportunities in the current economic cycle"
+      ],
+      "investment_environment": [
+        "What are the main differences between US and Chinese investment environments?",
+        "Investment opportunity comparison: A-shares, HK stocks, US stocks",
+        "Investment risk assessment: emerging markets vs mature markets",
+        "Regulatory environment changes affecting foreign investment",
+        "ESG considerations in Asian vs Western markets",
+        "Technology sector investment climate comparison"
+      ],
+      "valuation_adjustment": [
+        "Key terms and mechanisms in valuation adjustment agreements",
+        "How to structure anti-dilution clauses?",
+        "Negotiating valuation adjustment trigger mechanisms and calculations",
+        "Milestone-based valuation adjustment frameworks",
+        "Protecting investor interests through adjustment mechanisms",
+        "Common disputes and resolutions in valuation adjustments"
+      ],
+      "exit_strategy": [
+        "PE/VC exit timing and method selection",
+        "Pros and cons comparison: IPO exit vs M&A exit",
+        "How to maximize investment exit returns?",
+        "Secondary market strategies for private equity exits",
+        "Cross-border exit considerations and tax implications",
+        "Building strategic buyer relationships for exits"
+      ],
+      "valuation_model": [
+        "Application scenarios for valuation methods like DCF, PE, PB",
+        "How to establish reasonable valuations for high-growth companies?",
+        "Key factor analysis in comparable company valuation",
+        "Valuation adjustments for emerging market risks",
+        "Valuation methodologies for technology companies",
+        "Integration of ESG factors in modern valuation models"
+      ],
+      "due_diligence": [
+        "Core focus points and methods for financial due diligence",
+        "Key business metrics analysis in commercial due diligence",
+        "Main risk identification points in legal due diligence",
+        "Technical and IP due diligence for technology investments",
+        "Environmental and social due diligence frameworks",
+        "Management team assessment and background checks"
+      ]
     }
   },
   
