@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { Mail, MapPin, Phone, Clock, ArrowLeft, Send } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import officeImages from '@/data/officeImages.json';
 
 const Contact: React.FC = () => {
   const { actualTheme } = useTheme();
@@ -31,14 +32,14 @@ const Contact: React.FC = () => {
 
 
 
-  // Get office images
+  // Get office images (base64 encoded for better performance)
   const getOfficeImage = (officeType: 'shenzhen' | 'hong_kong' | 'san_jose') => {
-    const images = {
-      shenzhen: '/images/offices/shenzhen-office.jpg',
-      hong_kong: '/images/offices/hong-kong-office.jpg', 
-      san_jose: '/images/offices/san-jose-office.jpg'
+    const imageMap = {
+      shenzhen: officeImages['shenzhen'],
+      hong_kong: officeImages['hong-kong'],
+      san_jose: officeImages['san-jose']
     };
-    return images[officeType];
+    return imageMap[officeType];
   };
 
   // Get click-through URLs for opening full maps
