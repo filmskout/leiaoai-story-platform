@@ -86,6 +86,17 @@ const Contact: React.FC = () => {
     return selectedConfig;
   };
 
+  // China-only multi-marker AMap iframe URL (no API key; hides UI; shows only map and pins)
+  const gaodeMultiIframeUrl =
+    'https://uri.amap.com/marker?' +
+    'markers=' +
+    [
+      '113.943139,22.520361,深圳南山区后海阳光金融大厦',
+      '114.149885,22.281337,香港灣仔The Phoenix 21F The Hive',
+      '-122.008221,37.335237,美国加州圣荷西1814 Brighten Avenue',
+    ].join('|') +
+    '&hide=1&zoom=13&src=leiaoai';
+
   const offices = [
     {
       city: t('contact.shenzhen', 'Shenzhen Office'),
@@ -342,10 +353,43 @@ const Contact: React.FC = () => {
             {t('contact.offices', 'Our Offices')}
           </h2>
 
+          {/* China-only: show one consolidated AMap multi-marker map */}
+          {isChina && (
+            <div className={cn(
+              "rounded-xl overflow-hidden mb-8",
+              actualTheme === 'dark'
+                ? "bg-gray-800 border border-gray-700"
+                : "bg-white border border-gray-200 shadow-lg"
+            )}>
+              <div className="p-4">
+                <p className={cn(
+                  "text-sm",
+                  actualTheme === 'dark' ? "text-gray-300" : "text-gray-600"
+                )}>
+                  高德地图 · 多个办公位置
+                </p>
+              </div>
+              <div className="aspect-video w-full">
+                <a href={gaodeMultiIframeUrl} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
+                  <iframe
+                    src={gaodeMultiIframeUrl}
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    title={`AMap Multi Office Locations`}
+                    className="rounded-b-xl"
+                  />
+                </a>
+              </div>
+            </div>
+          )}
+
           {/* Desktop: 3 maps in a row, Mobile: 1 map per row */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {offices.map((office, index) => {
-              const mapUrl = getMapConfig(office.type);
+              const mapUrl = isChina ? null : getMapConfig(office.type);
               
               return (
                 <div
@@ -441,12 +485,14 @@ const Contact: React.FC = () => {
                           )}>
                             {office.address}
                           </p>
-                          <p className={cn(
-                            "text-xs mt-4",
-                            actualTheme === 'dark' ? "text-gray-400" : "text-gray-500"
-                          )}>
-                            Map loading...
-                          </p>
+                          {!isChina && (
+                            <p className={cn(
+                              "text-xs mt-4",
+                              actualTheme === 'dark' ? "text-gray-400" : "text-gray-500"
+                            )}>
+                              Map loading...
+                            </p>
+                          )}
                         </div>
                       </div>
                     )}
