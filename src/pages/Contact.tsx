@@ -36,22 +36,22 @@ const Contact: React.FC = () => {
 
     const configs = {
       shenzhen: {
-        // Google Maps: English address, public embed with specific coordinates
-        google: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3684.1234567890!2d113.943139!3d22.520361!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjLCsDMxJzEzLjMiTiAxMTNCsDU2JzM1LjMiRQ!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus',
-        // Gaode: Chinese address, public embed without search bar and popup
-        gaode: 'https://uri.amap.com/marker?position=113.943139,22.520361&name=深圳市南山区后海阳光金融大厦&src=leiaoai&hide=1'
+        // Google Maps: English address, public embed with specific coordinates and pin
+        google: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3684.1234567890!2d113.943139!3d22.520361!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjLCsDMxJzEzLjMiTiAxMTNCsDU2JzM1LjMiRQ!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus&q=22.520361,113.943139&markers=22.520361,113.943139',
+        // Gaode: Chinese address, public embed with minimal UI (hide all controls)
+        gaode: 'https://uri.amap.com/marker?position=113.943139,22.520361&name=LeiaoAI&src=leiaoai&hide=1&ui=0'
       },
       hong_kong: {
         // Google Maps: English address, public embed
         google: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3684.1234567890!2d114.149885!3d22.281337!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjLCsDE2JzUyLjgiTiAxMTTCsDA4JzU5LjYiRQ!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus',
-        // Gaode: Chinese address, public embed without search bar and popup
-        gaode: 'https://uri.amap.com/marker?position=114.14988455,22.281337&name=香港灣仔盧押道23號The Phoenix 21樓.The Hive Wanchai&src=leiaoai&hide=1'
+        // Gaode: Chinese address, public embed with minimal UI (hide all controls)
+        gaode: 'https://uri.amap.com/marker?position=114.14988455,22.281337&name=LeiaoAI&src=leiaoai&hide=1&ui=0'
       },
       san_jose: {
         // Google Maps: English address, public embed
         google: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3684.1234567890!2d-122.008221!3d37.335237!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzfCsDIwJzA2LjkiTiAxMjLCsDAwJzI5LjYiVw!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus',
-        // Gaode: Chinese address, public embed without search bar and popup
-        gaode: 'https://uri.amap.com/marker?position=-122.00822085,37.3352372&name=美国加州圣荷西1814 Brighten Avenue&src=leiaoai&hide=1'
+        // Gaode: Chinese address, public embed with minimal UI (hide all controls)
+        gaode: 'https://uri.amap.com/marker?position=-122.00822085,37.3352372&name=LeiaoAI&src=leiaoai&hide=1&ui=0'
       }
     };
 
@@ -91,11 +91,11 @@ const Contact: React.FC = () => {
     'https://uri.amap.com/marker?' +
     'markers=' +
     [
-      '113.943139,22.520361,深圳南山区后海阳光金融大厦',
-      '114.149885,22.281337,香港灣仔The Phoenix 21F The Hive',
-      '-122.008221,37.335237,美国加州圣荷西1814 Brighten Avenue',
+      '113.943139,22.520361,LeiaoAI',
+      '114.149885,22.281337,LeiaoAI',
+      '-122.008221,37.335237,LeiaoAI',
     ].join('|') +
-    '&hide=1&zoom=13&src=leiaoai';
+    '&hide=1&ui=0&zoom=13&src=leiaoai';
 
   const offices = [
     {
