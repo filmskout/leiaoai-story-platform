@@ -357,6 +357,7 @@ const Contact: React.FC = () => {
                           {office.city}
                         </h3>
                         <p className={cn(
+                          "whitespace-pre-line",
                           actualTheme === 'dark' ? "text-gray-300" : "text-gray-600"
                         )}>
                           {office.address}
