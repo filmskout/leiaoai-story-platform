@@ -125,10 +125,24 @@ export default function Home() {
       <motion.section 
         variants={itemVariants}
         className={cn(
-          "relative overflow-hidden bg-gradient-subtle",
-          isMobile ? "py-6 px-4" : "py-10 md:py-12 px-4"
+          "relative overflow-hidden",
+          isMobile 
+            ? "py-8 px-4 bg-gradient-to-br from-primary-50 via-background to-primary-100/30 dark:from-primary-950/50 dark:via-background dark:to-primary-900/30" 
+            : "py-10 md:py-12 px-4 bg-gradient-subtle"
         )}
       >
+        {/* 移动端装饰性AI图标 */}
+        {isMobile && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+            className="absolute top-4 right-4 w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center"
+          >
+            <Sparkles className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+          </motion.div>
+        )}
+        
         <div className={cn("container-custom", isMobile && "px-0")}>
           <div className={cn("max-w-6xl mx-auto", isMobile && "max-w-none")}>
             <div className={cn(
@@ -151,11 +165,14 @@ export default function Home() {
                     variants={itemVariants}
                     className={cn(
                       "font-bold text-foreground leading-tight",
-                      isMobile ? "text-2xl" : "text-4xl md:text-5xl lg:text-6xl"
+                      isMobile ? "text-3xl" : "text-4xl md:text-5xl lg:text-6xl"
                     )}
                   >
                     {t('home.hero.title_1')}
-                    <span className="text-gradient"> {t('home.hero.title_2')} </span>
+                    <span className={cn(
+                      "text-gradient",
+                      isMobile && "block mt-1 text-4xl"
+                    )}> {t('home.hero.title_2')} </span>
                     {t('home.hero.title_3')}
                   </motion.h1>
                   
@@ -163,7 +180,7 @@ export default function Home() {
                     variants={itemVariants}
                     className={cn(
                       "text-foreground-secondary leading-relaxed",
-                      isMobile ? "text-base max-w-sm mx-auto" : "text-lg max-w-2xl"
+                      isMobile ? "text-base max-w-xs mx-auto font-medium" : "text-lg max-w-2xl"
                     )}
                   >
                     {isMobile ? t('home.hero.mobile_description') : t('home.hero.description')}
@@ -174,23 +191,38 @@ export default function Home() {
                   variants={itemVariants}
                   className={cn(
                     "flex gap-3",
-                    isMobile ? "flex-col" : "flex-row gap-4"
+                    isMobile ? "flex-col space-y-3" : "flex-row gap-4"
                   )}
                 >
                   {/* 左侧主按钮：AI Investment Expert */}
                   <Link to="/ai-chat">
                     <Button 
-                      size={isMobile ? "default" : "lg"} 
+                      size={isMobile ? "lg" : "lg"} 
                       className={cn(
-                        "group",
-                        isMobile && "w-full"
+                        "group bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white shadow-lg hover:shadow-xl transition-all duration-300",
+                        isMobile && "w-full py-4 text-lg font-semibold"
                       )}
                     >
-                      <Bot size={16} className="mr-2" />
+                      <Bot size={isMobile ? 20 : 16} className="mr-2" />
                       {t('ai_chat.title')}
-                      <ArrowRight size={14} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                      <ArrowRight size={isMobile ? 18 : 14} className="ml-2 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </Link>
+                  
+                  {/* 移动端添加BP分析按钮 */}
+                  {isMobile && (
+                    <Link to="/bp-analysis">
+                      <Button 
+                        size="lg"
+                        variant="outline"
+                        className="w-full py-4 text-lg font-semibold border-primary-300 text-primary-600 hover:bg-primary-50 dark:border-primary-700 dark:text-primary-400 dark:hover:bg-primary-950/50"
+                      >
+                        <FileText size={20} className="mr-2" />
+                        {t('bp_analysis.title')}
+                        <ArrowRight size={18} className="ml-2" />
+                      </Button>
+                    </Link>
+                  )}
                 </motion.div>
 
                 {/* 数据统计 - 移动端优化 */}
@@ -198,7 +230,7 @@ export default function Home() {
                   variants={itemVariants}
                   className={cn(
                     "pt-6",
-                    isMobile ? "grid grid-cols-2 gap-3" : "grid grid-cols-2 md:grid-cols-4 gap-4 pt-8"
+                    isMobile ? "grid grid-cols-2 gap-4 bg-white/50 dark:bg-gray-800/50 rounded-xl p-4 backdrop-blur-sm" : "grid grid-cols-2 md:grid-cols-4 gap-4 pt-8"
                   )}
                 >
                   <motion.div 
@@ -207,11 +239,11 @@ export default function Home() {
                   >
                     <div className={cn(
                       "font-bold text-foreground",
-                      isMobile ? "text-lg" : "text-2xl"
+                      isMobile ? "text-xl text-primary-600 dark:text-primary-400" : "text-2xl"
                     )}>{isStatsLoading ? mockStats.totalUsers.toLocaleString() : stats.total_users.toLocaleString()}</div>
                     <div className={cn(
                       "text-foreground-muted",
-                      isMobile ? "text-xs" : "text-sm"
+                      isMobile ? "text-xs font-medium" : "text-sm"
                     )}>{t('home.stats.total_users')}</div>
                   </motion.div>
                   <motion.div 
@@ -220,11 +252,11 @@ export default function Home() {
                   >
                     <div className={cn(
                       "font-bold text-foreground",
-                      isMobile ? "text-lg" : "text-2xl"
+                      isMobile ? "text-xl text-primary-600 dark:text-primary-400" : "text-2xl"
                     )}>{isStatsLoading ? mockStats.totalQuestions.toLocaleString() : stats.total_qa.toLocaleString()}</div>
                     <div className={cn(
                       "text-foreground-muted",
-                      isMobile ? "text-xs" : "text-sm"
+                      isMobile ? "text-xs font-medium" : "text-sm"
                     )}>{t('home.stats.total_qa')}</div>
                   </motion.div>
                   <motion.div 
