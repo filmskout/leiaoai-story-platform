@@ -454,20 +454,16 @@ export default function Layout() {
             
             <div className="flex items-center space-x-6 text-sm text-foreground-muted">
               <Link to="/about" className="hover:text-foreground transition-colors">
-                <span className="hidden sm:inline">{t('nav.about')}</span>
-                <span className="sm:hidden">About</span>
+                {t('nav.about')}
               </Link>
               <Link to="/privacy" className="hover:text-foreground transition-colors">
-                <span className="hidden sm:inline">{t('nav.privacy')}</span>
-                <span className="sm:hidden">Privacy</span>
+                {t('nav.privacy')}
               </Link>
               <Link to="/terms" className="hover:text-foreground transition-colors">
-                <span className="hidden sm:inline">{t('nav.terms')}</span>
-                <span className="sm:hidden">Terms</span>
+                {t('nav.terms')}
               </Link>
               <Link to="/contact" className="hover:text-foreground transition-colors">
-                <span className="hidden sm:inline">{t('nav.contact')}</span>
-                <span className="sm:hidden">Contact</span>
+                {t('nav.contact')}
               </Link>
             </div>
           </div>

@@ -50,11 +50,26 @@
   },
   
   "home": {
+    "hero": {
+      "title_1": "पेशेवर",
+      "title_2": "AI निवेश",
+      "title_3": "प्लेटफॉर्म",
+      "description": "उन्नत AI तकनीक पर आधारित, पेशेवर निवेश विश्लेषण, व्यापार योजना मूल्यांकन और बुद्धिमान निर्णय समर्थन प्रदान करना",
+      "mobile_description": "स्मार्ट व्यापारिक निर्णयों के लिए AI निवेश विश्लेषण"
+    },
     "cta": {
-      "title": "Start Experiencing Professional AI Investment Consulting",
-      "subtitle": "Upload your business plan for AI analysis, or directly consult on investment and financing issues",
-      "upload_bp": "Upload BP Analysis",
-      "ai_chat": "AI Q&A Consulting"
+      "title": "पेशेवर AI निवेश सलाहकार अनुभव शुरू करें",
+      "subtitle": "AI विश्लेषण के लिए अपनी व्यापार योजना अपलोड करें, या निवेश और वित्तपोषण मुद्दों पर सीधे सलाह लें",
+      "mobile_title": "AI निवेश सलाहकार शुरू करें",
+      "mobile_subtitle": "BP विश्लेषण अपलोड करें या सीधे सलाह लें",
+      "upload_bp": "BP विश्लेषण अपलोड करें",
+      "ai_chat": "AI Q&A सलाहकार"
+    },
+    "stats": {
+      "total_users": "प्लेटफॉर्म उपयोगकर्ता",
+      "total_qa": "Q&A गिनती",
+      "bp_analysis": "BP विश्लेषण",
+      "avg_response": "औसत प्रतिक्रिया समय"
     }
   },
   

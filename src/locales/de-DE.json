@@ -117,11 +117,26 @@
   },
   
   "home": {
+    "hero": {
+      "title_1": "Professionelle",
+      "title_2": "KI-Investition",
+      "title_3": "Plattform",
+      "description": "Basierend auf fortschrittlicher KI-Technologie, bietet professionelle Investitionsanalyse, Geschäftsplanbewertung und intelligente Entscheidungsunterstützung",
+      "mobile_description": "KI-Investitionsanalyse für intelligente Geschäftsentscheidungen"
+    },
     "cta": {
       "title": "Beginnen Sie die Erfahrung mit professioneller KI-Investment-Beratung",
       "subtitle": "Laden Sie Ihren Geschäftsplan für KI-Analyse hoch oder konsultieren Sie direkt zu Investment- und Finanzierungsfragen",
+      "mobile_title": "KI-Investment-Beratung starten",
+      "mobile_subtitle": "BP-Analyse hochladen oder direkt konsultieren",
       "upload_bp": "BP Analyse hochladen",
       "ai_chat": "KI Q&A Beratung"
+    },
+    "stats": {
+      "total_users": "Plattform-Benutzer",
+      "total_qa": "Q&A-Anzahl",
+      "bp_analysis": "BP-Analyse",
+      "avg_response": "Durchschnittliche Antwortzeit"
     }
   },
   

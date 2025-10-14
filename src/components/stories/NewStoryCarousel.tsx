@@ -178,11 +178,6 @@ export function NewStoryCarousel({ className }: NewStoryCarouselProps) {
   if (loading) {
     return (
       <div className={cn("space-y-6", className)}>
-        <div className="text-center space-y-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-            {t('stories.latest_stories', 'Latest Stories')}
-          </h2>
-        </div>
         
         {/* Loading grid */}
         <div className={cn(
@@ -207,9 +202,6 @@ export function NewStoryCarousel({ className }: NewStoryCarouselProps) {
     return (
       <div className={cn("space-y-6", className)}>
         <div className="text-center space-y-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-            {t('stories.latest_stories', 'Latest Stories')}
-          </h2>
           <p className="text-foreground-secondary">
             {t('stories.no_stories', 'No stories available at the moment.')}
           </p>
@@ -220,26 +212,6 @@ export function NewStoryCarousel({ className }: NewStoryCarouselProps) {
 
   return (
     <div className={cn("space-y-6", className)}>
-      {/* Section header */}
-      <div className="text-center space-y-4">
-        <motion.h2 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-2xl md:text-3xl font-bold text-foreground"
-        >
-          {t('stories.latest_stories', 'Latest Stories')}
-        </motion.h2>
-        <motion.p 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="text-foreground-secondary max-w-2xl mx-auto"
-        >
-          {t('stories.latest_description', 'Discover the latest insights and experiences from our community.')}
-        </motion.p>
-      </div>
-
       {/* Story Cards Grid */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
@@ -259,18 +231,18 @@ export function NewStoryCarousel({ className }: NewStoryCarouselProps) {
             className="group"
             onClick={() => handleStoryClick(story.id)}
           >
-            <Card className="overflow-hidden h-full hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer border-0 shadow-md">
+            <Card className="overflow-hidden h-full transition-all duration-200 cursor-pointer border-0 shadow-sm hover:shadow-md">
               <div className="relative aspect-[4/3] overflow-hidden">
                 <img 
                   src={story.image} 
                   alt={story.title}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  className="w-full h-full object-cover"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.src = `/story-images/story-${Math.floor(Math.random() * 8) + 1}.jpg`;
                   }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
                 
                 {/* Tags overlay */}
                 {story.tags && story.tags.length > 0 && (
@@ -290,7 +262,7 @@ export function NewStoryCarousel({ className }: NewStoryCarouselProps) {
               
               <CardContent className="p-6 space-y-4">
                 {/* Title */}
-                <h3 className="text-lg font-semibold text-foreground line-clamp-2 leading-tight group-hover:text-primary-600 transition-colors">
+                <h3 className="text-lg font-semibold text-foreground line-clamp-2 leading-tight">
                   {story.title}
                 </h3>
                 

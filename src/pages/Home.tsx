@@ -129,8 +129,8 @@ export default function Home() {
           isMobile ? "py-6 px-4" : "py-10 md:py-12 px-4"
         )}
       >
-        <div className="container-custom">
-          <div className="max-w-6xl mx-auto">
+        <div className={cn("container-custom", isMobile && "px-0")}>
+          <div className={cn("max-w-6xl mx-auto", isMobile && "max-w-none")}>
             <div className={cn(
               "items-center",
               isMobile ? "space-y-6" : "grid lg:grid-cols-2 gap-12"
@@ -278,7 +278,7 @@ export default function Home() {
           isMobile ? "py-6" : "py-10"
         )}
       >
-        <div className="container-custom">
+        <div className={cn("container-custom", isMobile && "px-0")}>
           <ExpertiseCards />
         </div>
       </motion.section>
@@ -288,12 +288,12 @@ export default function Home() {
         variants={itemVariants}
         className={cn(
           "px-4",
-          isMobile ? "py-8" : "py-12"
+          isMobile ? "py-4" : "py-8"
         )}
       >
-        <div className="container-custom">
-          {/* 标题与操作区：左侧标题，右侧 Create Story（与上方“专业服务领域”对齐） */}
-          <div className={cn("max-w-6xl mx-auto flex items-center justify-between mb-3")}> 
+        <div className={cn("container-custom", isMobile && "px-0")}>
+          {/* 标题与操作区：左侧标题，右侧 Create Story（与上方"专业服务领域"对齐） */}
+          <div className={cn("max-w-6xl mx-auto flex items-center justify-between mb-3", isMobile && "max-w-none px-4")}> 
             <div>
               <h2 className={cn(isMobile ? "text-xl" : "text-2xl", "font-bold text-foreground")}>{t('stories.latest', 'Latest Stories')}</h2>
               <p className="text-foreground-muted text-sm">
@@ -309,7 +309,7 @@ export default function Home() {
               </Link>
             </div>
           </div>
-          <NewStoryCarousel className="max-w-6xl mx-auto" />
+          <NewStoryCarousel className={cn("max-w-6xl mx-auto", isMobile && "max-w-none")} />
 
           {/* View All Stories Button */}
           <motion.div 

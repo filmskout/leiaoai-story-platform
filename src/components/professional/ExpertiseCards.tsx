@@ -583,7 +583,7 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
                         <Card 
                           key={`${area.key}-${refreshKey}`}
                           className={cn(
-                            "group cursor-pointer border border-border/50 hover:border-primary-400/80 dark:hover:border-primary-500/80 select-none overflow-hidden bg-gradient-to-br from-background via-background to-background/95 hover:from-background hover:via-primary-50/20 hover:to-primary-100/30 dark:hover:from-background dark:hover:via-primary-900/10 dark:hover:to-primary-800/20 backdrop-blur-sm",
+                            "group cursor-pointer border-0 select-none overflow-hidden bg-background/50 backdrop-blur-sm",
                             styles.expertiseCard
                           )}
                           onClick={() => handleCardClick(area)}

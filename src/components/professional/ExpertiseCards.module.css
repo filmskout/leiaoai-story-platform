@@ -17,22 +17,17 @@
 
 /* 卡片hover效果优化 */
 .expertiseCard {
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   transform-origin: center;
   z-index: 1;
   position: relative;
-  /* 增加buffer空间确保hover效果不被裁切 */
-  margin: 8px;
+  margin: 4px;
 }
 
 .expertiseCard:hover {
-  transform: translateY(-12px) scale(1.03);
-  z-index: 20;
-  box-shadow: 
-    0 25px 50px -12px rgba(0, 0, 0, 0.25),
-    0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 0 0 1px rgba(99, 102, 241, 0.3),
-    0 0 20px rgba(99, 102, 241, 0.15);
+  transform: translateY(-2px);
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* 确保卡片在hover时有足够空间显示完整边框和阴影 */
@@ -45,11 +40,7 @@
 /* 深色模式下的hover效果 */
 @media (prefers-color-scheme: dark) {
   .expertiseCard:hover {
-    box-shadow: 
-      0 25px 50px -12px rgba(0, 0, 0, 0.5),
-      0 20px 25px -5px rgba(0, 0, 0, 0.3),
-      0 0 0 1px rgba(139, 92, 246, 0.4),
-      0 0 20px rgba(139, 92, 246, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
 }
 
