@@ -455,10 +455,6 @@
     }
   },
 
-  "stories": {
-    "filter_by_tags": "按標籤篩選"
-  },
-
   "tags": {
     "popular_tags": "熱門標籤"
   },
