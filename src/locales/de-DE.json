@@ -4,6 +4,7 @@
   "error": "Fehler",
   "cancel": "Abbrechen",
   "confirm": "Bestätigen",
+  "characters": "Zeichen",
   "save": "Speichern",
   "delete": "Löschen",
   "edit": "Bearbeiten",
@@ -34,19 +35,85 @@
   "terms": "Nutzungsbedingungen",
   "success": "Erfolg",
   
+  "common": {
+    "back": "Zurück",
+    "cancel": "Abbrechen",
+    "characters": "Zeichen",
+    "back_to_home": "Zurück zur Startseite"
+  },
+  
   "app_description": "Professionelle KI-Investment-Plattform",
   "footer": {
-    "developed_by": "Entwickelt von LeiaoAI Agent"
+    "slogan": "Professionelle KI-Investment-Plattform",
+    "developed_by": "Entwickelt von LeiaoAI Agent",
+    "copyright": "© 2025 Shenzhen Leiao Artificial Intelligence Operations Limited. Alle Rechte vorbehalten."
   },
   
   "nav": {
     "home": "Startseite",
+    "about": "Über uns",
+    "contact": "Kontakt",
+    "privacy": "Datenschutz",
+    "terms": "Bedingungen",
     "ai_chat": "KI Chat",
     "stories": "Geschichten",
     "questions": "Fragen",
     "bp_analysis": "BP Analyse",
     "profile": "Profil",
-    "settings": "Einstellungen"
+    "settings": "Einstellungen",
+    "dashboard": "Dashboard"
+  },
+
+  "auth": {
+    "sign_in": "Anmelden",
+    "sign_out": "Abmelden",
+    "sign_up": "Registrieren",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "confirm_password": "Passwort bestätigen",
+    "forgot_password": "Passwort vergessen?",
+    "remember_me": "Angemeldet bleiben",
+    "or_continue_with": "Oder fortfahren mit",
+    "already_have_account": "Haben Sie bereits ein Konto?",
+    "dont_have_account": "Haben Sie kein Konto?",
+    "create_account": "Konto erstellen",
+    "back_to_home": "Zurück zur Startseite",
+    "welcome": "Willkommen bei LeiaoAI",
+    "signin_subtitle": "Melden Sie sich in Ihrem Konto an",
+    "signup_subtitle": "Erstellen Sie ein neues Konto",
+    "signin": "Anmelden",
+    "signup": "Registrieren",
+    "email_label": "E-Mail-Adresse",
+    "email_placeholder": "Geben Sie Ihre E-Mail ein",
+    "password_label": "Passwort",
+    "password_placeholder": "Geben Sie Ihr Passwort ein",
+    "confirm_password_label": "Passwort bestätigen",
+    "confirm_password_placeholder": "Bestätigen Sie Ihr Passwort",
+    "processing": "Verarbeitung...",
+    "signin_button": "Anmelden",
+    "signup_button": "Konto erstellen",
+    "divider_or": "Oder fortfahren mit",
+    "google_signin": "Mit Google fortfahren",
+    "footer_signin": "Durch die Anmeldung stimmen Sie unseren",
+    "footer_signup": "Durch die Kontoerstellung stimmen Sie unseren",
+    "terms": "Nutzungsbedingungen",
+    "privacy": "Datenschutzrichtlinie",
+    "error_required_fields": "Bitte füllen Sie alle erforderlichen Felder aus",
+    "error_password_mismatch": "Passwörter stimmen nicht überein",
+    "error_password_length": "Passwort muss mindestens 6 Zeichen haben",
+    "error_signin_failed": "Anmeldung fehlgeschlagen",
+    "error_signup_failed": "Registrierung fehlgeschlagen",
+    "error_unexpected": "Ein unerwarteter Fehler ist aufgetreten",
+    "error_google_failed": "Google-Anmeldung fehlgeschlagen",
+    "error_wallet_failed": "Wallet-Verbindung fehlgeschlagen",
+    "success_signin": "Erfolgreich angemeldet!",
+    "success_signup": "Konto erfolgreich erstellt! Sie können sich jetzt anmelden.",
+    "success_wallet": "Wallet erfolgreich verbunden!"
+  },
+
+  "user": {
+    "avatar": "Benutzer-Avatar",
+    "profile": "Sie"
   },
   
   "home": {
@@ -182,8 +249,7 @@
     "years_ago": "vor {{years}} Jahren"
   }
 ,
-  "placeholder_response": "Ask investment-related questions to get professional AI advice"
-,
-  "footer_description": "LeiaoAI professional investment consulting services, providing intelligent investment analysis and decision support",
-  "footer_provider": "Powered by LeiaoAI Agent"
+  "placeholder_response": "Stellen Sie investitionsbezogene Fragen, um professionelle KI-Beratung zu erhalten",
+  "footer_description": "Unterstützt von fortschrittlichen KI-Modellen",
+  "footer_provider": "Professionelle Investment-Beratung"
 }

@@ -265,8 +265,7 @@
     "years_ago": "há {{years}} anos"
   }
 ,
-  "placeholder_response": "Ask investment-related questions to get professional AI advice"
-,
-  "footer_description": "LeiaoAI professional investment consulting services, providing intelligent investment analysis and decision support",
-  "footer_provider": "Powered by LeiaoAI Agent"
+  "placeholder_response": "Faça perguntas relacionadas a investimentos para obter conselhos profissionais de IA",
+  "footer_description": "Alimentado por modelos de IA avançados",
+  "footer_provider": "Consultoria de investimento profissional"
 }
