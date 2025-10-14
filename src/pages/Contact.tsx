@@ -30,33 +30,15 @@ const Contact: React.FC = () => {
   }, []);
 
 
-  // Map configurations - Public access versions without API keys
-  const getMapConfig = (officeType: 'shenzhen' | 'hong_kong' | 'san_jose') => {
-    if (isChina === null) return null; // Still loading
 
-    const configs = {
-      shenzhen: {
-        // Google Maps: English address, public embed with specific coordinates and pin
-        google: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3684.1234567890!2d113.943139!3d22.520361!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjLCsDMxJzEzLjMiTiAxMTNCsDU2JzM1LjMiRQ!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus&q=22.520361,113.943139&markers=22.520361,113.943139',
-        // Gaode: Chinese address, public embed with minimal UI (hide all controls and popups)
-        gaode: 'https://uri.amap.com/marker?position=113.943139,22.520361&name=LeiaoAI&src=leiaoai&hide=1&ui=0&popup=0&toolbar=0'
-      },
-      hong_kong: {
-        // Google Maps: English address, public embed
-        google: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3684.1234567890!2d114.149885!3d22.281337!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjLCsDE2JzUyLjgiTiAxMTTCsDA4JzU5LjYiRQ!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus',
-        // Gaode: Chinese address, public embed with minimal UI (hide all controls and popups)
-        gaode: 'https://uri.amap.com/marker?position=114.14988455,22.281337&name=LeiaoAI&src=leiaoai&hide=1&ui=0&popup=0&toolbar=0'
-      },
-      san_jose: {
-        // Google Maps: English address, public embed
-        google: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3684.1234567890!2d-122.008221!3d37.335237!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzfCsDIwJzA2LjkiTiAxMjLCsDAwJzI5LjYiVw!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus',
-        // Gaode: Chinese address, public embed with minimal UI (hide all controls and popups)
-        gaode: 'https://uri.amap.com/marker?position=-122.00822085,37.3352372&name=LeiaoAI&src=leiaoai&hide=1&ui=0&popup=0&toolbar=0'
-      }
+  // Get office images
+  const getOfficeImage = (officeType: 'shenzhen' | 'hong_kong' | 'san_jose') => {
+    const images = {
+      shenzhen: '/images/offices/shenzhen-office.jpg',
+      hong_kong: '/images/offices/hong-kong-office.jpg', 
+      san_jose: '/images/offices/san-jose-office.jpg'
     };
-
-    const selectedConfig = isChina ? configs[officeType].gaode : configs[officeType].google;
-    return selectedConfig;
+    return images[officeType];
   };
 
   // Get click-through URLs for opening full maps
@@ -347,8 +329,6 @@ const Contact: React.FC = () => {
           {/* Desktop: 3 maps in a row, Mobile: 1 map per row */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {offices.map((office, index) => {
-              // In China: still show per-office AMap thumbnails (and consolidated AMap above)
-              const mapUrl = getMapConfig(office.type);
               
               return (
                 <div
@@ -384,77 +364,38 @@ const Contact: React.FC = () => {
                     </div>
                   </div>
                   
-                  {/* Map */}
+                  {/* Office Image */}
                   <div className="aspect-video w-full">
-                    {mapUrl ? (
-                      <div className="relative w-full h-full">
-                        <iframe
-                          src={mapUrl}
-                          width="100%"
-                          height="100%"
-                          style={{ border: 0 }}
-                          allowFullScreen
-                          loading="lazy"
-                          referrerPolicy="no-referrer-when-downgrade"
-                          title={`${office.city} Office Location`}
-                          className="rounded-b-xl"
-                        />
-                        {/* Click overlay to open full map */}
-                        <a
-                          href={getMapClickUrl(office.type)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={cn(
-                            "absolute inset-0 bg-transparent hover:bg-black hover:bg-opacity-10 transition-all duration-300",
-                            "flex items-center justify-center rounded-b-xl group"
-                          )}
-                        >
-                          <div className={cn(
-                            "opacity-0 group-hover:opacity-100 transition-opacity duration-300",
-                            "bg-white bg-opacity-90 px-4 py-2 rounded-lg shadow-lg"
-                          )}>
-                            <p className={cn(
-                              "text-sm font-medium",
-                              actualTheme === 'dark' ? "text-gray-900" : "text-gray-700"
-                            )}>
-                              {isChina ? '点击查看高德地图' : 'Click to view in Google Maps'}
-                            </p>
-                          </div>
-                        </a>
-                      </div>
-                    ) : (
+                    <a
+                      href={getMapClickUrl(office.type)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block w-full h-full relative group cursor-pointer"
+                    >
+                      <img
+                        src={getOfficeImage(office.type)}
+                        alt={`${office.city} Office`}
+                        className="w-full h-full object-cover rounded-b-xl"
+                        loading="lazy"
+                      />
+                      {/* Overlay with click hint */}
                       <div className={cn(
-                        "w-full h-full flex items-center justify-center",
-                        actualTheme === 'dark' ? "bg-gray-700" : "bg-gray-100"
+                        "absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center",
+                        "rounded-b-xl"
                       )}>
-                        <div className="text-center p-6">
-                          <MapPin className={cn(
-                            "mx-auto mb-4",
-                            actualTheme === 'dark' ? "text-gray-400" : "text-gray-500"
-                          )} size={48} />
+                        <div className={cn(
+                          "opacity-0 group-hover:opacity-100 transition-opacity duration-300",
+                          "bg-white bg-opacity-90 px-4 py-2 rounded-lg shadow-lg"
+                        )}>
                           <p className={cn(
-                            "text-lg font-semibold mb-2",
-                            actualTheme === 'dark' ? "text-white" : "text-gray-900"
+                            "text-sm font-medium",
+                            actualTheme === 'dark' ? "text-gray-900" : "text-gray-700"
                           )}>
-                            {office.city}
+                            {isChina ? '点击查看高德地图' : 'Click to view in Google Maps'}
                           </p>
-                          <p className={cn(
-                            "text-sm",
-                            actualTheme === 'dark' ? "text-gray-300" : "text-gray-600"
-                          )}>
-                            {office.address}
-                          </p>
-                          {!isChina && (
-                            <p className={cn(
-                              "text-xs mt-4",
-                              actualTheme === 'dark' ? "text-gray-400" : "text-gray-500"
-                            )}>
-                              Map loading...
-                            </p>
-                          )}
                         </div>
                       </div>
-                    )}
+                    </a>
                   </div>
                 </div>
               );
