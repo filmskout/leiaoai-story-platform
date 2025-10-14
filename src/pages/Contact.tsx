@@ -196,10 +196,10 @@ const Contact: React.FC = () => {
                 "space-y-1",
                 actualTheme === 'dark' ? "text-gray-300" : "text-gray-600"
               )}>
-                <p><strong>{t('contact.shenzhen', 'Shenzhen:')}</strong></p>
-                <p>+86 755 xxxx xxxx</p>
-                <p className="mt-3"><strong>{t('contact.hong_kong', 'Hong Kong:')}</strong></p>
-                <p>+852 xxxx xxxx</p>
+                <p><strong>{t('contact.shenzhen', 'Shenzhen Office')}</strong></p>
+                <p>{t('contact.shenzhen_phone', '+86 131 8911 1956')}</p>
+                <p className="mt-3"><strong>{t('contact.hong_kong', 'Hong Kong Office')}</strong></p>
+                <p>{t('contact.hong_kong_phone', '+852 6496 9205')}</p>
               </div>
             </div>
           </div>

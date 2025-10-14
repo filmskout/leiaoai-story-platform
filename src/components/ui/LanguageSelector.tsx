@@ -85,6 +85,12 @@ const supportedLanguages = [
     flag: '🇸🇦'
   },
   {
+    code: 'fa-IR',
+    name: 'فارسی',
+    nativeName: 'فارسی',
+    flag: '🇮🇷'
+  },
+  {
     code: 'hi-IN',
     name: 'हिन्दी',
     nativeName: 'हिन्दी',
@@ -141,7 +147,7 @@ export function LanguageSelector({ className, variant = 'default' }: LanguageSel
           'CN': 'zh-CN', 'TW': 'zh-HK', 'HK': 'zh-HK', 'MO': 'zh-HK',
           'JP': 'ja-JP', 'KR': 'ko-KR', 'FR': 'fr-FR', 'DE': 'de-DE', 'ES': 'es-ES',
           'PT': 'pt-PT', 'BR': 'pt-PT', 'RU': 'ru-RU', 'IN': 'hi-IN',
-          'SA': 'ar-SA', 'AE': 'ar-SA', 'EG': 'ar-SA', 'IT': 'it-IT'
+          'SA': 'ar-SA', 'AE': 'ar-SA', 'EG': 'ar-SA', 'IT': 'it-IT', 'IR': 'fa-IR'
         };
         
         const detectedLanguage = countryToLanguage[countryCode] || 'en';

@@ -8,6 +8,14 @@ import zhCNTranslation from '../locales/zh-CN.json';
 import zhHKTranslation from '../locales/zh-HK.json';
 import jaJPTranslation from '../locales/ja-JP.json';
 import koKRTranslation from '../locales/ko-KR.json';
+import frFRTranslation from '../locales/fr-FR.json';
+import deDETranslation from '../locales/de-DE.json';
+import esESTranslation from '../locales/es-ES.json';
+import itITTranslation from '../locales/it-IT.json';
+import ptPTTranslation from '../locales/pt-PT.json';
+import ruRUTranslation from '../locales/ru-RU.json';
+import arSATranslation from '../locales/ar-SA.json';
+import faIRTranslation from '../locales/fa-IR.json';
 
 // Create resources object with proper structure
 const resources = {
@@ -17,13 +25,14 @@ const resources = {
   'zh-HK': { translation: zhHKTranslation },
   'ja-JP': { translation: jaJPTranslation },
   'ko-KR': { translation: koKRTranslation },
-  'fr-FR': { translation: enTranslation }, // Fallback to English
-  'de-DE': { translation: enTranslation }, // Fallback to English
-  'es-ES': { translation: enTranslation }, // Fallback to English
-  'it-IT': { translation: enTranslation }, // Fallback to English
-  'pt-PT': { translation: enTranslation }, // Fallback to English
-  'ru-RU': { translation: enTranslation }, // Fallback to English
-  'ar-SA': { translation: enTranslation }, // Fallback to English
+  'fr-FR': { translation: frFRTranslation },
+  'de-DE': { translation: deDETranslation },
+  'es-ES': { translation: esESTranslation },
+  'it-IT': { translation: itITTranslation },
+  'pt-PT': { translation: ptPTTranslation },
+  'ru-RU': { translation: ruRUTranslation },
+  'ar-SA': { translation: arSATranslation },
+  'fa-IR': { translation: faIRTranslation },
   'hi-IN': { translation: enTranslation }, // Fallback to English
 };
 
@@ -39,7 +48,7 @@ i18n
       'zh': ['zh-CN'],
       'default': ['en']
     },
-    supportedLngs: ['zh-CN', 'en', 'en-US', 'zh-HK', 'ja-JP', 'ko-KR', 'fr-FR', 'de-DE', 'es-ES', 'it-IT', 'pt-PT', 'ru-RU', 'ar-SA', 'hi-IN'],
+    supportedLngs: ['zh-CN', 'en', 'en-US', 'zh-HK', 'ja-JP', 'ko-KR', 'fr-FR', 'de-DE', 'es-ES', 'it-IT', 'pt-PT', 'ru-RU', 'ar-SA', 'fa-IR', 'hi-IN'],
     interpolation: {
       escapeValue: false,
     },
