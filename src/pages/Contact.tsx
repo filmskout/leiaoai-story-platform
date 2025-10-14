@@ -389,7 +389,8 @@ const Contact: React.FC = () => {
           {/* Desktop: 3 maps in a row, Mobile: 1 map per row */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {offices.map((office, index) => {
-              const mapUrl = isChina ? null : getMapConfig(office.type);
+              // In China: still show per-office AMap thumbnails (and consolidated AMap above)
+              const mapUrl = getMapConfig(office.type);
               
               return (
                 <div
