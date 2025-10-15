@@ -296,10 +296,10 @@
   },
   
   "ai_chat": {
-    "title": "AI Investment Expert",
+    "title": "Experto en inversión con IA",
     "subtitle": "Professional investment consulting services to empower your business decisions",
-    "page_title": "AI Investment Consultant",
-    "page_subtitle": "Professional investment advice powered by advanced AI",
+    "page_title": "Consultor de inversión con IA",
+    "page_subtitle": "Asesoramiento profesional impulsado por modelos de IA avanzados",
     "mobile_page_title": "AI Consultant",
     "mobile_page_subtitle": "Investment advice at your fingertips",
     "placeholder": "Ask me about investment opportunities, market trends, or financial advice...",
@@ -624,8 +624,8 @@
   },
   
   "placeholder_response": "Ask investment-related questions to get professional AI advice",
-  "footer_description": "Powered by advanced AI models",
-  "footer_provider": "Professional investment consultation",
+  "footer_description": "Asesoría de inversión profesional con modelos de IA avanzados",
+  "footer_provider": "Impulsado por LeiaoAI Agent",
   
   "about": {
     "title": "About LeiaoAI",

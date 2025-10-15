@@ -296,10 +296,10 @@
   },
 
   "ai_chat": {
-    "title": "AI Investment Expert",
+    "title": "AI 투자 전문가",
     "subtitle": "Professional investment consulting services to empower your business decisions",
-    "page_title": "AI Investment Consultant",
-    "page_subtitle": "Professional investment advice powered by advanced AI",
+    "page_title": "AI 투자 컨설턴트",
+    "page_subtitle": "고급 AI 모델 기반의 전문 투자 자문",
     "mobile_page_title": "AI Consultant",
     "mobile_page_subtitle": "Investment advice at your fingertips",
     "placeholder": "Ask me about investment opportunities, market trends, or financial advice...",
@@ -624,8 +624,8 @@
   },
   
   "placeholder_response": "Ask investment-related questions to get professional AI advice",
-  "footer_description": "Powered by advanced AI models",
-  "footer_provider": "Professional investment consultation",
+  "footer_description": "고급 AI 모델이 제공하는 전문 투자 컨설팅",
+  "footer_provider": "LeiaoAI Agent 제공",
   
   "about": {
     "title": "About LeiaoAI",

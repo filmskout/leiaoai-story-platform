@@ -296,10 +296,10 @@
   },
   
   "ai_chat": {
-    "title": "AI Investment Expert",
+    "title": "ผู้เชี่ยวชาญการลงทุนด้วย AI",
     "subtitle": "Professional investment consulting services to empower your business decisions",
-    "page_title": "AI Investment Consultant",
-    "page_subtitle": "Professional investment advice powered by advanced AI",
+    "page_title": "ที่ปรึกษาการลงทุนด้วย AI",
+    "page_subtitle": "คำแนะนำการลงทุนระดับมืออาชีพโดยขับเคลื่อนด้วยโมเดล AI ขั้นสูง",
     "mobile_page_title": "AI Consultant",
     "mobile_page_subtitle": "Investment advice at your fingertips",
     "placeholder": "Ask me about investment opportunities, market trends, or financial advice...",
@@ -624,8 +624,8 @@
   },
   
   "placeholder_response": "Ask investment-related questions to get professional AI advice",
-  "footer_description": "Powered by advanced AI models",
-  "footer_provider": "Professional investment consultation",
+  "footer_description": "ที่ปรึกษาการลงทุนระดับมืออาชีพด้วยโมเดล AI ขั้นสูง",
+  "footer_provider": "ขับเคลื่อนโดย LeiaoAI Agent",
   
   "about": {
     "title": "About LeiaoAI",
