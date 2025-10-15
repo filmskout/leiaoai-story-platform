@@ -584,11 +584,6 @@
     "max_tags_reached": "Maximum 3 tags allowed"
   },
 
-  "auth": {
-    "login_required": "Please log in",
-    "sign_in": "Sign In"
-  },
-
   "quick_ai_consultation_title": "Quick AI Investment Consultation",
   "ai_expert_greeting": "Hello! I am LeiaoAI Investment Expert, specializing in professional investment consulting services.",
   "view_complete_ai_chat": "View Complete AI Chat",

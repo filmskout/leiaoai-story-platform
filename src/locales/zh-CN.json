@@ -47,27 +47,7 @@
     "copyright": "© 2025 深圳市蕾奥人工智能运营有限公司。保留所有权利。"
   },
   
-  "auth": {
-    "sign_in": "登录",
-    "sign_out": "退出登录",
-    "sign_up": "注册",
-    "email": "邮箱",
-    "password": "密码",
-    "forgot_password": "忘记密码",
-    "reset_password": "重置密码",
-    "login_with_google": "使用Google登录",
-    "login_with_github": "使用GitHub登录",
-    "login_success": "登录成功",
-    "logout_success": "退出成功",
-    "login_required": "请先登录"
-  },
   
-  "user": {
-    "avatar": "头像",
-    "username": "用户名",
-    "email": "邮箱",
-    "profile": "个人资料"
-  },
   
   "loading": {
     "page": "页面加载中...",
