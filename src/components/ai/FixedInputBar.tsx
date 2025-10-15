@@ -58,11 +58,12 @@ export function FixedInputBar({
       transition={{ duration: 0.5 }}
       className={cn(
         'fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-md border-t border-border z-40',
+        isMobile && 'px-0',
         className
       )}
     >
-      <div className="container-custom py-4">
-        <div className="max-w-4xl mx-auto">
+      <div className={cn("container-custom py-4", isMobile && "px-4")}>
+        <div className={cn("max-w-4xl mx-auto", isMobile && "max-w-none")}>
           {/* 快速问题建议 - 仅在输入框为空时显示 */}
           {!value.trim() && (
             <motion.div 

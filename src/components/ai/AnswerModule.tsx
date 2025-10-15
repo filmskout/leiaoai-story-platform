@@ -26,6 +26,7 @@ import {
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { formatMessagesToMarkdown, exportAsMarkdown, exportAsDocx } from '@/utils/exportUtils';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 interface AnswerModuleProps {
   messages: ChatMessage[];
@@ -59,6 +60,8 @@ export function AnswerModule({
   onQuestionSelect
 }: AnswerModuleProps) {
   const { t, i18n } = useTranslation();
+  const isMobile = useMediaQuery('(max-width: 768px)');
+  
   const {
     selectedChatModel,
     setSelectedChatModel,
@@ -344,8 +347,11 @@ export function AnswerModule({
       )}
 
       {/* 答案显示区域 */}
-      <Card className="min-h-[200px] p-0 overflow-hidden rounded-xl border shadow w-full">
-        <div className="p-6">
+      <Card className={cn(
+        "min-h-[200px] p-0 overflow-hidden shadow w-full",
+        isMobile ? "rounded-none border-0" : "rounded-xl border"
+      )}>
+        <div className={cn("p-6", isMobile && "px-4")}>
           {messages.length === 0 ? (
             <motion.div 
               initial={{ opacity: 0, scale: 0.9 }}

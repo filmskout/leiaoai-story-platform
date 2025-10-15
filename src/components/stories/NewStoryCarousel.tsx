@@ -260,14 +260,20 @@ export function NewStoryCarousel({ className }: NewStoryCarouselProps) {
                 )}
               </div>
               
-              <CardContent className="p-6 space-y-4">
+              <CardContent className={cn("space-y-4", isMobile ? "p-4" : "p-6")}>
                 {/* Title */}
-                <h3 className="text-lg font-semibold text-foreground line-clamp-2 leading-tight">
+                <h3 className={cn(
+                  "font-semibold text-foreground leading-tight",
+                  isMobile ? "text-base line-clamp-1" : "text-lg line-clamp-2"
+                )}>
                   {story.title}
                 </h3>
                 
                 {/* Excerpt */}
-                <p className="text-sm text-foreground-secondary line-clamp-3 leading-relaxed">
+                <p className={cn(
+                  "text-foreground-secondary leading-relaxed",
+                  isMobile ? "text-xs line-clamp-2" : "text-sm line-clamp-3"
+                )}>
                   {story.excerpt}
                 </p>
                 

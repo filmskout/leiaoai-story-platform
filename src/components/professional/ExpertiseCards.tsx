@@ -588,33 +588,37 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
                           )}
                           onClick={() => handleCardClick(area)}
                         >
-                          <CardContent className="p-6">
+                          <CardContent className={cn("p-6", isMobile && "p-4")}>
                             {/* 图标、标题和统计 */}
                             <div className="mb-4">
                               <div className="flex items-start justify-between mb-3">
                                 <div className={cn(
-                                  'w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-500 ease-out group-hover:scale-125 group-hover:shadow-lg group-hover:rotate-3 relative overflow-hidden',
+                                  'rounded-xl flex items-center justify-center transition-all duration-500 ease-out group-hover:scale-125 group-hover:shadow-lg group-hover:rotate-3 relative overflow-hidden',
+                                  isMobile ? 'w-10 h-10' : 'w-12 h-12',
                                   area.bgColor
                                 )}>
                                   <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl" />
-                                  <IconComponent className={cn('text-2xl relative z-10 transition-all duration-500 group-hover:drop-shadow-sm', area.color)} size={24} />
+                                  <IconComponent className={cn('relative z-10 transition-all duration-500 group-hover:drop-shadow-sm', area.color, isMobile ? 'text-xl' : 'text-2xl')} size={isMobile ? 20 : 24} />
                                 </div>
                                 <Badge 
                                   variant="secondary" 
                                   className="flex items-center gap-1 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border-primary-200 dark:border-primary-800"
                                 >
-                                  <Users size={12} />
-                                  <span className="font-semibold">{getDisplayCount(area.key).toLocaleString()}</span>
+                                  <Users size={isMobile ? 10 : 12} />
+                                  <span className={cn("font-semibold", isMobile && "text-xs")}>{getDisplayCount(area.key).toLocaleString()}</span>
                                 </Badge>
                               </div>
-                              <h3 className="text-lg font-semibold text-foreground group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-all duration-500 group-hover:translate-x-1">
+                              <h3 className={cn(
+                                "font-semibold text-foreground group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-all duration-500 group-hover:translate-x-1",
+                                isMobile ? "text-base line-clamp-1" : "text-lg"
+                              )}>
                                 {area.name}
                               </h3>
                             </div>
 
                             {/* 建议问题 */}
                             <div className="space-y-2">
-                              <h4 className="text-sm font-medium text-foreground-muted mb-2">{t('professional_services.suggested_questions')}:</h4>
+                              <h4 className={cn("font-medium text-foreground-muted mb-2", isMobile ? "text-xs" : "text-sm")}>{t('professional_services.suggested_questions')}:</h4>
                               {randomQuestions.length > 0 ? (
                                 randomQuestions.map((question, index) => (
                                   <motion.button
@@ -626,8 +630,11 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
                                     className="w-full text-left p-2 text-xs bg-background-secondary hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-all duration-300 border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:translate-x-1 hover:shadow-sm group/question"
                                   >
                                     <div className="flex items-start gap-2">
-                                      <ArrowRight size={12} className="mt-0.5 text-primary-500 flex-shrink-0 group-hover:animate-pulse group-hover/question:translate-x-1 transition-transform duration-300" />
-                                      <span className="text-foreground-secondary group-hover/question:text-primary-600 dark:group-hover/question:text-primary-400 transition-colors duration-300 line-clamp-2">
+                                      <ArrowRight size={isMobile ? 10 : 12} className="mt-0.5 text-primary-500 flex-shrink-0 group-hover:animate-pulse group-hover/question:translate-x-1 transition-transform duration-300" />
+                                      <span className={cn(
+                                        "text-foreground-secondary group-hover/question:text-primary-600 dark:group-hover/question:text-primary-400 transition-colors duration-300",
+                                        isMobile ? "line-clamp-1" : "line-clamp-2"
+                                      )}>
                                         {question}
                                       </span>
                                     </div>

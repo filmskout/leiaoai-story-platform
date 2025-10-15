@@ -324,23 +324,27 @@ export default function Home() {
         )}
       >
         <div className={cn("container-custom", isMobile && "px-0")}>
-          {/* 标题与操作区：左侧标题，右侧 Create Story（与上方"专业服务领域"对齐） */}
-          <div className={cn("max-w-6xl mx-auto flex items-center justify-between mb-3", isMobile && "max-w-none px-4")}> 
+          {/* 标题与操作区：与Professional Services Area保持一致 */}
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }} 
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className={cn("flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8", isMobile && "px-4")}
+          >
             <div>
-              <h2 className={cn(isMobile ? "text-xl" : "text-2xl", "font-bold text-foreground")}>{t('stories.latest', 'Latest Stories')}</h2>
-              <p className="text-foreground-muted text-sm">
-                {t('stories.latest_subtitle', 'Discover the latest insights and experiences from our community.')}
-              </p>
+              <h2 className="text-3xl font-bold text-foreground mb-2">{t('stories.latest', 'Latest Stories')}</h2>
+              <p className="text-lg text-foreground-secondary">{t('stories.latest_subtitle', 'Discover the latest insights and experiences from our community.')}</p>
             </div>
-            <div>
-              <Link to={user ? "/create-story" : "/auth"}>
-                <Button size={isMobile ? "sm" : "default"} className="bg-orange-500 hover:bg-orange-600 text-white border-0">
-                  <Plus size={16} className="mr-2" />
-                  {t('stories.create_story', 'Create Story')}
-                </Button>
-              </Link>
-            </div>
-          </div>
+            <Link to={user ? "/create-story" : "/auth"}>
+              <Button 
+                size="default"
+                className="flex items-center gap-2 whitespace-nowrap self-start md:self-center group bg-orange-500 hover:bg-orange-600 text-white border-0"
+              >
+                <Plus size={16} className="group-hover:rotate-90 transition-transform duration-300" />
+                {t('stories.create_story', 'Create Story')}
+              </Button>
+            </Link>
+          </motion.div>
           <NewStoryCarousel className={cn("max-w-6xl mx-auto", isMobile && "max-w-none")} />
 
           {/* View All Stories Button */}
