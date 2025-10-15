@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
+import { authService } from '@/lib/supabase';
 
 // 支持的语言列表
 const supportedLanguages = [
@@ -139,6 +140,31 @@ export function LanguageSelector({ className, variant = 'default' }: LanguageSel
       
       // 保存用户选择
       localStorage.setItem('leoai-language', languageCode);
+      // 通知服务端保存用户偏好（若已登录会以Cookie记住）
+      fetch('/api/save-language-preference', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ language: languageCode })
+      }).catch(() => {});
+      // 记录语言访问统计
+      fetch('/api/track-language', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ language: languageCode })
+      }).catch(() => {});
+
+      // 若用户已登录，将偏好保存到数据库profiles.preferences.preferred_language
+      try {
+        await authService.waitForInitialization();
+        if (authService.isAuthenticated()) {
+          const currentProfile = authService.getCurrentProfile();
+          const nextPreferences = {
+            ...(currentProfile?.preferences || {}),
+            preferred_language: languageCode,
+          } as Record<string, any>;
+          await authService.updateProfile({ preferences: nextPreferences });
+        }
+      } catch {}
       
       // 更新HTML lang属性
       document.documentElement.lang = languageCode;
@@ -187,6 +213,14 @@ export function LanguageSelector({ className, variant = 'default' }: LanguageSel
   useEffect(() => {
     // 初始化语言检测
     detectLanguageByIP();
+    // 首次加载记录一次当前语言访问
+    try {
+      fetch('/api/track-language', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ language: i18n.language })
+      }).catch(() => {});
+    } catch {}
     
     // 监听语言变化
     const handleLanguageChange = () => {
@@ -216,7 +250,7 @@ export function LanguageSelector({ className, variant = 'default' }: LanguageSel
               {isDetecting ? t('detecting', 'Detecting...') : currentLangInfo.nativeName}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="min-w-[180px]">
+          <DropdownMenuContent align="start" className="min-w-[180px] md:max-h-[80vh] max-h-[70vh] overflow-y-auto">
             {supportedLanguages.map((language) => (
               <DropdownMenuItem
                 key={language.code}
@@ -262,7 +296,7 @@ export function LanguageSelector({ className, variant = 'default' }: LanguageSel
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="min-w-[200px] z-[100] bg-background border border-border shadow-lg">
+      <DropdownMenuContent align="end" className="min-w-[200px] z-[100] bg-background border border-border shadow-lg md:max-h-[80vh] max-h-[70vh] overflow-y-auto">
         <div className="px-3 py-2 text-sm font-medium text-foreground border-b border-border">
           {t('language_selector', 'Select Language')}
         </div>

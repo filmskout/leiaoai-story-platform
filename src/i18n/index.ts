@@ -59,9 +59,11 @@ i18n
       escapeValue: false,
     },
     detection: {
-      order: ['localStorage', 'navigator', 'htmlTag'],
+      order: ['localStorage', 'cookie', 'navigator', 'htmlTag'],
       lookupLocalStorage: 'leoai-language',
-      caches: ['localStorage'],
+      lookupCookie: 'preferred_language',
+      caches: ['localStorage', 'cookie'],
+      cookieMinutes: 60 * 24 * 30, // 30天
       checkWhitelist: true
     },
     react: {
