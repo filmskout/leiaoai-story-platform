@@ -53,6 +53,7 @@ interface ProfileFormData {
   company: string;
   website_url: string;
   avatar_url?: string;
+  username?: string;
 }
 
 export default function EnhancedSettings() {
@@ -76,6 +77,7 @@ export default function EnhancedSettings() {
   const [isSaving, setIsSaving] = useState(false);
   const [showAvatarDialog, setShowAvatarDialog] = useState(false);
   const [error, setError] = useState('');
+  const [usernameError, setUsernameError] = useState('');
 
   const themeOptions: { value: Theme; label: string; icon: React.ReactNode }[] = [
     { value: 'light', label: t('settings.theme_light'), icon: <Sun size={16} /> },
@@ -113,7 +115,8 @@ export default function EnhancedSettings() {
           location: profile.location || '',
           company: profile.company || '',
           website_url: profile.website_url || '',
-          avatar_url: profile.avatar_url || ''
+          avatar_url: profile.avatar_url || '',
+          username: profile.username || ''
         });
       } else {
         // Set defaults from user metadata or empty values
@@ -123,7 +126,8 @@ export default function EnhancedSettings() {
           location: user.user_metadata?.location || '',
           company: user.user_metadata?.company || '',
           website_url: user.user_metadata?.website_url || '',
-          avatar_url: user.user_metadata?.avatar_url || ''
+          avatar_url: user.user_metadata?.avatar_url || '',
+          username: ''
         });
       }
     } catch (error) {
@@ -222,13 +226,71 @@ export default function EnhancedSettings() {
 
     setIsSaving(true);
     setError('');
+    setUsernameError('');
 
     try {
+      // Username validation and change limit
+      const desiredUsername = (profileForm.username || '').trim();
+      const usernamePattern = /^[a-zA-Z0-9_\.\-]{3,20}$/; // 3-20 characters, alnum _ . -
+
+      let usernameToSave: string | undefined = undefined;
+      let nextPreferences: Record<string, any> | undefined = undefined;
+
+      if (desiredUsername) {
+        if (!usernamePattern.test(desiredUsername)) {
+          setUsernameError(t('profile.username_invalid', 'Username must be 3-20 chars: letters, numbers, _ . -'));
+          throw new Error('INVALID_USERNAME');
+        }
+
+        // Load current profile to check previous username and preferences
+        const { data: currentProfile } = await supabase
+          .from('profiles')
+          .select('id, user_id, username, preferences')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        const currentUsername = currentProfile?.username || '';
+        const preferences = (currentProfile?.preferences || {}) as Record<string, any>;
+        const changes: { changed_at: string }[] = Array.isArray(preferences.username_changes) ? preferences.username_changes : [];
+
+        // Only check quota if actually changing username
+        if (desiredUsername !== currentUsername) {
+          // Enforce monthly limit: 2 changes in last 30 days
+          const now = new Date();
+          const cutoff = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          const recentChanges = changes.filter(c => new Date(c.changed_at) > cutoff);
+          if (recentChanges.length >= 2) {
+            setUsernameError(t('profile.username_change_limit', 'You can change your username at most 2 times every 30 days'));
+            throw new Error('USERNAME_CHANGE_LIMIT');
+          }
+
+          // Uniqueness check
+          const { data: existing } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('username', desiredUsername)
+            .limit(1)
+            .maybeSingle();
+          if (existing && existing.id && existing.id !== user.id) {
+            setUsernameError(t('profile.username_taken', 'This username is already taken'));
+            throw new Error('USERNAME_TAKEN');
+          }
+
+          usernameToSave = desiredUsername;
+          nextPreferences = {
+            ...preferences,
+            username_changes: [...recentChanges, { changed_at: now.toISOString() }]
+          };
+        }
+      }
+
       // 直接更新到profiles表，包括avatar_url
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
           ...profileForm,
+          username: usernameToSave ?? profileForm.username,
+          preferences: nextPreferences ? nextPreferences : undefined,
           updated_at: new Date().toISOString()
         })
         .eq('id', user.id);
@@ -424,6 +486,27 @@ export default function EnhancedSettings() {
                   placeholder={t('settings.company_placeholder', 'Your company or organization')}
                 />
               </div>
+            </div>
+
+            {/* Username (public link) */}
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-2">
+                <Link className="w-4 h-4 inline mr-1" />
+                {t('profile.username', 'Username (public link)')}
+              </label>
+              <Input
+                value={profileForm.username || ''}
+                onChange={(e) => setProfileForm(prev => ({ ...prev, username: e.target.value }))}
+                placeholder={t('profile.username_placeholder', 'letters, numbers, _ . - (3-20 chars)')}
+              />
+              {usernameError && (
+                <p className="text-xs text-red-600 mt-1">{usernameError}</p>
+              )}
+              {profileForm.username && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  {t('profile.public_link', 'Public link')}: {typeof window !== 'undefined' ? window.location.origin : ''}/u/{profileForm.username}
+                </p>
+              )}
             </div>
 
             <div>

@@ -207,6 +207,7 @@ function AppRoutes() {
           <Route path="stories" element={<Stories />} />
           <Route path="story/:id" element={<StoryDetail />} />
           <Route path="user/:id" element={<UserProfile />} />
+          <Route path="u/:username" element={<UserProfile />} />
           
           {/* Protected routes */}
           <Route path="dashboard" element={

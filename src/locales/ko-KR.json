@@ -243,7 +243,7 @@
     "avatar_uploaded": "Avatar updated successfully",
     "avatar_upload_failed": "Failed to upload avatar"
   },
-  
+
   "home": {
     "hero": {
       "title_1": "Professional",
@@ -267,7 +267,7 @@
       "avg_response": "Avg Response"
     }
   },
-  
+
   "professional_services": {
     "title": "Professional Investment Services",
     "subtitle": "Expert AI-powered investment consultation across multiple domains",
@@ -281,7 +281,7 @@
     "mobile_bottom_description": "Click 'Refresh' for new suggestions",
     "enter_full_chat": "Enter Full AI Chat"
   },
-  
+
   "ai_chat": {
     "title": "AI Investment Expert",
     "subtitle": "Professional investment consulting services to empower your business decisions",
@@ -405,7 +405,7 @@
       ]
     }
   },
-  
+
   "bp_analysis": {
     "title": "Business Plan Analysis",
     "subtitle": "Upload your business plan to get professional AI analysis report",

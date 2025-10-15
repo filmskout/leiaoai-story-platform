@@ -54,7 +54,7 @@ interface UserStats {
 }
 
 export default function UserProfile() {
-  const { id } = useParams<{ id: string }>();
+  const { id, username } = useParams<{ id?: string; username?: string }>();
   const { user: currentUser } = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -75,9 +75,9 @@ export default function UserProfile() {
   const [followLoading, setFollowLoading] = useState(false);
 
   useEffect(() => {
-    if (id) {
+    if (id || username) {
       // 如果是当前用户访问自己的公开页面，重定向到dashboard
-      if (currentUser && currentUser.id === id) {
+      if (currentUser && id && currentUser.id === id) {
         navigate('/profile');
         return;
       }
@@ -86,18 +86,32 @@ export default function UserProfile() {
   }, [id, currentUser]);
 
   const loadPublicProfile = async () => {
-    if (!id) return;
+    if (!id && !username) return;
     
     setIsLoading(true);
     try {
       console.log('🔵 UserProfile: Loading profile for user', id);
 
-      // Load user profile
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('id, full_name, bio, avatar_url, location_name, company, website_url, created_at')
-        .eq('id', id)
-        .single();
+      // Load user profile by id or username
+      let profileData: any = null;
+      let profileError: any = null;
+      if (id) {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('id, full_name, bio, avatar_url, location_name, company, website_url, created_at, username')
+          .eq('id', id)
+          .single();
+        profileData = data;
+        profileError = error;
+      } else if (username) {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('id, full_name, bio, avatar_url, location_name, company, website_url, created_at, username')
+          .eq('username', username)
+          .maybeSingle();
+        profileData = data;
+        profileError = error;
+      }
 
       if (profileError) throw profileError;
 
@@ -105,10 +119,10 @@ export default function UserProfile() {
         setProfile(profileData);
 
         // Load stats
-        await loadUserStats(id);
+        await loadUserStats(profileData.id);
 
         // Load user's published stories
-        await loadUserStories(id);
+        await loadUserStories(profileData.id);
 
         // Load user's badges
         await loadUserBadges(id);
