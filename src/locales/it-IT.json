@@ -628,7 +628,7 @@
   "footer_provider": "Offerto da LeiaoAI Agent",
   
   "about": {
-    "title": "About LeiaoAI",
+    "title": "Su LeiaoAI",
     "company_name_en": "Shenzhen Leiao Artificial Intelligence Operations Limited",
     "company_name_cn": "深圳市蕾奥人工智能运营有限公司",
     "vision_mission": "Vision & Mission",
@@ -648,7 +648,7 @@
   },
   
   "privacy": {
-    "title": "Privacy Policy",
+    "title": "Informativa sulla privacy",
     "last_updated": "Last Updated: January 12, 2025",
     "introduction": "Shenzhen Leiao Artificial Intelligence Operations Limited ('we', 'our', or 'us') is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our AI investment consultation platform.",
     "information_collection": "Information We Collect",
@@ -681,7 +681,7 @@
   },
   
   "terms": {
-    "title": "Terms of Service",
+    "title": "Termini di servizio",
     "last_updated": "Last Updated: January 12, 2025",
     "acceptance": "By accessing and using LeiaoAI's AI investment consultation platform, you accept and agree to be bound by the terms and provision of this agreement.",
     "service_description": "Service Description",
@@ -701,7 +701,7 @@
   },
   
   "contact": {
-    "title": "Contact Us",
+    "title": "Contattaci",
     "subtitle": "Get in touch with our team",
     "description": "We're here to help you with any questions about our AI investment consultation platform.",
     "offices": "Our Offices",
