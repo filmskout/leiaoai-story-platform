@@ -271,6 +271,68 @@
       "exit_strategy": "Planification de Stratégie de Sortie",
       "valuation_model": "Modèle de Valorisation",
       "due_diligence": "Due Diligence"
+    },
+    "expertise_questions": {
+      "cvc_investment": [
+        "Comment les VC d'entreprise diffèrent-ils des VC traditionnels ?",
+        "Quels sont les avantages des partenariats CVC pour les startups ?",
+        "Comment approcher le financement par capital-risque d'entreprise ?"
+      ],
+      "ma_restructuring": [
+        "Quelles sont les considérations clés dans la valorisation M&A ?",
+        "Comment structurer une transaction de fusion réussie ?",
+        "Quels sont les défis courants d'intégration post-fusion ?"
+      ],
+      "ipo_a_share": [
+        "Quelles sont les exigences pour l'introduction en bourse d'actions A ?",
+        "Combien de temps prend généralement le processus d'IPO d'actions A ?",
+        "Quelles sont les principales différences entre les conseils d'actions A ?"
+      ],
+      "ipo_hk_share": [
+        "Quels sont les avantages de l'introduction en bourse à Hong Kong ?",
+        "Comment le processus d'IPO HK se compare-t-il à la Chine continentale ?",
+        "Quelles sont les exigences d'inscription pour HKEX ?"
+      ],
+      "ipo_us_share": [
+        "Quels sont les avantages d'un IPO américain pour les entreprises internationales ?",
+        "Comment se préparer à la conformité et aux rapports SEC ?",
+        "Quelles sont les principales différences entre NYSE et NASDAQ ?"
+      ],
+      "spac_listing": [
+        "Comment fonctionnent les transactions SPAC par rapport aux IPO traditionnels ?",
+        "Quels sont les avantages et risques des fusions SPAC ?",
+        "Comment évaluer les opportunités d'investissement SPAC ?"
+      ],
+      "macro_analysis": [
+        "Comment les changements de taux d'intérêt affectent-ils les stratégies d'investissement ?",
+        "Quels facteurs macro les investisseurs devraient-ils surveiller en 2024 ?",
+        "Comment se couvrir contre l'inflation dans les portefeuilles d'investissement ?"
+      ],
+      "investment_environment": [
+        "Comment l'environnement réglementaire actuel affecte-t-il les investissements ?",
+        "Quels sont les marchés émergents avec le meilleur climat d'investissement ?",
+        "Comment les tensions géopolitiques impactent-elles les investissements mondiaux ?"
+      ],
+      "valuation_adjustment": [
+        "Quand et comment les entreprises devraient-elles ajuster leurs valorisations ?",
+        "Quels facteurs déclenchent les réinitialisations de valorisation sur les marchés privés ?",
+        "Comment communiquer les changements de valorisation aux investisseurs ?"
+      ],
+      "exit_strategy": [
+        "Quelles sont les principales options de sortie pour les investisseurs de startups ?",
+        "Comment chronométrer efficacement une stratégie de sortie ?",
+        "Quels facteurs déterminent la meilleure méthode de sortie ?"
+      ],
+      "valuation_model": [
+        "Quelles méthodes de valorisation fonctionnent le mieux pour les startups tech ?",
+        "Comment appliquer les modèles DCF aux entreprises à forte croissance ?",
+        "Quelles sont les erreurs de valorisation courantes à éviter ?"
+      ],
+      "due_diligence": [
+        "Quels sont les domaines clés sur lesquels se concentrer dans la due diligence ?",
+        "Combien de temps devrait prendre un processus de due diligence typique ?",
+        "Quels signaux d'alarme les investisseurs devraient-ils surveiller ?"
+      ]
     }
   },
   

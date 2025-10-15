@@ -188,6 +188,68 @@
       "exit_strategy": "Exit-Strategie-Planung",
       "valuation_model": "Bewertungsmodell",
       "due_diligence": "Due Diligence"
+    },
+    "expertise_questions": {
+      "cvc_investment": [
+        "Wie unterscheiden sich Corporate VCs von traditionellen VCs?",
+        "Welche Vorteile haben CVC-Partnerschaften für Startups?",
+        "Wie nähert man sich Corporate Venture Capital Finanzierung?"
+      ],
+      "ma_restructuring": [
+        "Was sind die wichtigsten Überlegungen bei M&A-Bewertungen?",
+        "Wie strukturiert man eine erfolgreiche Fusionstransaktion?",
+        "Was sind häufige Herausforderungen bei der Post-Merger-Integration?"
+      ],
+      "ipo_a_share": [
+        "Was sind die Anforderungen für A-Aktien IPO-Listing?",
+        "Wie lange dauert der A-Aktien IPO-Prozess typischerweise?",
+        "Was sind die Hauptunterschiede zwischen A-Aktien Boards?"
+      ],
+      "ipo_hk_share": [
+        "Was sind die Vorteile eines Listings in Hongkong?",
+        "Wie vergleicht sich der HK IPO-Prozess mit dem chinesischen Festland?",
+        "Was sind die Listing-Anforderungen für HKEX?"
+      ],
+      "ipo_us_share": [
+        "Was sind die Vorteile eines US-IPO für internationale Unternehmen?",
+        "Wie bereitet man sich auf SEC-Compliance und Berichterstattung vor?",
+        "Was sind die Hauptunterschiede zwischen NYSE und NASDAQ?"
+      ],
+      "spac_listing": [
+        "Wie funktionieren SPAC-Deals im Vergleich zu traditionellen IPOs?",
+        "Was sind die Vor- und Nachteile von SPAC-Fusionen?",
+        "Wie bewertet man SPAC-Investitionsmöglichkeiten?"
+      ],
+      "macro_analysis": [
+        "Wie beeinflussen Zinsänderungen Investitionsstrategien?",
+        "Welche Makrofaktoren sollten Investoren 2024 überwachen?",
+        "Wie hedgt man gegen Inflation in Investmentportfolios?"
+      ],
+      "investment_environment": [
+        "Wie beeinflusst die aktuelle Regulierungslandschaft Investitionen?",
+        "Welche Schwellenmärkte haben das beste Investitionsklima?",
+        "Wie beeinflussen geopolitische Spannungen globale Investitionen?"
+      ],
+      "valuation_adjustment": [
+        "Wann und wie sollten Unternehmen ihre Bewertungen anpassen?",
+        "Welche Faktoren lösen Bewertungsresets auf privaten Märkten aus?",
+        "Wie kommuniziert man Bewertungsänderungen an Investoren?"
+      ],
+      "exit_strategy": [
+        "Was sind die Hauptausstiegsoptionen für Startup-Investoren?",
+        "Wie plant man eine Exit-Strategie effektiv?",
+        "Welche Faktoren bestimmen die beste Exit-Methode?"
+      ],
+      "valuation_model": [
+        "Welche Bewertungsmethoden funktionieren am besten für Tech-Startups?",
+        "Wie wendet man DCF-Modelle auf wachstumsstarke Unternehmen an?",
+        "Was sind häufige Bewertungsfehler, die vermieden werden sollten?"
+      ],
+      "due_diligence": [
+        "Was sind die Schlüsselbereiche für Due Diligence?",
+        "Wie lange sollte ein typischer Due Diligence-Prozess dauern?",
+        "Welche Warnsignale sollten Investoren beachten?"
+      ]
     }
   },
   

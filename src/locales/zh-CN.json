@@ -394,6 +394,8 @@
   
   "stories": {
     "title": "故事",
+    "latest": "最新故事",
+    "latest_subtitle": "发现我们社区的最新见解和经验分享",
     "page_title": "我和AI人工智能的故事",
     "page_subtitle": "分享AI投融资，工具锐评，学习实践案例",
     "mobile_page_title": "我和AI的故事",
