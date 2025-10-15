@@ -296,10 +296,10 @@
   },
   
   "ai_chat": {
-    "title": "AI Investment Expert",
-    "subtitle": "Professional investment consulting services to empower your business decisions",
-    "page_title": "AI Investment Consultant",
-    "page_subtitle": "Professional investment advice powered by advanced AI",
+    "title": "AI‑Investmentexperte",
+    "subtitle": "Professionelle Investmentberatung für bessere Entscheidungen",
+    "page_title": "AI‑Investmentberater",
+    "page_subtitle": "Professionelle Investmentberatung auf Basis fortschrittlicher KI",
     "mobile_page_title": "AI Consultant",
     "mobile_page_subtitle": "Investment advice at your fingertips",
     "placeholder": "Ask me about investment opportunities, market trends, or financial advice...",
@@ -508,7 +508,7 @@
     }
   },
   "story": {
-    "create_title": "Create New Story",
+    "create_title": "Neue Story erstellen",
     "title_label": "Title",
     "title_placeholder": "Enter your story title...",
     "title_required": "Title is required",

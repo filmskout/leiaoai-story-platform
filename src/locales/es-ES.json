@@ -508,7 +508,7 @@
     }
   },
   "story": {
-    "create_title": "Create New Story",
+    "create_title": "Crear nueva historia",
     "title_label": "Title",
     "title_placeholder": "Enter your story title...",
     "title_required": "Title is required",
