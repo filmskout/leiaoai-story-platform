@@ -50,18 +50,18 @@
   },
   
   "nav": {
-    "home": "Home",
-    "about": "About",
-    "contact": "Contact",
-    "privacy": "Privacy",
-    "terms": "Terms",
-    "ai_chat": "AI Chat",
-    "stories": "Stories",
-    "questions": "Questions",
-    "bp_analysis": "BP Analysis",
-    "profile": "Profile",
-    "settings": "Settings",
-    "dashboard": "Dashboard"
+    "home": "Trang chủ",
+    "about": "Giới thiệu",
+    "contact": "Liên hệ",
+    "privacy": "Quyền riêng tư",
+    "terms": "Điều khoản",
+    "ai_chat": "Chat AI",
+    "stories": "Câu chuyện",
+    "questions": "Câu hỏi",
+    "bp_analysis": "Phân tích BP",
+    "profile": "Hồ sơ",
+    "settings": "Cài đặt",
+    "dashboard": "Bảng điều khiển"
   },
 
   "auth": {
@@ -132,12 +132,12 @@
       "total_views": "Total Views"
     },
     "tabs": {
-      "overview": "Overview",
-      "stories": "Stories",
-      "saved": "Saved",
-      "submissions": "Submissions",
-      "achievements": "Achievements",
-      "activity": "Activity"
+      "overview": "Tổng quan",
+      "stories": "Câu chuyện",
+      "saved": "Đã lưu",
+      "submissions": "Bài gửi",
+      "achievements": "Thành tựu",
+      "activity": "Hoạt động"
     },
     "recent_badges": "Recent Badges",
     "no_badges": "No badges earned yet",
@@ -206,8 +206,8 @@
   "search": "Search",
   
   "settings": {
-    "title": "Settings",
-    "description": "Personalize your LeiaoAI experience",
+    "title": "Cài đặt",
+    "description": "Cá nhân hóa trải nghiệm LeiaoAI của bạn",
     "profile_information": "Profile Information",
     "profile_description": "Quản lý hồ sơ công khai và thông tin cá nhân của bạn",
     "change_avatar": "Change Avatar",

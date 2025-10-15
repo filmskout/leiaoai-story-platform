@@ -50,18 +50,18 @@
   },
   
   "nav": {
-    "home": "Home",
-    "about": "About",
-    "contact": "Contact",
-    "privacy": "Privacy",
-    "terms": "Terms",
-    "ai_chat": "AI Chat",
-    "stories": "Stories",
-    "questions": "Questions",
-    "bp_analysis": "BP Analysis",
-    "profile": "Profile",
-    "settings": "Settings",
-    "dashboard": "Dashboard"
+    "home": "Главная",
+    "about": "О нас",
+    "contact": "Контакты",
+    "privacy": "Конфиденциальность",
+    "terms": "Условия",
+    "ai_chat": "AI‑чат",
+    "stories": "Истории",
+    "questions": "Вопросы",
+    "bp_analysis": "BP‑анализ",
+    "profile": "Профиль",
+    "settings": "Настройки",
+    "dashboard": "Панель"
   },
 
   "auth": {
@@ -132,12 +132,12 @@
       "total_views": "Total Views"
     },
     "tabs": {
-      "overview": "Overview",
-      "stories": "Stories",
-      "saved": "Saved",
-      "submissions": "Submissions",
-      "achievements": "Achievements",
-      "activity": "Activity"
+      "overview": "Обзор",
+      "stories": "Истории",
+      "saved": "Сохранённое",
+      "submissions": "Отправки",
+      "achievements": "Достижения",
+      "activity": "Активность"
     },
     "recent_badges": "Recent Badges",
     "no_badges": "No badges earned yet",
@@ -194,7 +194,7 @@
     "completed": "Completed",
     "activity_timeline": "Activity Timeline",
     "activity_desc": "Your recent actions and interactions on the platform",
-    "view_public": "Public Profile",
+    "view_public": "Публичный профиль",
     "username": "Имя пользователя (публичная ссылка)",
     "username_placeholder": "буквы/цифры, _ . - (3–20 символов)",
     "public_link": "Публичная ссылка",
@@ -206,8 +206,8 @@
   "search": "Search",
   
   "settings": {
-    "title": "Settings",
-    "description": "Personalize your LeiaoAI experience",
+    "title": "Настройки",
+    "description": "Персонализируйте свой опыт в LeiaoAI",
     "profile_information": "Profile Information",
     "profile_description": "Управляйте публичным профилем и личной информацией",
     "change_avatar": "Change Avatar",

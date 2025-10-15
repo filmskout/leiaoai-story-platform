@@ -50,18 +50,18 @@
   },
   
   "nav": {
-    "home": "Home",
-    "about": "About",
-    "contact": "Contact",
-    "privacy": "Privacy",
-    "terms": "Terms",
-    "ai_chat": "AI Chat",
-    "stories": "Stories",
-    "questions": "Questions",
-    "bp_analysis": "BP Analysis",
-    "profile": "Profile",
-    "settings": "Settings",
-    "dashboard": "Dashboard"
+    "home": "الرئيسية",
+    "about": "من نحن",
+    "contact": "اتصل بنا",
+    "privacy": "الخصوصية",
+    "terms": "الشروط",
+    "ai_chat": "دردشة الذكاء الاصطناعي",
+    "stories": "قصص",
+    "questions": "أسئلة",
+    "bp_analysis": "تحليل BP",
+    "profile": "الملف الشخصي",
+    "settings": "الإعدادات",
+    "dashboard": "لوحة التحكم"
   },
 
   "auth": {
@@ -132,12 +132,12 @@
       "total_views": "Total Views"
     },
     "tabs": {
-      "overview": "Overview",
-      "stories": "Stories",
-      "saved": "Saved",
-      "submissions": "Submissions",
-      "achievements": "Achievements",
-      "activity": "Activity"
+      "overview": "نظرة عامة",
+      "stories": "قصص",
+      "saved": "محفوظات",
+      "submissions": "إرسالات",
+      "achievements": "الإنجازات",
+      "activity": "النشاط"
     },
     "recent_badges": "Recent Badges",
     "no_badges": "No badges earned yet",
@@ -194,7 +194,7 @@
     "completed": "Completed",
     "activity_timeline": "Activity Timeline",
     "activity_desc": "Your recent actions and interactions on the platform",
-    "view_public": "الملف العام",
+    "view_public": "الملف الشخصي العام",
     "username": "اسم المستخدم (رابط عام)",
     "username_placeholder": "أحرف/أرقام، _ . - (3–20 حرفًا)",
     "public_link": "رابط عام",
@@ -206,8 +206,8 @@
   "search": "Search",
   
   "settings": {
-    "title": "Settings",
-    "description": "Personalize your LeiaoAI experience",
+    "title": "الإعدادات",
+    "description": "خصص تجربتك على LeiaoAI",
     "profile_information": "Profile Information",
     "profile_description": "إدارة ملفك العام ومعلوماتك الشخصية",
     "change_avatar": "Change Avatar",

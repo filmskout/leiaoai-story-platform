@@ -50,18 +50,18 @@
   },
   
   "nav": {
-    "home": "Home",
-    "about": "About",
-    "contact": "Contact",
-    "privacy": "Privacy",
-    "terms": "Terms",
-    "ai_chat": "AI Chat",
-    "stories": "Stories",
-    "questions": "Questions",
-    "bp_analysis": "BP Analysis",
-    "profile": "Profile",
-    "settings": "Settings",
-    "dashboard": "Dashboard"
+    "home": "Início",
+    "about": "Sobre",
+    "contact": "Contacto",
+    "privacy": "Privacidade",
+    "terms": "Termos",
+    "ai_chat": "Chat IA",
+    "stories": "Histórias",
+    "questions": "Perguntas",
+    "bp_analysis": "Análise BP",
+    "profile": "Perfil",
+    "settings": "Definições",
+    "dashboard": "Painel"
   },
 
   "auth": {
@@ -132,12 +132,12 @@
       "total_views": "Total Views"
     },
     "tabs": {
-      "overview": "Overview",
-      "stories": "Stories",
-      "saved": "Saved",
-      "submissions": "Submissions",
-      "achievements": "Achievements",
-      "activity": "Activity"
+      "overview": "Visão geral",
+      "stories": "Histórias",
+      "saved": "Guardados",
+      "submissions": "Envios",
+      "achievements": "Conquistas",
+      "activity": "Atividade"
     },
     "recent_badges": "Recent Badges",
     "no_badges": "No badges earned yet",
@@ -194,7 +194,7 @@
     "completed": "Completed",
     "activity_timeline": "Activity Timeline",
     "activity_desc": "Your recent actions and interactions on the platform",
-    "view_public": "Public Profile",
+    "view_public": "Perfil público",
     "username": "Nome de utilizador (link público)",
     "username_placeholder": "letras/números, _ . - (3–20 caracteres)",
     "public_link": "Link público",
@@ -206,8 +206,8 @@
   "search": "Search",
   
   "settings": {
-    "title": "Settings",
-    "description": "Personalize your LeiaoAI experience",
+    "title": "Definições",
+    "description": "Personalize a sua experiência no LeiaoAI",
     "profile_information": "Profile Information",
     "profile_description": "Gere o seu perfil público e as suas informações pessoais",
     "change_avatar": "Change Avatar",

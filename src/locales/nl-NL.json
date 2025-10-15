@@ -50,18 +50,18 @@
   },
   
   "nav": {
-    "home": "Home",
-    "about": "About",
+    "home": "Start",
+    "about": "Over",
     "contact": "Contact",
     "privacy": "Privacy",
-    "terms": "Terms",
-    "ai_chat": "AI Chat",
-    "stories": "Stories",
-    "questions": "Questions",
-    "bp_analysis": "BP Analysis",
-    "profile": "Profile",
-    "settings": "Settings",
-    "dashboard": "Dashboard"
+    "terms": "Voorwaarden",
+    "ai_chat": "AI‑chat",
+    "stories": "Verhalen",
+    "questions": "Vragen",
+    "bp_analysis": "BP‑analyse",
+    "profile": "Profiel",
+    "settings": "Instellingen",
+    "dashboard": "Overzicht"
   },
 
   "auth": {
@@ -132,12 +132,12 @@
       "total_views": "Total Views"
     },
     "tabs": {
-      "overview": "Overview",
-      "stories": "Stories",
-      "saved": "Saved",
-      "submissions": "Submissions",
-      "achievements": "Achievements",
-      "activity": "Activity"
+      "overview": "Overzicht",
+      "stories": "Verhalen",
+      "saved": "Opgeslagen",
+      "submissions": "Inzendingen",
+      "achievements": "Prestaties",
+      "activity": "Activiteit"
     },
     "recent_badges": "Recent Badges",
     "no_badges": "No badges earned yet",
@@ -206,8 +206,8 @@
   "search": "Search",
   
   "settings": {
-    "title": "Settings",
-    "description": "Personalize your LeiaoAI experience",
+    "title": "Instellingen",
+    "description": "Personaliseer je LeiaoAI‑ervaring",
     "profile_information": "Profile Information",
     "profile_description": "Beheer je openbare profiel en persoonlijke informatie",
     "change_avatar": "Change Avatar",

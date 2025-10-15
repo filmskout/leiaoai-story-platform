@@ -50,18 +50,18 @@
   },
   
   "nav": {
-    "home": "Home",
-    "about": "About",
-    "contact": "Contact",
-    "privacy": "Privacy",
-    "terms": "Terms",
-    "ai_chat": "AI Chat",
-    "stories": "Stories",
-    "questions": "Questions",
-    "bp_analysis": "BP Analysis",
-    "profile": "Profile",
-    "settings": "Settings",
-    "dashboard": "Dashboard"
+    "home": "होम",
+    "about": "परिचय",
+    "contact": "संपर्क",
+    "privacy": "गोपनीयता",
+    "terms": "नियम",
+    "ai_chat": "एआई चैट",
+    "stories": "कहानियां",
+    "questions": "प्रश्न",
+    "bp_analysis": "BP विश्लेषण",
+    "profile": "प्रोफ़ाइल",
+    "settings": "सेटिंग्स",
+    "dashboard": "डैशबोर्ड"
   },
 
   "auth": {
@@ -132,12 +132,12 @@
       "total_views": "Total Views"
     },
     "tabs": {
-      "overview": "Overview",
-      "stories": "Stories",
-      "saved": "Saved",
-      "submissions": "Submissions",
-      "achievements": "Achievements",
-      "activity": "Activity"
+      "overview": "सारांश",
+      "stories": "कहानियां",
+      "saved": "सहेजे गए",
+      "submissions": "प्रेषण",
+      "achievements": "उपलब्धियां",
+      "activity": "गतिविधि"
     },
     "recent_badges": "Recent Badges",
     "no_badges": "No badges earned yet",
@@ -194,7 +194,7 @@
     "completed": "Completed",
     "activity_timeline": "Activity Timeline",
     "activity_desc": "Your recent actions and interactions on the platform",
-    "view_public": "सार्वजनिक प्रोफ़ाइल",
+    "view_public": "पब्लिक प्रोफ़ाइल",
     "username": "यूज़रनेम (सार्वजनिक लिंक)",
     "username_placeholder": "अक्षर/संख्या, _ . - (3–20 अक्षर)",
     "public_link": "सार्वजनिक लिंक",
@@ -206,8 +206,8 @@
   "search": "Search",
   
   "settings": {
-    "title": "Settings",
-    "description": "Personalize your LeiaoAI experience",
+    "title": "सेटिंग्स",
+    "description": "अपने LeiaoAI अनुभव को व्यक्तिगत बनाएं",
     "profile_information": "Profile Information",
     "profile_description": "अपनी सार्वजनिक प्रोफ़ाइल और व्यक्तिगत जानकारी प्रबंधित करें",
     "change_avatar": "Change Avatar",

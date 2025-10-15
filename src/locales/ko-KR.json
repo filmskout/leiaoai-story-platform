@@ -50,18 +50,18 @@
   },
   
   "nav": {
-    "home": "Home",
-    "about": "About",
-    "contact": "Contact",
-    "privacy": "Privacy",
-    "terms": "Terms",
-    "ai_chat": "AI Chat",
-    "stories": "Stories",
-    "questions": "Questions",
-    "bp_analysis": "BP Analysis",
-    "profile": "Profile",
-    "settings": "Settings",
-    "dashboard": "Dashboard"
+    "home": "홈",
+    "about": "소개",
+    "contact": "문의",
+    "privacy": "개인정보",
+    "terms": "이용약관",
+    "ai_chat": "AI 채팅",
+    "stories": "스토리",
+    "questions": "질문",
+    "bp_analysis": "BP 분석",
+    "profile": "프로필",
+    "settings": "설정",
+    "dashboard": "대시보드"
   },
 
   "auth": {
@@ -132,12 +132,12 @@
       "total_views": "Total Views"
     },
     "tabs": {
-      "overview": "Overview",
-      "stories": "Stories",
-      "saved": "Saved",
-      "submissions": "Submissions",
-      "achievements": "Achievements",
-      "activity": "Activity"
+      "overview": "개요",
+      "stories": "스토리",
+      "saved": "저장됨",
+      "submissions": "제출",
+      "achievements": "업적",
+      "activity": "활동"
     },
     "recent_badges": "Recent Badges",
     "no_badges": "No badges earned yet",
@@ -194,7 +194,7 @@
     "completed": "Completed",
     "activity_timeline": "Activity Timeline",
     "activity_desc": "Your recent actions and interactions on the platform",
-    "view_public": "Public Profile",
+    "view_public": "공개 프로필",
     "username": "사용자명(공개 링크)",
     "username_placeholder": "영문/숫자, _ . - (3~20자)",
     "public_link": "공개 링크",
@@ -206,8 +206,8 @@
   "search": "Search",
   
   "settings": {
-    "title": "Settings",
-    "description": "Personalize your LeiaoAI experience",
+    "title": "설정",
+    "description": "LeiaoAI 사용 경험을 개인화하세요",
     "profile_information": "Profile Information",
     "profile_description": "공개 프로필과 개인 정보를 관리하세요",
     "change_avatar": "Change Avatar",

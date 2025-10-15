@@ -51,17 +51,17 @@
   
   "nav": {
     "home": "Home",
-    "about": "About",
-    "contact": "Contact",
+    "about": "Chi siamo",
+    "contact": "Contatti",
     "privacy": "Privacy",
-    "terms": "Terms",
-    "ai_chat": "AI Chat",
-    "stories": "Stories",
-    "questions": "Questions",
-    "bp_analysis": "BP Analysis",
-    "profile": "Profile",
-    "settings": "Settings",
-    "dashboard": "Dashboard"
+    "terms": "Termini",
+    "ai_chat": "Chat IA",
+    "stories": "Storie",
+    "questions": "Domande",
+    "bp_analysis": "Analisi BP",
+    "profile": "Profilo",
+    "settings": "Impostazioni",
+    "dashboard": "Pannello"
   },
 
   "auth": {
@@ -132,12 +132,12 @@
       "total_views": "Total Views"
     },
     "tabs": {
-      "overview": "Overview",
-      "stories": "Stories",
-      "saved": "Saved",
-      "submissions": "Submissions",
-      "achievements": "Achievements",
-      "activity": "Activity"
+      "overview": "Panoramica",
+      "stories": "Storie",
+      "saved": "Salvati",
+      "submissions": "Invii",
+      "achievements": "Obiettivi",
+      "activity": "Attività"
     },
     "recent_badges": "Recent Badges",
     "no_badges": "No badges earned yet",
@@ -194,7 +194,7 @@
     "completed": "Completed",
     "activity_timeline": "Activity Timeline",
     "activity_desc": "Your recent actions and interactions on the platform",
-    "view_public": "Public Profile",
+    "view_public": "Profilo pubblico",
     "username": "Nome utente (link pubblico)",
     "username_placeholder": "lettere/numeri, _ . - (3–20 caratteri)",
     "public_link": "Link pubblico",
@@ -206,8 +206,8 @@
   "search": "Search",
   
   "settings": {
-    "title": "Settings",
-    "description": "Personalize your LeiaoAI experience",
+    "title": "Impostazioni",
+    "description": "Personalizza la tua esperienza su LeiaoAI",
     "profile_information": "Profile Information",
     "profile_description": "Gestisci il tuo profilo pubblico e le informazioni personali",
     "change_avatar": "Change Avatar",

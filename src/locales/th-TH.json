@@ -50,18 +50,18 @@
   },
   
   "nav": {
-    "home": "Home",
-    "about": "About",
-    "contact": "Contact",
-    "privacy": "Privacy",
-    "terms": "Terms",
-    "ai_chat": "AI Chat",
-    "stories": "Stories",
-    "questions": "Questions",
-    "bp_analysis": "BP Analysis",
-    "profile": "Profile",
-    "settings": "Settings",
-    "dashboard": "Dashboard"
+    "home": "หน้าแรก",
+    "about": "เกี่ยวกับ",
+    "contact": "ติดต่อ",
+    "privacy": "ความเป็นส่วนตัว",
+    "terms": "ข้อกำหนด",
+    "ai_chat": "แชท AI",
+    "stories": "สตอรี่",
+    "questions": "คำถาม",
+    "bp_analysis": "วิเคราะห์ BP",
+    "profile": "โปรไฟล์",
+    "settings": "การตั้งค่า",
+    "dashboard": "แดชบอร์ด"
   },
 
   "auth": {
@@ -132,12 +132,12 @@
       "total_views": "Total Views"
     },
     "tabs": {
-      "overview": "Overview",
-      "stories": "Stories",
-      "saved": "Saved",
-      "submissions": "Submissions",
-      "achievements": "Achievements",
-      "activity": "Activity"
+      "overview": "ภาพรวม",
+      "stories": "สตอรี่",
+      "saved": "ที่บันทึกไว้",
+      "submissions": "ที่ส่ง",
+      "achievements": "ความสำเร็จ",
+      "activity": "กิจกรรม"
     },
     "recent_badges": "Recent Badges",
     "no_badges": "No badges earned yet",
@@ -206,8 +206,8 @@
   "search": "Search",
   
   "settings": {
-    "title": "Settings",
-    "description": "Personalize your LeiaoAI experience",
+    "title": "การตั้งค่า",
+    "description": "ปรับประสบการณ์ใช้งาน LeiaoAI ให้เหมาะกับคุณ",
     "profile_information": "Profile Information",
     "profile_description": "จัดการโปรไฟล์สาธารณะและข้อมูลส่วนบุคคลของคุณ",
     "change_avatar": "Change Avatar",
