@@ -31,12 +31,6 @@ const supportedLanguages = [
     flag: '🇺🇸'
   },
   {
-    code: 'en-US',
-    name: 'English (US)',
-    nativeName: 'English (US)',
-    flag: '🇺🇸'
-  },
-  {
     code: 'ja-JP',
     name: '日本語',
     nativeName: '日本語',

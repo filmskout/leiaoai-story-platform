@@ -24,7 +24,6 @@ import viVNTranslation from '../locales/vi-VN.json';
 // Create resources object with proper structure
 const resources = {
   'en': { translation: enTranslation },
-  'en-US': { translation: enTranslation }, // Alias for en
   'zh-CN': { translation: zhCNTranslation },
   'zh-HK': { translation: zhHKTranslation },
   'ja-JP': { translation: jaJPTranslation },
@@ -55,7 +54,7 @@ i18n
       'zh': ['zh-CN'],
       'default': ['en']
     },
-    supportedLngs: ['zh-CN', 'en', 'en-US', 'zh-HK', 'ja-JP', 'ko-KR', 'fr-FR', 'de-DE', 'es-ES', 'it-IT', 'pt-PT', 'ru-RU', 'ar-SA', 'fa-IR', 'hi-IN', 'nl-NL', 'th-TH', 'vi-VN'],
+    supportedLngs: ['zh-CN', 'en', 'zh-HK', 'ja-JP', 'ko-KR', 'fr-FR', 'de-DE', 'es-ES', 'it-IT', 'pt-PT', 'ru-RU', 'ar-SA', 'fa-IR', 'hi-IN', 'nl-NL', 'th-TH', 'vi-VN'],
     interpolation: {
       escapeValue: false,
     },
