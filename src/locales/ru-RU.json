@@ -247,7 +247,14 @@
     "avatar_error_type": "Please select an image file",
     "avatar_error_size": "Image must be less than 5MB",
     "avatar_uploaded": "Avatar updated successfully",
-    "avatar_upload_failed": "Failed to upload avatar"
+    "avatar_upload_failed": "Failed to upload avatar",
+    "ai_preferences": "Настройки ИИ",
+    "ai_description": "Выберите предпочитаемые модели ИИ",
+    "preferred_chat_model": "Предпочитаемая чат‑модель",
+    "preferred_image_model": "Предпочитаемая модель изображений",
+    "recommended": "Рекомендуется",
+    "available": "Доступно",
+    "unavailable": "Недоступно"
   },
   
   "home": {

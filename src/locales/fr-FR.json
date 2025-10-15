@@ -461,7 +461,14 @@
     "avatar_error_type": "Veuillez sélectionner un fichier image",
     "avatar_error_size": "L'image doit faire moins de 5MB",
     "avatar_uploaded": "Avatar mis à jour avec succès",
-    "avatar_upload_failed": "Échec du téléchargement de l'avatar"
+    "avatar_upload_failed": "Échec du téléchargement de l'avatar",
+    "ai_preferences": "Préférences IA",
+    "ai_description": "Choisissez vos modèles IA préférés",
+    "preferred_chat_model": "Modèle de chat préféré",
+    "preferred_image_model": "Modèle d'image préféré",
+    "recommended": "Recommandé",
+    "available": "Disponible",
+    "unavailable": "Indisponible"
   },
   
   "about": {

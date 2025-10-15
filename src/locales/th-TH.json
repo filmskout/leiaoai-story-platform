@@ -247,7 +247,14 @@
     "avatar_error_type": "Please select an image file",
     "avatar_error_size": "Image must be less than 5MB",
     "avatar_uploaded": "Avatar updated successfully",
-    "avatar_upload_failed": "Failed to upload avatar"
+    "avatar_upload_failed": "Failed to upload avatar",
+    "ai_preferences": "การตั้งค่า AI",
+    "ai_description": "เลือกรุ่น AI ที่คุณต้องการ",
+    "preferred_chat_model": "รุ่นแชทที่ต้องการ",
+    "preferred_image_model": "รุ่นภาพที่ต้องการ",
+    "recommended": "แนะนำ",
+    "available": "พร้อมใช้งาน",
+    "unavailable": "ไม่พร้อมใช้งาน"
   },
   
   "home": {

@@ -247,7 +247,14 @@
     "avatar_error_type": "Please select an image file",
     "avatar_error_size": "Image must be less than 5MB",
     "avatar_uploaded": "Avatar updated successfully",
-    "avatar_upload_failed": "Failed to upload avatar"
+    "avatar_upload_failed": "Failed to upload avatar",
+    "ai_preferences": "AI-voorkeuren",
+    "ai_description": "Kies je favoriete AI-modellen",
+    "preferred_chat_model": "Voorkeurs chatmodel",
+    "preferred_image_model": "Voorkeurs beeldmodel",
+    "recommended": "Aanbevolen",
+    "available": "Beschikbaar",
+    "unavailable": "Niet beschikbaar"
   },
   
   "home": {

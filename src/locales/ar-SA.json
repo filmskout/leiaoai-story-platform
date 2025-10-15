@@ -247,7 +247,14 @@
     "avatar_error_type": "Please select an image file",
     "avatar_error_size": "Image must be less than 5MB",
     "avatar_uploaded": "Avatar updated successfully",
-    "avatar_upload_failed": "Failed to upload avatar"
+    "avatar_upload_failed": "Failed to upload avatar",
+    "ai_preferences": "تفضيلات الذكاء الاصطناعي",
+    "ai_description": "اختر نماذج الذكاء الاصطناعي المفضلة لديك",
+    "preferred_chat_model": "نموذج الدردشة المفضل",
+    "preferred_image_model": "نموذج الصور المفضل",
+    "recommended": "موصى به",
+    "available": "متاح",
+    "unavailable": "غير متاح"
   },
   
   "home": {

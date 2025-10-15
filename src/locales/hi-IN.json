@@ -247,7 +247,14 @@
     "avatar_error_type": "Please select an image file",
     "avatar_error_size": "Image must be less than 5MB",
     "avatar_uploaded": "Avatar updated successfully",
-    "avatar_upload_failed": "Failed to upload avatar"
+    "avatar_upload_failed": "Failed to upload avatar",
+    "ai_preferences": "एआई वरीयताएँ",
+    "ai_description": "अपना पसंदीदा एआई मॉडल चुनें",
+    "preferred_chat_model": "पसंदीदा चैट मॉडल",
+    "preferred_image_model": "पसंदीदा इमेज मॉडल",
+    "recommended": "अनुशंसित",
+    "available": "उपलब्ध",
+    "unavailable": "उपलब्ध नहीं"
   },
   
   "home": {
