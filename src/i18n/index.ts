@@ -16,6 +16,10 @@ import ptPTTranslation from '../locales/pt-PT.json';
 import ruRUTranslation from '../locales/ru-RU.json';
 import arSATranslation from '../locales/ar-SA.json';
 import faIRTranslation from '../locales/fa-IR.json';
+import hiINTranslation from '../locales/hi-IN.json';
+import nlNLTranslation from '../locales/nl-NL.json';
+import thTHTranslation from '../locales/th-TH.json';
+import viVNTranslation from '../locales/vi-VN.json';
 
 // Create resources object with proper structure
 const resources = {
@@ -33,7 +37,10 @@ const resources = {
   'ru-RU': { translation: ruRUTranslation },
   'ar-SA': { translation: arSATranslation },
   'fa-IR': { translation: faIRTranslation },
-  'hi-IN': { translation: enTranslation }, // Fallback to English
+  'hi-IN': { translation: hiINTranslation },
+  'nl-NL': { translation: nlNLTranslation },
+  'th-TH': { translation: thTHTranslation },
+  'vi-VN': { translation: viVNTranslation }
 };
 
 i18n
@@ -48,7 +55,7 @@ i18n
       'zh': ['zh-CN'],
       'default': ['en']
     },
-    supportedLngs: ['zh-CN', 'en', 'en-US', 'zh-HK', 'ja-JP', 'ko-KR', 'fr-FR', 'de-DE', 'es-ES', 'it-IT', 'pt-PT', 'ru-RU', 'ar-SA', 'fa-IR', 'hi-IN'],
+    supportedLngs: ['zh-CN', 'en', 'en-US', 'zh-HK', 'ja-JP', 'ko-KR', 'fr-FR', 'de-DE', 'es-ES', 'it-IT', 'pt-PT', 'ru-RU', 'ar-SA', 'fa-IR', 'hi-IN', 'nl-NL', 'th-TH', 'vi-VN'],
     interpolation: {
       escapeValue: false,
     },

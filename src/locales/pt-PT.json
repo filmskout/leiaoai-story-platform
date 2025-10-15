@@ -41,6 +41,10 @@
   
   "nav": {
     "home": "Início",
+    "about": "Sobre",
+    "contact": "Contacto",
+    "privacy": "Privacidade",
+    "terms": "Termos",
     "ai_chat": "Chat IA",
     "stories": "Histórias",
     "questions": "Perguntas",

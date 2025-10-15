@@ -106,6 +106,68 @@
       "exit_strategy": "การวางแผนกลยุทธ์การออก",
       "valuation_model": "แบบจำลองการประเมินมูลค่า",
       "due_diligence": "การตรวจสอบความถูกต้อง"
+    },
+    "expertise_questions": {
+      "cvc_investment": [
+        "How do corporate VCs differ from traditional VCs?",
+        "What are the benefits of CVC partnerships for startups?",
+        "How to approach corporate venture capital funding?"
+      ],
+      "ma_restructuring": [
+        "What are key considerations in M&A valuation?",
+        "How to structure a successful merger deal?",
+        "What are common post-merger integration challenges?"
+      ],
+      "ipo_a_share": [
+        "What are the requirements for A-share IPO listing?",
+        "How long does the A-share IPO process typically take?",
+        "What are the key differences between A-share boards?"
+      ],
+      "ipo_hk_share": [
+        "What are the advantages of listing in Hong Kong?",
+        "How does the HK IPO process compare to mainland China?",
+        "What are the listing requirements for HKEX?"
+      ],
+      "ipo_us_share": [
+        "What are the benefits of a US IPO for international companies?",
+        "How to prepare for SEC compliance and reporting?",
+        "What are the key differences between NYSE and NASDAQ?"
+      ],
+      "spac_listing": [
+        "How do SPAC deals work compared to traditional IPOs?",
+        "What are the advantages and risks of SPAC mergers?",
+        "How to evaluate SPAC investment opportunities?"
+      ],
+      "macro_analysis": [
+        "How do interest rate changes affect investment strategies?",
+        "What macro factors should investors monitor in 2024?",
+        "How to hedge against inflation in investment portfolios?"
+      ],
+      "investment_environment": [
+        "How is the current regulatory environment affecting investments?",
+        "What are the emerging markets with best investment climate?",
+        "How do geopolitical tensions impact global investments?"
+      ],
+      "valuation_adjustment": [
+        "When and how should companies adjust their valuations?",
+        "What factors trigger valuation resets in private markets?",
+        "How to communicate valuation changes to investors?"
+      ],
+      "exit_strategy": [
+        "What are the main exit options for startup investors?",
+        "How to time an exit strategy effectively?",
+        "What factors determine the best exit method?"
+      ],
+      "valuation_model": [
+        "Which valuation methods work best for tech startups?",
+        "How to apply DCF models to high-growth companies?",
+        "What are common valuation mistakes to avoid?"
+      ],
+      "due_diligence": [
+        "What are the key areas to focus on in due diligence?",
+        "How long should a typical due diligence process take?",
+        "What red flags should investors watch for?"
+      ]
     }
   },
   

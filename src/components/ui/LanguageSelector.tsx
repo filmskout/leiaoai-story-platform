@@ -95,6 +95,24 @@ const supportedLanguages = [
     name: 'हिन्दी',
     nativeName: 'हिन्दी',
     flag: '🇮🇳'
+  },
+  {
+    code: 'nl-NL',
+    name: 'Nederlands',
+    nativeName: 'Nederlands',
+    flag: '🇳🇱'
+  },
+  {
+    code: 'th-TH',
+    name: 'ไทย',
+    nativeName: 'ไทย',
+    flag: '🇹🇭'
+  },
+  {
+    code: 'vi-VN',
+    name: 'Tiếng Việt',
+    nativeName: 'Tiếng Việt',
+    flag: '🇻🇳'
   }
 ];
 
@@ -147,7 +165,8 @@ export function LanguageSelector({ className, variant = 'default' }: LanguageSel
           'CN': 'zh-CN', 'TW': 'zh-HK', 'HK': 'zh-HK', 'MO': 'zh-HK',
           'JP': 'ja-JP', 'KR': 'ko-KR', 'FR': 'fr-FR', 'DE': 'de-DE', 'ES': 'es-ES',
           'PT': 'pt-PT', 'BR': 'pt-PT', 'RU': 'ru-RU', 'IN': 'hi-IN',
-          'SA': 'ar-SA', 'AE': 'ar-SA', 'EG': 'ar-SA', 'IT': 'it-IT', 'IR': 'fa-IR'
+          'SA': 'ar-SA', 'AE': 'ar-SA', 'EG': 'ar-SA', 'IT': 'it-IT', 'IR': 'fa-IR',
+          'NL': 'nl-NL', 'TH': 'th-TH', 'VN': 'vi-VN'
         };
         
         const detectedLanguage = countryToLanguage[countryCode] || 'en';

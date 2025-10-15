@@ -1,52 +1,65 @@
 {
   "app_name": "LeiaoAI",
-  "loading": "Loading...",
-  "error": "Error",
-  "cancel": "Cancel",
-  "confirm": "Confirm",
-  "save": "Save",
-  "delete": "Delete",
-  "edit": "Edit",
-  "submit": "Submit",
-  "back": "Back",
-  "next": "Next",
-  "previous": "Previous",
-  "search": "Search",
-  "filter": "Filter",
-  "sort": "Sort",
-  "refresh": "Refresh",
-  "upload": "Upload",
-  "download": "Download",
-  "view": "View",
-  "share": "Share",
-  "like": "Like",
-  "comment": "Comment",
-  "follow": "Follow",
-  "unfollow": "Unfollow",
-  "login": "Login",
-  "logout": "Logout",
-  "register": "Register",
-  "profile": "Profile",
-  "help": "Help",
-  "about": "About",
-  "contact": "Contact Us",
-  "privacy": "Privacy Policy",
-  "terms": "Terms of Service",
-  "success": "Success",
+  "loading": "लोड हो रहा है...",
+  "error": "त्रुटि",
+  "cancel": "रद्द करें",
+  "confirm": "पुष्टि करें",
+  "save": "सहेजें",
+  "delete": "हटाएं",
+  "edit": "संपादित करें",
+  "submit": "जमा करें",
+  "back": "वापस",
+  "next": "अगला",
+  "previous": "पिछला",
+  "search": "खोजें",
+  "filter": "फ़िल्टर करें",
+  "sort": "क्रमबद्ध करें",
+  "refresh": "ताज़ा करें",
+  "upload": "अपलोड करें",
+  "download": "डाउनलोड करें",
+  "view": "देखें",
+  "share": "साझा करें",
+  "like": "पसंद करें",
+  "comment": "टिप्पणी",
+  "follow": "फॉलो करें",
+  "unfollow": "अनफॉलो करें",
+  "login": "लॉगिन",
+  "logout": "लॉगआउट",
+  "register": "रजिस्टर",
+  "profile": "प्रोफ़ाइल",
+  "help": "सहायता",
+  "about": "के बारे में",
+  "contact": "संपर्क करें",
+  "privacy": "गोपनीयता नीति",
+  "terms": "सेवा की शर्तें",
+  "success": "सफलता",
   
-  "app_description": "Professional AI Investment Platform",
+  "common": {
+    "back": "वापस",
+    "cancel": "रद्द करें",
+    "characters": "वर्ण",
+    "back_to_home": "होम पर वापस जाएं"
+  },
+  
+  "app_description": "पेशेवर AI निवेश प्लेटफॉर्म",
   "footer": {
-    "developed_by": "Developed by LeiaoAI Agent"
+    "developed_by": "LeiaoAI Agent द्वारा विकसित",
+    "copyright": "© 2025 शेन्ज़ेन Leiao Artificial Intelligence Operations Limited। सभी अधिकार सुरक्षित।"
   },
   
   "nav": {
-    "home": "Home",
-    "ai_chat": "AI Chat",
-    "stories": "Stories",
-    "questions": "Questions",
-    "bp_analysis": "BP Analysis",
-    "profile": "Profile",
-    "settings": "Settings"
+    "home": "होम",
+    "about": "के बारे में",
+    "contact": "संपर्क",
+    "privacy": "गोपनीयता",
+    "terms": "शर्तें",
+    "ai_chat": "AI चैट",
+    "stories": "कहानियां",
+    "questions": "प्रश्न",
+    "bp_analysis": "BP विश्लेषण",
+    "profile": "प्रोफ़ाइल",
+    "settings": "सेटिंग्स",
+    "dashboard": "डैशबोर्ड"
   },
   
   "home": {
@@ -54,165 +67,148 @@
       "title_1": "पेशेवर",
       "title_2": "AI निवेश",
       "title_3": "प्लेटफॉर्म",
-      "description": "उन्नत AI तकनीक पर आधारित, पेशेवर निवेश विश्लेषण, व्यापार योजना मूल्यांकन और बुद्धिमान निर्णय समर्थन प्रदान करना",
+      "description": "उन्नत AI तकनीक के आधार पर पेशेवर निवेश विश्लेषण, व्यापार योजना मूल्यांकन और बुद्धिमान निर्णय समर्थन प्रदान करता है",
       "mobile_description": "स्मार्ट व्यापारिक निर्णयों के लिए AI निवेश विश्लेषण"
     },
     "cta": {
-      "title": "पेशेवर AI निवेश सलाहकार अनुभव शुरू करें",
-      "subtitle": "AI विश्लेषण के लिए अपनी व्यापार योजना अपलोड करें, या निवेश और वित्तपोषण मुद्दों पर सीधे सलाह लें",
+      "title": "पेशेवर AI निवेश सलाहकार का अनुभव शुरू करें",
+      "subtitle": "AI विश्लेषण के लिए अपनी व्यापार योजना अपलोड करें या निवेश और फंडिंग समस्याओं के बारे में सीधे परामर्श करें",
       "mobile_title": "AI निवेश सलाहकार शुरू करें",
-      "mobile_subtitle": "BP विश्लेषण अपलोड करें या सीधे सलाह लें",
+      "mobile_subtitle": "BP विश्लेषण अपलोड करें या सीधे परामर्श करें",
       "upload_bp": "BP विश्लेषण अपलोड करें",
       "ai_chat": "AI Q&A सलाहकार"
     },
     "stats": {
       "total_users": "प्लेटफॉर्म उपयोगकर्ता",
-      "total_qa": "Q&A गिनती",
+      "total_qa": "Q&A संख्या",
       "bp_analysis": "BP विश्लेषण",
       "avg_response": "औसत प्रतिक्रिया समय"
     }
   },
   
+  "stories": {
+    "title": "कहानियां",
+    "latest": "नवीनतम कहानियां",
+    "latest_subtitle": "हमारे समुदाय से नवीनतम अंतर्दृष्टि और अनुभव खोजें",
+    "page_title": "मेरी AI कहानी",
+    "page_subtitle": "AI निवेश और वित्तपोषण अनुभव साझा करें",
+    "mobile_page_title": "AI कहानी",
+    "mobile_page_subtitle": "AI अनुभव साझा करें",
+    "create_story": "कहानी साझा करें",
+    "cta_title": "अपनी कहानी साझा करें",
+    "cta_subtitle": "आपके अनुभव और अंतर्दृष्टि अगली पीढ़ी के नवप्रवर्तकों को प्रेरित कर सकते हैं। हमारे कहानीकार समुदाय में शामिल हों और प्रभाव बनाएं।",
+    "story_title": "कहानी शीर्षक",
+    "story_content": "कहानी सामग्री",
+    "category": "श्रेणी",
+    "public": "सार्वजनिक",
+    "private": "निजी",
+    "publish": "प्रकाशित करें",
+    "draft": "ड्राफ्ट",
+    "view_count": "दृश्य संख्या",
+    "like_count": "पसंद संख्या",
+    "comment_count": "टिप्पणी संख्या"
+  },
+  
   "professional_services": {
-    "title": "Professional Service Areas",
-    "subtitle": "Click on area cards for professional investment consulting advice",
-    "refresh_suggestions": "Refresh Suggestions",
-    "suggested_questions": "Suggested Questions",
-    "click_for_advice": "Click for Professional Advice",
-    "bottom_description": "Showing 3 random suggestion questions each time, click 'Refresh Suggestions' for new consultation directions",
-    "enter_full_chat": "Enter Full AI Chat"
+    "title": "पेशेवर सेवा क्षेत्र",
+    "subtitle": "पेशेवर निवेश सलाहकार सलाह के लिए क्षेत्र कार्ड पर क्लिक करें",
+    "refresh_suggestions": "सुझाव ताज़ा करें",
+    "suggested_questions": "सुझाए गए प्रश्न",
+    "click_for_advice": "पेशेवर सलाह के लिए क्लिक करें",
+    "bottom_description": "हर बार 3 यादृच्छिक सुझाव प्रश्न दिखा रहे हैं, नई परामर्श दिशाओं के लिए 'सुझाव ताज़ा करें' पर क्लिक करें",
+    "enter_full_chat": "पूर्ण AI चैट में प्रवेश करें"
   },
   
   "ai_chat": {
-    "title": "AI Investment Expert",
-    "subtitle": "Professional investment consulting services to empower your business decisions",
-    "placeholder": "Please enter your investment-related questions...",
-    "send": "Send",
-    "voice_input": "Voice Input",
-    "stop_recording": "Stop Recording",
-    "processing": "Processing your question...",
-    "new_chat": "New Chat",
-    "chat_history": "Chat History",
-    "select_model": "Select Model",
-    "model_recommended": "Recommended",
-    "model_fastest": "Fastest",
-    "model_china_optimized": "China Optimized",
-    "model_overseas_optimized": "Overseas Optimized",
-    "model_responses": {
-      "deepseek": "Based on current economic trends, I recommend focusing on ESG investments, artificial intelligence, and green energy. For emerging markets, consider a diversified investment strategy with sufficient liquidity.",
-      "openai": "When considering investment directions, focus on digital transformation, wildlife large models, and process automation. These areas are poised for rapid growth in the next five years and potential unicorn companies are already emerging.",
-      "qwen": "For the current investment environment, I recommend a 'layered allocation' strategy - base layer with low-volatility high-yield products, opportunity layer focused on innovative companies in AI, biotechnology and clean energy, and a defensive cash reserve.",
-      "default": "Based on current market analysis, investment strategies should be diversified, with a balanced allocation of traditional and emerging assets. I recommend focusing on ESG investments, AI, and green energy. I can provide more detailed investment advice for specific industries."
-    },
-    "sample_questions": {
-      "q1": "What are the valuation trends for companies listed on China's STAR Market in 2025?",
-      "q2": "How can startups optimize their Series A financing strategy?",
-      "q3": "What are the differences between US and Chinese VC investment environments?"
-    },
+    "title": "AI निवेश विशेषज्ञ",
+    "subtitle": "आपके व्यापारिक निर्णयों को सशक्त बनाने के लिए पेशेवर निवेश सलाहकार सेवाएं",
+    "placeholder": "कृपया अपने निवेश संबंधी प्रश्न दर्ज करें...",
+    "send": "भेजें",
+    "voice_input": "आवाज़ इनपुट",
+    "stop_recording": "रिकॉर्डिंग रोकें",
+    "processing": "आपके प्रश्न को संसाधित कर रहे हैं...",
+    "new_chat": "नई चैट",
+    "chat_history": "चैट इतिहास",
+    "select_model": "मॉडल चुनें",
+    "model_recommended": "अनुशंसित",
+    "model_fastest": "सबसे तेज़",
+    "model_china_optimized": "चीन अनुकूलित",
+    "model_overseas_optimized": "विदेशी अनुकूलित",
     "expertise_areas": {
-      "cvc_investment": "CVC Industrial Investment",
-      "ma_restructuring": "M&A Restructuring",
-      "ipo_a_share": "IPO Listing (A-Share)",
-      "ipo_hk_share": "IPO Listing (HK Stock)",
-      "ipo_us_share": "IPO Listing (US Stock)",
-      "spac_listing": "SPAC Shell Listing",
-      "macro_analysis": "Macroeconomic Analysis",
-      "investment_environment": "Investment Environment",
-      "valuation_adjustment": "Valuation Adjustment Agreement",
-      "exit_strategy": "Exit Strategy Planning",
-      "valuation_model": "Valuation Model",
-      "due_diligence": "Due Diligence"
-    }
-  },
-  
-  "bp_analysis": {
-    "title": "Business Plan Analysis",
-    "subtitle": "Upload your business plan to get a professional AI analysis report",
-    "upload_bp": "Upload BP",
-    "drag_drop": "Drag files here or click to upload",
-    "supported_formats": "Supports PDF, DOCX formats",
-    "max_size": "Maximum file size 50MB",
-    "analyzing": "Analyzing...",
-    "analysis_complete": "Analysis Complete",
-    "analysis_report": "Analysis Report",
-    "score": "Overall Score",
-    "recommendations": "Improvement Suggestions",
-    "market_analysis": "Market Analysis",
-    "business_model": "Business Model",
-    "team_assessment": "Team Assessment",
-    "financial_projection": "Financial Projection",
-    "risk_assessment": "Risk Assessment",
-    "investment_value": "Investment Value"
-  },
-  
-  "stories": {
-    "title": "Stories",
-    "page_title": "उपयोगकर्ता कहानियां और समुदाय",
-    "page_subtitle": "निवेश अनुभव साझा करें, सफलता के मामलों से सीखें",
-    "mobile_page_title": "उपयोगकर्ता कहानियां",
-    "mobile_page_subtitle": "अनुभव साझा करें, मामले सीखें",
-    "latest": "नवीनतम कहानियां",
-    "latest_subtitle": "हमारे समुदाय के नवीनतम अंतर्दृष्टि और अनुभवों की खोज करें।",
-    "cta_title": "अपनी कहानी साझा करें",
-    "cta_subtitle": "आपके अनुभव और अंतर्दृष्टि अगली पीढ़ी के नवप्रवर्तकों को प्रेरित कर सकते हैं। हमारे कहानीकार समुदाय में शामिल हों और प्रभाव बनाएं।",
-    "need_ideas": "विचारों की जरूरत है? AI के साथ चैट करें",
-    "writing_section_title": "अपनी निवेश AI अनुभव कहानी लिखें",
-    "writing_section_desc": "निवेश विश्लेषण, वित्तीय मॉडलिंग या व्यापार योजना के लिए AI उपकरणों का उपयोग करने के अपने अनुभव को साझा करें ताकि अन्य उपयोगकर्ताओं को वित्तीय क्षेत्र में AI के व्यावहारिक मूल्य को समझने में मदद मिल सके।",
-    "mobile_writing_section_title": "AI अनुभव कहानी साझा करें",
-    "mobile_writing_section_desc": "AI निवेश विश्लेषण अनुभव और व्यावहारिक मूल्य साझा करें।",
-    "create_button": "कहानी साझा करें",
-    "story_title": "Story Title",
-    "story_content": "Story Content",
-    "category": "Category",
-    "public": "Public",
-    "private": "Private",
-    "publish": "Publish",
-    "draft": "Draft",
-    "view_count": "Views",
-    "like_count": "Likes",
-    "comment_count": "Comments",
-    "section_title": "User Stories and Community",
-    "section_subtitle": "Share investment experiences, learn from success cases",
-    "create_button": "Share Story",
-    "no_stories": {
-      "title": "No Stories Yet",
-      "desc": "There are no user stories shared in this category yet"
+      "cvc_investment": "CVC औद्योगिक निवेश",
+      "ma_restructuring": "M&A पुनर्गठन",
+      "ipo_a_share": "IPO सार्वजनिक पेशकश (A शेयर)",
+      "ipo_hk_share": "IPO सार्वजनिक पेशकश (HK शेयर)",
+      "ipo_us_share": "IPO सार्वजनिक पेशकश (US शेयर)",
+      "spac_listing": "SPAC Shell लिस्टिंग",
+      "macro_analysis": "मैक्रो आर्थिक विश्लेषण",
+      "investment_environment": "निवेश वातावरण",
+      "valuation_adjustment": "मूल्यांकन समायोजन समझौता",
+      "exit_strategy": "एग्जिट रणनीति योजना",
+      "valuation_model": "मूल्यांकन मॉडल",
+      "due_diligence": "ड्यू डिलिजेंस"
     },
-    "be_first_share": "Be the first to share",
-    "categories": {
-      "all": "All",
-      "ai_tools": "AI Tools Experience",
-      "startup_interview": "Startup Interviews",
-      "investment_outlook": "Investment Outlook",
-      "finance_ai": "Financial AI Applications",
-      "video_generation": "Video Generation Experience",
-      "domestic_ai": "Domestic AI Tools",
-      "overseas_ai": "Overseas AI Platforms"
+    "expertise_questions": {
+      "cvc_investment": [
+        "How do corporate VCs differ from traditional VCs?",
+        "What are the benefits of CVC partnerships for startups?",
+        "How to approach corporate venture capital funding?"
+      ],
+      "ma_restructuring": [
+        "What are key considerations in M&A valuation?",
+        "How to structure a successful merger deal?",
+        "What are common post-merger integration challenges?"
+      ],
+      "ipo_a_share": [
+        "What are the requirements for A-share IPO listing?",
+        "How long does the A-share IPO process typically take?",
+        "What are the key differences between A-share boards?"
+      ],
+      "ipo_hk_share": [
+        "What are the advantages of listing in Hong Kong?",
+        "How does the HK IPO process compare to mainland China?",
+        "What are the listing requirements for HKEX?"
+      ],
+      "ipo_us_share": [
+        "What are the benefits of a US IPO for international companies?",
+        "How to prepare for SEC compliance and reporting?",
+        "What are the key differences between NYSE and NASDAQ?"
+      ],
+      "spac_listing": [
+        "How do SPAC deals work compared to traditional IPOs?",
+        "What are the advantages and risks of SPAC mergers?",
+        "How to evaluate SPAC investment opportunities?"
+      ],
+      "macro_analysis": [
+        "How do interest rate changes affect investment strategies?",
+        "What macro factors should investors monitor in 2024?",
+        "How to hedge against inflation in investment portfolios?"
+      ],
+      "investment_environment": [
+        "How is the current regulatory environment affecting investments?",
+        "What are the emerging markets with best investment climate?",
+        "How do geopolitical tensions impact global investments?"
+      ],
+      "valuation_adjustment": [
+        "When and how should companies adjust their valuations?",
+        "What factors trigger valuation resets in private markets?",
+        "How to communicate valuation changes to investors?"
+      ],
+      "exit_strategy": [
+        "What are the main exit options for startup investors?",
+        "How to time an exit strategy effectively?",
+        "What factors determine the best exit method?"
+      ],
+      "valuation_model": [
+        "Which valuation methods work best for tech startups?",
+        "How to apply DCF models to high-growth companies?",
+        "What are common valuation mistakes to avoid?"
+      ],
+      "due_diligence": [
+        "What are the key areas to focus on in due diligence?",
+        "How long should a typical due diligence process take?",
+        "What red flags should investors watch for?"
+      ]
     }
-  },
-  
-  "quick_ai_consultation_title": "Quick AI Investment Consultation",
-  "ai_expert_greeting": "Hello! I am 蕾奥AI Investment Expert, specializing in professional investment consulting services.",
-  "view_complete_ai_chat": "View Complete AI Chat",
-  "auto_select_model": "Auto Select",
-  "select_model": "Select Model",
-  "model_fastest": "Fastest",
-  "avg_response_time": "{{time}}s avg",
-  "avg_response_time_title": "Average response time: {{time}} seconds",
-  "analyzing_question": "Analyzing your question...",
-  "export": "Export",
-  "regenerate": "Regenerate",
-  "feedback": "Feedback",
-  
-  "date": {
-    "today": "Today",
-    "days_ago": "{{days}} days ago",
-    "months_ago": "{{months}} months ago",
-    "years_ago": "{{years}} years ago"
   }
-,
-  "placeholder_response": "Ask investment-related questions to get professional AI advice"
-,
-  "footer_description": "LeiaoAI professional investment consulting services, providing intelligent investment analysis and decision support",
-  "footer_provider": "Powered by LeiaoAI Agent"
 }
