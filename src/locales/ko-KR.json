@@ -194,7 +194,13 @@
     "completed": "Completed",
     "activity_timeline": "Activity Timeline",
     "activity_desc": "Your recent actions and interactions on the platform",
-    "view_public": "Public Profile"
+    "view_public": "Public Profile",
+    "username": "사용자명(공개 링크)",
+    "username_placeholder": "영문/숫자, _ . - (3~20자)",
+    "public_link": "공개 링크",
+    "username_invalid": "사용자명은 3~20자, 영문/숫자와 _ . - 만 가능합니다",
+    "username_change_limit": "사용자명은 30일에 최대 2회 변경할 수 있습니다",
+    "username_taken": "이미 사용 중인 사용자명입니다"
   },
 
   "search": "Search",

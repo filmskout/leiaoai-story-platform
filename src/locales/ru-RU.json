@@ -194,7 +194,13 @@
     "completed": "Completed",
     "activity_timeline": "Activity Timeline",
     "activity_desc": "Your recent actions and interactions on the platform",
-    "view_public": "Public Profile"
+    "view_public": "Public Profile",
+    "username": "Имя пользователя (публичная ссылка)",
+    "username_placeholder": "буквы/цифры, _ . - (3–20 символов)",
+    "public_link": "Публичная ссылка",
+    "username_invalid": "Имя пользователя должно быть 3–20 символов: буквы/цифры и _ . -",
+    "username_change_limit": "Имя пользователя можно менять не более 2 раз за 30 дней",
+    "username_taken": "Это имя пользователя уже занято"
   },
 
   "search": "Search",

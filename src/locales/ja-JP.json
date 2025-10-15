@@ -426,7 +426,13 @@
     "no_achievements": "まだ追跡されている実績がありません",
     "completed": "完了",
     "activity_timeline": "アクティビティタイムライン",
-    "activity_desc": "プラットフォームでの最近のアクションとインタラクション"
+    "activity_desc": "プラットフォームでの最近のアクションとインタラクション",
+    "username": "ユーザー名（公開リンク）",
+    "username_placeholder": "英数字、_ . -（3〜20文字）",
+    "public_link": "公開リンク",
+    "username_invalid": "ユーザー名は3〜20文字、英数字と _ . - のみ使用できます",
+    "username_change_limit": "ユーザー名は30日間で最大2回まで変更できます",
+    "username_taken": "このユーザー名は既に使用されています"
   },
   "story": {
     "create_title": "新しいストーリーを作成",
