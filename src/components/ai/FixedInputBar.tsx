@@ -5,6 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Send, Mic, MicOff, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 interface FixedInputBarProps {
   value: string;
@@ -28,6 +29,7 @@ export function FixedInputBar({
   className 
 }: FixedInputBarProps) {
   const { t } = useTranslation();
+  const isMobile = useMediaQuery('(max-width: 768px)');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // 自动调整文本域高度

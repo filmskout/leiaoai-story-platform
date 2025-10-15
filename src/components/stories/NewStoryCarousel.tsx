@@ -17,7 +17,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import { useMobileLayout } from '@/hooks/use-mobile';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 interface Tag {
   id: string;
@@ -53,7 +53,7 @@ interface NewStoryCarouselProps {
 export function NewStoryCarousel({ className }: NewStoryCarouselProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const isMobile = useMobileLayout();
+  const isMobile = useMediaQuery('(max-width: 768px)');
   const [stories, setStories] = useState<Story[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);

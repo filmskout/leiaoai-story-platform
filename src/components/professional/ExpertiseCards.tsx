@@ -30,6 +30,7 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import styles from './ExpertiseCards.module.css';
 import { supabase } from '@/lib/supabase';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 interface ExpertiseArea {
   key: string;
@@ -48,6 +49,7 @@ interface ExpertiseCardsProps {
 export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsProps) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const isMobile = useMediaQuery('(max-width: 768px)');
   const [refreshKey, setRefreshKey] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);

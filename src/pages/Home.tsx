@@ -8,7 +8,7 @@ import { ExpertiseCards } from '@/components/professional/ExpertiseCards';
 import { NewStoryCarousel } from '@/components/stories/NewStoryCarousel';
 import { useAIChat } from '@/hooks/useAIChat';
 import { useWebsiteStats } from '@/hooks/useWebsiteStats';
-import { useMobileLayout, useCompactLayout } from '@/hooks/use-mobile';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { 
   Heart, 
   MessageCircle, 
@@ -66,8 +66,8 @@ export default function Home() {
   const location = useLocation();
   const { sendMessage, isLoading: isAILoading } = useAIChat();
   const { stats, isLoading: isStatsLoading } = useWebsiteStats();
-  const isMobile = useMobileLayout();
-  const isCompact = useCompactLayout();
+  const isMobile = useMediaQuery('(max-width: 768px)');
+  const isCompact = useMediaQuery('(max-width: 1024px)');
   
   // Handle scroll to professional services when returning from AI Chat
   useEffect(() => {
