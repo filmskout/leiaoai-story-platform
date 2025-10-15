@@ -194,7 +194,13 @@
     "completed": "Completed",
     "activity_timeline": "Activity Timeline",
     "activity_desc": "Your recent actions and interactions on the platform",
-    "view_public": "Public Profile"
+    "view_public": "सार्वजनिक प्रोफ़ाइल",
+    "username": "यूज़रनेम (सार्वजनिक लिंक)",
+    "username_placeholder": "अक्षर/संख्या, _ . - (3–20 अक्षर)",
+    "public_link": "सार्वजनिक लिंक",
+    "username_invalid": "यूज़रनेम 3–20 अक्षरों का होना चाहिए: अक्षर/संख्या और _ . -",
+    "username_change_limit": "आप 30 दिनों में अधिकतम 2 बार यूज़रनेम बदल सकते हैं",
+    "username_taken": "यह यूज़रनेम पहले से लिया जा चुका है"
   },
 
   "search": "Search",

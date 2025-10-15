@@ -194,7 +194,13 @@
     "completed": "Completed",
     "activity_timeline": "Activity Timeline",
     "activity_desc": "Your recent actions and interactions on the platform",
-    "view_public": "Public Profile"
+    "view_public": "الملف العام",
+    "username": "اسم المستخدم (رابط عام)",
+    "username_placeholder": "أحرف/أرقام، _ . - (3–20 حرفًا)",
+    "public_link": "رابط عام",
+    "username_invalid": "يجب أن يكون اسم المستخدم من 3–20 حرفًا: أحرف/أرقام و _ . -",
+    "username_change_limit": "يمكنك تغيير اسم المستخدم بحد أقصى مرتين كل 30 يومًا",
+    "username_taken": "اسم المستخدم هذا مستخدم بالفعل"
   },
 
   "search": "Search",

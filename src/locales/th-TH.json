@@ -194,7 +194,13 @@
     "completed": "Completed",
     "activity_timeline": "Activity Timeline",
     "activity_desc": "Your recent actions and interactions on the platform",
-    "view_public": "Public Profile"
+    "view_public": "โปรไฟล์สาธารณะ",
+    "username": "ชื่อผู้ใช้ (ลิงก์สาธารณะ)",
+    "username_placeholder": "ตัวอักษร/ตัวเลข, _ . - (3–20 ตัวอักษร)",
+    "public_link": "ลิงก์สาธารณะ",
+    "username_invalid": "ชื่อผู้ใช้ต้องมี 3–20 ตัวอักษร: ตัวอักษร/ตัวเลข และ _ . -",
+    "username_change_limit": "คุณสามารถเปลี่ยนชื่อผู้ใช้ได้สูงสุด 2 ครั้งใน 30 วัน",
+    "username_taken": "ชื่อนี้ถูกใช้แล้ว"
   },
 
   "search": "Search",

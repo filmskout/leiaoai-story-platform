@@ -194,7 +194,13 @@
     "completed": "Terminé",
     "activity_timeline": "Chronologie d'activité",
     "activity_desc": "Vos actions et interactions récentes sur la plateforme",
-    "view_public": "Profil public"
+    "view_public": "Profil public",
+    "username": "Nom d'utilisateur (lien public)",
+    "username_placeholder": "lettres/chiffres, _ . - (3–20 caractères)",
+    "public_link": "Lien public",
+    "username_invalid": "Le nom d'utilisateur doit comporter 3–20 caractères : lettres/chiffres et _ . -",
+    "username_change_limit": "Vous pouvez changer le nom d'utilisateur au maximum 2 fois tous les 30 jours",
+    "username_taken": "Ce nom d'utilisateur est déjà utilisé"
   },
 
   "search": "Rechercher",

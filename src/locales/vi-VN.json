@@ -194,7 +194,13 @@
     "completed": "Completed",
     "activity_timeline": "Activity Timeline",
     "activity_desc": "Your recent actions and interactions on the platform",
-    "view_public": "Public Profile"
+    "view_public": "Hồ sơ công khai",
+    "username": "Tên người dùng (liên kết công khai)",
+    "username_placeholder": "chữ/số, _ . - (3–20 ký tự)",
+    "public_link": "Liên kết công khai",
+    "username_invalid": "Tên người dùng phải 3–20 ký tự: chữ/số và _ . -",
+    "username_change_limit": "Bạn có thể đổi tên người dùng tối đa 2 lần mỗi 30 ngày",
+    "username_taken": "Tên người dùng này đã được sử dụng"
   },
 
   "search": "Search",

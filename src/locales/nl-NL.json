@@ -194,7 +194,13 @@
     "completed": "Completed",
     "activity_timeline": "Activity Timeline",
     "activity_desc": "Your recent actions and interactions on the platform",
-    "view_public": "Public Profile"
+    "view_public": "Openbaar Profiel",
+    "username": "Gebruikersnaam (publieke link)",
+    "username_placeholder": "letters/cijfers, _ . - (3–20 tekens)",
+    "public_link": "Publieke link",
+    "username_invalid": "Gebruikersnaam moet 3–20 tekens zijn: letters/cijfers en _ . -",
+    "username_change_limit": "Je kunt je gebruikersnaam maximaal 2 keer per 30 dagen wijzigen",
+    "username_taken": "Deze gebruikersnaam is al in gebruik"
   },
 
   "search": "Search",
