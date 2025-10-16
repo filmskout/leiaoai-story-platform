@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
@@ -28,6 +29,7 @@ interface DocumentUpload {
 }
 
 const Program: React.FC = () => {
+  const { slug } = useParams<{ slug: string }>();
   const { t } = useTranslation();
   const { user } = useAuth();
   const [selectedDate, setSelectedDate] = useState<Date>();
@@ -109,6 +111,15 @@ const Program: React.FC = () => {
 
   const availableSlots = bookingSlots.filter(slot => slot.available);
 
+  const programTitle = useMemo(() => {
+    switch (slug) {
+      case 'financial-pioneer-100':
+        return '《金融先锋100》计划';
+      default:
+        return 'Program';
+    }
+  }, [slug]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
       <div className="container mx-auto px-4 max-w-6xl">
@@ -116,9 +127,7 @@ const Program: React.FC = () => {
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-4">
             <Award className="h-12 w-12 text-yellow-500 mr-3" />
-            <h1 className="text-4xl font-bold text-gray-900">
-              《金融先锋100》计划
-            </h1>
+            <h1 className="text-4xl font-bold text-gray-900">{programTitle}</h1>
           </div>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             汇聚金融科技领域的创新力量，为100位金融先锋提供专业投资对接、资源整合和品牌推广服务
