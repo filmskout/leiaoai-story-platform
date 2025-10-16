@@ -26,7 +26,7 @@ export default function ToolsReviews() {
   const [fundingLoading, setFundingLoading] = useState(false);
   const [fundings, setFundings] = useState<any[]>([]);
   const [fundingCompany, setFundingCompany] = useState<{ id: string; name: string } | null>(null);
-  const [researchMap, setResearchMap] = useState<Record<string, { summary?: string; funding_highlights?: string }>>({});
+  const [researchMap, setResearchMap] = useState<Record<string, { summary?: string; funding_highlights?: string; current_round?: string; overall_score?: number }>>({});
   const [researching, setResearching] = useState<string | null>(null);
   // aidb external tools
   const [extLoading, setExtLoading] = useState(true);
@@ -78,14 +78,14 @@ export default function ToolsReviews() {
       // try cache first
       const cached = await getCompanyResearch(domain);
       if (cached) {
-        setResearchMap(prev => ({ ...prev, [domain]: { summary: cached.summary, funding_highlights: cached.funding_highlights } }));
+        setResearchMap(prev => ({ ...prev, [domain]: { summary: cached.summary, funding_highlights: cached.funding_highlights, current_round: cached.current_round, overall_score: cached.overall_score } }));
       }
       // call API to refresh (will upsert and return latest)
       const resp = await fetch('/api/tools-research', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ domains: [domain] }) });
       if (resp.ok) {
         const json = await resp.json();
         const r = json?.results?.[domain];
-        if (r) setResearchMap(prev => ({ ...prev, [domain]: { summary: r.summary, funding_highlights: r.funding_highlights } }));
+        if (r) setResearchMap(prev => ({ ...prev, [domain]: { summary: r.summary, funding_highlights: r.funding_highlights, current_round: r.current_round, overall_score: r.overall_score } }));
       }
     } catch (e) {
       console.error('research error', e);
@@ -244,9 +244,17 @@ export default function ToolsReviews() {
                               <div className="text-foreground-secondary whitespace-pre-wrap mt-1">
                                 {researchMap[x.company!]?.summary || '（点击“刷新调研”获取 GPT 摘要）'}
                               </div>
-                              {researchMap[x.company!]?.funding_highlights && (
-                                <div className="text-foreground-secondary mt-1">投融资：{researchMap[x.company!]?.funding_highlights}</div>
-                              )}
+                              <div className="text-foreground-secondary mt-1 space-y-1">
+                                {researchMap[x.company!]?.funding_highlights && (
+                                  <div>投融资：{researchMap[x.company!]?.funding_highlights}</div>
+                                )}
+                                {(researchMap[x.company!]?.current_round || researchMap[x.company!]?.overall_score !== undefined) && (
+                                  <div>
+                                    {researchMap[x.company!]?.current_round ? `轮次：${researchMap[x.company!]?.current_round}` : ''}
+                                    {researchMap[x.company!]?.overall_score !== undefined ? `${researchMap[x.company!]?.current_round ? '｜' : ''}评分：${researchMap[x.company!]?.overall_score}` : ''}
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           )}
                         </div>
