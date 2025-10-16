@@ -19,4 +19,14 @@ export async function listCompanyFundings(companyId: string) {
   return data;
 }
 
+export async function getCompanyResearch(domain: string) {
+  const { data, error } = await supabase
+    .from('company_research')
+    .select('*')
+    .eq('company_domain', domain)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
 

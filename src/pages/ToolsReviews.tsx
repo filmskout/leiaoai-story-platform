@@ -4,9 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { Star, Building2, ExternalLink } from 'lucide-react';
-import { listToolsWithCompany, listCompanyFundings } from '@/services/tools';
+import { listToolsWithCompany, listCompanyFundings, getCompanyResearch } from '@/services/tools';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { getLogoUrlFromLink } from '@/lib/logos';
 
 interface ToolItem {
   id: string;
@@ -25,6 +26,8 @@ export default function ToolsReviews() {
   const [fundingLoading, setFundingLoading] = useState(false);
   const [fundings, setFundings] = useState<any[]>([]);
   const [fundingCompany, setFundingCompany] = useState<{ id: string; name: string } | null>(null);
+  const [researchMap, setResearchMap] = useState<Record<string, { summary?: string; funding_highlights?: string }>>({});
+  const [researching, setResearching] = useState<string | null>(null);
   // aidb external tools
   const [extLoading, setExtLoading] = useState(true);
   const [extTools, setExtTools] = useState<Array<{ id: string | number; name: string; description?: string; link?: string; category?: string; source?: string; company?: string; isOSS?: boolean }>>([]);
@@ -68,6 +71,29 @@ export default function ToolsReviews() {
     }
   };
 
+  const fetchResearch = async (domain?: string) => {
+    if (!domain) return;
+    try {
+      setResearching(domain);
+      // try cache first
+      const cached = await getCompanyResearch(domain);
+      if (cached) {
+        setResearchMap(prev => ({ ...prev, [domain]: { summary: cached.summary, funding_highlights: cached.funding_highlights } }));
+      }
+      // call API to refresh (will upsert and return latest)
+      const resp = await fetch('/api/tools-research', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ domains: [domain] }) });
+      if (resp.ok) {
+        const json = await resp.json();
+        const r = json?.results?.[domain];
+        if (r) setResearchMap(prev => ({ ...prev, [domain]: { summary: r.summary, funding_highlights: r.funding_highlights } }));
+      }
+    } catch (e) {
+      console.error('research error', e);
+    } finally {
+      setResearching(null);
+    }
+  };
+
   // load AIverse public JSON (object with tools array)
   useEffect(() => {
     const loadExt = async () => {
@@ -86,11 +112,11 @@ export default function ToolsReviews() {
           return { id: x.id, name: x.name, description: x.description, link: x.link, category: x.category, source, company: domain || undefined, isOSS };
         });
         setExtTools(withDerived);
-        const cats = Array.from(new Set(withDerived.map((x: any) => x.category || 'Uncategorized')));
+        const cats = Array.from(new Set(withDerived.map((x: any) => String(x.category || 'Uncategorized')))).filter(Boolean) as string[];
         setCategories(['all', ...cats]);
-        const companies = Array.from(new Set(withDerived.map((x: any) => x.company || 'unknown'))).filter(Boolean);
+        const companies = Array.from(new Set(withDerived.map((x: any) => String(x.company || 'unknown')))).filter(Boolean) as string[];
         setCompanyOptions(['all', ...companies]);
-        const sources = Array.from(new Set(withDerived.map((x: any) => x.source || 'unknown'))).filter(Boolean);
+        const sources = Array.from(new Set(withDerived.map((x: any) => String(x.source || 'unknown')))).filter(Boolean) as string[];
         setSourceOptions(['all', ...sources]);
       } catch (e) {
         console.error('load aidb tools error', e);
@@ -121,10 +147,15 @@ export default function ToolsReviews() {
                 {tools.length === 0 && (
                   <div className="text-sm text-foreground-secondary">暂无工具数据</div>
                 )}
-                {tools.map((tool) => (
+                    {tools.map((tool) => (
                   <div key={tool.id} className="p-3 border rounded-lg">
                     <div className="flex items-center justify-between">
-                      <div className="font-medium">{tool.name}</div>
+                      <div className="font-medium flex items-center gap-2">
+                        {getLogoUrlFromLink(tool.website) && (
+                          <img src={getLogoUrlFromLink(tool.website)} alt={tool.name} className="w-5 h-5 rounded" />
+                        )}
+                        {tool.name}
+                      </div>
                       {tool.website && (
                         <a href={tool.website} target="_blank" rel="noreferrer" className="text-primary-600 text-sm inline-flex items-center">
                           官网 <ExternalLink className="w-3 h-3 ml-1" />
@@ -188,16 +219,35 @@ export default function ToolsReviews() {
                       .map((x) => (
                         <div key={String(x.id)} className="p-3 border rounded-lg">
                           <div className="flex items-center justify-between">
-                            <div className="font-medium">{x.name}</div>
+                            <div className="font-medium flex items-center gap-2">
+                              {x.link && (
+                                <img src={getLogoUrlFromLink(x.link)} alt={x.name} className="w-5 h-5 rounded" />
+                              )}
+                              {x.name}
+                            </div>
                             {x.link && (
                               <a href={x.link} target="_blank" rel="noreferrer" className="text-primary-600 text-sm inline-flex items-center">
                                 官网 <ExternalLink className="w-3 h-3 ml-1" />
                               </a>
                             )}
                           </div>
-                          <div className="text-sm text-foreground-secondary mt-1">{x.category || 'Uncategorized'}</div>
+                          <div className="text-sm text-foreground-secondary mt-1">{x.category || 'Uncategorized'}{x.company ? `｜${x.company}` : ''}{x.source ? `｜${x.source}` : ''}{x.isOSS ? '｜开源' : ''}</div>
                           {x.description && (
                             <div className="text-sm text-foreground-secondary mt-1 line-clamp-2">{x.description}</div>
+                          )}
+                          {x.company && (
+                            <div className="mt-2 text-sm">
+                              <div className="flex items-center justify-between">
+                                <div className="font-medium">公司概览</div>
+                                <Button size="sm" variant="outline" onClick={() => fetchResearch(x.company!)} disabled={researching === x.company}>{researching === x.company ? '刷新中...' : '刷新调研'}</Button>
+                              </div>
+                              <div className="text-foreground-secondary whitespace-pre-wrap mt-1">
+                                {researchMap[x.company!]?.summary || '（点击“刷新调研”获取 GPT 摘要）'}
+                              </div>
+                              {researchMap[x.company!]?.funding_highlights && (
+                                <div className="text-foreground-secondary mt-1">投融资：{researchMap[x.company!]?.funding_highlights}</div>
+                              )}
+                            </div>
                           )}
                         </div>
                       ))}
