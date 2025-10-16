@@ -27,4 +27,20 @@ export async function submitProgramApplication(userId: string, input: ProgramApp
   return data;
 }
 
+export async function uploadProgramDocument(
+  slug: string,
+  userId: string,
+  file: File
+) {
+  const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+  const path = `${slug}/${userId}/${Date.now()}_${sanitizedName}`;
+  const { data, error } = await supabase.storage.from('program-docs').upload(path, file, {
+    cacheControl: '3600',
+    upsert: false
+  });
+  if (error) throw error;
+  const { data: urlData } = supabase.storage.from('program-docs').getPublicUrl(data.path);
+  return { path: data.path, publicUrl: urlData.publicUrl };
+}
+
 

@@ -9,7 +9,7 @@ import { Textarea } from '../components/ui/textarea';
 import { CalendarIcon, Upload, CheckCircle, Star, Users, Award, Clock, DollarSign } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '../lib/utils';
-import { submitProgramApplication } from '@/services/programs';
+import { submitProgramApplication, uploadProgramDocument } from '@/services/programs';
 
 interface BookingSlot {
   id: string;
@@ -70,12 +70,22 @@ const Program: React.FC = () => {
     setBookingSlots(slots);
   }, []);
 
-  const handleDocumentUpload = (docId: string, file: File) => {
-    setDocuments(prev => prev.map(doc => 
-      doc.id === docId 
-        ? { ...doc, url: URL.createObjectURL(file), uploaded: true }
-        : doc
-    ));
+  const handleDocumentUpload = async (docId: string, file: File) => {
+    if (!user) {
+      alert('请先登录');
+      return;
+    }
+    try {
+      const r = await uploadProgramDocument(slug || 'financial-pioneer-100', user.id, file);
+      setDocuments(prev => prev.map(doc => 
+        doc.id === docId 
+          ? { ...doc, url: r.publicUrl, uploaded: true }
+          : doc
+      ));
+    } catch (e) {
+      console.error('upload error', e);
+      alert('上传失败，请重试');
+    }
   };
 
   const handleSubmit = async () => {
