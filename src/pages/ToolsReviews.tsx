@@ -114,6 +114,22 @@ export default function ToolsReviews() {
     }
   };
 
+  // 批量后台刷新调研（无按钮，首次加载后自动触发）
+  useEffect(() => {
+    const triggerBatch = async () => {
+      const domains = Array.from(new Set(extTools.map(x => String(x.company || '')).filter(Boolean)));
+      if (domains.length === 0) return;
+      try {
+        await fetch('/api/tools-research', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ domains }) });
+      } catch (e) {
+        console.error('batch research error', e);
+      }
+    };
+    if (!extLoading && extTools.length > 0) {
+      triggerBatch();
+    }
+  }, [extLoading, extTools]);
+
   // load AIverse public JSON (object with tools array)
   useEffect(() => {
     const loadExt = async () => {
@@ -226,13 +242,6 @@ export default function ToolsReviews() {
                           )}
                           {x.company && (
                             <div className="mt-2 text-sm">
-                              <div className="flex items-center justify-between">
-                                <div className="font-medium">公司概览</div>
-                                <Button size="sm" variant="outline" onClick={() => fetchResearch(x.company!)} disabled={researching === x.company}>{researching === x.company ? '刷新中...' : '刷新调研'}</Button>
-                              </div>
-                              <div className="text-foreground-secondary whitespace-pre-wrap mt-1">
-                                {researchMap[x.company!]?.summary || '（点击"刷新调研"获取 GPT 摘要）'}
-                              </div>
                               <div className="text-foreground-secondary mt-1 space-y-1">
                                 {researchMap[x.company!]?.funding_highlights && (
                                   <div>投融资：{researchMap[x.company!]?.funding_highlights}</div>
