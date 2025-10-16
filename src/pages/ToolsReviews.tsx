@@ -4,8 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { Star, Building2, ExternalLink } from 'lucide-react';
-import { listToolsWithCompany } from '@/services/tools';
+import { listToolsWithCompany, listCompanyFundings } from '@/services/tools';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface ToolItem {
   id: string;
@@ -20,6 +21,10 @@ export default function ToolsReviews() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [tools, setTools] = useState<ToolItem[]>([]);
+  const [fundingOpen, setFundingOpen] = useState(false);
+  const [fundingLoading, setFundingLoading] = useState(false);
+  const [fundings, setFundings] = useState<any[]>([]);
+  const [fundingCompany, setFundingCompany] = useState<{ id: string; name: string } | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -35,6 +40,21 @@ export default function ToolsReviews() {
     };
     load();
   }, []);
+
+  const openFundings = async (company?: { id: string; name: string }) => {
+    if (!company?.id) return;
+    setFundingCompany(company);
+    setFundingOpen(true);
+    setFundingLoading(true);
+    try {
+      const data = await listCompanyFundings(company.id);
+      setFundings(data as any[]);
+    } catch (e) {
+      console.error('load fundings error', e);
+    } finally {
+      setFundingLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -69,6 +89,13 @@ export default function ToolsReviews() {
                     <div className="text-sm text-foreground-secondary mt-1">
                       {tool.category || '未分类'} {tool.company?.name ? `｜${tool.company.name}` : ''}
                     </div>
+                    {tool.company?.id && (
+                      <div className="mt-2">
+                        <Button size="sm" variant="outline" onClick={() => openFundings({ id: tool.company!.id, name: tool.company!.name })}>
+                          <Building2 className="w-4 h-4 mr-2" /> 查看融资详情
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -87,6 +114,34 @@ export default function ToolsReviews() {
             </div>
           </CardContent>
         </Card>
+
+        <Dialog open={fundingOpen} onOpenChange={setFundingOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>融资详情{fundingCompany?.name ? `｜${fundingCompany.name}` : ''}</DialogTitle>
+            </DialogHeader>
+            {fundingLoading ? (
+              <LoadingSpinner />
+            ) : (
+              <div className="space-y-3">
+                {fundings.length === 0 && (
+                  <div className="text-sm text-foreground-secondary">暂无融资记录</div>
+                )}
+                {fundings.map((f) => (
+                  <div key={f.id} className="p-3 border rounded-lg text-sm">
+                    <div className="font-medium">{f.round || '未披露轮次'} {f.amount_usd ? `｜$${Number(f.amount_usd).toLocaleString()}` : ''}</div>
+                    <div className="text-foreground-secondary">
+                      {f.investors && f.investors.length ? `投资方：${f.investors.join(', ')}` : '投资方未披露'}
+                    </div>
+                    {f.announced_on && (
+                      <div className="text-foreground-secondary">公布日期：{new Date(f.announced_on).toLocaleDateString()}</div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
