@@ -6,9 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
-import { Badge } from '../components/ui/badge';
-import { Calendar } from '../components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popover';
 import { CalendarIcon, Upload, CheckCircle, Star, Users, Award, Clock, DollarSign } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '../lib/utils';
@@ -33,7 +30,7 @@ const Program: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [selectedDate, setSelectedDate] = useState<Date>();
+  const [selectedDate, setSelectedDate] = useState<string>('');
   const [bookingSlots, setBookingSlots] = useState<BookingSlot[]>([]);
   const [documents, setDocuments] = useState<DocumentUpload[]>([
     { id: '1', name: 'Business Plan', type: 'pdf', url: '', uploaded: false },
@@ -93,7 +90,7 @@ const Program: React.FC = () => {
       const selectedDateStr = selectedDate ? selectedDate.toISOString().split('T')[0] : undefined;
       await submitProgramApplication(user.id, {
         slug: slug || 'financial-pioneer-100',
-        selectedDate: selectedDateStr,
+        selectedDate: selectedDate || selectedDateStr,
         timeSlot: undefined,
         documents: documents.map(d => ({ name: d.name, type: d.type, url: d.url })),
         personalIntro
@@ -251,49 +248,35 @@ const Program: React.FC = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !selectedDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {selectedDate ? format(selectedDate, "PPP") : "选择日期"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={setSelectedDate}
-                      disabled={(date) => date < new Date()}
-                      initialFocus
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm mb-1">选择日期</label>
+                    <Input
+                      type="date"
+                      value={selectedDate}
+                      onChange={(e) => setSelectedDate(e.target.value)}
                     />
-                  </PopoverContent>
-                </Popover>
-                
-                {selectedDate && (
-                  <div className="mt-4">
-                    <div className="text-sm font-medium mb-2">可选时间段：</div>
-                    <div className="space-y-2">
-                      {availableSlots
-                        .filter(slot => slot.date === selectedDate.toISOString().split('T')[0])
-                        .map(slot => (
-                          <Button
-                            key={slot.id}
-                            variant="outline"
-                            size="sm"
-                            className="w-full"
-                          >
-                            {slot.time}
-                          </Button>
-                        ))}
-                    </div>
                   </div>
-                )}
+                  {selectedDate && (
+                    <div>
+                      <div className="text-sm font-medium mb-2">可选时间段：</n+div>
+                      <div className="space-y-2">
+                        {availableSlots
+                          .filter(slot => slot.date === selectedDate)
+                          .map(slot => (
+                            <Button
+                              key={slot.id}
+                              variant="outline"
+                              size="sm"
+                              className="w-full"
+                            >
+                              {slot.time}
+                            </Button>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </CardContent>
             </Card>
 
