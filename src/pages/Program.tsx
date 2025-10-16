@@ -12,6 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popove
 import { CalendarIcon, Upload, CheckCircle, Star, Users, Award, Clock, DollarSign } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '../lib/utils';
+import { submitProgramApplication } from '@/services/programs';
 
 interface BookingSlot {
   id: string;
@@ -89,18 +90,16 @@ const Program: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      // Submit application logic here
-      console.log('Submitting Financial Pioneer 100 application:', {
-        userId: user.id,
-        selectedDate,
-        documents,
+      const selectedDateStr = selectedDate ? selectedDate.toISOString().split('T')[0] : undefined;
+      await submitProgramApplication(user.id, {
+        slug: slug || 'financial-pioneer-100',
+        selectedDate: selectedDateStr,
+        timeSlot: undefined,
+        documents: documents.map(d => ({ name: d.name, type: d.type, url: d.url })),
         personalIntro
       });
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      alert('Application submitted successfully!');
+
+      alert('Application submitted successfully');
     } catch (error) {
       console.error('Error submitting application:', error);
       alert('Failed to submit application. Please try again.');
