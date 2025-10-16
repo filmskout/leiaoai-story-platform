@@ -6,6 +6,7 @@ create table if not exists public.company_research (
   funding_highlights text,
   current_round text,
   overall_score int,
+  score_breakdown jsonb default '{}'::jsonb,
   source_json jsonb default '{}'::jsonb,
   updated_at timestamptz not null default now()
 );

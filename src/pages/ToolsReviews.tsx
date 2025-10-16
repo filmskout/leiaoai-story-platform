@@ -26,7 +26,7 @@ export default function ToolsReviews() {
   const [fundingLoading, setFundingLoading] = useState(false);
   const [fundings, setFundings] = useState<any[]>([]);
   const [fundingCompany, setFundingCompany] = useState<{ id: string; name: string } | null>(null);
-  const [researchMap, setResearchMap] = useState<Record<string, { summary?: string; funding_highlights?: string; current_round?: string; overall_score?: number }>>({});
+  const [researchMap, setResearchMap] = useState<Record<string, { summary?: string; funding_highlights?: string; current_round?: string; overall_score?: number; score_breakdown?: any }>>({});
   const [researching, setResearching] = useState<string | null>(null);
   // aidb external tools
   const [extLoading, setExtLoading] = useState(true);
@@ -78,14 +78,14 @@ export default function ToolsReviews() {
       // try cache first
       const cached = await getCompanyResearch(domain);
       if (cached) {
-        setResearchMap(prev => ({ ...prev, [domain]: { summary: cached.summary, funding_highlights: cached.funding_highlights, current_round: cached.current_round, overall_score: cached.overall_score } }));
+        setResearchMap(prev => ({ ...prev, [domain]: { summary: cached.summary, funding_highlights: cached.funding_highlights, current_round: cached.current_round, overall_score: cached.overall_score, score_breakdown: cached.score_breakdown } }));
       }
       // call API to refresh (will upsert and return latest)
       const resp = await fetch('/api/tools-research', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ domains: [domain] }) });
       if (resp.ok) {
         const json = await resp.json();
         const r = json?.results?.[domain];
-        if (r) setResearchMap(prev => ({ ...prev, [domain]: { summary: r.summary, funding_highlights: r.funding_highlights, current_round: r.current_round, overall_score: r.overall_score } }));
+        if (r) setResearchMap(prev => ({ ...prev, [domain]: { summary: r.summary, funding_highlights: r.funding_highlights, current_round: r.current_round, overall_score: r.overall_score, score_breakdown: r.score_breakdown } }));
       }
     } catch (e) {
       console.error('research error', e);
@@ -252,6 +252,26 @@ export default function ToolsReviews() {
                                   <div>
                                     {researchMap[x.company!]?.current_round ? `轮次：${researchMap[x.company!]?.current_round}` : ''}
                                     {researchMap[x.company!]?.overall_score !== undefined ? `${researchMap[x.company!]?.current_round ? '｜' : ''}评分：${researchMap[x.company!]?.overall_score}` : ''}
+                                  </div>
+                                )}
+                                {researchMap[x.company!]?.score_breakdown && (
+                                  <div className="mt-2">
+                                    <div className="text-xs font-medium mb-1">分项评分</div>
+                                    <div className="space-y-1">
+                                      {Object.entries(researchMap[x.company!]?.score_breakdown || {}).map(([key, value]: [string, any]) => {
+                                        const labels: Record<string, string> = { scale: '规模', growth: '增长', moat: '护城河', team: '团队', risk: '风险' };
+                                        const score = typeof value === 'number' ? Math.max(0, Math.min(100, value)) : 0;
+                                        return (
+                                          <div key={key} className="flex items-center gap-2 text-xs">
+                                            <div className="w-12 text-right">{labels[key] || key}</div>
+                                            <div className="flex-1 bg-gray-200 rounded-full h-2">
+                                              <div className="bg-blue-500 h-2 rounded-full" style={{ width: `${score}%` }}></div>
+                                            </div>
+                                            <div className="w-8 text-right">{score}</div>
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
                                   </div>
                                 )}
                               </div>

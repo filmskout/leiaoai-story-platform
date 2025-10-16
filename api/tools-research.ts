@@ -59,7 +59,8 @@ Return a concise JSON with keys:
 - summary (<=120 words), 
 - funding_highlights (<=3 bullet points as a single string),
 - current_round (e.g., Seed/A/B/C/IPO/Private/Undisclosed),
-- overall_score (0-100 integer, your overall quality/traction assessment based on public info).
+- overall_score (0-100 integer, your overall quality/traction assessment based on public info),
+- score_breakdown (object with keys: scale, growth, moat, team, risk; each 0-100 integer).
 If unknown, leave empty/null.`;
 
       let summary = '';
@@ -67,6 +68,7 @@ If unknown, leave empty/null.`;
       let source_json: any = {};
       let current_round = '';
       let overall_score: number | null = null;
+      let score_breakdown: any = {};
 
       try {
         const resp = await client.chat.completions.create({
@@ -84,6 +86,7 @@ If unknown, leave empty/null.`;
         current_round = String(source_json.current_round || '');
         const score = source_json.overall_score;
         overall_score = typeof score === 'number' ? Math.max(0, Math.min(100, Math.round(score))) : null;
+        score_breakdown = source_json.score_breakdown || {};
       } catch (e: any) {
         // Fallback minimal record
         summary = summary || '';
@@ -91,12 +94,13 @@ If unknown, leave empty/null.`;
         source_json = source_json || {};
         current_round = current_round || '';
         overall_score = overall_score ?? null;
+        score_breakdown = score_breakdown || {};
       }
 
       // Upsert
       const { data: up } = await supabase
         .from('company_research')
-        .upsert({ company_domain: domain, summary, funding_highlights, current_round, overall_score, source_json, updated_at: new Date().toISOString() }, { onConflict: 'company_domain' })
+        .upsert({ company_domain: domain, summary, funding_highlights, current_round, overall_score, score_breakdown, source_json, updated_at: new Date().toISOString() }, { onConflict: 'company_domain' })
         .select('*')
         .single();
 
