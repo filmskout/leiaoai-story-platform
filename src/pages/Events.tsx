@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar, Ticket } from 'lucide-react';
-import { listUpcomingEvents, registerEvent } from '@/services/events';
+import { listUpcomingEvents, registerEvent, createEvent } from '@/services/events';
 import { useAuth } from '@/contexts/AuthContext';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
@@ -22,6 +22,12 @@ export default function Events() {
   const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState<EventItem[]>([]);
   const [registeringId, setRegisteringId] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [title, setTitle] = useState('');
+  const [location, setLocation] = useState('');
+  const [startsAt, setStartsAt] = useState(''); // ISO from datetime-local
+  const [description, setDescription] = useState('');
+  const [capacity, setCapacity] = useState<number | ''>('');
 
   useEffect(() => {
     const load = async () => {
@@ -55,6 +61,43 @@ export default function Events() {
     }
   };
 
+  const handleCreate = async () => {
+    if (!user) {
+      alert('请先登录');
+      return;
+    }
+    if (!title || !startsAt) {
+      alert('请填写标题与开始时间');
+      return;
+    }
+    try {
+      setCreating(true);
+      await createEvent(user.id, {
+        title,
+        description: description || undefined,
+        location: location || undefined,
+        startsAt,
+        capacity: capacity === '' ? undefined : Number(capacity),
+        visibility: 'public'
+      });
+      // reload list
+      const data = await listUpcomingEvents();
+      setEvents(data as unknown as EventItem[]);
+      // reset form
+      setTitle('');
+      setLocation('');
+      setStartsAt('');
+      setDescription('');
+      setCapacity('');
+      alert('活动已创建');
+    } catch (e) {
+      console.error('create event error', e);
+      alert('创建失败，请重试');
+    } finally {
+      setCreating(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container-custom py-8">
@@ -68,12 +111,34 @@ export default function Events() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Calendar className="w-5 h-5 mr-2" /> 发布新活动（占位）
+                  <Calendar className="w-5 h-5 mr-2" /> 发布新活动
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-sm text-foreground-secondary">
-                  即将支持：活动标题、时间地点、票种与价格、报名表单、容量控制、审核机制。
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm mb-1">标题</label>
+                    <input className="w-full border rounded-md px-3 py-2" value={title} onChange={(e)=>setTitle(e.target.value)} placeholder="活动标题" />
+                  </div>
+                  <div>
+                    <label className="block text-sm mb-1">地点</label>
+                    <input className="w-full border rounded-md px-3 py-2" value={location} onChange={(e)=>setLocation(e.target.value)} placeholder="线上/线下地址" />
+                  </div>
+                  <div>
+                    <label className="block text-sm mb-1">开始时间</label>
+                    <input type="datetime-local" className="w-full border rounded-md px-3 py-2" value={startsAt} onChange={(e)=>setStartsAt(e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="block text-sm mb-1">容量（可选）</label>
+                    <input type="number" className="w-full border rounded-md px-3 py-2" value={capacity} onChange={(e)=>setCapacity(e.target.value === '' ? '' : Number(e.target.value))} min={0} />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm mb-1">简介（可选）</label>
+                    <textarea className="w-full border rounded-md px-3 py-2" rows={3} value={description} onChange={(e)=>setDescription(e.target.value)} placeholder="活动简介" />
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <Button size="sm" onClick={handleCreate} disabled={creating}>{creating ? '创建中...' : '创建活动'}</Button>
                 </div>
               </CardContent>
             </Card>
