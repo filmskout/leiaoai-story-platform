@@ -1,11 +1,59 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar, Ticket } from 'lucide-react';
+import { listUpcomingEvents, registerEvent } from '@/services/events';
+import { useAuth } from '@/contexts/AuthContext';
+import LoadingSpinner from '@/components/LoadingSpinner';
+
+interface EventItem {
+  id: string;
+  title: string;
+  description?: string;
+  location?: string;
+  starts_at: string;
+  ends_at?: string;
+}
 
 export default function Events() {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [events, setEvents] = useState<EventItem[]>([]);
+  const [registeringId, setRegisteringId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      try {
+        const data = await listUpcomingEvents();
+        setEvents(data as unknown as EventItem[]);
+      } catch (e) {
+        console.error('Failed to load events', e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
+
+  const handleRegister = async (eventId: string) => {
+    if (!user) {
+      alert('请先登录');
+      return;
+    }
+    try {
+      setRegisteringId(eventId);
+      await registerEvent(eventId, user.id);
+      alert('报名成功');
+    } catch (e) {
+      console.error('register error', e);
+      alert('报名失败，请重试');
+    } finally {
+      setRegisteringId(null);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -32,20 +80,31 @@ export default function Events() {
 
             <Card>
               <CardHeader>
-                <CardTitle>已发布活动列表（占位）</CardTitle>
+                <CardTitle>即将到来活动</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 border rounded-lg">
-                    <div>
-                      <div className="font-medium">LeiaoAI 月度投融资圆桌</div>
-                      <div className="text-sm text-foreground-secondary">下月第一周｜线上</div>
-                    </div>
-                    <Button size="sm" className="whitespace-nowrap">
-                      <Ticket className="w-4 h-4 mr-2" /> 报名
-                    </Button>
+                {loading ? (
+                  <LoadingSpinner />
+                ) : (
+                  <div className="space-y-3">
+                    {events.length === 0 && (
+                      <div className="text-sm text-foreground-secondary">暂无即将到来活动</div>
+                    )}
+                    {events.map((ev) => (
+                      <div key={ev.id} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div>
+                          <div className="font-medium">{ev.title}</div>
+                          <div className="text-sm text-foreground-secondary">
+                            {ev.location || '线上'} ｜ {new Date(ev.starts_at).toLocaleString()}
+                          </div>
+                        </div>
+                        <Button size="sm" className="whitespace-nowrap" onClick={() => handleRegister(ev.id)} disabled={registeringId === ev.id}>
+                          <Ticket className="w-4 h-4 mr-2" /> {registeringId === ev.id ? '提交中...' : '报名'}
+                        </Button>
+                      </div>
+                    ))}
                   </div>
-                </div>
+                )}
               </CardContent>
             </Card>
           </div>
