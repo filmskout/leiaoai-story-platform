@@ -27,11 +27,16 @@ export default function ToolsReviews() {
   const [fundingCompany, setFundingCompany] = useState<{ id: string; name: string } | null>(null);
   // aidb external tools
   const [extLoading, setExtLoading] = useState(true);
-  const [extTools, setExtTools] = useState<Array<{ id: string | number; name: string; description?: string; link?: string; category?: string }>>([]);
+  const [extTools, setExtTools] = useState<Array<{ id: string | number; name: string; description?: string; link?: string; category?: string; source?: string; company?: string; isOSS?: boolean }>>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [sortKey, setSortKey] = useState<'name_asc' | 'name_desc'>('name_asc');
   const [search, setSearch] = useState('');
+  const [companyOptions, setCompanyOptions] = useState<string[]>(['all']);
+  const [selectedCompany, setSelectedCompany] = useState<string>('all');
+  const [sourceOptions, setSourceOptions] = useState<string[]>(['all']);
+  const [selectedSource, setSelectedSource] = useState<string>('all');
+  const [ossOnly, setOssOnly] = useState<boolean>(false);
 
   useEffect(() => {
     const load = async () => {
@@ -63,16 +68,30 @@ export default function ToolsReviews() {
     }
   };
 
-  // load aidb public JSON
+  // load AIverse public JSON (object with tools array)
   useEffect(() => {
     const loadExt = async () => {
       setExtLoading(true);
       try {
-        const resp = await fetch('/aidb/tools.json');
+        const resp = await fetch('/AIverse/aiverse_tools_2024_2025_comprehensive.json');
         const json = await resp.json();
-        setExtTools(json || []);
-        const cats = Array.from(new Set((json || []).map((x: any) => x.category || 'Uncategorized')));
+        const raw = Array.isArray(json) ? json : (json?.tools || []);
+        const withDerived = raw.map((x: any) => {
+          const url = String(x.link || '');
+          let domain = '';
+          try { domain = new URL(url).hostname.replace(/^www\./,''); } catch {}
+          const source = String(x.source || '').trim() || (domain || 'unknown');
+          const desc = String(x.description || '').toLowerCase();
+          const isOSS = /github\.com|huggingface\.co/.test(domain) || /open[- ]?source/.test(desc) || /opensource/.test(desc);
+          return { id: x.id, name: x.name, description: x.description, link: x.link, category: x.category, source, company: domain || undefined, isOSS };
+        });
+        setExtTools(withDerived);
+        const cats = Array.from(new Set(withDerived.map((x: any) => x.category || 'Uncategorized')));
         setCategories(['all', ...cats]);
+        const companies = Array.from(new Set(withDerived.map((x: any) => x.company || 'unknown'))).filter(Boolean);
+        setCompanyOptions(['all', ...companies]);
+        const sources = Array.from(new Set(withDerived.map((x: any) => x.source || 'unknown'))).filter(Boolean);
+        setSourceOptions(['all', ...sources]);
       } catch (e) {
         console.error('load aidb tools error', e);
       } finally {
@@ -139,6 +158,15 @@ export default function ToolsReviews() {
                         {cat}
                       </Button>
                     ))}
+                    <select className="border rounded-md px-2 py-1 h-9" value={selectedCompany} onChange={(e)=>setSelectedCompany(e.target.value)}>
+                      {companyOptions.map(c => (<option key={c} value={c}>{c}</option>))}
+                    </select>
+                    <select className="border rounded-md px-2 py-1 h-9" value={selectedSource} onChange={(e)=>setSelectedSource(e.target.value)}>
+                      {sourceOptions.map(s => (<option key={s} value={s}>{s}</option>))}
+                    </select>
+                    <label className="flex items-center gap-1 text-sm">
+                      <input type="checkbox" checked={ossOnly} onChange={(e)=>setOssOnly(e.target.checked)} /> 开源
+                    </label>
                     <input className="ml-auto border rounded-md px-2 py-1 h-9" placeholder="搜索工具..." value={search} onChange={(e)=>setSearch(e.target.value)} />
                     <div className="flex gap-2">
                       <Button size="sm" variant={sortKey === 'name_asc' ? 'default' : 'outline'} onClick={() => setSortKey('name_asc')}>A→Z</Button>
@@ -148,6 +176,9 @@ export default function ToolsReviews() {
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     {extTools
                       .filter((x) => selectedCategory === 'all' || (x.category || 'Uncategorized') === selectedCategory)
+                      .filter((x) => selectedCompany === 'all' || (x.company || 'unknown') === selectedCompany)
+                      .filter((x) => selectedSource === 'all' || (x.source || 'unknown') === selectedSource)
+                      .filter((x) => !ossOnly || x.isOSS)
                       .filter((x) => {
                         const q = search.trim().toLowerCase();
                         if (!q) return true;
