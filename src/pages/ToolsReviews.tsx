@@ -3,11 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { Star, Building2, ExternalLink } from 'lucide-react';
+import { Star, Building2, ExternalLink, Wrench } from 'lucide-react';
 import { listToolsWithCompany, listCompanyFundings, getCompanyResearch } from '@/services/tools';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { getLogoUrlFromLink } from '@/lib/logos';
+import { PageHero } from '@/components/PageHero';
+import { motion } from 'framer-motion';
 
 interface ToolItem {
   id: string;
@@ -40,6 +42,24 @@ export default function ToolsReviews() {
   const [sourceOptions, setSourceOptions] = useState<string[]>(['all']);
   const [selectedSource, setSelectedSource] = useState<string>('all');
   const [ossOnly, setOssOnly] = useState<boolean>(false);
+
+  // 页面动画
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: { 
+        duration: 0.5, 
+        staggerChildren: 0.1,
+        delayChildren: 0.3
+      }
+    }
+  };
+  
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -128,57 +148,26 @@ export default function ToolsReviews() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
+    <motion.div 
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="min-h-screen bg-background"
+    >
+      {/* 页面标题 - 使用PageHero组件保持一致性 */}
+      <PageHero 
+        titleKey="AI 工具测评"
+        subtitleKey="结合 Stories 打造大众点评式测评体系，含投融资信息"
+        icon={Wrench}
+      />
+
       <div className="container-custom py-8">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold">AI 工具测评</h1>
-          <p className="text-foreground-secondary mt-2">结合 Stories 打造大众点评式测评体系，含投融资信息</p>
-        </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>工具库与投融资数据（占位）</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <LoadingSpinner />
-            ) : (
-              <div className="space-y-3">
-                {tools.length === 0 && (
-                  <div className="text-sm text-foreground-secondary">暂无工具数据</div>
-                )}
-                    {tools.map((tool) => (
-                  <div key={tool.id} className="p-3 border rounded-lg">
-                    <div className="flex items-center justify-between">
-                      <div className="font-medium flex items-center gap-2">
-                        {getLogoUrlFromLink(tool.website) && (
-                          <img src={getLogoUrlFromLink(tool.website)} alt={tool.name} className="w-5 h-5 rounded" />
-                        )}
-                        {tool.name}
-                      </div>
-                      {tool.website && (
-                        <a href={tool.website} target="_blank" rel="noreferrer" className="text-primary-600 text-sm inline-flex items-center">
-                          官网 <ExternalLink className="w-3 h-3 ml-1" />
-                        </a>
-                      )}
-                    </div>
-                    <div className="text-sm text-foreground-secondary mt-1">
-                      {tool.category || '未分类'} {tool.company?.name ? `｜${tool.company.name}` : ''}
-                    </div>
-                    {tool.company?.id && (
-                      <div className="mt-2">
-                        <Button size="sm" variant="outline" onClick={() => openFundings({ id: tool.company!.id, name: tool.company!.name })}>
-                          <Building2 className="w-4 h-4 mr-2" /> 查看融资详情
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className="mt-8">
-              <h2 className="text-xl font-semibold mb-3">AI 工具库（来自 aidb）</h2>
+        <motion.div variants={itemVariants}>
+          <Card>
+            <CardHeader>
+              <CardTitle>AI 工具库</CardTitle>
+            </CardHeader>
+            <CardContent>
               {extLoading ? (
                 <LoadingSpinner />
               ) : (
@@ -242,7 +231,7 @@ export default function ToolsReviews() {
                                 <Button size="sm" variant="outline" onClick={() => fetchResearch(x.company!)} disabled={researching === x.company}>{researching === x.company ? '刷新中...' : '刷新调研'}</Button>
                               </div>
                               <div className="text-foreground-secondary whitespace-pre-wrap mt-1">
-                                {researchMap[x.company!]?.summary || '（点击“刷新调研”获取 GPT 摘要）'}
+                                {researchMap[x.company!]?.summary || '（点击"刷新调研"获取 GPT 摘要）'}
                               </div>
                               <div className="text-foreground-secondary mt-1 space-y-1">
                                 {researchMap[x.company!]?.funding_highlights && (
@@ -282,21 +271,21 @@ export default function ToolsReviews() {
                   </div>
                 </>
               )}
-            </div>
-            <div className="mt-4 flex gap-3">
-              <Link to="/stories">
-                <Button size="sm" variant="outline">
-                  <Star className="w-4 h-4 mr-2" /> 去查看测评 Stories
-                </Button>
-              </Link>
-              <a href="https://ow4l9vcrew3d.space.minimax.io/" target="_blank" rel="noreferrer" className="inline-flex">
-                <Button size="sm">
-                  <ExternalLink className="w-4 h-4 mr-2" /> 参考成品站点
-                </Button>
-              </a>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+          <div className="mt-4 flex gap-3">
+            <Link to="/stories">
+              <Button size="sm" variant="outline">
+                <Star className="w-4 h-4 mr-2" /> 去查看测评 Stories
+              </Button>
+            </Link>
+            <a href="https://ow4l9vcrew3d.space.minimax.io/" target="_blank" rel="noreferrer" className="inline-flex">
+              <Button size="sm">
+                <ExternalLink className="w-4 h-4 mr-2" /> 参考成品站点
+              </Button>
+            </a>
+          </div>
+        </motion.div>
 
         <Dialog open={fundingOpen} onOpenChange={setFundingOpen}>
           <DialogContent>
@@ -326,7 +315,7 @@ export default function ToolsReviews() {
           </DialogContent>
         </Dialog>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
