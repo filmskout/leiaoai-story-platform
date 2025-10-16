@@ -33,6 +33,7 @@ export default function Events() {
   const [ticketName, setTicketName] = useState('');
   const [ticketPrice, setTicketPrice] = useState<number | ''>('');
   const [ticketQuota, setTicketQuota] = useState<number | ''>('');
+  const [ticketCurrency, setTicketCurrency] = useState<'CNY' | 'USD'>('CNY');
   const [regs, setRegs] = useState<any[]>([]);
   const formatPrice = (cents?: number, currency: string = 'CNY') => {
     if (typeof cents !== 'number') return '-';
@@ -150,6 +151,7 @@ export default function Events() {
       await createTicket(activeEventId, {
         name: ticketName,
         priceCents: ticketPrice === '' ? 0 : Number(ticketPrice),
+        currency: ticketCurrency,
         quota: ticketQuota === '' ? undefined : Number(ticketQuota)
       });
       const t = await listTickets(activeEventId);
@@ -244,6 +246,10 @@ export default function Events() {
                               <div className="grid grid-cols-2 gap-2 mb-2">
                                 <input className="border rounded-md px-2 py-1" placeholder="名称" value={ticketName} onChange={(e)=>setTicketName(e.target.value)} />
                                 <input type="number" className="border rounded-md px-2 py-1" placeholder="价格(分)" value={ticketPrice} onChange={(e)=>setTicketPrice(e.target.value === '' ? '' : Number(e.target.value))} />
+                                <select className="border rounded-md px-2 py-1" value={ticketCurrency} onChange={(e)=>setTicketCurrency(e.target.value as 'CNY'|'USD')}>
+                                  <option value="CNY">CNY</option>
+                                  <option value="USD">USD</option>
+                                </select>
                                 <input type="number" className="border rounded-md px-2 py-1" placeholder="配额(可选)" value={ticketQuota} onChange={(e)=>setTicketQuota(e.target.value === '' ? '' : Number(e.target.value))} />
                                 <Button size="sm" onClick={handleCreateTicket}>新增票种</Button>
                               </div>
@@ -263,7 +269,10 @@ export default function Events() {
                                 {regs.length === 0 && <div className="text-foreground-secondary">暂无报名</div>}
                                 {regs.map((r: any) => (
                                   <div key={r.id} className="flex justify-between">
-                                    <div>{r.user_id}</div>
+                                    <div>
+                                      <div>{r.user?.email || r.user_id}</div>
+                                      <div className="text-foreground-secondary">{r.user_id}</div>
+                                    </div>
                                     <div className="text-foreground-secondary">{new Date(r.created_at).toLocaleString()}</div>
                                   </div>
                                 ))}
