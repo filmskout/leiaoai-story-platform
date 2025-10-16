@@ -66,4 +66,24 @@ export async function updateProgramStatus(applicationId: string, status: Program
   return data;
 }
 
+export async function addProgramReviewLog(applicationId: string, adminId: string, action: string, note?: string) {
+  const { data, error } = await supabase
+    .from('program_review_logs')
+    .insert({ application_id: applicationId, admin_id: adminId, action, note: note ?? null })
+    .select('*')
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function listProgramReviewLogs(applicationId: string) {
+  const { data, error } = await supabase
+    .from('program_review_logs')
+    .select('*')
+    .eq('application_id', applicationId)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return data;
+}
+
 

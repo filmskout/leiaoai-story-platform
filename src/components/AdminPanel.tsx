@@ -6,7 +6,7 @@ import { Shield, Users, BarChart3, Settings, LogOut, Clock, AlertTriangle } from
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
-import { updateProgramStatus, ProgramStatus } from '@/services/programs';
+import { updateProgramStatus, ProgramStatus, addProgramReviewLog, listProgramReviewLogs } from '@/services/programs';
 
 interface AdminPanelProps {
   onClose?: () => void;
@@ -18,6 +18,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   const { actualTheme } = useTheme();
   const [apps, setApps] = useState<any[]>([]);
   const [loadingApps, setLoadingApps] = useState(false);
+  const [logsMap, setLogsMap] = useState<Record<string, any[]>>({});
+  const [noteText, setNoteText] = useState<Record<string, string>>({});
 
   // Don't render if not admin
   if (!isAdmin || !adminSessionValid) {
@@ -44,9 +46,30 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
       await updateProgramStatus(id, st);
       setApps(prev => prev.map(a => a.id === id ? { ...a, status: st } : a));
       toast.success('状态已更新');
+      if (user?.id) {
+        await addProgramReviewLog(id, user.id, 'status_change', `set to ${st}`);
+        const logs = await listProgramReviewLogs(id);
+        setLogsMap(prev => ({ ...prev, [id]: logs as any[] }));
+      }
     } catch (e) {
       console.error('update status error', e);
       toast.error('更新失败');
+    }
+  };
+
+  const addNote = async (id: string) => {
+    const text = noteText[id]?.trim();
+    if (!text) return;
+    try {
+      if (!user?.id) return;
+      await addProgramReviewLog(id, user.id, 'note', text);
+      const logs = await listProgramReviewLogs(id);
+      setLogsMap(prev => ({ ...prev, [id]: logs as any[] }));
+      setNoteText(prev => ({ ...prev, [id]: '' }));
+      toast.success('备注已添加');
+    } catch (e) {
+      console.error('add note error', e);
+      toast.error('添加失败');
     }
   };
 
@@ -175,6 +198,33 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                             {st}
                           </button>
                         ))}
+                      </div>
+                      <div className="mt-2">
+                        <div className="text-xs font-medium mb-1">审核备注</div>
+                        <div className="flex gap-2">
+                          <input className={cn(
+                            "flex-1 border rounded px-2 py-1 text-xs",
+                            actualTheme === 'dark' ? "bg-gray-800 border-gray-700 text-gray-100" : "bg-white border-gray-300 text-gray-800"
+                          )} value={noteText[a.id] || ''} onChange={(e)=>setNoteText(prev=>({ ...prev, [a.id]: e.target.value }))} placeholder="添加备注..." />
+                          <button onClick={()=>addNote(a.id)} className={cn(
+                            "px-2 py-1 rounded border text-xs",
+                            actualTheme === 'dark' ? "border-gray-700" : "border-gray-200"
+                          )}>添加</button>
+                        </div>
+                        <div className="mt-2 max-h-24 overflow-auto space-y-1 text-xs">
+                          {(logsMap[a.id] || []).map((l:any) => (
+                            <div key={l.id} className={cn(
+                              "p-2 rounded border",
+                              actualTheme === 'dark' ? "border-gray-700" : "border-gray-200"
+                            )}>
+                              <div className="flex justify-between">
+                                <div className="font-medium">{l.action}</div>
+                                <div className="text-foreground-secondary">{new Date(l.created_at).toLocaleString()}</div>
+                              </div>
+                              {l.note && <div className="opacity-75 mt-1">{l.note}</div>}
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   ))}
