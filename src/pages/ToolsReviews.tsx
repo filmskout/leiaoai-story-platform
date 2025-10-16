@@ -25,6 +25,12 @@ export default function ToolsReviews() {
   const [fundingLoading, setFundingLoading] = useState(false);
   const [fundings, setFundings] = useState<any[]>([]);
   const [fundingCompany, setFundingCompany] = useState<{ id: string; name: string } | null>(null);
+  // aidb external tools
+  const [extLoading, setExtLoading] = useState(true);
+  const [extTools, setExtTools] = useState<Array<{ id: string | number; name: string; description?: string; link?: string; category?: string }>>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [sortKey, setSortKey] = useState<'name_asc' | 'name_desc'>('name_asc');
 
   useEffect(() => {
     const load = async () => {
@@ -55,6 +61,25 @@ export default function ToolsReviews() {
       setFundingLoading(false);
     }
   };
+
+  // load aidb public JSON
+  useEffect(() => {
+    const loadExt = async () => {
+      setExtLoading(true);
+      try {
+        const resp = await fetch('/aidb/tools.json');
+        const json = await resp.json();
+        setExtTools(json || []);
+        const cats = Array.from(new Set((json || []).map((x: any) => x.category || 'Uncategorized')));
+        setCategories(['all', ...cats]);
+      } catch (e) {
+        console.error('load aidb tools error', e);
+      } finally {
+        setExtLoading(false);
+      }
+    };
+    loadExt();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -100,6 +125,48 @@ export default function ToolsReviews() {
                 ))}
               </div>
             )}
+
+            <div className="mt-8">
+              <h2 className="text-xl font-semibold mb-3">AI 工具库（来自 aidb）</h2>
+              {extLoading ? (
+                <LoadingSpinner />
+              ) : (
+                <>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {categories.map((cat) => (
+                      <Button key={cat} size="sm" variant={selectedCategory === cat ? 'default' : 'outline'} onClick={() => setSelectedCategory(cat)}>
+                        {cat}
+                      </Button>
+                    ))}
+                    <div className="ml-auto flex gap-2">
+                      <Button size="sm" variant={sortKey === 'name_asc' ? 'default' : 'outline'} onClick={() => setSortKey('name_asc')}>A→Z</Button>
+                      <Button size="sm" variant={sortKey === 'name_desc' ? 'default' : 'outline'} onClick={() => setSortKey('name_desc')}>Z→A</Button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {extTools
+                      .filter((x) => selectedCategory === 'all' || (x.category || 'Uncategorized') === selectedCategory)
+                      .sort((a, b) => sortKey === 'name_asc' ? String(a.name).localeCompare(String(b.name)) : String(b.name).localeCompare(String(a.name)))
+                      .map((x) => (
+                        <div key={String(x.id)} className="p-3 border rounded-lg">
+                          <div className="flex items-center justify-between">
+                            <div className="font-medium">{x.name}</div>
+                            {x.link && (
+                              <a href={x.link} target="_blank" rel="noreferrer" className="text-primary-600 text-sm inline-flex items-center">
+                                官网 <ExternalLink className="w-3 h-3 ml-1" />
+                              </a>
+                            )}
+                          </div>
+                          <div className="text-sm text-foreground-secondary mt-1">{x.category || 'Uncategorized'}</div>
+                          {x.description && (
+                            <div className="text-sm text-foreground-secondary mt-1 line-clamp-2">{x.description}</div>
+                          )}
+                        </div>
+                      ))}
+                  </div>
+                </>
+              )}
+            </div>
             <div className="mt-4 flex gap-3">
               <Link to="/stories">
                 <Button size="sm" variant="outline">
