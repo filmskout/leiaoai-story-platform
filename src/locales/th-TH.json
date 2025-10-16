@@ -66,7 +66,7 @@
 
   "auth": {
     "sign_in": "Sign In",
-    "sign_out": "Sign Out",
+    "sign_out": "ออกจากระบบ",
     "sign_up": "Sign Up",
     "email": "Email",
     "password": "Password",
@@ -470,7 +470,7 @@
     "page_subtitle": "แบ่งปันประสบการณ์การลงทุน เรียนรู้จากกรณีศึกษาที่ประสบความสำเร็จ",
     "mobile_page_title": "User Stories",
     "mobile_page_subtitle": "Share experiences, learn cases",
-    "create_story": "Share Story",
+    "create_story": "แบ่งปันสตอรี่",
     "latest": "Latest Stories",
     "latest_subtitle": "Discover the latest insights and experiences from our community.",
     "cta_title": "แบ่งปันเรื่องราวของคุณ",

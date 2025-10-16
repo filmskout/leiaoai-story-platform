@@ -66,7 +66,7 @@
 
   "auth": {
     "sign_in": "Sign In",
-    "sign_out": "Sign Out",
+    "sign_out": "Disconnetti",
     "sign_up": "Sign Up",
     "email": "Email",
     "password": "Password",
@@ -470,7 +470,7 @@
     "page_subtitle": "Condividi esperienze di investimento, impara dai casi di successo",
     "mobile_page_title": "User Stories",
     "mobile_page_subtitle": "Share experiences, learn cases",
-    "create_story": "Share Story",
+    "create_story": "Condividi storia",
     "latest": "Latest Stories",
     "latest_subtitle": "Discover the latest insights and experiences from our community.",
     "cta_title": "Condividi la tua storia",

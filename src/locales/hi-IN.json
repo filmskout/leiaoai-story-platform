@@ -66,7 +66,7 @@
 
   "auth": {
     "sign_in": "Sign In",
-    "sign_out": "Sign Out",
+    "sign_out": "साइन आउट",
     "sign_up": "Sign Up",
     "email": "Email",
     "password": "Password",
@@ -470,7 +470,7 @@
     "page_subtitle": "निवेश अनुभव साझा करें, सफलता के मामलों से सीखें",
     "mobile_page_title": "User Stories",
     "mobile_page_subtitle": "Share experiences, learn cases",
-    "create_story": "Share Story",
+    "create_story": "कहानी साझा करें",
     "latest": "Latest Stories",
     "latest_subtitle": "Discover the latest insights and experiences from our community.",
     "cta_title": "अपनी कहानी साझा करें",

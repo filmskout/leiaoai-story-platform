@@ -34,6 +34,7 @@ const About = lazy(() => import('@/pages/About'));
 const Privacy = lazy(() => import('@/pages/Privacy'));
 const Terms = lazy(() => import('@/pages/Terms'));
 const Contact = lazy(() => import('@/pages/Contact'));
+const FinancialPioneer100 = lazy(() => import('@/pages/FinancialPioneer100'));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -202,6 +203,7 @@ function AppRoutes() {
           <Route path="privacy" element={<Privacy />} />
           <Route path="terms" element={<Terms />} />
           <Route path="contact" element={<Contact />} />
+          <Route path="financial-pioneer-100" element={<FinancialPioneer100 />} />
           <Route path="ai-chat" element={<AIChat />} />
           <Route path="bp-analysis" element={<BPAnalysis />} />
           <Route path="stories" element={<Stories />} />
