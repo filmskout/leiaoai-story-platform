@@ -85,7 +85,7 @@ export async function listTickets(eventId: string) {
 export async function listRegistrations(eventId: string) {
   const { data, error } = await supabase
     .from('event_registrations')
-    .select('*')
+    .select('*, user:auth.users(email)')
     .eq('event_id', eventId)
     .order('created_at', { ascending: false });
   if (error) throw error;

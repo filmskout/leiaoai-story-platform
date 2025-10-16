@@ -53,4 +53,17 @@ export async function listMyProgramApplications(userId: string) {
   return data;
 }
 
+export type ProgramStatus = 'submitted' | 'under_review' | 'approved' | 'rejected';
+
+export async function updateProgramStatus(applicationId: string, status: ProgramStatus) {
+  const { data, error } = await supabase
+    .from('program_applications')
+    .update({ status })
+    .eq('id', applicationId)
+    .select('*')
+    .single();
+  if (error) throw error;
+  return data;
+}
+
 

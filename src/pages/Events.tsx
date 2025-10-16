@@ -46,9 +46,9 @@ export default function Events() {
       alert('暂无报名记录');
       return;
     }
-    const header = ['id','event_id','user_id','ticket_id','status','created_at'];
+    const header = ['id','event_id','user_id','user_email','ticket_id','status','created_at'];
     const rows = regs.map((r:any)=>[
-      r.id, r.event_id, r.user_id, r.ticket_id || '', r.status, r.created_at
+      r.id, r.event_id, r.user_id, r.user?.email || '', r.ticket_id || '', r.status, r.created_at
     ]);
     const csv = [header, ...rows].map(arr => arr.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });

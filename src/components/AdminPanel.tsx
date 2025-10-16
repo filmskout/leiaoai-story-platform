@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAdmin } from '@/contexts/AdminContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Shield, Users, BarChart3, Settings, LogOut, Clock, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { supabase } from '@/lib/supabase';
+import { updateProgramStatus, ProgramStatus } from '@/services/programs';
 
 interface AdminPanelProps {
   onClose?: () => void;
@@ -14,11 +16,39 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   const { isAdmin, adminSessionValid, revokeAdminAccess, adminFeatures } = useAdmin();
   const { user } = useAuth();
   const { actualTheme } = useTheme();
+  const [apps, setApps] = useState<any[]>([]);
+  const [loadingApps, setLoadingApps] = useState(false);
 
   // Don't render if not admin
   if (!isAdmin || !adminSessionValid) {
     return null;
   }
+  useEffect(() => {
+    const load = async () => {
+      setLoadingApps(true);
+      try {
+        const { data, error } = await supabase.from('program_applications').select('*').order('created_at', { ascending: false }).limit(50);
+        if (error) throw error;
+        setApps(data || []);
+      } catch (e) {
+        console.error('load program apps error', e);
+      } finally {
+        setLoadingApps(false);
+      }
+    };
+    load();
+  }, []);
+
+  const setStatus = async (id: string, st: ProgramStatus) => {
+    try {
+      await updateProgramStatus(id, st);
+      setApps(prev => prev.map(a => a.id === id ? { ...a, status: st } : a));
+      toast.success('状态已更新');
+    } catch (e) {
+      console.error('update status error', e);
+      toast.error('更新失败');
+    }
+  };
 
   const handleRevokeAccess = () => {
     revokeAdminAccess();
@@ -108,6 +138,48 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
               )}>
                 {user?.email}
               </div>
+            </div>
+          </div>
+
+          {/* Program 审核面板 */}
+          <div className="space-y-2">
+            <h3 className={cn(
+              "text-sm font-medium",
+              actualTheme === 'dark' ? "text-gray-200" : "text-gray-700"
+            )}>
+              Program 审核
+            </h3>
+            <div className="max-h-64 overflow-auto space-y-2 text-xs">
+              {loadingApps ? (
+                <div className="text-foreground-secondary">加载中...</div>
+              ) : (
+                <>
+                  {apps.length === 0 && <div className="text-foreground-secondary">暂无记录</div>}
+                  {apps.map((a) => (
+                    <div key={a.id} className={cn(
+                      "p-2 rounded border",
+                      actualTheme === 'dark' ? "border-gray-700" : "border-gray-200"
+                    )}>
+                      <div className="flex justify-between">
+                        <div className="font-medium">{a.slug}</div>
+                        <div className="text-foreground-secondary">{new Date(a.created_at).toLocaleString()}</div>
+                      </div>
+                      <div className="mt-1">状态：{a.status}</div>
+                      <div className="mt-1 flex gap-1">
+                        {(['submitted','under_review','approved','rejected'] as ProgramStatus[]).map(st => (
+                          <button key={st} onClick={()=>setStatus(a.id, st)} className={cn(
+                            "px-2 py-1 rounded border",
+                            actualTheme === 'dark' ? "border-gray-700" : "border-gray-200",
+                            a.status===st ? "bg-blue-600 text-white" : ""
+                          )}>
+                            {st}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </>
+              )}
             </div>
           </div>
 
