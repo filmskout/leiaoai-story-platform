@@ -27,7 +27,7 @@ interface DocumentUpload {
   uploaded: boolean;
 }
 
-const FinancialPioneer100: React.FC = () => {
+const Program: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [selectedDate, setSelectedDate] = useState<Date>();
@@ -429,4 +429,4 @@ const FinancialPioneer100: React.FC = () => {
   );
 };
 
-export default FinancialPioneer100;
+export default Program;
