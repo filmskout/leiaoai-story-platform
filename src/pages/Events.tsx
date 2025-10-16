@@ -34,6 +34,31 @@ export default function Events() {
   const [ticketPrice, setTicketPrice] = useState<number | ''>('');
   const [ticketQuota, setTicketQuota] = useState<number | ''>('');
   const [regs, setRegs] = useState<any[]>([]);
+  const formatPrice = (cents?: number, currency: string = 'CNY') => {
+    if (typeof cents !== 'number') return '-';
+    const amount = (cents / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const symbol = currency === 'CNY' ? '¥' : currency === 'USD' ? '$' : '';
+    return `${symbol}${amount}${symbol ? '' : ' ' + currency}`;
+  };
+
+  const exportRegsCSV = () => {
+    if (regs.length === 0) {
+      alert('暂无报名记录');
+      return;
+    }
+    const header = ['id','event_id','user_id','ticket_id','status','created_at'];
+    const rows = regs.map((r:any)=>[
+      r.id, r.event_id, r.user_id, r.ticket_id || '', r.status, r.created_at
+    ]);
+    const csv = [header, ...rows].map(arr => arr.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `event-registrations-${activeEventId || 'list'}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -227,7 +252,7 @@ export default function Events() {
                                 {tickets.map((t: any) => (
                                   <div key={t.id} className="flex justify-between">
                                     <div>{t.name}</div>
-                                    <div className="text-foreground-secondary">{t.price_cents} 分 {t.quota ? `｜配额 ${t.quota}` : ''}</div>
+                                    <div className="text-foreground-secondary">{formatPrice(t.price_cents, t.currency)} {t.quota ? `｜配额 ${t.quota}` : ''}</div>
                                   </div>
                                 ))}
                               </div>
@@ -242,6 +267,9 @@ export default function Events() {
                                     <div className="text-foreground-secondary">{new Date(r.created_at).toLocaleString()}</div>
                                   </div>
                                 ))}
+                              </div>
+                              <div className="mt-2">
+                                <Button size="sm" variant="outline" onClick={exportRegsCSV}>导出报名 CSV</Button>
                               </div>
                             </div>
                           </div>

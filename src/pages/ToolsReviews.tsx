@@ -31,6 +31,7 @@ export default function ToolsReviews() {
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [sortKey, setSortKey] = useState<'name_asc' | 'name_desc'>('name_asc');
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     const load = async () => {
@@ -132,13 +133,14 @@ export default function ToolsReviews() {
                 <LoadingSpinner />
               ) : (
                 <>
-                  <div className="flex flex-wrap gap-2 mb-3">
+                  <div className="flex flex-wrap gap-2 mb-3 items-center">
                     {categories.map((cat) => (
                       <Button key={cat} size="sm" variant={selectedCategory === cat ? 'default' : 'outline'} onClick={() => setSelectedCategory(cat)}>
                         {cat}
                       </Button>
                     ))}
-                    <div className="ml-auto flex gap-2">
+                    <input className="ml-auto border rounded-md px-2 py-1 h-9" placeholder="搜索工具..." value={search} onChange={(e)=>setSearch(e.target.value)} />
+                    <div className="flex gap-2">
                       <Button size="sm" variant={sortKey === 'name_asc' ? 'default' : 'outline'} onClick={() => setSortKey('name_asc')}>A→Z</Button>
                       <Button size="sm" variant={sortKey === 'name_desc' ? 'default' : 'outline'} onClick={() => setSortKey('name_desc')}>Z→A</Button>
                     </div>
@@ -146,6 +148,11 @@ export default function ToolsReviews() {
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     {extTools
                       .filter((x) => selectedCategory === 'all' || (x.category || 'Uncategorized') === selectedCategory)
+                      .filter((x) => {
+                        const q = search.trim().toLowerCase();
+                        if (!q) return true;
+                        return String(x.name).toLowerCase().includes(q) || String(x.description||'').toLowerCase().includes(q);
+                      })
                       .sort((a, b) => sortKey === 'name_asc' ? String(a.name).localeCompare(String(b.name)) : String(b.name).localeCompare(String(a.name)))
                       .map((x) => (
                         <div key={String(x.id)} className="p-3 border rounded-lg">

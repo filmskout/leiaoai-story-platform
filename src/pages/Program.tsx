@@ -149,6 +149,8 @@ const Program: React.FC = () => {
     }
   }, [slug]);
 
+  const [statusFilter, setStatusFilter] = useState<'all' | 'submitted' | 'under_review' | 'approved' | 'rejected'>('all');
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
       <div className="container mx-auto px-4 max-w-6xl">
@@ -453,15 +455,24 @@ const Program: React.FC = () => {
           <div className="mt-8">
             <Card>
               <CardHeader>
-                <CardTitle className="text-center">我的提交记录</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle>我的提交记录</CardTitle>
+                  <div className="flex gap-2 text-sm">
+                    {(['all','submitted','under_review','approved','rejected'] as const).map(st => (
+                      <Button key={st} size="sm" variant={statusFilter===st?'default':'outline'} onClick={()=>setStatusFilter(st)}>
+                        {st}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
                 {loadingApps ? (
                   <div className="text-sm text-foreground-secondary">加载中...</div>
                 ) : (
                   <div className="space-y-2 text-sm">
-                    {myApps.length === 0 && <div className="text-foreground-secondary">暂无记录</div>}
-                    {myApps.map((app) => (
+                    {myApps.filter(a=> statusFilter==='all' ? true : a.status===statusFilter).length === 0 && <div className="text-foreground-secondary">暂无记录</div>}
+                    {myApps.filter(a=> statusFilter==='all' ? true : a.status===statusFilter).map((app) => (
                       <div key={app.id} className="p-3 border rounded-lg">
                         <div className="flex justify-between">
                           <div>计划：{app.slug}｜状态：{app.status}</div>
