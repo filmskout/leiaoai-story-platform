@@ -49,4 +49,47 @@ export async function registerEvent(eventId: string, userId: string, ticketId?: 
   return data;
 }
 
+export interface CreateTicketInput {
+  name: string;
+  priceCents?: number;
+  currency?: string;
+  quota?: number;
+}
+
+export async function createTicket(eventId: string, input: CreateTicketInput) {
+  const { data, error } = await supabase
+    .from('event_tickets')
+    .insert({
+      event_id: eventId,
+      name: input.name,
+      price_cents: input.priceCents ?? 0,
+      currency: input.currency ?? 'CNY',
+      quota: input.quota
+    })
+    .select('*')
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function listTickets(eventId: string) {
+  const { data, error } = await supabase
+    .from('event_tickets')
+    .select('*')
+    .eq('event_id', eventId)
+    .order('created_at', { ascending: true });
+  if (error) throw error;
+  return data;
+}
+
+export async function listRegistrations(eventId: string) {
+  const { data, error } = await supabase
+    .from('event_registrations')
+    .select('*')
+    .eq('event_id', eventId)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return data;
+}
+
 

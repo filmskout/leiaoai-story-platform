@@ -43,4 +43,14 @@ export async function uploadProgramDocument(
   return { path: data.path, publicUrl: urlData.publicUrl };
 }
 
+export async function listMyProgramApplications(userId: string) {
+  const { data, error } = await supabase
+    .from('program_applications')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return data;
+}
+
 

@@ -9,7 +9,7 @@ import { Textarea } from '../components/ui/textarea';
 import { CalendarIcon, Upload, CheckCircle, Star, Users, Award, Clock, DollarSign } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '../lib/utils';
-import { submitProgramApplication, uploadProgramDocument } from '@/services/programs';
+import { submitProgramApplication, uploadProgramDocument, listMyProgramApplications } from '@/services/programs';
 
 interface BookingSlot {
   id: string;
@@ -40,6 +40,8 @@ const Program: React.FC = () => {
   ]);
   const [personalIntro, setPersonalIntro] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [myApps, setMyApps] = useState<any[]>([]);
+  const [loadingApps, setLoadingApps] = useState(false);
 
   useEffect(() => {
     // Generate booking slots for the next 30 days
@@ -69,6 +71,22 @@ const Program: React.FC = () => {
     
     setBookingSlots(slots);
   }, []);
+
+  useEffect(() => {
+    const load = async () => {
+      if (!user) return;
+      setLoadingApps(true);
+      try {
+        const data = await listMyProgramApplications(user.id);
+        setMyApps(data as any[]);
+      } catch (e) {
+        console.error('load my apps error', e);
+      } finally {
+        setLoadingApps(false);
+      }
+    };
+    load();
+  }, [user]);
 
   const handleDocumentUpload = async (docId: string, file: File) => {
     if (!user) {
@@ -107,6 +125,11 @@ const Program: React.FC = () => {
       });
 
       alert('Application submitted successfully');
+      // refresh my apps
+      if (user) {
+        const data = await listMyProgramApplications(user.id);
+        setMyApps(data as any[]);
+      }
     } catch (error) {
       console.error('Error submitting application:', error);
       alert('Failed to submit application. Please try again.');
@@ -425,6 +448,36 @@ const Program: React.FC = () => {
             </CardContent>
           </Card>
         </div>
+        {/* My Applications */}
+        {user && (
+          <div className="mt-8">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-center">我的提交记录</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loadingApps ? (
+                  <div className="text-sm text-foreground-secondary">加载中...</div>
+                ) : (
+                  <div className="space-y-2 text-sm">
+                    {myApps.length === 0 && <div className="text-foreground-secondary">暂无记录</div>}
+                    {myApps.map((app) => (
+                      <div key={app.id} className="p-3 border rounded-lg">
+                        <div className="flex justify-between">
+                          <div>计划：{app.slug}｜状态：{app.status}</div>
+                          <div className="text-foreground-secondary">{new Date(app.created_at).toLocaleString()}</div>
+                        </div>
+                        {app.documents && app.documents.length > 0 && (
+                          <div className="mt-1 text-foreground-secondary">附件：{app.documents.length} 个</div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </div>
     </div>
   );

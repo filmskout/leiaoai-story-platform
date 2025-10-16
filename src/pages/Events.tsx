@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar, Ticket } from 'lucide-react';
-import { listUpcomingEvents, registerEvent, createEvent } from '@/services/events';
+import { listUpcomingEvents, registerEvent, createEvent, createTicket, listTickets, listRegistrations } from '@/services/events';
 import { useAuth } from '@/contexts/AuthContext';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
@@ -28,6 +28,12 @@ export default function Events() {
   const [startsAt, setStartsAt] = useState(''); // ISO from datetime-local
   const [description, setDescription] = useState('');
   const [capacity, setCapacity] = useState<number | ''>('');
+  const [activeEventId, setActiveEventId] = useState<string | null>(null);
+  const [tickets, setTickets] = useState<any[]>([]);
+  const [ticketName, setTicketName] = useState('');
+  const [ticketPrice, setTicketPrice] = useState<number | ''>('');
+  const [ticketQuota, setTicketQuota] = useState<number | ''>('');
+  const [regs, setRegs] = useState<any[]>([]);
 
   useEffect(() => {
     const load = async () => {
@@ -98,6 +104,40 @@ export default function Events() {
     }
   };
 
+  const loadEventDetail = async (eventId: string) => {
+    setActiveEventId(eventId);
+    try {
+      const [t, r] = await Promise.all([listTickets(eventId), listRegistrations(eventId)]);
+      setTickets(t as any[]);
+      setRegs(r as any[]);
+    } catch (e) {
+      console.error('load event detail error', e);
+    }
+  };
+
+  const handleCreateTicket = async () => {
+    if (!activeEventId) return;
+    if (!ticketName) {
+      alert('请输入票种名称');
+      return;
+    }
+    try {
+      await createTicket(activeEventId, {
+        name: ticketName,
+        priceCents: ticketPrice === '' ? 0 : Number(ticketPrice),
+        quota: ticketQuota === '' ? undefined : Number(ticketQuota)
+      });
+      const t = await listTickets(activeEventId);
+      setTickets(t as any[]);
+      setTicketName('');
+      setTicketPrice('');
+      setTicketQuota('');
+    } catch (e) {
+      console.error('create ticket error', e);
+      alert('创建票种失败');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container-custom py-8">
@@ -156,16 +196,56 @@ export default function Events() {
                       <div className="text-sm text-foreground-secondary">暂无即将到来活动</div>
                     )}
                     {events.map((ev) => (
-                      <div key={ev.id} className="flex items-center justify-between p-3 border rounded-lg">
-                        <div>
-                          <div className="font-medium">{ev.title}</div>
-                          <div className="text-sm text-foreground-secondary">
-                            {ev.location || '线上'} ｜ {new Date(ev.starts_at).toLocaleString()}
+                      <div key={ev.id} className="p-3 border rounded-lg">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="font-medium">{ev.title}</div>
+                            <div className="text-sm text-foreground-secondary">
+                              {ev.location || '线上'} ｜ {new Date(ev.starts_at).toLocaleString()}
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button size="sm" variant="outline" onClick={() => loadEventDetail(ev.id)}>管理</Button>
+                            <Button size="sm" className="whitespace-nowrap" onClick={() => handleRegister(ev.id)} disabled={registeringId === ev.id}>
+                              <Ticket className="w-4 h-4 mr-2" /> {registeringId === ev.id ? '提交中...' : '报名'}
+                            </Button>
                           </div>
                         </div>
-                        <Button size="sm" className="whitespace-nowrap" onClick={() => handleRegister(ev.id)} disabled={registeringId === ev.id}>
-                          <Ticket className="w-4 h-4 mr-2" /> {registeringId === ev.id ? '提交中...' : '报名'}
-                        </Button>
+
+                        {activeEventId === ev.id && (
+                          <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div className="p-3 border rounded-lg">
+                              <div className="font-medium mb-2">票种管理</div>
+                              <div className="grid grid-cols-2 gap-2 mb-2">
+                                <input className="border rounded-md px-2 py-1" placeholder="名称" value={ticketName} onChange={(e)=>setTicketName(e.target.value)} />
+                                <input type="number" className="border rounded-md px-2 py-1" placeholder="价格(分)" value={ticketPrice} onChange={(e)=>setTicketPrice(e.target.value === '' ? '' : Number(e.target.value))} />
+                                <input type="number" className="border rounded-md px-2 py-1" placeholder="配额(可选)" value={ticketQuota} onChange={(e)=>setTicketQuota(e.target.value === '' ? '' : Number(e.target.value))} />
+                                <Button size="sm" onClick={handleCreateTicket}>新增票种</Button>
+                              </div>
+                              <div className="space-y-2 text-sm">
+                                {tickets.length === 0 && <div className="text-foreground-secondary">暂无票种</div>}
+                                {tickets.map((t: any) => (
+                                  <div key={t.id} className="flex justify-between">
+                                    <div>{t.name}</div>
+                                    <div className="text-foreground-secondary">{t.price_cents} 分 {t.quota ? `｜配额 ${t.quota}` : ''}</div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                            <div className="p-3 border rounded-lg">
+                              <div className="font-medium mb-2">报名明细</div>
+                              <div className="space-y-2 text-sm max-h-64 overflow-auto">
+                                {regs.length === 0 && <div className="text-foreground-secondary">暂无报名</div>}
+                                {regs.map((r: any) => (
+                                  <div key={r.id} className="flex justify-between">
+                                    <div>{r.user_id}</div>
+                                    <div className="text-foreground-secondary">{new Date(r.created_at).toLocaleString()}</div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
