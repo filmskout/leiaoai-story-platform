@@ -259,7 +259,7 @@ const Program: React.FC = () => {
                   </div>
                   {selectedDate && (
                     <div>
-                      <div className="text-sm font-medium mb-2">可选时间段：</n+div>
+                      <div className="text-sm font-medium mb-2">可选时间段：</div>
                       <div className="space-y-2">
                         {availableSlots
                           .filter(slot => slot.date === selectedDate)
