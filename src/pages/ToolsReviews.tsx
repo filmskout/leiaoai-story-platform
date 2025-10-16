@@ -30,6 +30,7 @@ export default function ToolsReviews() {
   const [fundingCompany, setFundingCompany] = useState<{ id: string; name: string } | null>(null);
   const [researchMap, setResearchMap] = useState<Record<string, { summary?: string; funding_highlights?: string; current_round?: string; overall_score?: number; score_breakdown?: any }>>({});
   const [researching, setResearching] = useState<string | null>(null);
+  const [flipped, setFlipped] = useState<Record<string, boolean>>({});
   // aidb external tools
   const [extLoading, setExtLoading] = useState(true);
   const [extTools, setExtTools] = useState<Array<{ id: string | number; name: string; description?: string; link?: string; category?: string; source?: string; company?: string; isOSS?: boolean }>>([]);
@@ -120,7 +121,25 @@ export default function ToolsReviews() {
       const domains = Array.from(new Set(extTools.map(x => String(x.company || '')).filter(Boolean)));
       if (domains.length === 0) return;
       try {
-        await fetch('/api/tools-research', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ domains }) });
+        const resp = await fetch('/api/tools-research', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ domains }) });
+        if (resp.ok) {
+          const json = await resp.json();
+          if (json?.results) {
+            const newMap: Record<string, any> = {};
+            Object.entries(json.results).forEach(([domain, data]: [string, any]) => {
+              if (data) {
+                newMap[domain] = {
+                  summary: data.summary,
+                  funding_highlights: data.funding_highlights,
+                  current_round: data.current_round,
+                  overall_score: data.overall_score,
+                  score_breakdown: data.score_breakdown
+                };
+              }
+            });
+            setResearchMap(prev => ({ ...prev, ...newMap }));
+          }
+        }
       } catch (e) {
         console.error('batch research error', e);
       }
@@ -230,50 +249,62 @@ export default function ToolsReviews() {
                               )}
                               {x.name}
                             </div>
-                            {x.link && (
-                              <a href={x.link} target="_blank" rel="noreferrer" className="text-primary-600 text-sm inline-flex items-center">
-                                官网 <ExternalLink className="w-3 h-3 ml-1" />
-                              </a>
-                            )}
+                            <div className="flex items-center gap-2">
+                              {x.company && (
+                                <Button size="sm" variant="outline" onClick={() => setFlipped(prev => ({ ...prev, [String(x.id)]: !prev[String(x.id)] }))}>
+                                  {flipped[String(x.id)] ? '返回' : '评分'}
+                                </Button>
+                              )}
+                              {x.link && (
+                                <a href={x.link} target="_blank" rel="noreferrer" className="text-primary-600 text-sm inline-flex items-center">
+                                  官网 <ExternalLink className="w-3 h-3 ml-1" />
+                                </a>
+                              )}
+                            </div>
                           </div>
-                          <div className="text-sm text-foreground-secondary mt-1">{x.category || 'Uncategorized'}{x.company ? `｜${x.company}` : ''}{x.source ? `｜${x.source}` : ''}{x.isOSS ? '｜开源' : ''}</div>
-                          {x.description && (
-                            <div className="text-sm text-foreground-secondary mt-1 line-clamp-2">{x.description}</div>
-                          )}
-                          {x.company && (
-                            <div className="mt-2 text-sm">
-                              <div className="text-foreground-secondary mt-1 space-y-1">
-                                {researchMap[x.company!]?.funding_highlights && (
-                                  <div>投融资：{researchMap[x.company!]?.funding_highlights}</div>
-                                )}
-                                {(researchMap[x.company!]?.current_round || researchMap[x.company!]?.overall_score !== undefined) && (
-                                  <div>
-                                    {researchMap[x.company!]?.current_round ? `轮次：${researchMap[x.company!]?.current_round}` : ''}
-                                    {researchMap[x.company!]?.overall_score !== undefined ? `${researchMap[x.company!]?.current_round ? '｜' : ''}评分：${researchMap[x.company!]?.overall_score}` : ''}
+                          {!flipped[String(x.id)] ? (
+                            <>
+                              <div className="text-sm text-foreground-secondary mt-1">{x.category || 'Uncategorized'}{x.company ? `｜${x.company}` : ''}{x.source ? `｜${x.source}` : ''}{x.isOSS ? '｜开源' : ''}</div>
+                              {x.description && (
+                                <div className="text-sm text-foreground-secondary mt-1 line-clamp-2">{x.description}</div>
+                              )}
+                            </>
+                          ) : (
+                            <div className="mt-2 text-sm">{x.company && researchMap[x.company] ? (
+                              <div className="text-foreground-secondary space-y-2">
+                                {(researchMap[x.company]?.current_round || researchMap[x.company]?.overall_score !== undefined) && (
+                                  <div className="font-medium">
+                                    {researchMap[x.company]?.current_round ? `轮次：${researchMap[x.company]?.current_round}` : ''}
+                                    {researchMap[x.company]?.overall_score !== undefined ? `${researchMap[x.company]?.current_round ? '｜' : ''}总分：${researchMap[x.company]?.overall_score}` : ''}
                                   </div>
                                 )}
-                                {researchMap[x.company!]?.score_breakdown && (
-                                  <div className="mt-2">
-                                    <div className="text-xs font-medium mb-1">分项评分</div>
-                                    <div className="space-y-1">
-                                      {Object.entries(researchMap[x.company!]?.score_breakdown || {}).map(([key, value]: [string, any]) => {
+                                {researchMap[x.company]?.score_breakdown && Object.keys(researchMap[x.company]?.score_breakdown || {}).length > 0 && (
+                                  <div>
+                                    <div className="text-xs font-medium mb-2">分项评分</div>
+                                    <div className="space-y-1.5">
+                                      {Object.entries(researchMap[x.company]?.score_breakdown || {}).map(([key, value]: [string, any]) => {
                                         const labels: Record<string, string> = { scale: '规模', growth: '增长', moat: '护城河', team: '团队', risk: '风险' };
                                         const score = typeof value === 'number' ? Math.max(0, Math.min(100, value)) : 0;
                                         return (
                                           <div key={key} className="flex items-center gap-2 text-xs">
-                                            <div className="w-12 text-right">{labels[key] || key}</div>
-                                            <div className="flex-1 bg-gray-200 rounded-full h-2">
-                                              <div className="bg-blue-500 h-2 rounded-full" style={{ width: `${score}%` }}></div>
+                                            <div className="w-14 text-right">{labels[key] || key}</div>
+                                            <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                              <div className="bg-blue-500 h-2 rounded-full transition-all" style={{ width: `${score}%` }}></div>
                                             </div>
-                                            <div className="w-8 text-right">{score}</div>
+                                            <div className="w-10 text-right font-medium">{score}</div>
                                           </div>
                                         );
                                       })}
                                     </div>
                                   </div>
                                 )}
+                                {researchMap[x.company]?.funding_highlights && (
+                                  <div className="text-xs">投融资：{researchMap[x.company]?.funding_highlights}</div>
+                                )}
                               </div>
-                            </div>
+                            ) : (
+                              <div className="text-foreground-secondary text-xs">调研数据加载中...</div>
+                            )}</div>
                           )}
                         </div>
                       ))}
