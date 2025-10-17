@@ -22,7 +22,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
   try {
-    const { domains } = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    const { domains, models } = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
     if (!Array.isArray(domains) || domains.length === 0) {
       res.status(400).json({ error: 'domains required' });
       return;
@@ -71,16 +71,26 @@ If unknown, leave empty/null.`;
       let score_breakdown: any = {};
 
       try {
-        const resp = await client.chat.completions.create({
-          model: 'gpt-4o-mini',
-          messages: [
-            { role: 'system', content: 'You output strict JSON only.' },
-            { role: 'user', content: prompt }
-          ],
-          temperature: 0.2,
-        });
-        const text = resp.choices?.[0]?.message?.content?.trim() || '{}';
-        source_json = JSON.parse(text);
+        const modelList: string[] = Array.isArray(models) && models.length ? models : ['gpt-4o', 'gpt-4o-mini'];
+        let parsed: any = null;
+        for (const m of modelList) {
+          try {
+            const resp = await client.chat.completions.create({
+              model: m,
+              messages: [
+                { role: 'system', content: 'You output strict JSON only.' },
+                { role: 'user', content: prompt }
+              ],
+              temperature: 0.2,
+            });
+            const text = resp.choices?.[0]?.message?.content?.trim() || '{}';
+            parsed = JSON.parse(text);
+            break;
+          } catch (_) {
+            continue;
+          }
+        }
+        source_json = parsed || {};
         summary = String(source_json.summary || '');
         funding_highlights = String(source_json.funding_highlights || '');
         current_round = String(source_json.current_round || '');

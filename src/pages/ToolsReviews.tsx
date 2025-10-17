@@ -209,19 +209,14 @@ export default function ToolsReviews() {
                 <>
                   <div className="flex flex-wrap gap-2 mb-3 items-center">
                     {categories.map((cat) => (
-                      <Button key={cat} size="sm" variant={selectedCategory === cat ? 'default' : 'outline'} onClick={() => setSelectedCategory(cat)}>
+                      <span
+                        key={cat}
+                        onClick={() => setSelectedCategory(cat)}
+                        className={`px-3 py-1 rounded-full cursor-pointer text-sm border ${selectedCategory === cat ? 'bg-blue-600 text-white border-blue-600' : 'bg-blue-50 border-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-900/40'}`}
+                      >
                         {cat}
-                      </Button>
+                      </span>
                     ))}
-                    <select className="border rounded-md px-2 py-1 h-9" value={selectedCompany} onChange={(e)=>setSelectedCompany(e.target.value)}>
-                      {companyOptions.map(c => (<option key={c} value={c}>{c}</option>))}
-                    </select>
-                    <select className="border rounded-md px-2 py-1 h-9" value={selectedSource} onChange={(e)=>setSelectedSource(e.target.value)}>
-                      {sourceOptions.map(s => (<option key={s} value={s}>{s}</option>))}
-                    </select>
-                    <label className="flex items-center gap-1 text-sm">
-                      <input type="checkbox" checked={ossOnly} onChange={(e)=>setOssOnly(e.target.checked)} /> 开源
-                    </label>
                     <input className="ml-auto border rounded-md px-2 py-1 h-9" placeholder="搜索工具..." value={search} onChange={(e)=>setSearch(e.target.value)} />
                     <div className="flex gap-2">
                       <Button size="sm" variant={sortKey === 'name_asc' ? 'default' : 'outline'} onClick={() => setSortKey('name_asc')}>A→Z</Button>
@@ -231,9 +226,7 @@ export default function ToolsReviews() {
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     {extTools
                       .filter((x) => selectedCategory === 'all' || (x.category || 'Uncategorized') === selectedCategory)
-                      .filter((x) => selectedCompany === 'all' || (x.company || 'unknown') === selectedCompany)
-                      .filter((x) => selectedSource === 'all' || (x.source || 'unknown') === selectedSource)
-                      .filter((x) => !ossOnly || x.isOSS)
+                      // 只按分类和搜索筛选
                       .filter((x) => {
                         const q = search.trim().toLowerCase();
                         if (!q) return true;
@@ -251,7 +244,13 @@ export default function ToolsReviews() {
                             </div>
                             <div className="flex items-center gap-2">
                               {x.company && (
-                                <Button size="sm" variant="outline" onClick={() => setFlipped(prev => ({ ...prev, [String(x.id)]: !prev[String(x.id)] }))}>
+                              <Button size="sm" variant="outline" onClick={() => {
+                                const next = !flipped[String(x.id)];
+                                setFlipped(prev => ({ ...prev, [String(x.id)]: next }));
+                                if (next && x.company && !researchMap[x.company]) {
+                                  fetchResearch(x.company);
+                                }
+                              }}>
                                   {flipped[String(x.id)] ? '返回' : '评分'}
                                 </Button>
                               )}
