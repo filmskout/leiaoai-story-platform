@@ -37,6 +37,8 @@ const Contact = lazy(() => import('@/pages/Contact'));
 const Program = lazy(() => import('@/pages/Program'));
 const Events = lazy(() => import('@/pages/Events'));
 const ToolsReviews = lazy(() => import('@/pages/ToolsReviews'));
+const AICompaniesCatalog = lazy(() => import('@/pages/AICompaniesCatalog'));
+const CompanyDetail = lazy(() => import('@/pages/CompanyDetail'));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -208,6 +210,8 @@ function AppRoutes() {
           <Route path="program/:slug" element={<Program />} />
           <Route path="events" element={<Events />} />
           <Route path="tools" element={<ToolsReviews />} />
+          <Route path="ai-companies" element={<AICompaniesCatalog />} />
+          <Route path="ai-companies/:id" element={<CompanyDetail />} />
           <Route path="ai-chat" element={<AIChat />} />
           <Route path="bp-analysis" element={<BPAnalysis />} />
           <Route path="stories" element={<Stories />} />

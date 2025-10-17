@@ -120,6 +120,11 @@ export default function Layout() {
       icon: <Bot size={18} />
     },
     {
+      path: '/ai-companies',
+      label: 'AI公司',
+      icon: <Building2 size={18} />
+    },
+    {
       path: '/stories',
       label: t('nav.stories'),
       icon: <BookOpen size={18} />
