@@ -510,11 +510,11 @@ export default function AICompaniesCatalog() {
     const displayRating = userRating || rating;
     
     return (
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-0.5 sm:gap-1">
         {[1, 2, 3, 4, 5].map((star) => (
           <Star
             key={star}
-            className={`w-4 h-4 ${
+            className={`w-3 h-3 sm:w-4 sm:h-4 ${
               star <= displayRating 
                 ? 'text-yellow-500 fill-yellow-500' 
                 : 'text-muted-foreground/40'
@@ -522,11 +522,11 @@ export default function AICompaniesCatalog() {
             onClick={interactive ? () => handleRating(toolId, star) : undefined}
           />
         ))}
-        <span className="text-sm text-muted-foreground ml-1">
+        <span className="text-xs sm:text-sm text-muted-foreground ml-0.5 sm:ml-1">
           {rating.toFixed(1)}
         </span>
         {userRating > 0 && (
-          <span className="text-xs text-primary ml-1">(已评分)</span>
+          <span className="text-xs text-primary ml-0.5 sm:ml-1 hidden sm:inline">(已评分)</span>
         )}
       </div>
     );
@@ -756,30 +756,34 @@ export default function AICompaniesCatalog() {
                             </p>
                           </div>
                           
-                          <div className="flex items-center gap-2">
-                            {renderStars(tool.tool_stats?.average_rating || 0, tool.id, true)}
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => handleFavorite(tool.id)}
-                              className="hover:bg-muted/50"
-                            >
-                              <Heart 
-                                className={`w-4 h-4 ${
-                                  userFavorites.has(tool.id) 
-                                    ? 'text-red-500 fill-red-500' 
-                                    : 'text-muted-foreground hover:text-red-500'
-                                }`} 
-                              />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => openStoryDialog(tool, company)}
-                              className="hover:bg-muted/50"
-                            >
-                              <Plus className="w-4 h-4" />
-                            </Button>
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-1 sm:gap-2 min-w-0 flex-1">
+                              {renderStars(tool.tool_stats?.average_rating || 0, tool.id, true)}
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleFavorite(tool.id)}
+                                className="hover:bg-muted/50 p-1 sm:p-2"
+                              >
+                                <Heart 
+                                  className={`w-3 h-3 sm:w-4 sm:h-4 ${
+                                    userFavorites.has(tool.id) 
+                                      ? 'text-red-500 fill-red-500' 
+                                      : 'text-muted-foreground hover:text-red-500'
+                                  }`} 
+                                />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => openStoryDialog(tool, company)}
+                                className="hover:bg-muted/50 p-1 sm:p-2"
+                              >
+                                <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
+                              </Button>
+                            </div>
                           </div>
                         </div>
                       ))}
