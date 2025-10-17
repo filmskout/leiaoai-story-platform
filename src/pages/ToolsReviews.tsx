@@ -296,7 +296,6 @@ export default function ToolsReviews() {
                           </div>
                           {!flipped[String(x.id)] ? (
                             <>
-                              <div className="text-sm text-foreground-secondary mt-1">{x.company ? `公司：${x.company}` : ''}{x.source ? `${x.company ? ' ｜' : ''}来源：${x.source}` : ''}{x.isOSS ? ' ｜开源' : ''}</div>
                               {x.description && (
                                 <div className="text-sm text-foreground-secondary mt-2 whitespace-pre-wrap">{x.description}</div>
                               )}
