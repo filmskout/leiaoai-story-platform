@@ -64,13 +64,5 @@ INSERT INTO public.companies (name, website, description, founded_year, headquar
 -- 思必驰
 ('思必驰', 'https://www.aichat.com', '专注于语音识别和自然语言处理技术的AI公司', 2007, '苏州, 中国', ARRAY['Speech Recognition', 'NLP', 'Voice AI'], 'https://www.aichat.com/favicon.ico', '{"weibo": "https://weibo.com/aichat", "zhihu": "https://www.zhihu.com/org/aichat"}', 1000000000, '2021-03-01')
 
-ON CONFLICT (name) DO UPDATE SET
-  website = EXCLUDED.website,
-  description = EXCLUDED.description,
-  founded_year = EXCLUDED.founded_year,
-  headquarters = EXCLUDED.headquarters,
-  industry_tags = EXCLUDED.industry_tags,
-  logo_url = EXCLUDED.logo_url,
-  social_links = EXCLUDED.social_links,
-  valuation_usd = EXCLUDED.valuation_usd,
-  last_funding_date = EXCLUDED.last_funding_date;
+-- Use DO NOTHING to avoid duplicate insertion errors
+ON CONFLICT DO NOTHING;

@@ -82,13 +82,5 @@ INSERT INTO public.companies (name, website, description, founded_year, headquar
 -- 阿联酋AI公司
 ('Careem', 'https://careem.com', '中东出行平台，使用AI优化交通服务', 2012, '迪拜, 阿联酋', ARRAY['Transportation', 'Mobility', 'AI Optimization'], 'https://careem.com/favicon.ico', '{"linkedin": "https://linkedin.com/company/careem", "twitter": "https://twitter.com/careem"}', 1000000000, '2019-03-01')
 
-ON CONFLICT (name) DO UPDATE SET
-  website = EXCLUDED.website,
-  description = EXCLUDED.description,
-  founded_year = EXCLUDED.founded_year,
-  headquarters = EXCLUDED.headquarters,
-  industry_tags = EXCLUDED.industry_tags,
-  logo_url = EXCLUDED.logo_url,
-  social_links = EXCLUDED.social_links,
-  valuation_usd = EXCLUDED.valuation_usd,
-  last_funding_date = EXCLUDED.last_funding_date;
+-- Use DO NOTHING to avoid duplicate insertion errors
+ON CONFLICT DO NOTHING;

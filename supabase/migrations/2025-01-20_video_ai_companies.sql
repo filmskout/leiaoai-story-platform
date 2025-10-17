@@ -42,13 +42,5 @@ INSERT INTO public.companies (name, website, description, founded_year, headquar
 
 ('LeiaPix', 'https://convert.leiapix.com', 'AI视频生成平台，专注于3D视频内容', 2023, '北京, 中国', ARRAY['Video Generation', '3D Video', 'Chinese AI'], 'https://convert.leiapix.com/favicon.ico', '{"weibo": "https://weibo.com/leiapix", "zhihu": "https://www.zhihu.com/org/leiapix"}', 150000000, '2024-01-01')
 
-ON CONFLICT (name) DO UPDATE SET
-  website = EXCLUDED.website,
-  description = EXCLUDED.description,
-  founded_year = EXCLUDED.founded_year,
-  headquarters = EXCLUDED.headquarters,
-  industry_tags = EXCLUDED.industry_tags,
-  logo_url = EXCLUDED.logo_url,
-  social_links = EXCLUDED.social_links,
-  valuation_usd = EXCLUDED.valuation_usd,
-  last_funding_date = EXCLUDED.last_funding_date;
+-- Use DO NOTHING to avoid duplicate insertion errors
+ON CONFLICT DO NOTHING;
