@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { PageHero } from '@/components/PageHero';
-import { Building, ExternalLink, Star, ArrowLeft, Globe2, Tag, BarChart3 } from 'lucide-react';
+import { Building, ExternalLink, Star, ArrowLeft, Globe2, Tag, BarChart3, Wrench } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
@@ -155,34 +155,39 @@ export default function CompanyDetail() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="border border-border/50 dark:border-border/30">
                 <CardHeader>
-                  <CardTitle>工具与服务</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <Wrench className="w-5 h-5" />
+                    工具与服务
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {company.tools.map((tool) => (
-                      <Card key={tool.id} className="border border-muted-foreground/10">
+                      <Card key={tool.id} className="border border-border/30 hover:border-border dark:hover:border-border/50 transition-colors">
                         <CardHeader className="pb-2">
                           <CardTitle className="text-base flex items-center justify-between">
-                            <span>{tool.name}</span>
+                            <span className="truncate">{tool.name}</span>
                             {tool.website && (
-                              <a href={tool.website} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
-                                <ExternalLink className="w-4 h-4" />
-                              </a>
+                              <Button variant="ghost" size="sm" asChild>
+                                <a href={tool.website} target="_blank" rel="noopener noreferrer">
+                                  <ExternalLink className="w-4 h-4" />
+                                </a>
+                              </Button>
                             )}
                           </CardTitle>
                         </CardHeader>
-                        <CardContent>
-                          <p className="text-sm text-muted-foreground line-clamp-3">{tool.description}</p>
-                          <div className="mt-2 flex flex-wrap gap-2">
-                            <Badge variant="outline">{tool.category}</Badge>
+                        <CardContent className="pt-0">
+                          <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{tool.description}</p>
+                          <div className="flex flex-wrap gap-1 mb-3">
+                            <Badge variant="outline" className="text-xs">{tool.category}</Badge>
                             {tool.industry_tags?.slice(0,3).map((t) => (
-                              <Badge key={t} variant="secondary">{t}</Badge>
+                              <Badge key={t} variant="secondary" className="text-xs">{t}</Badge>
                             ))}
                           </div>
-                          <div className="mt-3 text-xs text-muted-foreground flex items-center gap-2">
-                            <Star className="w-3 h-3 text-yellow-500" />
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
                             <span>{tool.tool_stats?.average_rating?.toFixed(1) ?? '0.0'} ({tool.tool_stats?.total_ratings ?? 0})</span>
                           </div>
                         </CardContent>
@@ -192,19 +197,37 @@ export default function CompanyDetail() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="border border-border/50 dark:border-border/30">
                 <CardHeader>
-                  <CardTitle>社区故事与评测</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5" />
+                    社区故事与评测
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   {stories.length === 0 ? (
-                    <div className="text-sm text-muted-foreground">暂无故事</div>
+                    <div className="text-center py-8">
+                      <div className="text-muted-foreground mb-2">暂无相关故事</div>
+                      <div className="text-sm text-muted-foreground">成为第一个分享使用体验的用户</div>
+                    </div>
                   ) : (
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       {stories.map((s) => (
-                        <div key={s.id} className="border-b pb-3">
-                          <Link to={`/story/${s.id}`} className="font-medium hover:underline">{s.title}</Link>
-                          <div className="text-xs text-muted-foreground mt-1">{new Date(s.created_at).toLocaleString()}</div>
+                        <div key={s.id} className="border border-border/30 rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                          <Link to={`/story/${s.id}`} className="block">
+                            <h4 className="font-medium text-foreground hover:text-primary transition-colors line-clamp-2">
+                              {s.title}
+                            </h4>
+                            <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
+                              <span>{new Date(s.created_at).toLocaleDateString()}</span>
+                              {s.author && <span>• {s.author}</span>}
+                            </div>
+                            {s.excerpt && (
+                              <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                                {s.excerpt}
+                              </p>
+                            )}
+                          </Link>
                         </div>
                       ))}
                     </div>

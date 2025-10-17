@@ -559,24 +559,26 @@ export default function AICompaniesCatalog() {
       <div className="container-custom py-8">
         {/* 搜索和筛选 */}
         <motion.div variants={itemVariants} className="mb-6">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex flex-col md:flex-row gap-4">
+          <Card className="border border-border/50 dark:border-border/30">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex flex-col gap-4">
+                {/* 搜索栏 */}
                 <div className="flex-1">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                     <Input
                       placeholder="搜索公司、工具或技术... (支持中英文)"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 h-11"
                     />
                   </div>
                 </div>
                 
-                <div className="flex gap-2 flex-wrap">
+                {/* 筛选器 - 响应式网格布局 */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                   <Select value={selectedRegion} onValueChange={setSelectedRegion}>
-                    <SelectTrigger className="w-48">
+                    <SelectTrigger className="h-11">
                       <SelectValue placeholder="选择地区" />
                     </SelectTrigger>
                     <SelectContent>
@@ -589,7 +591,7 @@ export default function AICompaniesCatalog() {
                   </Select>
 
                   <Select value={selectedTechArea} onValueChange={setSelectedTechArea}>
-                    <SelectTrigger className="w-48">
+                    <SelectTrigger className="h-11">
                       <SelectValue placeholder="技术领域" />
                     </SelectTrigger>
                     <SelectContent>
@@ -602,7 +604,7 @@ export default function AICompaniesCatalog() {
                   </Select>
 
                   <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                    <SelectTrigger className="w-48">
+                    <SelectTrigger className="h-11">
                       <SelectValue placeholder="选择类别" />
                     </SelectTrigger>
                     <SelectContent>
@@ -615,7 +617,7 @@ export default function AICompaniesCatalog() {
                   </Select>
 
                   <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="w-48">
+                    <SelectTrigger className="h-11">
                       <SelectValue placeholder="排序方式" />
                     </SelectTrigger>
                     <SelectContent>
@@ -633,9 +635,9 @@ export default function AICompaniesCatalog() {
 
         {/* 公司列表 */}
         <motion.div variants={itemVariants}>
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
             {filteredCompanies.map((company) => (
-              <Card key={company.id} className="hover:shadow-lg transition-shadow border border-border/50 dark:border-border/30">
+              <Card key={company.id} className="hover:shadow-lg transition-all duration-300 border border-border/50 dark:border-border/30 hover:border-border dark:hover:border-border/50">
                 <CardHeader className="pb-4">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
