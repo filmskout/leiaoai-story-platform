@@ -516,17 +516,17 @@ export default function AICompaniesCatalog() {
             key={star}
             className={`w-4 h-4 ${
               star <= displayRating 
-                ? 'text-yellow-400 fill-yellow-400' 
-                : 'text-gray-300'
-            } ${interactive ? 'cursor-pointer hover:text-yellow-400' : ''}`}
+                ? 'text-yellow-500 fill-yellow-500' 
+                : 'text-muted-foreground/40'
+            } ${interactive ? 'cursor-pointer hover:text-yellow-400 transition-colors' : ''}`}
             onClick={interactive ? () => handleRating(toolId, star) : undefined}
           />
         ))}
-        <span className="text-sm text-gray-600 ml-1">
+        <span className="text-sm text-muted-foreground ml-1">
           {rating.toFixed(1)}
         </span>
         {userRating > 0 && (
-          <span className="text-xs text-blue-600 ml-1">(已评分)</span>
+          <span className="text-xs text-primary ml-1">(已评分)</span>
         )}
       </div>
     );
@@ -635,30 +635,32 @@ export default function AICompaniesCatalog() {
         <motion.div variants={itemVariants}>
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {filteredCompanies.map((company) => (
-              <Card key={company.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
+              <Card key={company.id} className="hover:shadow-lg transition-shadow border border-border/50 dark:border-border/30">
+                <CardHeader className="pb-4">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
                       {company.logo_url && (
                         <img 
                           src={company.logo_url} 
                           alt={company.name}
-                          className="w-12 h-12 rounded-lg object-contain"
+                          className="w-12 h-12 rounded-lg object-contain bg-background/50 p-1"
                         />
                       )}
-                      <div>
-                        <CardTitle className="text-lg">
-                          <Link to={`/ai-companies/${company.id}`}>{company.name}</Link>
+                      <div className="flex-1">
+                        <CardTitle className="text-lg text-foreground">
+                          <Link to={`/ai-companies/${company.id}`} className="hover:text-primary transition-colors">
+                            {company.name}
+                          </Link>
                         </CardTitle>
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <Globe className="w-4 h-4" />
                           <a 
                             href={company.website} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="hover:text-blue-600"
+                            className="hover:text-primary transition-colors"
                           >
-                            {company.website.replace('https://', '')}
+                            {company.website?.replace('https://', '')}
                           </a>
                         </div>
                       </div>
@@ -669,6 +671,7 @@ export default function AICompaniesCatalog() {
                         size="sm"
                         variant="outline"
                         onClick={() => openStoryDialog(undefined, company)}
+                        className="border-border/50 hover:border-primary/50"
                       >
                         <Plus className="w-4 h-4 mr-1" />
                         故事
@@ -677,114 +680,114 @@ export default function AICompaniesCatalog() {
                   </div>
                 </CardHeader>
 
-                <CardContent>
-                  <div className="space-y-4">
-                    {/* 公司描述 */}
-                    <p className="text-sm text-gray-600 line-clamp-2">
-                      {company.description}
-                    </p>
+                <CardContent className="space-y-4">
+                  {/* 公司描述 */}
+                  <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
+                    {company.description}
+                  </p>
 
-                    {/* 公司信息 */}
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      {company.founded_year && (
-                        <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4 text-gray-400" />
-                          <span>成立于 {company.founded_year}</span>
-                        </div>
-                      )}
-                      {company.headquarters && (
-                        <div className="flex items-center gap-2">
-                          <Building className="w-4 h-4 text-gray-400" />
-                          <span>{company.headquarters}</span>
-                        </div>
-                      )}
-                      {company.valuation_usd && (
-                        <div className="flex items-center gap-2">
-                          <DollarSign className="w-4 h-4 text-gray-400" />
-                          <span>估值 {formatCurrency(company.valuation_usd)}</span>
-                        </div>
-                      )}
-                      <div className="flex items-center gap-2">
-                        <Wrench className="w-4 h-4 text-gray-400" />
-                        <span>{company.tools.length} 个工具</span>
+                  {/* 公司信息 */}
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    {company.founded_year && (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Calendar className="w-4 h-4" />
+                        <span>成立于 {company.founded_year}</span>
                       </div>
+                    )}
+                    {company.headquarters && (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Building className="w-4 h-4" />
+                        <span>{company.headquarters}</span>
+                      </div>
+                    )}
+                    {company.valuation_usd && (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <DollarSign className="w-4 h-4" />
+                        <span>估值 {formatCurrency(company.valuation_usd)}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Wrench className="w-4 h-4" />
+                      <span>{company.tools.length} 个工具</span>
                     </div>
+                  </div>
 
-                    {/* 行业标签 */}
-                    <div className="flex flex-wrap gap-2">
-                      {company.industry_tags.slice(0, 3).map((tag) => (
-                        <Badge key={tag} variant="secondary" className="text-xs">
-                          {tag}
-                        </Badge>
-                      ))}
-                      {company.industry_tags.length > 3 && (
-                        <Badge variant="outline" className="text-xs">
-                          +{company.industry_tags.length - 3}
-                        </Badge>
-                      )}
-                    </div>
+                  {/* 行业标签 */}
+                  <div className="flex flex-wrap gap-2">
+                    {company.industry_tags.slice(0, 3).map((tag) => (
+                      <Badge key={tag} variant="secondary" className="text-xs bg-secondary/50 hover:bg-secondary/70 transition-colors">
+                        {tag}
+                      </Badge>
+                    ))}
+                    {company.industry_tags.length > 3 && (
+                      <Badge variant="outline" className="text-xs border-border/50">
+                        +{company.industry_tags.length - 3}
+                      </Badge>
+                    )}
+                  </div>
 
-                    {/* 工具列表 */}
+                  {/* 工具列表 */}
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-sm text-foreground">工具套件</h4>
                     <div className="space-y-2">
-                      <h4 className="font-medium text-sm">工具套件</h4>
-                      <div className="space-y-2">
-                        {company.tools.slice(0, 3).map((tool) => (
-                          <div key={tool.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2">
-                                <span className="font-medium text-sm">{tool.name}</span>
-                                <Badge variant="outline" className="text-xs">
-                                  {tool.category}
+                      {company.tools.slice(0, 3).map((tool) => (
+                        <div key={tool.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border/30 hover:bg-muted/50 transition-colors">
+                          <div className="flex-1 mr-3">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="font-medium text-sm text-foreground">{tool.name}</span>
+                              <Badge variant="outline" className="text-xs border-border/50">
+                                {tool.category}
+                              </Badge>
+                              {tool.free_tier && (
+                                <Badge variant="default" className="text-xs bg-green-500/20 text-green-700 dark:text-green-300 border-green-500/30">
+                                  免费
                                 </Badge>
-                                {tool.free_tier && (
-                                  <Badge variant="default" className="text-xs">
-                                    免费
-                                  </Badge>
-                                )}
-                                {tool.api_available && (
-                                  <Badge variant="secondary" className="text-xs">
-                                    API
-                                  </Badge>
-                                )}
-                              </div>
-                              <p className="text-xs text-gray-600 mt-1 line-clamp-1">
-                                {tool.description}
-                              </p>
+                              )}
+                              {tool.api_available && (
+                                <Badge variant="secondary" className="text-xs bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-500/30">
+                                  API
+                                </Badge>
+                              )}
                             </div>
-                            
-                            <div className="flex items-center gap-2">
-                              {renderStars(tool.tool_stats?.average_rating || 0, tool.id, true)}
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handleFavorite(tool.id)}
-                              >
-                                <Heart 
-                                  className={`w-4 h-4 ${
-                                    userFavorites.has(tool.id) 
-                                      ? 'text-red-500 fill-red-500' 
-                                      : 'text-gray-400'
-                                  }`} 
-                                />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => openStoryDialog(tool, company)}
-                              >
-                                <Plus className="w-4 h-4" />
-                              </Button>
-                            </div>
+                            <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                              {tool.description}
+                            </p>
                           </div>
-                        ))}
-                        {company.tools.length > 3 && (
-                          <div className="text-center">
-                            <Button variant="outline" size="sm">
-                              查看全部 {company.tools.length} 个工具
+                          
+                          <div className="flex items-center gap-2">
+                            {renderStars(tool.tool_stats?.average_rating || 0, tool.id, true)}
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleFavorite(tool.id)}
+                              className="hover:bg-muted/50"
+                            >
+                              <Heart 
+                                className={`w-4 h-4 ${
+                                  userFavorites.has(tool.id) 
+                                    ? 'text-red-500 fill-red-500' 
+                                    : 'text-muted-foreground hover:text-red-500'
+                                }`} 
+                              />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => openStoryDialog(tool, company)}
+                              className="hover:bg-muted/50"
+                            >
+                              <Plus className="w-4 h-4" />
                             </Button>
                           </div>
-                        )}
-                      </div>
+                        </div>
+                      ))}
+                      {company.tools.length > 3 && (
+                        <div className="text-center pt-2">
+                          <Button variant="outline" size="sm" className="border-border/50 hover:border-primary/50">
+                            查看全部 {company.tools.length} 个工具
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </CardContent>

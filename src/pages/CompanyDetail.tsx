@@ -109,13 +109,13 @@ export default function CompanyDetail() {
               <Card>
                 <CardHeader className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-xl flex items-center gap-2">
+                    <CardTitle className="text-xl flex items-center gap-2 text-foreground">
                       {company.logo_url && (
-                        <img src={company.logo_url} alt={company.name} className="w-8 h-8 rounded" />
+                        <img src={company.logo_url} alt={company.name} className="w-8 h-8 rounded bg-background/50 p-1" />
                       )}
                       {company.name}
                       {company.website && (
-                        <a href={company.website} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
+                        <a href={company.website} target="_blank" rel="noreferrer" className="text-primary hover:text-primary/80 transition-colors">
                           <ExternalLink className="w-4 h-4 inline-block ml-1" />
                         </a>
                       )}
@@ -130,7 +130,10 @@ export default function CompanyDetail() {
                   {company.industry_tags?.length > 0 && (
                     <div className="flex flex-wrap gap-2">
                       {company.industry_tags.map((tag) => (
-                        <Badge key={tag} variant="secondary"><Tag className="w-3 h-3 mr-1" />{tag}</Badge>
+                        <Badge key={tag} variant="secondary" className="bg-secondary/50 hover:bg-secondary/70 transition-colors">
+                          <Tag className="w-3 h-3 mr-1" />
+                          {tag}
+                        </Badge>
                       ))}
                     </div>
                   )}
@@ -139,12 +142,15 @@ export default function CompanyDetail() {
                   <p className="text-muted-foreground leading-relaxed">{company.description}</p>
                   <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     {company.headquarters && (
-                      <div className="flex items-center gap-2"><Globe2 className="w-4 h-4" />{company.headquarters}</div>
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Globe2 className="w-4 h-4" />
+                        {company.headquarters}
+                      </div>
                     )}
                     {company.valuation_usd != null && (
-                      <div>估值：${(company.valuation_usd/1_000_000_000).toFixed(1)}B</div>
+                      <div className="text-muted-foreground">估值：${(company.valuation_usd/1_000_000_000).toFixed(1)}B</div>
                     )}
-                    {company.funding_status && <div>融资阶段：{company.funding_status}</div>}
+                    {company.funding_status && <div className="text-muted-foreground">融资阶段：{company.funding_status}</div>}
                   </div>
                 </CardContent>
               </Card>
