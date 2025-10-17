@@ -123,13 +123,8 @@ export default function Layout() {
     },
     {
       path: '/ai-companies',
-      label: 'AI公司',
+      label: 'AI Companies',
       icon: <Building size={18} />
-    },
-    {
-      path: '/monitoring',
-      label: '监控面板',
-      icon: <Activity size={18} />
     },
     {
       path: '/stories',
@@ -476,6 +471,9 @@ export default function Layout() {
               </Link>
               <Link to="/contact" className="hover:text-foreground transition-colors">
                 {t('nav.contact')}
+              </Link>
+              <Link to="/monitoring" className="hover:text-foreground transition-colors">
+                Monitoring Dashboard
               </Link>
             </div>
           </div>
