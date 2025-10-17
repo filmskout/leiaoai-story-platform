@@ -21,6 +21,8 @@
     "update-logos": "tsx scripts/update_all_logos.ts",
     "fix-synonymous": "tsx scripts/fix_synonymous_relationships.ts",
     "complete-data": "tsx scripts/comprehensive_bilingual_update.ts && tsx scripts/update_all_logos.ts && tsx scripts/fix_synonymous_relationships.ts",
+    "complete-missing": "tsx scripts/complete_missing_data.ts",
+    "final-completion": "tsx scripts/final_data_completion.ts",
     "monitor": "tsx scripts/check_data_integrity.ts && tsx scripts/automated_update_tracker.ts"
   },
   "dependencies": {
