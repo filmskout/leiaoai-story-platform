@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { PageHero } from '@/components/PageHero';
-import { Building2, ExternalLink, Star, ArrowLeft, Globe2, Tag, ChartBar } from 'lucide-react';
+import { Building2, ExternalLink, Star, ArrowLeft, Globe2, Tag, BarChart3 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
@@ -123,7 +123,7 @@ export default function CompanyDetail() {
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Star className="w-4 h-4 text-yellow-500" />
                       <span>{avgRating}</span>
-                      <ChartBar className="w-4 h-4 ml-3" />
+                      <BarChart3 className="w-4 h-4 ml-3" />
                       <span>{company.company_stats?.total_tools || company.tools.length} 工具</span>
                     </div>
                   </div>
