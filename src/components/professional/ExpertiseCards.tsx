@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
   TrendingUp, 
-  Building2, 
+  Building, 
   BarChart3, 
   Globe, 
   DollarSign, 
@@ -82,7 +82,7 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
     {
       key: 'cvc_investment',
       name: t('ai_chat.expertise_areas.cvc_investment'),
-      icon: Building2,
+      icon: Building,
       color: 'text-blue-600',
       bgColor: 'bg-blue-100 dark:bg-blue-900/30',
       questions: t('ai_chat.expertise_questions.cvc_investment', { returnObjects: true }) as string[]

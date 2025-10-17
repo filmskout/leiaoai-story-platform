@@ -27,7 +27,8 @@ import {
   X,
   BookOpen,
   Shield,
-  Mail
+  Mail,
+  Building
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -122,7 +123,7 @@ export default function Layout() {
     {
       path: '/ai-companies',
       label: 'AI公司',
-      icon: <Building2 size={18} />
+      icon: <Building size={18} />
     },
     {
       path: '/stories',

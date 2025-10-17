@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { PageHero } from '@/components/PageHero';
-import { Building2, ExternalLink, Star, ArrowLeft, Globe2, Tag, BarChart3 } from 'lucide-react';
+import { Building, ExternalLink, Star, ArrowLeft, Globe2, Tag, BarChart3 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
@@ -89,7 +89,7 @@ export default function CompanyDetail() {
       <PageHero
         titleKey={company?.name || 'AI 公司'}
         subtitleKey="公司详情、工具套件、融资信息与社区故事"
-        icon={Building2}
+        icon={Building}
       />
 
       <div className="container-custom py-8">

@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { 
   Star, 
-  Building2, 
+  Building, 
   ExternalLink, 
   Wrench, 
   Heart, 
@@ -553,7 +553,7 @@ export default function AICompaniesCatalog() {
       <PageHero 
         titleKey="全球AI公司目录"
         subtitleKey="探索全球领先的AI公司及其工具套件，涵盖视频生成、大语言模型、计算机视觉等各技术领域"
-        icon={Building2}
+        icon={Building}
       />
 
       <div className="container-custom py-8">
@@ -694,7 +694,7 @@ export default function AICompaniesCatalog() {
                       )}
                       {company.headquarters && (
                         <div className="flex items-center gap-2">
-                          <Building2 className="w-4 h-4 text-gray-400" />
+                          <Building className="w-4 h-4 text-gray-400" />
                           <span>{company.headquarters}</span>
                         </div>
                       )}

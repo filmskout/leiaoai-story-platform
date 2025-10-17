@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { Star, Building2, ExternalLink, Wrench } from 'lucide-react';
+import { Star, Building, ExternalLink, Wrench } from 'lucide-react';
 import { listToolsWithCompany, listCompanyFundings, getCompanyResearch } from '@/services/tools';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
