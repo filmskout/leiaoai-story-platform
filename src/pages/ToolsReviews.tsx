@@ -43,6 +43,9 @@ export default function ToolsReviews() {
   const [sourceOptions, setSourceOptions] = useState<string[]>(['all']);
   const [selectedSource, setSelectedSource] = useState<string>('all');
   const [ossOnly, setOssOnly] = useState<boolean>(false);
+  // LLM 模型选择（顺序为回退优先级）
+  const modelOptions = ['gpt-4o', 'gpt-4o-mini', 'qwen-turbo', 'deepseek-chat'];
+  const [selectedModels, setSelectedModels] = useState<string[]>(['gpt-4o', 'gpt-4o-mini', 'qwen-turbo', 'deepseek-chat']);
 
   // 页面动画
   const containerVariants = {
@@ -102,7 +105,7 @@ export default function ToolsReviews() {
         setResearchMap(prev => ({ ...prev, [domain]: { summary: cached.summary, funding_highlights: cached.funding_highlights, current_round: cached.current_round, overall_score: cached.overall_score, score_breakdown: cached.score_breakdown } }));
       }
       // call API to refresh (will upsert and return latest)
-      const resp = await fetch('/api/tools-research', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ domains: [domain] }) });
+      const resp = await fetch('/api/tools-research', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ domains: [domain], models: selectedModels }) });
       if (resp.ok) {
         const json = await resp.json();
         const r = json?.results?.[domain];
@@ -121,7 +124,7 @@ export default function ToolsReviews() {
       const domains = Array.from(new Set(extTools.map(x => String(x.company || '')).filter(Boolean)));
       if (domains.length === 0) return;
       try {
-        const resp = await fetch('/api/tools-research', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ domains }) });
+        const resp = await fetch('/api/tools-research', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ domains, models: selectedModels }) });
         if (resp.ok) {
           const json = await resp.json();
           if (json?.results) {
@@ -147,7 +150,7 @@ export default function ToolsReviews() {
     if (!extLoading && extTools.length > 0) {
       triggerBatch();
     }
-  }, [extLoading, extTools]);
+  }, [extLoading, extTools, selectedModels]);
 
   // load AIverse public JSON (object with tools array)
   useEffect(() => {
@@ -217,7 +220,18 @@ export default function ToolsReviews() {
                         {cat}
                       </span>
                     ))}
-                    <input className="ml-auto border rounded-md px-2 py-1 h-9" placeholder="搜索工具..." value={search} onChange={(e)=>setSearch(e.target.value)} />
+                    <div className="flex items-center gap-2 ml-auto">
+                      <label className="text-sm text-foreground-secondary">模型</label>
+                      <select multiple className="border rounded-md px-2 py-1 h-9 min-w-[180px]" value={selectedModels as any} onChange={(e)=>{
+                        const opts = Array.from(e.target.selectedOptions).map(o=>o.value);
+                        setSelectedModels(opts);
+                      }}>
+                        {modelOptions.map(m => (
+                          <option key={m} value={m}>{m}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <input className="ml-2 border rounded-md px-2 py-1 h-9" placeholder="搜索工具..." value={search} onChange={(e)=>setSearch(e.target.value)} />
                     <div className="flex gap-2">
                       <Button size="sm" variant={sortKey === 'name_asc' ? 'default' : 'outline'} onClick={() => setSortKey('name_asc')}>A→Z</Button>
                       <Button size="sm" variant={sortKey === 'name_desc' ? 'default' : 'outline'} onClick={() => setSortKey('name_desc')}>Z→A</Button>
