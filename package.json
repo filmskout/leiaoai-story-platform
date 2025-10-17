@@ -12,7 +12,11 @@
     "build": "vite build",
     "build:prod": "tsc -b && BUILD_MODE=prod vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check-data": "tsx scripts/check_data_integrity.ts",
+    "track-updates": "tsx scripts/automated_update_tracker.ts",
+    "generate-content": "tsx scripts/generate_content_with_cursor.ts",
+    "monitor": "tsx scripts/check_data_integrity.ts && tsx scripts/automated_update_tracker.ts"
   },
   "dependencies": {
     "@excalidraw/excalidraw": "^0.18.0",
