@@ -231,22 +231,7 @@ Copy and paste this to add funding information:
 ```sql
 -- Run this fourth: Funding information
 -- File: 2025-01-20_complete_funding_data.sql
-
-INSERT INTO public.fundings (id, company_id, round, amount_usd, investors, announced_on)
-VALUES
-('00000000-0000-0000-0000-000000000201', (SELECT id FROM public.companies WHERE name = 'OpenAI'), 'Series E', 40000000000, '{"Microsoft", "SoftBank Group", "Founders Fund", "Magnetar Capital"}', '2024-12-01'),
-('00000000-0000-0000-0000-000000000202', (SELECT id FROM public.companies WHERE name = 'Anthropic'), 'Series D', 3500000000, '{"Lightspeed Venture Partners", "Salesforce Ventures", "Alphabet"}', '2024-11-01'),
-('00000000-0000-0000-0000-000000000203', (SELECT id FROM public.companies WHERE name = 'Perplexity AI'), 'Series C', 700000000, '{"IVP", "NEA", "NVIDIA", "Jeff Bezos"}', '2024-01-01'),
-('00000000-0000-0000-0000-000000000204', (SELECT id FROM public.companies WHERE name = 'Scale AI'), 'Series E', 1000000000, '{"Accel", "Index Ventures", "Tiger Global"}', '2023-12-01'),
-('00000000-0000-0000-0000-000000000205', (SELECT id FROM public.companies WHERE name = 'Databricks'), 'Series H', 10000000000, '{"Andreessen Horowitz", "Tiger Global", "Franklin Templeton"}', '2023-09-01'),
-('00000000-0000-0000-0000-000000000206', (SELECT id FROM public.companies WHERE name = 'Hugging Face'), 'Series C', 200000000, '{"Sequoia Capital", "Coatue", "Betaworks"}', '2023-08-01'),
-('00000000-0000-0000-0000-000000000207', (SELECT id FROM public.companies WHERE name = 'Stability AI'), 'Series A', 100000000, '{"Coatue", "Lightspeed Venture Partners"}', '2022-10-01')
-ON CONFLICT (id) DO UPDATE SET
-  company_id = EXCLUDED.company_id,
-  round = EXCLUDED.round,
-  amount_usd = EXCLUDED.amount_usd,
-  investors = EXCLUDED.investors,
-  announced_on = EXCLUDED.announced_on;
+-- Copy and paste the entire content from: supabase/migrations/2025-01-20_complete_funding_data.sql
 ```
 
 ## Step 5: Insert Chinese AI Companies (Optional)
