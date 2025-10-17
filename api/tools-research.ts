@@ -90,6 +90,26 @@ If unknown, leave empty/null.`;
             continue;
           }
         }
+        // extra fallback if all provided models failed
+        if (!parsed) {
+          for (const fallback of ['gpt-4o', 'gpt-4o-mini']) {
+            try {
+              const resp2 = await client.chat.completions.create({
+                model: fallback,
+                messages: [
+                  { role: 'system', content: 'You output strict JSON only.' },
+                  { role: 'user', content: prompt }
+                ],
+                temperature: 0.2,
+              });
+              const text2 = resp2.choices?.[0]?.message?.content?.trim() || '{}';
+              parsed = JSON.parse(text2);
+              if (parsed) break;
+            } catch (_) {
+              // ignore and try next fallback
+            }
+          }
+        }
         source_json = parsed || {};
         summary = String(source_json.summary || '');
         funding_highlights = String(source_json.funding_highlights || '');

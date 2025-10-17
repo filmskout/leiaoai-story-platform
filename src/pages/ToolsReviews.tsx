@@ -297,7 +297,7 @@ export default function ToolsReviews() {
                               )}
                             </>
                           ) : (
-                            <div className="mt-2 text-sm">{x.company && researchMap[x.company] ? (
+                            <div className="mt-2 text-sm">{x.company && (researchMap[x.company] || researching === x.company) ? (
                               <div className="text-foreground-secondary space-y-2">
                                 {(researchMap[x.company]?.current_round || researchMap[x.company]?.overall_score !== undefined) && (
                                   <div className="font-medium">
@@ -327,6 +327,9 @@ export default function ToolsReviews() {
                                 )}
                                 {researchMap[x.company]?.funding_highlights && (
                                   <div className="text-xs">投融资：{researchMap[x.company]?.funding_highlights}</div>
+                                )}
+                                {researching === x.company && !researchMap[x.company] && (
+                                  <div className="text-xs">分析中...</div>
                                 )}
                               </div>
                             ) : (
