@@ -45,7 +45,8 @@ export default function ToolsReviews() {
   const [ossOnly, setOssOnly] = useState<boolean>(false);
   // LLM 模型选择（顺序为回退优先级）
   const modelOptions = ['gpt-4o', 'gpt-4o-mini', 'qwen-turbo', 'deepseek-chat'];
-  const [selectedModels, setSelectedModels] = useState<string[]>(['gpt-4o', 'gpt-4o-mini', 'qwen-turbo', 'deepseek-chat']);
+  const [selectedModels, setSelectedModels] = useState<string[]>(['gpt-4o', 'gpt-4o-mini']);
+  const [usedModelMap, setUsedModelMap] = useState<Record<string, string | undefined>>({});
 
   const categoryColor = (cat?: string) => {
     const key = String(cat || 'Uncategorized').toLowerCase();
@@ -149,6 +150,9 @@ export default function ToolsReviews() {
                   overall_score: data.overall_score,
                   score_breakdown: data.score_breakdown
                 };
+                if (data.used_model) {
+                  setUsedModelMap(prev => ({ ...prev, [domain]: data.used_model }));
+                }
               }
             });
             setResearchMap(prev => ({ ...prev, ...newMap }));
@@ -233,9 +237,10 @@ export default function ToolsReviews() {
                     ))}
                     <div className="flex items-center gap-2 ml-auto">
                       <label className="text-sm text-foreground-secondary">模型</label>
-                      <select multiple className="border rounded-md px-2 py-1 h-9 min-w-[180px]" value={selectedModels as any} onChange={(e)=>{
-                        const opts = Array.from(e.target.selectedOptions).map(o=>o.value);
-                        setSelectedModels(opts);
+                      <select className="border rounded-md px-2 py-1 h-9 min-w-[160px]" value={selectedModels[0]} onChange={(e)=>{
+                        const first = e.target.value;
+                        const rest = modelOptions.filter(x => x !== first);
+                        setSelectedModels([first, ...rest]);
                       }}>
                         {modelOptions.map(m => (
                           <option key={m} value={m}>{m}</option>
@@ -304,6 +309,9 @@ export default function ToolsReviews() {
                                     {researchMap[x.company]?.current_round ? `轮次：${researchMap[x.company]?.current_round}` : ''}
                                     {researchMap[x.company]?.overall_score !== undefined ? `${researchMap[x.company]?.current_round ? '｜' : ''}总分：${researchMap[x.company]?.overall_score}` : ''}
                                   </div>
+                                )}
+                                {usedModelMap[x.company] && (
+                                  <div className="text-xs">模型：{usedModelMap[x.company]}</div>
                                 )}
                                 {researchMap[x.company]?.score_breakdown && Object.keys(researchMap[x.company]?.score_breakdown || {}).length > 0 && (
                                   <div>

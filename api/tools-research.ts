@@ -73,6 +73,7 @@ If unknown, leave empty/null.`;
       try {
         const modelList: string[] = Array.isArray(models) && models.length ? models : ['gpt-4o', 'gpt-4o-mini'];
         let parsed: any = null;
+        let usedModel: string | null = null;
         for (const m of modelList) {
           try {
             const resp = await client.chat.completions.create({
@@ -85,6 +86,7 @@ If unknown, leave empty/null.`;
             });
             const text = resp.choices?.[0]?.message?.content?.trim() || '{}';
             parsed = JSON.parse(text);
+            usedModel = m;
             break;
           } catch (_) {
             continue;
@@ -104,6 +106,7 @@ If unknown, leave empty/null.`;
               });
               const text2 = resp2.choices?.[0]?.message?.content?.trim() || '{}';
               parsed = JSON.parse(text2);
+              usedModel = fallback;
               if (parsed) break;
             } catch (_) {
               // ignore and try next fallback
@@ -111,6 +114,9 @@ If unknown, leave empty/null.`;
           }
         }
         source_json = parsed || {};
+        if (usedModel) {
+          try { source_json.used_model = usedModel; } catch {}
+        }
         summary = String(source_json.summary || '');
         funding_highlights = String(source_json.funding_highlights || '');
         current_round = String(source_json.current_round || '');
@@ -134,7 +140,7 @@ If unknown, leave empty/null.`;
         .select('*')
         .single();
 
-      results[domain] = up;
+      results[domain] = { ...up, used_model: usedModel };
     }
 
     res.status(200).json({ ok: true, results });
