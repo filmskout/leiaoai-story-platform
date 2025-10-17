@@ -47,6 +47,17 @@ export default function ToolsReviews() {
   const modelOptions = ['gpt-4o', 'gpt-4o-mini', 'qwen-turbo', 'deepseek-chat'];
   const [selectedModels, setSelectedModels] = useState<string[]>(['gpt-4o', 'gpt-4o-mini', 'qwen-turbo', 'deepseek-chat']);
 
+  const categoryColor = (cat?: string) => {
+    const key = String(cat || 'Uncategorized').toLowerCase();
+    if (key.includes('agent')) return 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-900/40';
+    if (key.includes('image') || key.includes('vision')) return 'bg-pink-100 text-pink-700 border-pink-200 dark:bg-pink-900/20 dark:text-pink-300 dark:border-pink-900/40';
+    if (key.includes('nlp') || key.includes('text') || key.includes('chat')) return 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-900/40';
+    if (key.includes('audio') || key.includes('voice')) return 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-900/40';
+    if (key.includes('video')) return 'bg-rose-100 text-rose-700 border-rose-200 dark:bg-rose-900/20 dark:text-rose-300 dark:border-rose-900/40';
+    if (key.includes('data') || key.includes('db') || key.includes('analytics')) return 'bg-teal-100 text-teal-700 border-teal-200 dark:bg-teal-900/20 dark:text-teal-300 dark:border-teal-900/40';
+    return 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800/60 dark:text-gray-300 dark:border-gray-700';
+  };
+
   // 页面动画
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -250,11 +261,14 @@ export default function ToolsReviews() {
                       .map((x) => (
                         <div key={String(x.id)} className="p-3 border rounded-lg">
                           <div className="flex items-center justify-between">
-                            <div className="font-medium flex items-center gap-2">
+                            <div className="font-medium flex items-center gap-2 flex-wrap">
                               {x.link && (
                                 <img src={getLogoUrlFromLink(x.link)} alt={x.name} className="w-5 h-5 rounded" />
                               )}
-                              {x.name}
+                              <span>{x.name}</span>
+                              <span className={`px-2 py-0.5 rounded-full text-xs border ${categoryColor(x.category)}`}>
+                                {x.category || 'Uncategorized'}
+                              </span>
                             </div>
                             <div className="flex items-center gap-2">
                               {x.company && (
@@ -270,16 +284,16 @@ export default function ToolsReviews() {
                               )}
                               {x.link && (
                                 <a href={x.link} target="_blank" rel="noreferrer" className="text-primary-600 text-sm inline-flex items-center">
-                                  官网 <ExternalLink className="w-3 h-3 ml-1" />
+                                  link <ExternalLink className="w-3 h-3 ml-1" />
                                 </a>
                               )}
                             </div>
                           </div>
                           {!flipped[String(x.id)] ? (
                             <>
-                              <div className="text-sm text-foreground-secondary mt-1">{x.category || 'Uncategorized'}{x.company ? `｜${x.company}` : ''}{x.source ? `｜${x.source}` : ''}{x.isOSS ? '｜开源' : ''}</div>
+                              <div className="text-sm text-foreground-secondary mt-1">{x.company ? `公司：${x.company}` : ''}{x.source ? `${x.company ? ' ｜' : ''}来源：${x.source}` : ''}{x.isOSS ? ' ｜开源' : ''}</div>
                               {x.description && (
-                                <div className="text-sm text-foreground-secondary mt-1 line-clamp-2">{x.description}</div>
+                                <div className="text-sm text-foreground-secondary mt-2 whitespace-pre-wrap">{x.description}</div>
                               )}
                             </>
                           ) : (
