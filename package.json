@@ -17,6 +17,10 @@
     "track-updates": "tsx scripts/automated_update_tracker.ts",
     "generate-content": "tsx scripts/generate_content_with_cursor.ts",
     "fix-relationships": "tsx scripts/fix_company_tool_relationships.ts",
+    "update-bilingual": "tsx scripts/comprehensive_bilingual_update.ts",
+    "update-logos": "tsx scripts/update_all_logos.ts",
+    "fix-synonymous": "tsx scripts/fix_synonymous_relationships.ts",
+    "complete-data": "tsx scripts/comprehensive_bilingual_update.ts && tsx scripts/update_all_logos.ts && tsx scripts/fix_synonymous_relationships.ts",
     "monitor": "tsx scripts/check_data_integrity.ts && tsx scripts/automated_update_tracker.ts"
   },
   "dependencies": {
