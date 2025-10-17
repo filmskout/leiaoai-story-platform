@@ -1,11 +1,7 @@
--- 基于a16z报告的完整AI公司数据
+-- 基于a16z报告的完整AI公司数据 (Fixed Version)
 -- 包含Top 50 AI Application Spending Report和Top 100 Gen AI Consumer Apps中的所有公司
 
--- 首先清空现有数据（如果需要）
--- DELETE FROM public.tools WHERE company_id IN (SELECT id FROM public.companies);
--- DELETE FROM public.companies;
-
--- 插入主要AI公司（基于a16z报告）
+-- 使用INSERT ... ON CONFLICT DO NOTHING 来避免重复插入
 INSERT INTO public.companies (name, website, description, founded_year, headquarters, industry_tags, logo_url, social_links, valuation_usd, last_funding_date) VALUES
 
 -- Top 50 AI Application Spending Report 公司
@@ -99,14 +95,5 @@ INSERT INTO public.companies (name, website, description, founded_year, headquar
 
 ('Emergent', 'https://emergent.ai', 'AI-powered development platform', 2023, 'San Francisco, CA', ARRAY['Development Platform', 'AI Coding', 'Automation'], 'https://emergent.ai/favicon.ico', '{"twitter": "https://twitter.com/emergent", "linkedin": "https://linkedin.com/company/emergent"}', 100000000, '2023-10-01')
 
--- Note: If you want to update existing companies, you can uncomment the following:
--- ON CONFLICT (name) DO UPDATE SET
---   website = EXCLUDED.website,
---   description = EXCLUDED.description,
---   founded_year = EXCLUDED.founded_year,
---   headquarters = EXCLUDED.headquarters,
---   industry_tags = EXCLUDED.industry_tags,
---   logo_url = EXCLUDED.logo_url,
---   social_links = EXCLUDED.social_links,
---   valuation_usd = EXCLUDED.valuation_usd,
---   last_funding_date = EXCLUDED.last_funding_date;
+-- 使用 DO NOTHING 来避免重复插入错误
+ON CONFLICT DO NOTHING;
