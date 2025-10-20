@@ -22,7 +22,14 @@ import {
   DollarSign,
   Globe,
   Calendar,
-  Tag
+  Tag,
+  Filter,
+  SortAsc,
+  SortDesc,
+  Grid,
+  List,
+  ChevronDown,
+  ChevronRight
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -76,194 +83,71 @@ type Company = {
   tools: Tool[];
 };
 
-// 模拟AI公司数据
-const mockCompanies = [
-  {
-    id: 'openai',
-    name: 'OpenAI',
-    website: 'https://openai.com',
-    description: 'AI研究公司，致力于确保人工通用智能造福全人类',
-    founded_year: 2015,
-    headquarters: 'San Francisco, CA',
-    industry_tags: ['AI Research', 'LLM', 'Generative AI'],
-    logo_url: 'https://openai.com/favicon.ico',
-    valuation_usd: 300000000000,
-    tools: [
-      {
-        id: 'chatgpt',
-        name: 'ChatGPT',
-        category: 'Conversational AI',
-        description: 'AI对话助手，能够进行自然语言对话和任务协助',
-        website: 'https://chat.openai.com',
-        industry_tags: ['Customer Support', 'Content Creation', 'Education'],
-        features: ['对话生成', '代码编写', '文本总结', '翻译'],
-        api_available: true,
-        free_tier: true,
-        average_rating: 4.5,
-        total_ratings: 1250
-      },
-      {
-        id: 'dalle',
-        name: 'DALL-E',
-        category: 'Image Generation',
-        description: 'AI图像生成模型，根据文本描述创建图像',
-        website: 'https://openai.com/dall-e',
-        industry_tags: ['Design', 'Marketing', 'Creative'],
-        features: ['文本到图像', '图像编辑', '风格转换'],
-        api_available: true,
-        free_tier: false,
-        average_rating: 4.3,
-        total_ratings: 890
-      },
-      {
-        id: 'sora',
-        name: 'Sora',
-        category: 'Video Generation',
-        description: 'AI视频生成模型，根据文本创建高质量视频',
-        website: 'https://openai.com/sora',
-        industry_tags: ['Video Production', 'Marketing', 'Entertainment'],
-        features: ['文本到视频', '视频编辑', '场景生成'],
-        api_available: false,
-        free_tier: false,
-        average_rating: 4.7,
-        total_ratings: 320
-      }
-    ]
-  },
-  {
-    id: 'anthropic',
-    name: 'Anthropic',
-    website: 'https://anthropic.com',
-    description: '专注于构建可靠、可解释的AI系统',
-    founded_year: 2021,
-    headquarters: 'San Francisco, CA',
-    industry_tags: ['AI Safety', 'LLM', 'Constitutional AI'],
-    logo_url: 'https://anthropic.com/favicon.ico',
-    valuation_usd: 61500000000,
-    tools: [
-      {
-        id: 'claude',
-        name: 'Claude',
-        category: 'Conversational AI',
-        description: 'AI助手，专注于安全、有用和诚实的对话',
-        website: 'https://claude.ai',
-        industry_tags: ['Customer Support', 'Content Creation', 'Analysis'],
-        features: ['长文本处理', '代码分析', '文档总结', '安全对话'],
-        api_available: true,
-        free_tier: true,
-        average_rating: 4.6,
-        total_ratings: 980
-      }
-    ]
-  },
-  {
-    id: 'google',
-    name: 'Google',
-    website: 'https://ai.google',
-    description: '全球科技巨头，提供广泛的AI产品和服务',
-    founded_year: 1998,
-    headquarters: 'Mountain View, CA',
-    industry_tags: ['Search', 'AI Platform', 'Cloud AI'],
-    logo_url: 'https://www.google.com/favicon.ico',
-    valuation_usd: 1800000000000,
-    tools: [
-      {
-        id: 'gemini',
-        name: 'Gemini',
-        category: 'Conversational AI',
-        description: 'Google的多模态AI模型',
-        website: 'https://gemini.google.com',
-        industry_tags: ['Multimodal AI', 'Search', 'Productivity'],
-        features: ['文本生成', '图像理解', '代码生成', '搜索增强'],
-        api_available: true,
-        free_tier: true,
-        average_rating: 4.2,
-        total_ratings: 750
-      }
-    ]
-  }
-];
-
 export default function AICompaniesCatalog() {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   
-  // 状态管理
-  const [loading, setLoading] = useState(true);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('name');
-  
-  // 评分和收藏状态
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [showFilters, setShowFilters] = useState(false);
   const [userRatings, setUserRatings] = useState<Record<string, number>>({});
   const [userFavorites, setUserFavorites] = useState<Set<string>>(new Set());
-  
-  // 故事创建
-  const [storyDialogOpen, setStoryDialogOpen] = useState(false);
-  const [selectedTool, setSelectedTool] = useState<any>(null);
-  const [selectedCompany, setSelectedCompany] = useState<any>(null);
-  const [storyTitle, setStoryTitle] = useState('');
+  const [storyDialog, setStoryDialog] = useState<{ open: boolean; tool?: Tool; company?: Company }>({ open: false });
   const [storyContent, setStoryContent] = useState('');
-  const [storyTags, setStoryTags] = useState<string[]>([]);
+  const [storyTitle, setStoryTitle] = useState('');
 
-  // 获取所有类别
-  const categories = ['all', ...Array.from(new Set(companies.flatMap(c => c.tools.map(t => t.category))))];
-  
-  // 获取所有地区
-  const regions = ['all', 'Global', 'China', 'US', 'Europe', 'Asia Pacific', 'Middle East', 'Latin America', 'Africa'];
-  const [selectedRegion, setSelectedRegion] = useState('all');
-  
-  // 获取所有技术领域
-  const techAreas = ['all', 'Video Generation', 'LLM', 'Computer Vision', 'Speech Recognition', 'Robotics', 'Autonomous Driving', 'Fintech', 'Enterprise AI'];
-  const [selectedTechArea, setSelectedTechArea] = useState('all');
+  // Categories for filtering
+  const categories = [
+    { value: 'all', label: 'All Categories' },
+    { value: 'AI Platforms', label: 'AI Platforms' },
+    { value: 'AI Development', label: 'AI Development' },
+    { value: 'Creative AI', label: 'Creative AI' },
+    { value: 'Enterprise AI', label: 'Enterprise AI' },
+    { value: 'Specialized AI', label: 'Specialized AI' },
+    { value: 'Chinese AI', label: 'Chinese AI' },
+    { value: 'Video Generation', label: 'Video Generation' },
+    { value: 'LLM', label: 'Large Language Models' },
+    { value: 'AI Assistant', label: 'AI Assistants' },
+    { value: 'Automation', label: 'Automation' },
+    { value: 'Computer Vision', label: 'Computer Vision' },
+    { value: 'Productivity', label: 'Productivity' },
+    { value: 'AI Coding', label: 'AI Coding' }
+  ];
 
-  // 页面动画
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
-      transition: { 
-        duration: 0.5, 
-        staggerChildren: 0.1,
-        delayChildren: 0.3
-      }
-    }
-  };
-  
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
-  };
+  // Sort options
+  const sortOptions = [
+    { value: 'name', label: 'Company Name' },
+    { value: 'tools_count', label: 'Number of Tools' },
+    { value: 'valuation', label: 'Valuation' },
+    { value: 'rating', label: 'Average Rating' },
+    { value: 'founded_year', label: 'Founded Year' }
+  ];
 
-  // 加载数据
   useEffect(() => {
-    loadData();
-  }, []);
-
-  // 加载用户数据
-  useEffect(() => {
-    if (user) {
+    loadCompanies();
+    if (isAuthenticated) {
       loadUserData();
     }
-  }, [user]);
+  }, [isAuthenticated]);
 
-  // 筛选和搜索
   useEffect(() => {
-    filterCompanies();
-  }, [companies, searchQuery, selectedCategory, sortBy, selectedRegion, selectedTechArea]);
+    applyFilters();
+  }, [companies, searchQuery, selectedCategory, sortBy, sortOrder]);
 
-  const loadData = async () => {
-    setLoading(true);
+  const loadCompanies = async () => {
     try {
+      setLoading(true);
       const data = await listAICompaniesWithTools();
-      setCompanies(data as Company[]);
+      setCompanies(data);
     } catch (error) {
-      console.error('Failed to load companies:', error);
-      // 如果API失败，使用模拟数据作为后备
-      setCompanies(mockCompanies);
+      console.error('Error loading companies:', error);
     } finally {
       setLoading(false);
     }
@@ -273,127 +157,82 @@ export default function AICompaniesCatalog() {
     if (!user) return;
     
     try {
-      // 加载用户评分和收藏
-      const favorites = await getUserFavorites(user.id);
-      const favoriteIds = new Set(favorites.map(f => f.tool_id));
-      setUserFavorites(favoriteIds);
-      
-      // 加载用户评分
+      // Load user ratings
       const ratings: Record<string, number> = {};
       for (const company of companies) {
         for (const tool of company.tools) {
-          const rating = await getUserRating(user.id, tool.id);
-          if (rating) {
-            ratings[tool.id] = rating.rating;
-          }
+          const rating = await getUserRating(tool.id, user.id);
+          if (rating) ratings[tool.id] = rating;
         }
       }
       setUserRatings(ratings);
+
+      // Load user favorites
+      const favorites = await getUserFavorites(user.id);
+      setUserFavorites(new Set(favorites));
     } catch (error) {
-      console.error('Failed to load user data:', error);
+      console.error('Error loading user data:', error);
     }
   };
 
-  const filterCompanies = () => {
+  const applyFilters = () => {
     let filtered = [...companies];
 
-    // 地区筛选
-    if (selectedRegion !== 'all') {
-      filtered = filtered.filter(company => {
-        const headquarters = company.headquarters || '';
-        switch (selectedRegion) {
-          case 'China':
-            return headquarters.includes('中国') || headquarters.includes('China') || 
-                   headquarters.includes('北京') || headquarters.includes('上海') || 
-                   headquarters.includes('深圳') || headquarters.includes('杭州') ||
-                   headquarters.includes('香港') || headquarters.includes('广州') ||
-                   headquarters.includes('合肥') || headquarters.includes('苏州');
-          case 'US':
-            return headquarters.includes('US') || headquarters.includes('United States') ||
-                   headquarters.includes('San Francisco') || headquarters.includes('New York') ||
-                   headquarters.includes('Mountain View') || headquarters.includes('Redmond') ||
-                   headquarters.includes('Menlo Park') || headquarters.includes('Seattle');
-          case 'Europe':
-            return headquarters.includes('UK') || headquarters.includes('London') ||
-                   headquarters.includes('Spain') || headquarters.includes('Malaga') ||
-                   headquarters.includes('France') || headquarters.includes('Paris') ||
-                   headquarters.includes('Germany') || headquarters.includes('Berlin') ||
-                   headquarters.includes('Cambridge') || headquarters.includes('Bristol');
-          case 'Asia Pacific':
-            return headquarters.includes('新加坡') || headquarters.includes('Singapore') ||
-                   headquarters.includes('日本') || headquarters.includes('Japan') ||
-                   headquarters.includes('韩国') || headquarters.includes('Korea') ||
-                   headquarters.includes('印度') || headquarters.includes('India') ||
-                   headquarters.includes('澳大利亚') || headquarters.includes('Australia') ||
-                   headquarters.includes('悉尼') || headquarters.includes('Sydney');
-          case 'Middle East':
-            return headquarters.includes('阿联酋') || headquarters.includes('UAE') ||
-                   headquarters.includes('迪拜') || headquarters.includes('Dubai') ||
-                   headquarters.includes('以色列') || headquarters.includes('Israel') ||
-                   headquarters.includes('耶路撒冷') || headquarters.includes('Jerusalem');
-          case 'Latin America':
-            return headquarters.includes('巴西') || headquarters.includes('Brazil') ||
-                   headquarters.includes('墨西哥') || headquarters.includes('Mexico') ||
-                   headquarters.includes('阿根廷') || headquarters.includes('Argentina') ||
-                   headquarters.includes('圣保罗') || headquarters.includes('São Paulo');
-          case 'Africa':
-            return headquarters.includes('南非') || headquarters.includes('South Africa') ||
-                   headquarters.includes('约翰内斯堡') || headquarters.includes('Johannesburg');
-          case 'Global':
-            return true; // 显示所有公司
-          default:
-            return true;
-        }
-      });
-    }
-
-    // 搜索筛选
+    // Search filter
     if (searchQuery) {
+      const query = searchQuery.toLowerCase();
       filtered = filtered.filter(company => 
-        company.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        company.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        company.industry_tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        company.name.toLowerCase().includes(query) ||
+        company.description.toLowerCase().includes(query) ||
+        company.industry_tags.some(tag => tag.toLowerCase().includes(query)) ||
         company.tools.some(tool => 
-          tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          tool.description.toLowerCase().includes(searchQuery.toLowerCase())
+          tool.name.toLowerCase().includes(query) ||
+          tool.description.toLowerCase().includes(query)
         )
       );
     }
 
-    // 技术领域筛选
-    if (selectedTechArea !== 'all') {
-      filtered = filtered.filter(company => 
-        company.industry_tags.includes(selectedTechArea) ||
-        company.tools.some(tool => 
-          tool.industry_tags.includes(selectedTechArea) ||
-          tool.category === selectedTechArea
-        )
-      );
-    }
-
-    // 类别筛选
+    // Category filter
     if (selectedCategory !== 'all') {
-      filtered = filtered.map(company => ({
-        ...company,
-        tools: company.tools.filter(tool => tool.category === selectedCategory)
-      })).filter(company => company.tools.length > 0);
+      filtered = filtered.filter(company => 
+        company.industry_tags.includes(selectedCategory)
+      );
     }
 
-    // 排序
+    // Sort
     filtered.sort((a, b) => {
+      let aValue: any, bValue: any;
+      
       switch (sortBy) {
         case 'name':
-          return a.name.localeCompare(b.name);
-        case 'valuation':
-          return (b.valuation_usd || 0) - (a.valuation_usd || 0);
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+          break;
         case 'tools_count':
-          return b.tools.length - a.tools.length;
+          aValue = a.tools.length;
+          bValue = b.tools.length;
+          break;
+        case 'valuation':
+          aValue = a.valuation_usd || 0;
+          bValue = b.valuation_usd || 0;
+          break;
         case 'rating':
-          const aAvg = a.tools.reduce((sum, tool) => sum + (tool.tool_stats?.average_rating || 0), 0) / a.tools.length;
-          const bAvg = b.tools.reduce((sum, tool) => sum + (tool.tool_stats?.average_rating || 0), 0) / b.tools.length;
-          return bAvg - aAvg;
+          aValue = a.tools.reduce((sum, tool) => sum + (tool.tool_stats?.average_rating || 0), 0) / a.tools.length || 0;
+          bValue = b.tools.reduce((sum, tool) => sum + (tool.tool_stats?.average_rating || 0), 0) / b.tools.length || 0;
+          break;
+        case 'founded_year':
+          aValue = a.founded_year || 0;
+          bValue = b.founded_year || 0;
+          break;
         default:
-          return 0;
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+      }
+
+      if (sortOrder === 'asc') {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
       }
     });
 
@@ -401,23 +240,24 @@ export default function AICompaniesCatalog() {
   };
 
   const handleRating = async (toolId: string, rating: number) => {
-    if (!user) {
+    if (!isAuthenticated || !user) {
       navigate('/auth');
       return;
     }
 
     try {
-      await submitRating(user.id, toolId, rating);
+      await submitRating(toolId, rating, user.id);
       setUserRatings(prev => ({ ...prev, [toolId]: rating }));
-      // 重新加载数据以更新统计
-      loadData();
+      
+      // Reload companies to get updated ratings
+      loadCompanies();
     } catch (error) {
-      console.error('Failed to submit rating:', error);
+      console.error('Error submitting rating:', error);
     }
   };
 
   const handleFavorite = async (toolId: string) => {
-    if (!user) {
+    if (!isAuthenticated || !user) {
       navigate('/auth');
       return;
     }
@@ -425,84 +265,48 @@ export default function AICompaniesCatalog() {
     try {
       const isFav = userFavorites.has(toolId);
       if (isFav) {
-        await removeFromFavorites(user.id, toolId);
+        await removeFromFavorites(toolId, user.id);
         setUserFavorites(prev => {
           const newSet = new Set(prev);
           newSet.delete(toolId);
           return newSet;
         });
       } else {
-        await addToFavorites(user.id, toolId);
-        setUserFavorites(prev => new Set([...prev, toolId]));
+        await addToFavorites(toolId, user.id);
+        setUserFavorites(prev => new Set(prev).add(toolId));
       }
-      // 重新加载数据以更新统计
-      loadData();
     } catch (error) {
-      console.error('Failed to toggle favorite:', error);
+      console.error('Error updating favorite:', error);
     }
   };
 
-  const handleCreateStory = async () => {
-    if (!user) {
+  const openStoryDialog = (tool: Tool, company: Company) => {
+    if (!isAuthenticated) {
       navigate('/auth');
+      return;
+    }
+    setStoryDialog({ open: true, tool, company });
+  };
+
+  const submitStory = async () => {
+    if (!storyDialog.tool || !storyDialog.company || !storyTitle.trim() || !storyContent.trim()) {
       return;
     }
 
     try {
-      const response = await fetch('/api/create-tool-story', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title: storyTitle,
-          content: storyContent,
-          tags: storyTags,
-          toolId: selectedTool?.id,
-          companyId: selectedCompany?.id,
-          userId: user.id
-        })
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log('故事创建成功:', result);
-        
-        // 重置表单
-        setStoryDialogOpen(false);
-        setStoryTitle('');
-        setStoryContent('');
-        setStoryTags([]);
-        setSelectedTool(null);
-        setSelectedCompany(null);
-        
-        // 可以添加成功提示
-        alert('故事创建成功！');
-      } else {
-        console.error('故事创建失败');
-        alert('故事创建失败，请重试');
-      }
+      const storyData = {
+        title: storyTitle,
+        content: storyContent,
+        tags: [storyDialog.company.name, storyDialog.tool.name, ...storyDialog.tool.industry_tags]
+      };
+      await linkStoryToTool(storyDialog.tool.id, JSON.stringify(storyData));
+      
+      setStoryDialog({ open: false });
+      setStoryTitle('');
+      setStoryContent('');
     } catch (error) {
-      console.error('故事创建错误:', error);
-      alert('故事创建失败，请重试');
+      console.error('Error submitting story:', error);
     }
-  };
-
-  const openStoryDialog = (tool?: any, company?: any) => {
-    setSelectedTool(tool || null);
-    setSelectedCompany(company || null);
-    
-    // 预填充标签
-    const tags: string[] = [];
-    if (tool) {
-      tags.push(tool.name, tool.category, ...tool.industry_tags);
-    }
-    if (company) {
-      tags.push(company.name, ...company.industry_tags);
-    }
-    setStoryTags(tags);
-    
-    setStoryDialogOpen(true);
   };
 
   const renderStars = (rating: number, toolId: string, interactive: boolean = false) => {
@@ -526,241 +330,269 @@ export default function AICompaniesCatalog() {
           {rating.toFixed(1)}
         </span>
         {userRating > 0 && (
-          <span className="text-xs text-primary ml-0.5 sm:ml-1 hidden sm:inline">(已评分)</span>
+          <span className="text-xs text-primary ml-0.5 sm:ml-1 hidden sm:inline">(Rated)</span>
         )}
       </div>
     );
   };
 
-  const formatCurrency = (amount: number) => {
-    if (amount >= 1000000000) {
-      return `$${(amount / 1000000000).toFixed(1)}B`;
-    } else if (amount >= 1000000) {
-      return `$${(amount / 1000000).toFixed(1)}M`;
-    } else if (amount >= 1000) {
-      return `$${(amount / 1000).toFixed(1)}K`;
-    }
-    return `$${amount}`;
+  const formatValuation = (valuation?: number) => {
+    if (!valuation) return 'N/A';
+    if (valuation >= 1e12) return `$${(valuation / 1e12).toFixed(1)}T`;
+    if (valuation >= 1e9) return `$${(valuation / 1e9).toFixed(1)}B`;
+    if (valuation >= 1e6) return `$${(valuation / 1e6).toFixed(1)}M`;
+    return `$${valuation.toLocaleString()}`;
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
   return (
-    <motion.div 
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="min-h-screen bg-background"
-    >
-      <PageHero 
-        titleKey="全球AI公司目录"
-        subtitleKey="探索全球领先的AI公司及其工具套件，涵盖视频生成、大语言模型、计算机视觉等各技术领域"
-        icon={Building}
-      />
+    <div className="min-h-screen bg-background">
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
+        <div className="container-custom text-center">
+          <h1 className="text-4xl font-bold mb-4">AI Companies Catalog</h1>
+          <p className="text-xl opacity-90">Discover and explore leading AI companies and their innovative tools</p>
+        </div>
+      </div>
 
       <div className="container-custom py-8">
-        {/* 搜索和筛选 */}
-        <motion.div variants={itemVariants} className="mb-6">
-          <Card className="border border-border/50 dark:border-border/30">
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex flex-col gap-4">
-                {/* 搜索栏 */}
-                <div className="flex-1">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                    <Input
-                      placeholder="搜索公司、工具或技术... (支持中英文)"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 h-11"
-                    />
-                  </div>
-                </div>
-                
-                {/* 筛选器 - 响应式网格布局 */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                  <Select value={selectedRegion} onValueChange={setSelectedRegion}>
-                    <SelectTrigger className="h-11">
-                      <SelectValue placeholder="选择地区" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {regions.map(region => (
-                        <SelectItem key={region} value={region}>
-                          {region === 'all' ? '所有地区' : region}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+        {/* Search and Filter Section */}
+        <div className="mb-8">
+          <div className="flex flex-col lg:flex-row gap-4 items-center justify-between mb-6">
+            {/* Search */}
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Input
+                placeholder="Search companies, tools, or categories..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
 
-                  <Select value={selectedTechArea} onValueChange={setSelectedTechArea}>
-                    <SelectTrigger className="h-11">
-                      <SelectValue placeholder="技术领域" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {techAreas.map(area => (
-                        <SelectItem key={area} value={area}>
-                          {area === 'all' ? '所有技术领域' : area}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+            {/* View Controls */}
+            <div className="flex items-center gap-2">
+              <Button
+                variant={viewMode === 'grid' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('grid')}
+              >
+                <Grid className="w-4 h-4" />
+              </Button>
+              <Button
+                variant={viewMode === 'list' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('list')}
+              >
+                <List className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowFilters(!showFilters)}
+              >
+                <Filter className="w-4 h-4 mr-2" />
+                Filters
+                {showFilters ? <ChevronDown className="w-4 h-4 ml-2" /> : <ChevronRight className="w-4 h-4 ml-2" />}
+              </Button>
+            </div>
+          </div>
 
-                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                    <SelectTrigger className="h-11">
-                      <SelectValue placeholder="选择类别" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map(category => (
-                        <SelectItem key={category} value={category}>
-                          {category === 'all' ? '所有类别' : category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="h-11">
-                      <SelectValue placeholder="排序方式" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="name">按名称</SelectItem>
-                      <SelectItem value="valuation">按估值</SelectItem>
-                      <SelectItem value="tools_count">按工具数量</SelectItem>
-                      <SelectItem value="rating">按评分</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+          {/* Advanced Filters */}
+          {showFilters && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-muted/30 rounded-lg mb-6"
+            >
+              <div>
+                <Label className="text-sm font-medium mb-2 block">Category</Label>
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger className="h-11">
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map(category => (
+                      <SelectItem key={category.value} value={category.value}>
+                        {category.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-            </CardContent>
-          </Card>
-        </motion.div>
 
-        {/* 公司列表 */}
-        <motion.div variants={itemVariants}>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+              <div>
+                <Label className="text-sm font-medium mb-2 block">Sort By</Label>
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="h-11">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {sortOptions.map(option => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium mb-2 block">Order</Label>
+                <Select value={sortOrder} onValueChange={(value: 'asc' | 'desc') => setSortOrder(value)}>
+                  <SelectTrigger className="h-11">
+                    <SelectValue placeholder="Sort order" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="asc">
+                      <div className="flex items-center gap-2">
+                        <SortAsc className="w-4 h-4" />
+                        Ascending
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="desc">
+                      <div className="flex items-center gap-2">
+                        <SortDesc className="w-4 h-4" />
+                        Descending
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex items-end">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSelectedCategory('all');
+                    setSortBy('name');
+                    setSortOrder('asc');
+                  }}
+                  className="w-full"
+                >
+                  Clear Filters
+                </Button>
+              </div>
+            </motion.div>
+          )}
+        </div>
+
+        {/* Results Summary */}
+        <div className="mb-6">
+          <p className="text-muted-foreground">
+            Showing {filteredCompanies.length} of {companies.length} companies
+            {searchQuery && ` matching "${searchQuery}"`}
+            {selectedCategory !== 'all' && ` in ${selectedCategory}`}
+          </p>
+        </div>
+
+        {/* Companies Grid/List */}
+        {viewMode === 'grid' ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredCompanies.map((company) => (
-              <Card key={company.id} className="hover:shadow-lg transition-all duration-300 border border-border/50 dark:border-border/30 hover:border-border dark:hover:border-border/50">
-                <CardHeader className="pb-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      {company.logo_url && (
-                        <img 
-                          src={company.logo_url} 
-                          alt={company.name}
-                          className="w-12 h-12 rounded-lg object-contain bg-background/50 p-1"
-                        />
-                      )}
-                      <div className="flex-1">
-                        <CardTitle className="text-lg text-foreground">
-                          <Link to={`/ai-companies/${company.id}`} className="hover:text-primary transition-colors">
-                            {company.name}
-                          </Link>
-                        </CardTitle>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Globe className="w-4 h-4" />
-                          <a 
-                            href={company.website} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="hover:text-primary transition-colors"
-                          >
-                            {company.website?.replace('https://', '')}
-                          </a>
+              <motion.div
+                key={company.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Card className="h-full hover:shadow-lg transition-all duration-300 border border-border/50 dark:border-border/30 hover:border-border dark:hover:border-border/50">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center overflow-hidden">
+                          {company.logo_url ? (
+                            <img
+                              src={company.logo_url}
+                              alt={company.name}
+                              className="w-full h-full object-contain"
+                            />
+                          ) : (
+                            <Building className="w-6 h-6 text-muted-foreground" />
+                          )}
+                        </div>
+                        <div>
+                          <CardTitle className="text-lg">{company.name}</CardTitle>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Globe className="w-3 h-3" />
+                            <span>{company.headquarters || 'Unknown'}</span>
+                          </div>
                         </div>
                       </div>
+                      {company.website && (
+                        <Button variant="ghost" size="sm" asChild>
+                          <a href={company.website} target="_blank" rel="noopener noreferrer">
+                            <ExternalLink className="w-4 h-4" />
+                          </a>
+                        </Button>
+                      )}
                     </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => openStoryDialog(undefined, company)}
-                        className="border-border/50 hover:border-primary/50"
-                      >
-                        <Plus className="w-4 h-4 mr-1" />
-                        故事
-                      </Button>
+                  </CardHeader>
+
+                  <CardContent className="space-y-4">
+                    <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
+                      {company.description}
+                    </p>
+
+                    {/* Company Stats */}
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="flex items-center gap-2">
+                        <Wrench className="w-4 h-4 text-muted-foreground" />
+                        <span>{company.tools.length} tools</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="w-4 h-4 text-muted-foreground" />
+                        <span>{formatValuation(company.valuation_usd)}</span>
+                      </div>
                     </div>
-                  </div>
-                </CardHeader>
 
-                <CardContent className="space-y-4">
-                  {/* 公司描述 */}
-                  <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
-                    {company.description}
-                  </p>
-
-                  {/* 公司信息 */}
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    {company.founded_year && (
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Calendar className="w-4 h-4" />
-                        <span>成立于 {company.founded_year}</span>
-                      </div>
-                    )}
-                    {company.headquarters && (
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Building className="w-4 h-4" />
-                        <span>{company.headquarters}</span>
-                      </div>
-                    )}
-                    {company.valuation_usd && (
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <DollarSign className="w-4 h-4" />
-                        <span>估值 {formatCurrency(company.valuation_usd)}</span>
-                      </div>
-                    )}
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Wrench className="w-4 h-4" />
-                      <span>{company.tools.length} 个工具</span>
+                    {/* Industry Tags */}
+                    <div className="flex flex-wrap gap-1">
+                      {company.industry_tags.slice(0, 3).map((tag) => (
+                        <Badge key={tag} variant="secondary" className="text-xs">
+                          {tag}
+                        </Badge>
+                      ))}
+                      {company.industry_tags.length > 3 && (
+                        <Badge variant="outline" className="text-xs">
+                          +{company.industry_tags.length - 3}
+                        </Badge>
+                      )}
                     </div>
-                  </div>
 
-                  {/* 行业标签 */}
-                  <div className="flex flex-wrap gap-2">
-                    {company.industry_tags.slice(0, 3).map((tag) => (
-                      <Badge key={tag} variant="secondary" className="text-xs bg-secondary/50 hover:bg-secondary/70 transition-colors">
-                        {tag}
-                      </Badge>
-                    ))}
-                    {company.industry_tags.length > 3 && (
-                      <Badge variant="outline" className="text-xs border-border/50">
-                        +{company.industry_tags.length - 3}
-                      </Badge>
-                    )}
-                  </div>
-
-                  {/* 工具列表 */}
-                  <div className="space-y-2">
-                    <h4 className="font-medium text-sm text-foreground">工具套件</h4>
+                    {/* Tools Preview */}
                     <div className="space-y-2">
-                      {company.tools.slice(0, 3).map((tool) => (
-                        <div key={tool.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border/30 hover:bg-muted/50 transition-colors">
-                          <div className="flex-1 mr-3">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="font-medium text-sm text-foreground">{tool.name}</span>
-                              <Badge variant="outline" className="text-xs border-border/50">
-                                {tool.category}
-                              </Badge>
-                              {tool.free_tier && (
-                                <Badge variant="default" className="text-xs bg-green-500/20 text-green-700 dark:text-green-300 border-green-500/30">
-                                  免费
-                                </Badge>
-                              )}
-                              {tool.api_available && (
-                                <Badge variant="secondary" className="text-xs bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-500/30">
-                                  API
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-                              {tool.description}
-                            </p>
-                          </div>
-                          
-                          <div className="flex items-center justify-between gap-2">
-                            <div className="flex items-center gap-1 sm:gap-2 min-w-0 flex-1">
-                              {renderStars(tool.tool_stats?.average_rating || 0, tool.id, true)}
+                      <h4 className="text-sm font-medium flex items-center gap-2">
+                        <Wrench className="w-4 h-4" />
+                        Key Tools
+                      </h4>
+                      <div className="space-y-2">
+                        {company.tools.slice(0, 2).map((tool) => (
+                          <div key={tool.id} className="flex items-center justify-between p-2 bg-muted/50 rounded-lg">
+                            <div className="flex items-center gap-2 min-w-0 flex-1">
+                              <div className="w-6 h-6 rounded bg-background flex items-center justify-center">
+                                {tool.logo_url ? (
+                                  <img
+                                    src={tool.logo_url}
+                                    alt={tool.name}
+                                    className="w-full h-full object-contain"
+                                  />
+                                ) : (
+                                  <Wrench className="w-3 h-3 text-muted-foreground" />
+                                )}
+                              </div>
+                              <span className="text-sm font-medium truncate">{tool.name}</span>
                             </div>
                             <div className="flex items-center gap-1">
+                              {renderStars(tool.tool_stats?.average_rating || 0, tool.id, true)}
                               <Button
                                 size="sm"
                                 variant="ghost"
@@ -785,77 +617,197 @@ export default function AICompaniesCatalog() {
                               </Button>
                             </div>
                           </div>
-                        </div>
-                      ))}
-                      {company.tools.length > 3 && (
-                        <div className="text-center pt-2">
-                          <Button variant="outline" size="sm" className="border-border/50 hover:border-primary/50">
-                            查看全部 {company.tools.length} 个工具
-                          </Button>
-                        </div>
-                      )}
+                        ))}
+                        {company.tools.length > 2 && (
+                          <p className="text-xs text-muted-foreground text-center">
+                            +{company.tools.length - 2} more tools
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+
+                    {/* Action Button */}
+                    <Button asChild className="w-full">
+                      <Link to={`/ai-companies/${company.id}`}>
+                        View Details
+                      </Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
           </div>
-        </motion.div>
+        ) : (
+          <div className="space-y-4">
+            {filteredCompanies.map((company) => (
+              <motion.div
+                key={company.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Card className="hover:shadow-lg transition-all duration-300 border border-border/50 dark:border-border/30 hover:border-border dark:hover:border-border/50">
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-4">
+                      <div className="w-16 h-16 rounded-lg bg-muted flex items-center justify-center overflow-hidden flex-shrink-0">
+                        {company.logo_url ? (
+                          <img
+                            src={company.logo_url}
+                            alt={company.name}
+                            className="w-full h-full object-contain"
+                          />
+                        ) : (
+                          <Building className="w-8 h-8 text-muted-foreground" />
+                        )}
+                      </div>
 
-        {/* 故事创建对话框 */}
-        <Dialog open={storyDialogOpen} onOpenChange={setStoryDialogOpen}>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>
-                创建故事 - {selectedTool?.name || selectedCompany?.name}
-              </DialogTitle>
-            </DialogHeader>
-            
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="story-title">标题</Label>
-                <Input
-                  id="story-title"
-                  value={storyTitle}
-                  onChange={(e) => setStoryTitle(e.target.value)}
-                  placeholder="输入故事标题..."
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="story-content">内容</Label>
-                <Textarea
-                  id="story-content"
-                  value={storyContent}
-                  onChange={(e) => setStoryContent(e.target.value)}
-                  placeholder="分享你的使用体验、评价或见解..."
-                  rows={6}
-                />
-              </div>
-              
-              <div>
-                <Label>标签（已预填充）</Label>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {storyTags.map((tag, index) => (
-                    <Badge key={index} variant="secondary">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-              
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setStoryDialogOpen(false)}>
-                  取消
-                </Button>
-                <Button onClick={handleCreateStory}>
-                  创建故事
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between mb-2">
+                          <div>
+                            <h3 className="text-xl font-semibold">{company.name}</h3>
+                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                              <div className="flex items-center gap-1">
+                                <Globe className="w-4 h-4" />
+                                <span>{company.headquarters || 'Unknown'}</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <Wrench className="w-4 h-4" />
+                                <span>{company.tools.length} tools</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <DollarSign className="w-4 h-4" />
+                                <span>{formatValuation(company.valuation_usd)}</span>
+                              </div>
+                            </div>
+                          </div>
+                          {company.website && (
+                            <Button variant="ghost" size="sm" asChild>
+                              <a href={company.website} target="_blank" rel="noopener noreferrer">
+                                <ExternalLink className="w-4 h-4" />
+                              </a>
+                            </Button>
+                          )}
+                        </div>
+
+                        <p className="text-muted-foreground mb-3 line-clamp-2 leading-relaxed">
+                          {company.description}
+                        </p>
+
+                        <div className="flex flex-wrap gap-1 mb-4">
+                          {company.industry_tags.slice(0, 5).map((tag) => (
+                            <Badge key={tag} variant="secondary" className="text-xs">
+                              {tag}
+                            </Badge>
+                          ))}
+                          {company.industry_tags.length > 5 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{company.industry_tags.length - 5}
+                            </Badge>
+                          )}
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            {company.tools.slice(0, 3).map((tool) => (
+                              <div key={tool.id} className="flex items-center gap-2">
+                                <div className="w-6 h-6 rounded bg-muted flex items-center justify-center">
+                                  {tool.logo_url ? (
+                                    <img
+                                      src={tool.logo_url}
+                                      alt={tool.name}
+                                      className="w-full h-full object-contain"
+                                    />
+                                  ) : (
+                                    <Wrench className="w-3 h-3 text-muted-foreground" />
+                                  )}
+                                </div>
+                                <span className="text-sm font-medium">{tool.name}</span>
+                                {renderStars(tool.tool_stats?.average_rating || 0, tool.id, true)}
+                              </div>
+                            ))}
+                            {company.tools.length > 3 && (
+                              <span className="text-sm text-muted-foreground">
+                                +{company.tools.length - 3} more
+                              </span>
+                            )}
+                          </div>
+
+                          <Button asChild>
+                            <Link to={`/ai-companies/${company.id}`}>
+                              View Details
+                            </Link>
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        )}
+
+        {filteredCompanies.length === 0 && (
+          <div className="text-center py-12">
+            <Building className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No companies found</h3>
+            <p className="text-muted-foreground mb-4">
+              Try adjusting your search criteria or filters
+            </p>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setSearchQuery('');
+                setSelectedCategory('all');
+                setSortBy('name');
+                setSortOrder('asc');
+              }}
+            >
+              Clear Filters
+            </Button>
+          </div>
+        )}
       </div>
-    </motion.div>
+
+      {/* Story Creation Dialog */}
+      <Dialog open={storyDialog.open} onOpenChange={(open) => setStoryDialog({ open })}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              Create Story for {storyDialog.tool?.name}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="story-title">Story Title</Label>
+              <Input
+                id="story-title"
+                value={storyTitle}
+                onChange={(e) => setStoryTitle(e.target.value)}
+                placeholder="Enter a compelling title for your story..."
+              />
+            </div>
+            <div>
+              <Label htmlFor="story-content">Story Content</Label>
+              <Textarea
+                id="story-content"
+                value={storyContent}
+                onChange={(e) => setStoryContent(e.target.value)}
+                placeholder="Share your experience with this tool..."
+                rows={6}
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setStoryDialog({ open: false })}>
+                Cancel
+              </Button>
+              <Button onClick={submitStory} disabled={!storyTitle.trim() || !storyContent.trim()}>
+                Submit Story
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }

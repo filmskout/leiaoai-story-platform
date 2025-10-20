@@ -122,11 +122,6 @@ export default function Layout() {
       icon: <Bot size={18} />
     },
     {
-      path: '/ai-companies',
-      label: 'AI Companies',
-      icon: <Building size={18} />
-    },
-    {
       path: '/stories',
       label: t('nav.stories'),
       icon: <BookOpen size={18} />
@@ -471,9 +466,6 @@ export default function Layout() {
               </Link>
               <Link to="/contact" className="hover:text-foreground transition-colors">
                 {t('nav.contact')}
-              </Link>
-              <Link to="/monitoring" className="hover:text-foreground transition-colors">
-                Monitoring Dashboard
               </Link>
             </div>
           </div>
