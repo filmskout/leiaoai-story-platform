@@ -29,11 +29,14 @@ import {
   Grid,
   List,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  Crown,
+  Zap,
+  Target,
+  Layers
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { PageHero } from '@/components/PageHero';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
@@ -68,6 +71,9 @@ type Tool = {
   free_tier?: boolean;
   api_available?: boolean;
   tool_stats?: { average_rating?: number; total_ratings?: number };
+  tool_category?: string;
+  tool_subcategory?: string;
+  focus_areas?: string[];
 };
 
 type Company = {
@@ -81,6 +87,10 @@ type Company = {
   logo_url?: string;
   valuation_usd?: number;
   tools: Tool[];
+  company_type?: string;
+  company_tier?: string;
+  company_category?: string;
+  focus_areas?: string[];
 };
 
 export default function AICompaniesCatalog() {
@@ -92,7 +102,9 @@ export default function AICompaniesCatalog() {
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCompanyType, setSelectedCompanyType] = useState('all');
+  const [selectedCompanyTier, setSelectedCompanyTier] = useState('all');
+  const [selectedToolCategory, setSelectedToolCategory] = useState('all');
   const [sortBy, setSortBy] = useState('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -103,27 +115,40 @@ export default function AICompaniesCatalog() {
   const [storyContent, setStoryContent] = useState('');
   const [storyTitle, setStoryTitle] = useState('');
 
-  // Categories for filtering
-  const categories = [
-    { value: 'all', label: 'All Categories' },
-    { value: 'AI Platforms', label: 'AI Platforms' },
-    { value: 'AI Development', label: 'AI Development' },
-    { value: 'Creative AI', label: 'Creative AI' },
-    { value: 'Enterprise AI', label: 'Enterprise AI' },
-    { value: 'Specialized AI', label: 'Specialized AI' },
-    { value: 'Chinese AI', label: 'Chinese AI' },
-    { value: 'Video Generation', label: 'Video Generation' },
-    { value: 'LLM', label: 'Large Language Models' },
-    { value: 'AI Assistant', label: 'AI Assistants' },
-    { value: 'Automation', label: 'Automation' },
-    { value: 'Computer Vision', label: 'Computer Vision' },
-    { value: 'Productivity', label: 'Productivity' },
-    { value: 'AI Coding', label: 'AI Coding' }
+  // Company type filters
+  const companyTypes = [
+    { value: 'all', label: 'All Company Types' },
+    { value: 'AI Giant', label: 'AI Giants', icon: Crown, color: 'text-yellow-500' },
+    { value: 'Independent AI', label: 'Independent AI', icon: Zap, color: 'text-blue-500' },
+    { value: 'AI Company', label: 'AI Companies', icon: Building, color: 'text-green-500' }
+  ];
+
+  // Company tier filters
+  const companyTiers = [
+    { value: 'all', label: 'All Tiers' },
+    { value: 'Tier 1', label: 'Tier 1 Giants', icon: Crown, color: 'text-yellow-600' },
+    { value: 'Tier 2', label: 'Tier 2 Giants', icon: Crown, color: 'text-yellow-500' },
+    { value: 'Independent', label: 'Independent', icon: Zap, color: 'text-blue-500' },
+    { value: 'Emerging', label: 'Emerging', icon: Target, color: 'text-green-500' }
+  ];
+
+  // Tool category filters
+  const toolCategories = [
+    { value: 'all', label: 'All Tool Categories' },
+    { value: 'LLM & Language Models', label: 'LLM & Language Models', icon: Layers, color: 'text-purple-500' },
+    { value: 'Image Processing & Generation', label: 'Image Processing & Generation', icon: Target, color: 'text-pink-500' },
+    { value: 'Video Processing & Generation', label: 'Video Processing & Generation', icon: Target, color: 'text-red-500' },
+    { value: 'Professional Domain Analysis', label: 'Professional Domain Analysis', icon: Building, color: 'text-blue-500' },
+    { value: 'Virtual Companions', label: 'Virtual Companions', icon: Users, color: 'text-green-500' },
+    { value: 'Virtual Employees & Assistants', label: 'Virtual Employees & Assistants', icon: Users, color: 'text-indigo-500' },
+    { value: 'Voice & Audio AI', label: 'Voice & Audio AI', icon: Target, color: 'text-orange-500' },
+    { value: 'Search & Information Retrieval', label: 'Search & Information Retrieval', icon: Search, color: 'text-cyan-500' }
   ];
 
   // Sort options
   const sortOptions = [
     { value: 'name', label: 'Company Name' },
+    { value: 'company_tier', label: 'Company Tier' },
     { value: 'tools_count', label: 'Number of Tools' },
     { value: 'valuation', label: 'Valuation' },
     { value: 'rating', label: 'Average Rating' },
@@ -139,7 +164,7 @@ export default function AICompaniesCatalog() {
 
   useEffect(() => {
     applyFilters();
-  }, [companies, searchQuery, selectedCategory, sortBy, sortOrder]);
+  }, [companies, searchQuery, selectedCompanyType, selectedCompanyTier, selectedToolCategory, sortBy, sortOrder]);
 
   const loadCompanies = async () => {
     try {
@@ -192,10 +217,24 @@ export default function AICompaniesCatalog() {
       );
     }
 
-    // Category filter
-    if (selectedCategory !== 'all') {
+    // Company type filter
+    if (selectedCompanyType !== 'all') {
       filtered = filtered.filter(company => 
-        company.industry_tags.includes(selectedCategory)
+        company.company_type === selectedCompanyType
+      );
+    }
+
+    // Company tier filter
+    if (selectedCompanyTier !== 'all') {
+      filtered = filtered.filter(company => 
+        company.company_tier === selectedCompanyTier
+      );
+    }
+
+    // Tool category filter
+    if (selectedToolCategory !== 'all') {
+      filtered = filtered.filter(company => 
+        company.tools.some(tool => tool.tool_category === selectedToolCategory)
       );
     }
 
@@ -207,6 +246,11 @@ export default function AICompaniesCatalog() {
         case 'name':
           aValue = a.name.toLowerCase();
           bValue = b.name.toLowerCase();
+          break;
+        case 'company_tier':
+          const tierOrder = { 'Tier 1': 1, 'Tier 2': 2, 'Independent': 3, 'Emerging': 4 };
+          aValue = tierOrder[a.company_tier as keyof typeof tierOrder] || 5;
+          bValue = tierOrder[b.company_tier as keyof typeof tierOrder] || 5;
           break;
         case 'tools_count':
           aValue = a.tools.length;
@@ -344,6 +388,34 @@ export default function AICompaniesCatalog() {
     return `$${valuation.toLocaleString()}`;
   };
 
+  const getCompanyTypeIcon = (companyType?: string) => {
+    switch (companyType) {
+      case 'AI Giant':
+        return <Crown className="w-4 h-4 text-yellow-500" />;
+      case 'Independent AI':
+        return <Zap className="w-4 h-4 text-blue-500" />;
+      default:
+        return <Building className="w-4 h-4 text-green-500" />;
+    }
+  };
+
+  const getCompanyTierBadge = (tier?: string) => {
+    if (!tier) return null;
+    
+    const tierColors = {
+      'Tier 1': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
+      'Tier 2': 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/10 dark:text-yellow-500',
+      'Independent': 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
+      'Emerging': 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+    };
+
+    return (
+      <Badge className={`text-xs ${tierColors[tier as keyof typeof tierColors] || 'bg-gray-100 text-gray-800'}`}>
+        {tier}
+      </Badge>
+    );
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -357,7 +429,7 @@ export default function AICompaniesCatalog() {
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
         <div className="container-custom text-center">
           <h1 className="text-4xl font-bold mb-4">AI Companies Catalog</h1>
-          <p className="text-xl opacity-90">Discover and explore leading AI companies and their innovative tools</p>
+          <p className="text-xl opacity-90">Discover AI Giants, Independent AI companies, and their specialized tools</p>
         </div>
       </div>
 
@@ -410,18 +482,59 @@ export default function AICompaniesCatalog() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-muted/30 rounded-lg mb-6"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 p-4 bg-muted/30 rounded-lg mb-6"
             >
               <div>
-                <Label className="text-sm font-medium mb-2 block">Category</Label>
-                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <Label className="text-sm font-medium mb-2 block">Company Type</Label>
+                <Select value={selectedCompanyType} onValueChange={setSelectedCompanyType}>
+                  <SelectTrigger className="h-11">
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {companyTypes.map(type => (
+                      <SelectItem key={type.value} value={type.value}>
+                        <div className="flex items-center gap-2">
+                          {type.icon && <type.icon className={`w-4 h-4 ${type.color}`} />}
+                          {type.label}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium mb-2 block">Company Tier</Label>
+                <Select value={selectedCompanyTier} onValueChange={setSelectedCompanyTier}>
+                  <SelectTrigger className="h-11">
+                    <SelectValue placeholder="Select tier" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {companyTiers.map(tier => (
+                      <SelectItem key={tier.value} value={tier.value}>
+                        <div className="flex items-center gap-2">
+                          {tier.icon && <tier.icon className={`w-4 h-4 ${tier.color}`} />}
+                          {tier.label}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium mb-2 block">Tool Category</Label>
+                <Select value={selectedToolCategory} onValueChange={setSelectedToolCategory}>
                   <SelectTrigger className="h-11">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
-                    {categories.map(category => (
+                    {toolCategories.map(category => (
                       <SelectItem key={category.value} value={category.value}>
-                        {category.label}
+                        <div className="flex items-center gap-2">
+                          {category.icon && <category.icon className={`w-4 h-4 ${category.color}`} />}
+                          {category.label}
+                        </div>
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -466,21 +579,6 @@ export default function AICompaniesCatalog() {
                   </SelectContent>
                 </Select>
               </div>
-
-              <div className="flex items-end">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setSearchQuery('');
-                    setSelectedCategory('all');
-                    setSortBy('name');
-                    setSortOrder('asc');
-                  }}
-                  className="w-full"
-                >
-                  Clear Filters
-                </Button>
-              </div>
             </motion.div>
           )}
         </div>
@@ -490,7 +588,9 @@ export default function AICompaniesCatalog() {
           <p className="text-muted-foreground">
             Showing {filteredCompanies.length} of {companies.length} companies
             {searchQuery && ` matching "${searchQuery}"`}
-            {selectedCategory !== 'all' && ` in ${selectedCategory}`}
+            {selectedCompanyType !== 'all' && ` of type ${selectedCompanyType}`}
+            {selectedCompanyTier !== 'all' && ` at ${selectedCompanyTier} tier`}
+            {selectedToolCategory !== 'all' && ` with ${selectedToolCategory} tools`}
           </p>
         </div>
 
@@ -520,10 +620,16 @@ export default function AICompaniesCatalog() {
                           )}
                         </div>
                         <div>
-                          <CardTitle className="text-lg">{company.name}</CardTitle>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Globe className="w-3 h-3" />
-                            <span>{company.headquarters || 'Unknown'}</span>
+                          <div className="flex items-center gap-2 mb-1">
+                            <CardTitle className="text-lg">{company.name}</CardTitle>
+                            {getCompanyTypeIcon(company.company_type)}
+                          </div>
+                          <div className="flex items-center gap-2 mb-1">
+                            {getCompanyTierBadge(company.company_tier)}
+                            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                              <Globe className="w-3 h-3" />
+                              <span>{company.headquarters || 'Unknown'}</span>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -554,19 +660,24 @@ export default function AICompaniesCatalog() {
                       </div>
                     </div>
 
-                    {/* Industry Tags */}
-                    <div className="flex flex-wrap gap-1">
-                      {company.industry_tags.slice(0, 3).map((tag) => (
-                        <Badge key={tag} variant="secondary" className="text-xs">
-                          {tag}
-                        </Badge>
-                      ))}
-                      {company.industry_tags.length > 3 && (
-                        <Badge variant="outline" className="text-xs">
-                          +{company.industry_tags.length - 3}
-                        </Badge>
-                      )}
-                    </div>
+                    {/* Focus Areas */}
+                    {company.focus_areas && company.focus_areas.length > 0 && (
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-medium">Focus Areas</h4>
+                        <div className="flex flex-wrap gap-1">
+                          {company.focus_areas.slice(0, 3).map((area) => (
+                            <Badge key={area} variant="outline" className="text-xs">
+                              {area}
+                            </Badge>
+                          ))}
+                          {company.focus_areas.length > 3 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{company.focus_areas.length - 3}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    )}
 
                     {/* Tools Preview */}
                     <div className="space-y-2">
@@ -589,7 +700,12 @@ export default function AICompaniesCatalog() {
                                   <Wrench className="w-3 h-3 text-muted-foreground" />
                                 )}
                               </div>
-                              <span className="text-sm font-medium truncate">{tool.name}</span>
+                              <div className="min-w-0 flex-1">
+                                <span className="text-sm font-medium truncate block">{tool.name}</span>
+                                {tool.tool_category && (
+                                  <span className="text-xs text-muted-foreground truncate block">{tool.tool_category}</span>
+                                )}
+                              </div>
                             </div>
                             <div className="flex items-center gap-1">
                               {renderStars(tool.tool_stats?.average_rating || 0, tool.id, true)}
@@ -664,7 +780,11 @@ export default function AICompaniesCatalog() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between mb-2">
                           <div>
-                            <h3 className="text-xl font-semibold">{company.name}</h3>
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="text-xl font-semibold">{company.name}</h3>
+                              {getCompanyTypeIcon(company.company_type)}
+                              {getCompanyTierBadge(company.company_tier)}
+                            </div>
                             <div className="flex items-center gap-4 text-sm text-muted-foreground">
                               <div className="flex items-center gap-1">
                                 <Globe className="w-4 h-4" />
@@ -693,18 +813,21 @@ export default function AICompaniesCatalog() {
                           {company.description}
                         </p>
 
-                        <div className="flex flex-wrap gap-1 mb-4">
-                          {company.industry_tags.slice(0, 5).map((tag) => (
-                            <Badge key={tag} variant="secondary" className="text-xs">
-                              {tag}
-                            </Badge>
-                          ))}
-                          {company.industry_tags.length > 5 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{company.industry_tags.length - 5}
-                            </Badge>
-                          )}
-                        </div>
+                        {/* Focus Areas */}
+                        {company.focus_areas && company.focus_areas.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mb-4">
+                            {company.focus_areas.slice(0, 5).map((area) => (
+                              <Badge key={area} variant="outline" className="text-xs">
+                                {area}
+                              </Badge>
+                            ))}
+                            {company.focus_areas.length > 5 && (
+                              <Badge variant="outline" className="text-xs">
+                                +{company.focus_areas.length - 5}
+                              </Badge>
+                            )}
+                          </div>
+                        )}
 
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4">
@@ -721,7 +844,12 @@ export default function AICompaniesCatalog() {
                                     <Wrench className="w-3 h-3 text-muted-foreground" />
                                   )}
                                 </div>
-                                <span className="text-sm font-medium">{tool.name}</span>
+                                <div>
+                                  <span className="text-sm font-medium">{tool.name}</span>
+                                  {tool.tool_category && (
+                                    <div className="text-xs text-muted-foreground">{tool.tool_category}</div>
+                                  )}
+                                </div>
                                 {renderStars(tool.tool_stats?.average_rating || 0, tool.id, true)}
                               </div>
                             ))}
@@ -758,7 +886,9 @@ export default function AICompaniesCatalog() {
               variant="outline"
               onClick={() => {
                 setSearchQuery('');
-                setSelectedCategory('all');
+                setSelectedCompanyType('all');
+                setSelectedCompanyTier('all');
+                setSelectedToolCategory('all');
                 setSortBy('name');
                 setSortOrder('asc');
               }}
