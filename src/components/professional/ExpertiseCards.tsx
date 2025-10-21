@@ -21,6 +21,8 @@ import {
   ArrowRight,
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
+  ChevronDown,
   RefreshCcw,
   ExternalLink,
   Loader2,
@@ -545,6 +547,60 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
+          {/* 垂直导航按钮 - 仅在移动端显示 */}
+          {isMobile && (
+            <>
+              <AnimatePresence>
+                {canGoPrevious && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className={cn(
+                        "rounded-full shadow-md",
+                        styles.verticalNavigationButton,
+                        styles.verticalNavigationButtonUp
+                      )}
+                      onClick={goToPrevious}
+                      disabled={!canGoPrevious || isTransitioning}
+                    >
+                      <ChevronUp size={14} />
+                    </Button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <AnimatePresence>
+                {canGoNext && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className={cn(
+                        "rounded-full shadow-md",
+                        styles.verticalNavigationButton,
+                        styles.verticalNavigationButtonDown
+                      )}
+                      onClick={goToNext}
+                      disabled={!canGoNext || isTransitioning}
+                    >
+                      <ChevronDown size={14} />
+                    </Button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </>
+          )}
           <div 
             className={cn(
               "flex transition-transform duration-300 ease-in-out",
@@ -582,37 +638,42 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
                           )}
                           onClick={() => handleCardClick(area)}
                         >
-                          <CardContent className={cn("p-6", isMobile && "p-4")}>
+                          <CardContent className={cn(
+                            "p-6 flex flex-col justify-between h-full",
+                            isMobile && "p-4 min-h-screen"
+                          )}>
                             {/* 图标、标题和统计 */}
-                            <div className="mb-4">
+                            <div className={cn("mb-4", isMobile && "mb-6")}>
                               <div className="flex items-start justify-between mb-3">
                                 <div className={cn(
                                   'rounded-xl flex items-center justify-center transition-all duration-500 ease-out group-hover:scale-125 group-hover:shadow-lg group-hover:rotate-3 relative overflow-hidden',
-                                  isMobile ? 'w-10 h-10' : 'w-12 h-12',
+                                  isMobile ? 'w-12 h-12' : 'w-12 h-12',
                                   area.bgColor
                                 )}>
                                   <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl" />
-                                  <IconComponent className={cn('relative z-10 transition-all duration-500 group-hover:drop-shadow-sm', area.color, isMobile ? 'text-xl' : 'text-2xl')} size={isMobile ? 20 : 24} />
+                                  <IconComponent className={cn('relative z-10 transition-all duration-500 group-hover:drop-shadow-sm', area.color, isMobile ? 'text-2xl' : 'text-2xl')} size={isMobile ? 24 : 24} />
                                 </div>
                                 <Badge 
                                   variant="secondary" 
                                   className="flex items-center gap-1 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border-primary-200 dark:border-primary-800"
                                 >
-                                  <Users size={isMobile ? 10 : 12} />
-                                  <span className={cn("font-semibold", isMobile && "text-xs")}>{getDisplayCount(area.key).toLocaleString()}</span>
+                                  <Users size={isMobile ? 12 : 12} />
+                                  <span className={cn("font-semibold", isMobile && "text-sm")}>{getDisplayCount(area.key).toLocaleString()}</span>
                                 </Badge>
                               </div>
                               <h3 className={cn(
                                 "font-semibold text-foreground group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-all duration-500 group-hover:translate-x-1",
-                                isMobile ? "text-base line-clamp-1" : "text-lg"
+                                isMobile ? "text-xl line-clamp-1" : "text-lg"
                               )}>
                                 {area.name}
                               </h3>
                             </div>
 
                             {/* 建议问题 */}
-                            <div className="space-y-2">
-                              <h4 className={cn("font-medium text-foreground-muted mb-2", isMobile ? "text-xs" : "text-sm")}>{t('professional_services.suggested_questions')}:</h4>
+                            <div className={cn("space-y-2 flex-1", isMobile && "space-y-3")}>
+                              {!isMobile && (
+                                <h4 className="font-medium text-foreground-muted mb-2 text-sm">{t('professional_services.suggested_questions')}:</h4>
+                              )}
                               {randomQuestions.length > 0 ? (
                                 randomQuestions.map((question, index) => (
                                   <motion.button
@@ -621,13 +682,16 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.2, delay: index * 0.1 }}
                                     onClick={(e) => handleQuestionClick(question, e, area.key)}
-                                    className="w-full text-left p-2 text-xs bg-background-secondary hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-all duration-300 border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:translate-x-1 hover:shadow-sm group/question"
+                                    className={cn(
+                                      "w-full text-left p-2 bg-background-secondary hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-all duration-300 border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:translate-x-1 hover:shadow-sm group/question",
+                                      isMobile && "p-3 text-sm"
+                                    )}
                                   >
                                     <div className="flex items-start gap-2">
-                                      <ArrowRight size={isMobile ? 10 : 12} className="mt-0.5 text-primary-500 flex-shrink-0 group-hover:animate-pulse group-hover/question:translate-x-1 transition-transform duration-300" />
+                                      <ArrowRight size={isMobile ? 12 : 12} className="mt-0.5 text-primary-500 flex-shrink-0 group-hover:animate-pulse group-hover/question:translate-x-1 transition-transform duration-300" />
                                       <span className={cn(
                                         "text-foreground-secondary group-hover/question:text-primary-600 dark:group-hover/question:text-primary-400 transition-colors duration-300",
-                                        isMobile ? "line-clamp-1" : "line-clamp-2"
+                                        isMobile ? "text-sm" : "text-xs"
                                       )}>
                                         {question}
                                       </span>
@@ -642,12 +706,24 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
                               )}
                             </div>
 
-                            {/* 底部提示 */}
-                            <div className="mt-4 pt-3 border-t border-border">
-                              <div className="flex items-center justify-between text-xs text-foreground-muted">
-                                <span>{t('professional_services.click_for_advice')}</span>
-                                <ArrowRight size={12} className="group-hover:translate-x-2 group-hover:text-primary-500 transition-all duration-500 ease-out" />
-                              </div>
+                            {/* 底部操作按钮 */}
+                            <div className={cn("mt-4", isMobile && "mt-6")}>
+                              <motion.button
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.3, delay: 0.4 }}
+                                onClick={(e) => handleCardClick(area, e)}
+                                className={cn(
+                                  "w-full flex items-center justify-center gap-2 py-2 px-4 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-all duration-300 hover:shadow-lg hover:scale-105 group/action",
+                                  isMobile && "py-3 text-base"
+                                )}
+                              >
+                                <MessageSquare size={isMobile ? 16 : 14} className="group-hover/action:animate-pulse" />
+                                <span className={cn("font-medium", isMobile && "text-base")}>
+                                  {t('professional_services.click_for_advice')}
+                                </span>
+                                <ArrowRight size={isMobile ? 16 : 14} className="group-hover/action:translate-x-1 transition-transform duration-300" />
+                              </motion.button>
                             </div>
                           </CardContent>
                         </Card>
