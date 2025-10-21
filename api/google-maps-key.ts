@@ -1,6 +1,4 @@
-import { VercelRequest, VercelResponse } from '@vercel/node';
-
-export default function handler(req: VercelRequest, res: VercelResponse) {
+export default function handler(req: any, res: any) {
   // Only allow GET requests
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -16,4 +14,3 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
   // Return the API key
   res.status(200).json({ apiKey: googleMapsApiKey });
 }
-

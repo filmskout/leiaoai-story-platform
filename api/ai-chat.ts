@@ -1,5 +1,3 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-
 // System prompt for AI investment consultant
 const getSystemPrompt = () => `你是一位专业的AI投融资顾问，拥有丰富的商业分析、投资策略和企业咨询经验。你的目标是为用户提供专业、准确且实用的投融资建议。
 
@@ -28,7 +26,7 @@ const MODEL_MAP: Record<string, { provider: 'deepseek' | 'openai' | 'qwen'; mode
   'qwen-turbo': { provider: 'qwen', model: 'qwen-turbo' },
 };
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method Not Allowed' });
     return;

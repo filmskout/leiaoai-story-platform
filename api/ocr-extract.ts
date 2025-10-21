@@ -1,4 +1,3 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 import mammoth from 'mammoth';
 
@@ -10,7 +9,7 @@ import mammoth from 'mammoth';
  * 3. PDF文件：返回友好错误提示，建议转换为DOCX或文本
  * 4. 图片文件：从Supabase下载并OCR（使用OpenAI Vision）
  */
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }

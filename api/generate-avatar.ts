@@ -1,5 +1,3 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-
 /**
  * Vercel Serverless Function: 使用 DALL·E 生成用户头像
  * 
@@ -11,7 +9,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 const OPENAI_API_URL = 'https://api.openai.com/v1/images/generations';
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: any, res: any) {
   // 只允许 POST 请求
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method Not Allowed' });

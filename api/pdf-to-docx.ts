@@ -1,4 +1,3 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 
 /**
@@ -10,7 +9,7 @@ import { createClient } from '@supabase/supabase-js';
  * 2. 调用CloudConvert API转换为DOCX
  * 3. 返回DOCX的URL或Base64
  */
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }

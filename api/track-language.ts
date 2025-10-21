@@ -1,11 +1,9 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-
 // Simple language tracking endpoint
 // - Increments a lightweight cookie-based counter per language
 // - Logs to server for observability
 // - Can be extended later to persist in Supabase
 
-function getCookie(req: VercelRequest, name: string): string | undefined {
+function getCookie(req: any, name: string): string | undefined {
   const cookie = req.headers.cookie || '';
   const parts = cookie.split(/;\s*/);
   for (const part of parts) {
@@ -15,7 +13,7 @@ function getCookie(req: VercelRequest, name: string): string | undefined {
   return undefined;
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method Not Allowed' });
     return;
@@ -43,27 +41,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(200).json({ ok: true, lang, total: map[lang] });
   } catch (err: any) {
     res.status(500).json({ error: err?.message || 'Internal Server Error' });
-  }
-}
-
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST');
-    return res.status(405).json({ error: 'Method Not Allowed' });
-  }
-
-  try {
-    const { language } = req.body || {};
-    const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.socket.remoteAddress || 'unknown';
-
-    // 目前先记录到日志；后续可接入数据库做持久化统计
-    console.log('[language_visit]', { language, ip, at: new Date().toISOString() });
-
-    return res.status(200).json({ ok: true });
-  } catch (e) {
-    return res.status(500).json({ error: 'internal_error' });
   }
 }
 

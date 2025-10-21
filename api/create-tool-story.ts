@@ -1,17 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.VITE_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-export async function POST(request: NextRequest) {
+export default async function handler(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
   try {
-    const { title, content, tags, toolId, companyId, userId } = await request.json();
+    const { title, content, tags, toolId, companyId, userId } = req.body;
 
     if (!title || !content || !userId) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+      return res.status(400).json({ error: 'Missing required fields' });
     }
 
     // 创建故事
@@ -29,7 +32,7 @@ export async function POST(request: NextRequest) {
 
     if (storyError) {
       console.error('Story creation error:', storyError);
-      return NextResponse.json({ error: 'Failed to create story' }, { status: 500 });
+      return res.status(500).json({ error: 'Failed to create story' });
     }
 
     // 关联到工具
@@ -62,7 +65,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ 
+    return res.status(200).json({ 
       success: true, 
       story: {
         id: story.id,
@@ -75,6 +78,6 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('API error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 }

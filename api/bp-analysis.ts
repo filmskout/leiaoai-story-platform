@@ -1,5 +1,3 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-
 /**
  * BP分析API
  * 
@@ -122,7 +120,7 @@ ${extractedText.slice(0, 8000)} ${extractedText.length > 8000 ? '...(内容过�
 
 请只返回JSON，不要包含其他文字说明。`;
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method Not Allowed' });
     return;
