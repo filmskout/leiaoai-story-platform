@@ -30,7 +30,8 @@
     "fetch-overseas": "tsx scripts/fetch_overseas_companies.ts",
     "fetch-domestic": "tsx scripts/fetch_domestic_companies.ts",
     "setup-updates": "tsx scripts/setup_periodic_updates.ts",
-    "reconfigure-all": "tsx scripts/comprehensive_reconfiguration.ts"
+    "reconfigure-all": "tsx scripts/comprehensive_reconfiguration.ts",
+    "setup-env": "./setup-env.sh"
   },
   "dependencies": {
     "@excalidraw/excalidraw": "^0.18.0",
