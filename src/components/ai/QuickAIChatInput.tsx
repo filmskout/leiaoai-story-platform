@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAI } from '@/contexts/AIContext';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Bot, ArrowRight, Sparkles, Send, ChevronDown } from 'lucide-react';
+import { Bot, ArrowRight, Sparkles, Send, ChevronDown, Mic, MicOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { UnifiedLoader } from '@/components/ui/UnifiedLoader';
@@ -14,6 +14,49 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+
+// 语音识别类型声明
+declare global {
+  interface Window {
+    SpeechRecognition: typeof SpeechRecognition;
+    webkitSpeechRecognition: typeof SpeechRecognition;
+  }
+}
+
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start(): void;
+  stop(): void;
+  onstart: (() => void) | null;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
+  onend: (() => void) | null;
+}
+
+interface SpeechRecognitionEvent {
+  results: SpeechRecognitionResultList;
+}
+
+interface SpeechRecognitionResultList {
+  [index: number]: SpeechRecognitionResult;
+  length: number;
+}
+
+interface SpeechRecognitionResult {
+  [index: number]: SpeechRecognitionAlternative;
+  length: number;
+}
+
+interface SpeechRecognitionAlternative {
+  transcript: string;
+  confidence: number;
+}
+
+interface SpeechRecognitionErrorEvent {
+  error: string;
+}
 
 interface QuickAIChatInputProps {
   className?: string;
@@ -27,13 +70,57 @@ export function QuickAIChatInput({ className, onSubmit }: QuickAIChatInputProps)
   const [isFocused, setIsFocused] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [response, setResponse] = useState<string | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isSupported, setIsSupported] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
   const navigate = useNavigate();
 
   // 模拟AI响应的欢迎消息
   useEffect(() => {
     setResponse(t('ai_expert_greeting'));
   }, [t]);
+
+  // 初始化语音识别
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        setIsSupported(true);
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'zh-CN,en-US'; // 支持中文和英文
+        
+        recognition.onstart = () => {
+          setIsRecording(true);
+        };
+        
+        recognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          setInputMessage(transcript);
+          adjustTextareaHeight();
+        };
+        
+        recognition.onerror = (event) => {
+          console.error('语音识别错误:', event.error);
+          setIsRecording(false);
+        };
+        
+        recognition.onend = () => {
+          setIsRecording(false);
+        };
+        
+        recognitionRef.current = recognition;
+      }
+    }
+    
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, []);
 
   // 自动调整文本域高度
   const adjustTextareaHeight = () => {
@@ -75,6 +162,20 @@ export function QuickAIChatInput({ className, onSubmit }: QuickAIChatInputProps)
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSubmit();
+    }
+  };
+
+  // 语音识别处理
+  const handleVoiceInput = () => {
+    if (!isSupported || !recognitionRef.current) {
+      console.warn('语音识别不支持');
+      return;
+    }
+
+    if (isRecording) {
+      recognitionRef.current.stop();
+    } else {
+      recognitionRef.current.start();
     }
   };
 
@@ -198,9 +299,29 @@ export function QuickAIChatInput({ className, onSubmit }: QuickAIChatInputProps)
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             placeholder={t('ai_chat.placeholder')}
-            className="resize-none min-h-[60px] pr-12 transition-all duration-200 focus:border-primary-300 focus:ring-primary-300"
+            className="resize-none min-h-[60px] pr-20 transition-all duration-200 focus:border-primary-300 focus:ring-primary-300"
             disabled={isLoading}
           />
+          
+          {/* 麦克风按钮 */}
+          {isSupported && (
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleVoiceInput}
+              disabled={isLoading}
+              className={cn(
+                "absolute right-10 top-2 h-8 w-8 p-0 transition-all duration-200",
+                isRecording 
+                  ? "bg-red-500 hover:bg-red-600 text-white animate-pulse" 
+                  : "bg-gray-500 hover:bg-gray-600 text-white"
+              )}
+            >
+              {isRecording ? <MicOff size={14} /> : <Mic size={14} />}
+            </Button>
+          )}
+          
+          {/* 发送按钮 */}
           <Button
             type="submit"
             size="sm"
