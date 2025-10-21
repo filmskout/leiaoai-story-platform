@@ -217,7 +217,7 @@ export function QuickAIChatInput({ className, onSubmit }: QuickAIChatInputProps)
         </div>
         
         {/* 示例问题 */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 py-2">
           {sampleQuestions.map((question, index) => (
             <button
               key={index}
@@ -228,7 +228,7 @@ export function QuickAIChatInput({ className, onSubmit }: QuickAIChatInputProps)
                 }
                 adjustTextareaHeight();
               }}
-              className="inline-flex items-center gap-1 px-3 py-1 text-xs rounded-full bg-background-secondary border border-border hover:border-primary-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-200"
+              className="inline-flex items-center gap-1 px-3 py-2 text-xs rounded-full bg-background-secondary border border-border hover:border-primary-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-200"
             >
               <Sparkles size={10} className="text-primary-500" />
               {question}
@@ -237,7 +237,7 @@ export function QuickAIChatInput({ className, onSubmit }: QuickAIChatInputProps)
         </div>
         
         {/* 底部 */}
-        <div className="pt-1 text-center">
+        <div className="pt-2 text-center">
           <Button 
             variant="ghost" 
             size="sm" 
