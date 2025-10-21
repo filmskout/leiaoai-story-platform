@@ -12,16 +12,7 @@ function detectLanguage(text: string): 'zh' | 'en' {
   return chineseRegex.test(text) ? 'zh' : 'en';
 }
 
-/**
- * 为消息添加语言提示
- */
-function addLanguagePrompt(message: string, targetLanguage: 'zh' | 'en'): string {
-  if (targetLanguage === 'zh') {
-    return `请用中文回答以下问题：${message}`;
-  } else {
-    return `Please answer the following question in English: ${message}`;
-  }
-}
+// 移除硬编码语言前缀，改为通过API参数控制语言
 
 export function useSmartAIChat() {
   const { i18n } = useTranslation();
@@ -72,13 +63,10 @@ export function useSmartAIChat() {
       // 3. 优先使用用户输入的语言，如果检测不出则使用界面语言
       const targetLanguage = userLanguage || currentUILanguage;
       
-      // 4. 为消息添加语言提示
-      const enhancedMessage = addLanguagePrompt(message, targetLanguage);
+      // 4. 直接发送原始消息，通过API参数控制语言
+      await originalSendMessage(message, sessionId, modelOverride, category, targetLanguage);
       
-      // 5. 发送增强后的消息（传递所有参数，包括category）
-      await originalSendMessage(enhancedMessage, sessionId, modelOverride, category);
-      
-      // 6. 清理输入
+      // 5. 清理输入
       setInputMessage('');
       
       console.log('✅ useSmartAIChat: Message sent successfully');
@@ -144,11 +132,16 @@ export function useSmartAIChat() {
     if (messageIndex > 0) {
       const userMessage = currentMessages[messageIndex - 1];
       if (userMessage.role === 'user') {
-        // 直接发送原始用户消息，不添加语言前缀
-        await originalSendMessage(userMessage.content);
+        // 检测用户消息的语言
+        const userLanguage = detectLanguage(userMessage.content);
+        const currentUILanguage = i18n.language.startsWith('zh') ? 'zh' : 'en';
+        const targetLanguage = userLanguage || currentUILanguage;
+        
+        // 直接发送原始用户消息，通过API参数控制语言
+        await originalSendMessage(userMessage.content, undefined, undefined, undefined, targetLanguage);
       }
     }
-  }, [currentMessages, originalSendMessage]);
+  }, [currentMessages, originalSendMessage, i18n.language]);
 
   // 清理错误
   const clearError = useCallback(() => {

@@ -224,13 +224,14 @@ export function useAIChat() {
   };
 
   // 发送消息
-  const sendMessage = async (content: string, sessionId?: string, modelOverride?: string, category?: string) => {
+  const sendMessage = async (content: string, sessionId?: string, modelOverride?: string, category?: string, language?: string) => {
     if (!content.trim()) return;
     
     console.log('🔵 Sending message', { 
       hasSession: !!currentSession, 
       model: modelOverride || selectedChatModel,
-      category 
+      category,
+      language
     });
     
     setIsLoading(true);
@@ -302,7 +303,7 @@ export function useAIChat() {
         const response = await fetchAIResponse(
           [{ role: 'user', content }],
           modelToUse,
-          i18n.language
+          language || i18n.language
         );
         
         // 更新模型响应时间统计
