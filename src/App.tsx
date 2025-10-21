@@ -40,6 +40,7 @@ const ToolsReviews = lazy(() => import('@/pages/ToolsReviews'));
 const AICompaniesCatalog = lazy(() => import('@/pages/AICompaniesCatalog'));
 const CompanyDetail = lazy(() => import('@/pages/CompanyDetail'));
 const MonitoringDashboard = lazy(() => import('@/pages/MonitoringDashboard'));
+const ReconfigureData = lazy(() => import('@/pages/ReconfigureData'));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -214,6 +215,7 @@ function AppRoutes() {
           <Route path="ai-companies" element={<AICompaniesCatalog />} />
           <Route path="ai-companies/:id" element={<CompanyDetail />} />
           <Route path="monitoring" element={<MonitoringDashboard />} />
+          <Route path="reconfigure" element={<ReconfigureData />} />
           <Route path="ai-chat" element={<AIChat />} />
           <Route path="bp-analysis" element={<BPAnalysis />} />
           <Route path="stories" element={<Stories />} />
