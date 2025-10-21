@@ -21,6 +21,9 @@ export default async function handler(req: any, res: any) {
       case 'check-env':
         return handleCheckEnv(req, res);
       
+      case 'auth-token':
+        return handleAuthToken(req, res);
+      
       case 'reconfigure':
         return handleReconfigure(req, res);
       
@@ -89,6 +92,29 @@ function handleCheckEnv(req: any, res: any) {
     variables: envVars,
     missing: missingVars,
     ready: missingVars.length === 0
+  });
+}
+
+// 获取认证token
+async function handleAuthToken(req: any, res: any) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // 检查ADMIN_TOKEN是否已设置
+  const adminToken = process.env.ADMIN_TOKEN;
+  if (!adminToken) {
+    return res.status(500).json({ 
+      error: 'ADMIN_TOKEN not configured',
+      token: null 
+    });
+  }
+
+  // 返回认证token（用于前端调用reconfigure API）
+  return res.json({
+    success: true,
+    token: adminToken,
+    message: 'Authentication token retrieved successfully'
   });
 }
 

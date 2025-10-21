@@ -8,8 +8,40 @@ export default function ReconfigureData() {
   const [isRunning, setIsRunning] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [authToken, setAuthToken] = useState<string | null>(null);
+  const [isLoadingToken, setIsLoadingToken] = useState(false);
+
+  // 获取认证token
+  const fetchAuthToken = async () => {
+    setIsLoadingToken(true);
+    try {
+      const response = await fetch('/api/unified?action=auth-token');
+      const data = await response.json();
+      
+      if (data.success) {
+        setAuthToken(data.token);
+        setError(null);
+      } else {
+        setError(data.error || '获取认证token失败');
+      }
+    } catch (err: any) {
+      setError(`获取认证token失败: ${err.message}`);
+    } finally {
+      setIsLoadingToken(false);
+    }
+  };
+
+  // 组件加载时获取token
+  React.useEffect(() => {
+    fetchAuthToken();
+  }, []);
 
   const handleReconfigure = async () => {
+    if (!authToken) {
+      setError('认证token未获取，请刷新页面重试');
+      return;
+    }
+
     setIsRunning(true);
     setResult(null);
     setError(null);
@@ -21,7 +53,7 @@ export default function ReconfigureData() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          token: 'admin-token-123' // 简单的认证token
+          token: authToken // 使用从API获取的token
         })
       });
 
@@ -59,9 +91,39 @@ export default function ReconfigureData() {
             </AlertDescription>
           </Alert>
 
+          {/* 认证状态 */}
+          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center gap-2">
+              {isLoadingToken ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span className="text-sm">正在获取认证token...</span>
+                </>
+              ) : authToken ? (
+                <>
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <span className="text-sm text-green-600">认证token已获取</span>
+                </>
+              ) : (
+                <>
+                  <XCircle className="h-4 w-4 text-red-600" />
+                  <span className="text-sm text-red-600">认证token获取失败</span>
+                </>
+              )}
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={fetchAuthToken}
+              disabled={isLoadingToken}
+            >
+              重新获取
+            </Button>
+          </div>
+
           <Button 
             onClick={handleReconfigure} 
-            disabled={isRunning}
+            disabled={isRunning || !authToken || isLoadingToken}
             className="w-full"
           >
             {isRunning ? (
