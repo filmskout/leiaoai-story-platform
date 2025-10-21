@@ -2,7 +2,7 @@
 
 /* Carousel 容器 - 增加buffer空间解决hover边框被裁切问题 */
 .carouselContainer {
-  padding: 32px 0; /* 上下增加32px buffer */
+  padding: 16px 0; /* 减少上下padding */
   margin: 0 24px; /* 左右增加24px buffer */
   overflow: visible; /* 确保悬停效果可见 */
   position: relative;
@@ -32,8 +32,8 @@
 
 /* 确保卡片在hover时有足够空间显示完整边框和阴影 */
 .cardsGrid {
-  gap: 24px;
-  padding: 16px; /* 为卡片hover效果提供额外空间 */
+  gap: 16px; /* 减少gap */
+  padding: 8px; /* 减少padding */
   display: grid;
 }
 

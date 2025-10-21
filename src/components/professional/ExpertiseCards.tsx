@@ -457,7 +457,9 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
       >
         <div>
           <h2 className="text-3xl font-bold text-foreground mb-2">{t('professional_services.title')}</h2>
-          <p className="text-lg text-foreground-secondary">{t('professional_services.subtitle')}</p>
+          {!isMobile && (
+            <p className="text-lg text-foreground-secondary">{t('professional_services.subtitle')}</p>
+          )}
         </div>
         <Button 
           variant="outline" 
@@ -671,9 +673,7 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
 
                             {/* 建议问题 */}
                             <div className={cn("space-y-2 flex-1", isMobile && "space-y-3")}>
-                              {!isMobile && (
-                                <h4 className="font-medium text-foreground-muted mb-2 text-sm">{t('professional_services.suggested_questions')}:</h4>
-                              )}
+                              <h4 className="font-medium text-foreground-muted mb-2 text-sm">{t('professional_services.suggested_questions')}:</h4>
                               {randomQuestions.length > 0 ? (
                                 randomQuestions.map((question, index) => (
                                   <motion.button
@@ -707,24 +707,26 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
                             </div>
 
                             {/* 底部操作按钮 */}
-                            <div className={cn("mt-4", isMobile && "mt-6")}>
-                              <motion.button
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.3, delay: 0.4 }}
-                                onClick={(e) => handleCardClick(area, e)}
-                                className={cn(
-                                  "w-full flex items-center justify-center gap-2 py-2 px-4 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-all duration-300 hover:shadow-lg hover:scale-105 group/action",
-                                  isMobile && "py-3 text-base"
-                                )}
-                              >
-                                <MessageSquare size={isMobile ? 16 : 14} className="group-hover/action:animate-pulse" />
-                                <span className={cn("font-medium", isMobile && "text-base")}>
-                                  {t('professional_services.click_for_advice')}
-                                </span>
-                                <ArrowRight size={isMobile ? 16 : 14} className="group-hover/action:translate-x-1 transition-transform duration-300" />
-                              </motion.button>
-                            </div>
+                            {!isMobile && (
+                              <div className={cn("mt-4", isMobile && "mt-6")}>
+                                <motion.button
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ duration: 0.3, delay: 0.4 }}
+                                  onClick={(e) => handleCardClick(area, e)}
+                                  className={cn(
+                                    "w-full flex items-center justify-center gap-2 py-2 px-4 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-all duration-300 hover:shadow-lg hover:scale-105 group/action",
+                                    isMobile && "py-3 text-base"
+                                  )}
+                                >
+                                  <MessageSquare size={isMobile ? 16 : 14} className="group-hover/action:animate-pulse" />
+                                  <span className={cn("font-medium", isMobile && "text-base")}>
+                                    {t('professional_services.click_for_advice')}
+                                  </span>
+                                  <ArrowRight size={isMobile ? 16 : 14} className="group-hover/action:translate-x-1 transition-transform duration-300" />
+                                </motion.button>
+                              </div>
+                            )}
                           </CardContent>
                         </Card>
                       );
@@ -765,9 +767,11 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
         transition={{ duration: 0.3, delay: 0.3 }}
         className="text-center space-y-3"
       >
-        <div className="text-sm text-foreground-muted">
-          {t('professional_services.bottom_description')}
-        </div>
+        {!isMobile && (
+          <div className="text-sm text-foreground-muted">
+            {t('professional_services.bottom_description')}
+          </div>
+        )}
         <Button 
           variant="outline" 
           size="lg"
