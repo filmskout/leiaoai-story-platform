@@ -1437,88 +1437,37 @@ export default function Profile() {
                               {t('profile.view', 'View')}
                             </Button>
                             {chat.markdown_file_url && (
-                              <>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={async () => {
-                                    try {
-                                      // 获取markdown内容并渲染
-                                      const response = await fetch(chat.markdown_file_url);
-                                      if (response.ok) {
-                                        const markdownContent = await response.text();
-                                        // 在新窗口中显示markdown内容
-                                        const newWindow = window.open('', '_blank');
-                                        if (newWindow) {
-                                          newWindow.document.write(`
-                                            <!DOCTYPE html>
-                                            <html>
-                                            <head>
-                                              <title>${chat.title || 'Chat Session'}</title>
-                                              <meta charset="utf-8">
-                                              <style>
-                                                body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.6; }
-                                                h1, h2, h3 { color: #333; }
-                                                code { background: #f4f4f4; padding: 2px 4px; border-radius: 3px; }
-                                                pre { background: #f4f4f4; padding: 10px; border-radius: 5px; overflow-x: auto; }
-                                                blockquote { border-left: 4px solid #ddd; margin: 0; padding-left: 20px; color: #666; }
-                                              </style>
-                                            </head>
-                                            <body>
-                                              <div id="markdown-content"></div>
-                                              <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-                                              <script>
-                                                document.getElementById('markdown-content').innerHTML = marked.parse(\`${markdownContent.replace(/`/g, '\\`')}\`);
-                                              </script>
-                                            </body>
-                                            </html>
-                                          `);
-                                        }
-                                      } else {
-                                        console.error('Failed to fetch markdown content');
-                                        alert('无法加载markdown内容');
-                                      }
-                                    } catch (error) {
-                                      console.error('Error loading markdown:', error);
-                                      alert('加载markdown内容时出错');
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={async () => {
+                                  try {
+                                    // 获取markdown内容并下载
+                                    const response = await fetch(chat.markdown_file_url);
+                                    if (response.ok) {
+                                      const markdownContent = await response.text();
+                                      const blob = new Blob([markdownContent], { type: 'text/markdown;charset=utf-8' });
+                                      const url = URL.createObjectURL(blob);
+                                      const a = document.createElement('a');
+                                      a.href = url;
+                                      a.download = `${chat.title || 'chat'}.md`;
+                                      document.body.appendChild(a);
+                                      a.click();
+                                      document.body.removeChild(a);
+                                      URL.revokeObjectURL(url);
+                                    } else {
+                                      console.error('Failed to fetch markdown content');
+                                      alert('无法下载markdown文件');
                                     }
-                                  }}
-                                  title={t('profile.view_markdown', 'View Markdown')}
-                                >
-                                  <FileText size={14} />
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={async () => {
-                                    try {
-                                      // 获取markdown内容并下载
-                                      const response = await fetch(chat.markdown_file_url);
-                                      if (response.ok) {
-                                        const markdownContent = await response.text();
-                                        const blob = new Blob([markdownContent], { type: 'text/markdown;charset=utf-8' });
-                                        const url = URL.createObjectURL(blob);
-                                        const a = document.createElement('a');
-                                        a.href = url;
-                                        a.download = `${chat.title || 'chat'}.md`;
-                                        document.body.appendChild(a);
-                                        a.click();
-                                        document.body.removeChild(a);
-                                        URL.revokeObjectURL(url);
-                                      } else {
-                                        console.error('Failed to fetch markdown content');
-                                        alert('无法下载markdown文件');
-                                      }
-                                    } catch (error) {
-                                      console.error('Error downloading markdown:', error);
-                                      alert('下载markdown文件时出错');
-                                    }
-                                  }}
-                                  title={t('profile.download_markdown', 'Download Markdown')}
-                                >
-                                  <Download size={14} />
-                                </Button>
-                              </>
+                                  } catch (error) {
+                                    console.error('Error downloading markdown:', error);
+                                    alert('下载markdown文件时出错');
+                                  }
+                                }}
+                                title={t('profile.download_markdown', 'Download Markdown')}
+                              >
+                                <Download size={14} />
+                              </Button>
                             )}
                             <Button
                               variant="ghost"

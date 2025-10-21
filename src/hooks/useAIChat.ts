@@ -7,6 +7,21 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useWebsiteStats } from './useWebsiteStats';
 import { sessionToMarkdown, generateMarkdownFilename } from '@/lib/chatMarkdown';
 
+/**
+ * 从用户消息生成session标题
+ */
+function generateSessionTitle(content: string): string {
+  // 移除多余的空格和换行
+  const cleanContent = content.trim().replace(/\s+/g, ' ');
+  
+  // 如果内容太长，截取前50个字符
+  if (cleanContent.length > 50) {
+    return cleanContent.substring(0, 50) + '...';
+  }
+  
+  return cleanContent || '新的投融资咨询';
+}
+
 export interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
@@ -241,7 +256,9 @@ export function useAIChat() {
       // 使用当前会话或创建新会话
       let session = currentSession;
       if (!session) {
-        session = await createNewSession(undefined, category);
+        // 使用第一条消息生成标题
+        const sessionTitle = generateSessionTitle(content);
+        session = await createNewSession(sessionTitle, category);
         
         // 增加会话统计（如果是新会话）
         try {
