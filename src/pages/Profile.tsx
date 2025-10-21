@@ -676,7 +676,7 @@ export default function Profile() {
     setExtractingText(bmcId);
 
     try {
-      const response = await fetch('/api/ocr-extract', {
+      const response = await fetch('/api/unified?action=ocr-extract', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

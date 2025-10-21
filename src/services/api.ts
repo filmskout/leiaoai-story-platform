@@ -30,13 +30,14 @@ export async function fetchAIResponse(
     console.log('🔵 Frontend: Calling AI Chat API', { model, messageLength: lastMessage.content.length });
 
     // 调用 Vercel Serverless Function 以隐藏服务端密钥
-    const resp = await fetch('/api/ai-chat', {
+    const resp = await fetch('/api/unified?action=ai-chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         message: lastMessage.content,
         model,
-        sessionId: crypto.randomUUID()
+        sessionId: crypto.randomUUID(),
+        language: language
       })
     });
 
@@ -85,25 +86,33 @@ export async function fetchAIResponse(
     }
 
     const data = await resp.json();
-    if (!data || !data.data) {
-      console.error('🔴 Frontend: Invalid response structure', data);
-      throw new Error('Invalid response from AI service');
+    
+    // 处理新的unified API响应格式
+    if (data.success && data.response) {
+      const endTime = Date.now();
+      const processingTime = Number(((endTime - startTime) / 1000).toFixed(1));
+
+      console.log('🟢 Frontend: Success', { 
+        model: data.model || model, 
+        responseLength: data.response?.length,
+        time: processingTime 
+      });
+
+      return {
+        response: data.response,
+        model: data.model || model,
+        processingTime
+      };
     }
-
-    const endTime = Date.now();
-    const processingTime = Number(((endTime - startTime) / 1000).toFixed(1));
-
-    console.log('🟢 Frontend: Success', { 
-      model: data.data.model, 
-      responseLength: data.data.content?.length,
-      time: processingTime 
-    });
-
-    return {
-      response: data.data.content || 'No response generated',
-      model: data.data.model || model,
-      processingTime
-    };
+    
+    // 处理错误响应
+    if (data.error) {
+      console.error('🔴 Frontend: API Error Response', data.error);
+      throw new Error(data.error);
+    }
+    
+    console.error('🔴 Frontend: Invalid response structure', data);
+    throw new Error('Invalid response from AI service');
   } catch (error) {
     console.error('🔴 Frontend: Error in fetchAIResponse:', error);
     

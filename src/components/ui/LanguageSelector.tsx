@@ -141,13 +141,13 @@ export function LanguageSelector({ className, variant = 'default' }: LanguageSel
       // 保存用户选择
       localStorage.setItem('leoai-language', languageCode);
       // 通知服务端保存用户偏好（若已登录会以Cookie记住）
-      fetch('/api/save-language-preference', {
+      fetch('/api/unified?action=save-language-preference', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ language: languageCode })
       }).catch(() => {});
       // 记录语言访问统计
-      fetch('/api/track-language', {
+      fetch('/api/unified?action=track-language', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ language: languageCode })
@@ -215,7 +215,7 @@ export function LanguageSelector({ className, variant = 'default' }: LanguageSel
     detectLanguageByIP();
     // 首次加载记录一次当前语言访问
     try {
-      fetch('/api/track-language', {
+      fetch('/api/unified?action=track-language', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ language: i18n.language })

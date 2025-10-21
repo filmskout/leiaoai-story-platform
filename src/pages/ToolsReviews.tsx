@@ -117,7 +117,7 @@ export default function ToolsReviews() {
         setResearchMap(prev => ({ ...prev, [domain]: { summary: cached.summary, funding_highlights: cached.funding_highlights, current_round: cached.current_round, overall_score: cached.overall_score, score_breakdown: cached.score_breakdown } }));
       }
       // call API to refresh (will upsert and return latest)
-      const resp = await fetch('/api/tools-research', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ domains: [domain], models: selectedModels }) });
+      const resp = await fetch('/api/unified?action=tools-research', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ domains: [domain], models: selectedModels }) });
       if (resp.ok) {
         const json = await resp.json();
         const r = json?.results?.[domain];
@@ -136,7 +136,7 @@ export default function ToolsReviews() {
       const domains = Array.from(new Set(extTools.map(x => String(x.company || '')).filter(Boolean)));
       if (domains.length === 0) return;
       try {
-        const resp = await fetch('/api/tools-research', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ domains, models: selectedModels }) });
+        const resp = await fetch('/api/unified?action=tools-research', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ domains, models: selectedModels }) });
         if (resp.ok) {
           const json = await resp.json();
           if (json?.results) {

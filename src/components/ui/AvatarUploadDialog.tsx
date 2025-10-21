@@ -91,7 +91,7 @@ export function AvatarUploadDialog({
     try {
       const prompt = `Professional business avatar portrait for ${userName}, modern style, high quality, suitable for business profile picture`;
 
-      const response = await fetch('/api/generate-avatar', {
+      const response = await fetch('/api/unified?action=generate-avatar', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -102,7 +102,7 @@ export default function EditStory() {
     try {
       const prompt = `Professional illustration for article titled: "${title}". Modern, clean, high-quality, suitable for business publication.`;
       
-      const response = await fetch('/api/generate-avatar', {
+      const response = await fetch('/api/unified?action=generate-avatar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt, size: '1024x1024' })

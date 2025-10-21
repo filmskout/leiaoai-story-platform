@@ -288,7 +288,7 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
         console.log('🔵 BP OCR: Using server-side download mode');
         console.log('   File path:', filePath);
         
-        const response = await fetch('/api/ocr-extract', {
+        const response = await fetch('/api/unified?action=ocr-extract', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
@@ -402,7 +402,7 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
 
       // 5. 调用分析API
       console.log('🔵 BP Analysis: Calling analysis API...');
-      const response = await fetch('/api/bp-analysis', {
+      const response = await fetch('/api/unified?action=bp-analysis', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -496,7 +496,7 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
     try {
       console.log('🔵 BP Website: Extracting content from', websiteUrl);
 
-      const response = await fetch('/api/extract-website', {
+      const response = await fetch('/api/unified?action=extract-website', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: websiteUrl })
@@ -536,7 +536,7 @@ export function BPUploadAnalysis({ className }: BPUploadAnalysisProps) {
     try {
       console.log('🔵 BP Analysis: Analyzing website content');
 
-      const response = await fetch('/api/bp-analysis', {
+      const response = await fetch('/api/unified?action=bp-analysis', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 

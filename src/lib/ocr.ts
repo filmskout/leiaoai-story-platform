@@ -9,7 +9,7 @@
  */
 export async function extractTextFromImageWithAI(imageBase64: string): Promise<string> {
   try {
-    const response = await fetch('/api/ocr-extract', {
+    const response = await fetch('/api/unified?action=ocr-extract', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -35,7 +35,7 @@ export async function extractTextFromImageWithAI(imageBase64: string): Promise<s
  */
 export async function extractTextFromPDF(pdfBase64: string): Promise<string> {
   try {
-    const response = await fetch('/api/extract-pdf-text', {
+    const response = await fetch('/api/unified?action=pdf-to-docx', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -61,7 +61,7 @@ export async function extractTextFromPDF(pdfBase64: string): Promise<string> {
  */
 export async function extractTextFromDOCX(docxBase64: string): Promise<string> {
   try {
-    const response = await fetch('/api/extract-docx-text', {
+    const response = await fetch('/api/unified?action=pdf-to-docx', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
