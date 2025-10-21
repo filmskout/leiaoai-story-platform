@@ -174,8 +174,71 @@ async function handleAIChat(req: any, res: any) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // 这里可以添加AI聊天的具体实现
-  return res.status(200).json({ message: 'AI Chat endpoint' });
+  try {
+    const { message, model = 'deepseek', sessionId, language = 'zh' } = req.body;
+
+    if (!message) {
+      return res.status(400).json({ error: 'Message is required' });
+    }
+
+    // 检查API密钥
+    const deepseekApiKey = process.env.DEEPSEEK_API_KEY;
+    if (!deepseekApiKey) {
+      return res.status(500).json({ error: 'DeepSeek API key not configured' });
+    }
+
+    // 创建系统提示
+    const systemPrompt = language === 'zh' 
+      ? '你是LeiaoAI的智能助手，专门帮助用户进行创意写作和故事创作。你友好、有帮助，并且能够提供有创意的建议。请用中文回答。'
+      : 'You are LeiaoAI\'s intelligent assistant, specialized in helping users with creative writing and storytelling. You are friendly, helpful, and provide creative suggestions. Please respond in English.';
+
+    // 调用DeepSeek API
+    const response = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${deepseekApiKey}`
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          {
+            role: 'system',
+            content: systemPrompt
+          },
+          {
+            role: 'user',
+            content: message
+          }
+        ],
+        max_tokens: 1000,
+        temperature: 0.7
+      })
+    });
+
+    if (!response.ok) {
+      console.error('DeepSeek API Error:', response.status);
+      return res.status(500).json({ error: 'AI service temporarily unavailable' });
+    }
+
+    const aiResponse = await response.json();
+    const aiMessage = aiResponse.choices[0]?.message?.content || '抱歉，无法生成回复。请稍后重试。';
+
+    return res.status(200).json({
+      success: true,
+      response: aiMessage,
+      conversationId: sessionId || 'default',
+      model: model,
+      language: language
+    });
+
+  } catch (error: any) {
+    console.error('AI Chat Error:', error);
+    return res.status(500).json({ 
+      error: 'Failed to process AI chat request',
+      details: error.message 
+    });
+  }
 }
 
 // BP分析处理
@@ -184,8 +247,88 @@ async function handleBPAnalysis(req: any, res: any) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // 这里可以添加BP分析的具体实现
-  return res.status(200).json({ message: 'BP Analysis endpoint' });
+  try {
+    const { businessPlan, language = 'zh' } = req.body;
+
+    if (!businessPlan) {
+      return res.status(400).json({ error: 'Business plan content is required' });
+    }
+
+    // 检查API密钥
+    const deepseekApiKey = process.env.DEEPSEEK_API_KEY;
+    if (!deepseekApiKey) {
+      return res.status(500).json({ error: 'DeepSeek API key not configured' });
+    }
+
+    // 创建BP分析系统提示
+    const systemPrompt = language === 'zh' 
+      ? `你是蕾奥AI投融资专家助手，专注于提供专业的投融资咨询服务。你的专业领域包括：
+
+1. 宏观经济展望分析
+2. 国内外投融资环境差异化对比
+3. CVC产业投资模式专业指导
+4. 并购对赌策略分析
+5. IPO/SPAC上市流程（A股/港股/美股差异化）
+6. 上市准备材料清单指导
+
+请用专业、准确、有深度的方式分析用户提供的商业计划书，并提供投融资建议。`
+      : `You are LeiaoAI's investment and financing expert assistant, specializing in providing professional investment and financing consulting services. Your expertise includes:
+
+1. Macroeconomic outlook analysis
+2. Comparative analysis of domestic and international investment environments
+3. Professional guidance on CVC industry investment models
+4. M&A betting strategy analysis
+5. IPO/SPAC listing processes (differences between A-share/HK-share/US-share markets)
+6. Listing preparation material guidance
+
+Please analyze the business plan provided by the user in a professional, accurate, and in-depth manner, and provide investment and financing recommendations.`;
+
+    // 调用DeepSeek API
+    const response = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${deepseekApiKey}`
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          {
+            role: 'system',
+            content: systemPrompt
+          },
+          {
+            role: 'user',
+            content: `请分析以下商业计划书：\n\n${businessPlan}`
+          }
+        ],
+        max_tokens: 2000,
+        temperature: 0.7
+      })
+    });
+
+    if (!response.ok) {
+      console.error('DeepSeek API Error:', response.status);
+      return res.status(500).json({ error: 'AI service temporarily unavailable' });
+    }
+
+    const aiResponse = await response.json();
+    const analysis = aiResponse.choices[0]?.message?.content || '抱歉，无法生成分析。请稍后重试。';
+
+    return res.status(200).json({
+      success: true,
+      analysis: analysis,
+      language: language,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error: any) {
+    console.error('BP Analysis Error:', error);
+    return res.status(500).json({ 
+      error: 'Failed to process BP analysis request',
+      details: error.message 
+    });
+  }
 }
 
 // 网站提取处理
