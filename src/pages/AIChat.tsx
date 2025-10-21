@@ -356,11 +356,11 @@ export default function AIChat() {
           </div>
         </section>
 
-        {/* 快速导航按钮 */}
+        {/* 快速导航按钮 - 移到角落，变小 */}
         <motion.div 
           className={cn(
-            "fixed z-[9998] flex flex-col gap-2 right-6",
-            isMobile ? "bottom-24" : "bottom-28" // 修改位置，移到更高的位置
+            "fixed z-[9998] flex flex-col gap-1 right-2",
+            isMobile ? "bottom-20" : "bottom-24" // 移到角落，避免遮挡
           )}
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -368,31 +368,28 @@ export default function AIChat() {
         >
           <Button
             onClick={scrollToTop}
-            size={isMobile ? "sm" : "default"}
+            size="sm"
             variant="outline"
             className={cn(
               "rounded-full shadow-lg hover:shadow-xl transition-all duration-300 p-0 bg-white/70 backdrop-blur-sm",
-              isMobile ? "w-10 h-10" : "w-12 h-12"
+              "w-8 h-8" // 统一变小
             )}
           >
-            <ArrowUp size={isMobile ? 16 : 20} />
+            <ArrowUp size={14} />
           </Button>
           <Button
             onClick={scrollToBottom}
-            size={isMobile ? "sm" : "default"}
+            size="sm"
             variant="outline"
             className={cn(
               "rounded-full shadow-lg hover:shadow-xl transition-all duration-300 p-0 bg-white/70 backdrop-blur-sm",
-              isMobile ? "w-10 h-10" : "w-12 h-12"
+              "w-8 h-8" // 统一变小
             )}
           >
-            <ArrowDown size={isMobile ? 16 : 20} />
+            <ArrowDown size={14} />
           </Button>
         </motion.div>
       </motion.div>
-
-      {/* 跳转到底部按钮 */}
-      <ScrollToBottomButton />
     </>
   );
 }

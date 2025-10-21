@@ -359,7 +359,7 @@ export function AnswerModule({
       {/* 答案显示区域 */}
       <Card className={cn(
         "min-h-[200px] p-0 overflow-hidden shadow w-full",
-        isMobile ? "rounded-none border-0" : "rounded-xl border"
+        isMobile ? "rounded-none border-0" : "rounded-none border-0"
       )}>
         <div className={cn("p-6", isMobile && "px-4")}>
           {messages.length === 0 ? (
@@ -466,14 +466,16 @@ export function AnswerModule({
             </div>
             
             {/* 底部信息 */}
-            <div className="flex justify-between items-center mt-3 text-xs text-foreground-muted">
-              <div>
-                <p>{t('footer_description')}</p>
+            {!isMobile && (
+              <div className="flex justify-between items-center mt-3 text-xs text-foreground-muted">
+                <div>
+                  <p>{t('footer_description')}</p>
+                </div>
+                <div className="mr-24"> {/* 增加右侧外边距，避免与按钮重叠 */}
+                  <p>{t('footer_provider')}</p>
+                </div>
               </div>
-              <div className="mr-24"> {/* 增加右侧外边距，避免与按钮重叠 */}
-                <p>{t('footer_provider')}</p>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </Card>
