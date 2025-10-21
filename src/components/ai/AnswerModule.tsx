@@ -138,109 +138,117 @@ export function AnswerModule({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
         className={cn(
-          'flex gap-3 p-4 rounded-xl transition-all duration-200',
+          'w-full p-4 transition-all duration-200',
           isUser 
-            ? 'bg-primary-50 dark:bg-primary-900/20 ml-8' 
-            : 'bg-neutral-50 dark:bg-neutral-800/50 mr-8'
+            ? 'bg-primary-50 dark:bg-primary-900/20' 
+            : 'bg-neutral-50 dark:bg-neutral-800/50'
         )}
       >
-        <div className={cn(
-          'flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center',
-          isUser 
-            ? 'bg-primary-500 text-white' 
-            : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300'
-        )}>
-          {isUser ? <User size={18} /> : <Bot size={18} />}
-        </div>
-        
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-sm font-medium text-foreground">
-              {isUser ? (profile?.full_name || profile?.username || t('user.profile')) : (
-                i18n.language.startsWith('zh') ? '蕾奥君' : 'LeiaoAI Agent'
-              )}
-            </span>
-            {!isUser && message.aiModel && (
-              <span className="text-xs px-2 py-1 bg-neutral-100 dark:bg-neutral-700 rounded-full text-foreground-muted">
-                {message.aiModel}
-              </span>
-            )}
-            <span className="text-xs text-foreground-muted">
-              {message.timestamp.toLocaleTimeString()}
-            </span>
-            {message.processingTime && (
-              <div className="flex items-center gap-1 text-xs text-foreground-muted">
-                <Clock size={12} />
-                {message.processingTime}s
-              </div>
-            )}
+        <div className="flex items-center gap-2 mb-3">
+          <div className={cn(
+            'flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center',
+            isUser 
+              ? 'bg-primary-500 text-white' 
+              : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300'
+          )}>
+            {isUser ? <User size={16} /> : <Bot size={16} />}
           </div>
           
-          <div className="prose prose-sm dark:prose-invert max-w-none">
-            {message.content && (
-              <MarkdownRenderer 
-                content={message.content} 
-                className="text-foreground"
-              />
+          <span className="text-sm font-medium text-foreground">
+            {isUser ? (profile?.full_name || profile?.username || t('user.profile')) : (
+              i18n.language.startsWith('zh') ? '蕾奥君' : 'LeiaoAI Agent'
             )}
-          </div>
+          </span>
           
-          {!isUser && message.content && (
-            <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border">
-              <div className="relative">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="text-xs h-7 px-2"
-                  onClick={() => setShowExportOptions(prev => !prev)}
-                >
-                  <Download size={14} className="mr-1" />
-                  {t('export')}
-                </Button>
-                
-                {/* 导出选项弹窗 */}
-                {showExportOptions && (
-                  <div className="absolute left-0 top-full mt-1 p-2 bg-background border border-border rounded-md shadow-lg z-10">
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="flex items-center w-full mb-1"
-                      onClick={() => handleExport('md')}
-                    >
-                      <FileText size={14} className="mr-2" />
-                      <span>导出为 Markdown (.md)</span>
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="flex items-center w-full"
-                      onClick={() => handleExport('docx')}
-                    >
-                      <FileText size={14} className="mr-2" />
-                      <span>导出为 Word (.docx)</span>
-                    </Button>
-                  </div>
-                )}
-              </div>
-              
-              {onRegenerateMessage && (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="text-xs h-7 px-2"
-                  onClick={() => onRegenerateMessage(message.id)}
-                >
-                  <RefreshCcw size={14} className="mr-1" />
-                  {t('regenerate')}
-                </Button>
-              )}
-              <Button variant="ghost" size="sm" className="text-xs h-7 px-2 ml-auto text-foreground-muted">
-                <InfoIcon size={14} className="mr-1" />
-                {t('feedback')}
-              </Button>
+          {!isUser && message.aiModel && (
+            <span className="text-xs px-2 py-1 bg-neutral-100 dark:bg-neutral-700 rounded-full text-foreground-muted">
+              {message.aiModel}
+            </span>
+          )}
+          
+          <span className="text-xs text-foreground-muted">
+            {message.timestamp.toLocaleTimeString()}
+          </span>
+          
+          {message.processingTime && (
+            <div className="flex items-center gap-1 text-xs text-foreground-muted">
+              <Clock size={12} />
+              {message.processingTime}s
             </div>
           )}
         </div>
+        
+        <div className={cn(
+          "prose max-w-none",
+          isMobile ? "prose-sm" : "prose-sm",
+          "dark:prose-invert"
+        )}>
+          {message.content && (
+            <MarkdownRenderer 
+              content={message.content} 
+              className={cn(
+                "text-foreground",
+                isMobile ? "text-sm" : "text-sm"
+              )}
+            />
+          )}
+        </div>
+        
+        {!isUser && message.content && (
+          <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border">
+            <div className="relative">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="text-xs h-7 px-2"
+                onClick={() => setShowExportOptions(prev => !prev)}
+              >
+                <Download size={14} className="mr-1" />
+                {t('export')}
+              </Button>
+              
+              {/* 导出选项弹窗 */}
+              {showExportOptions && (
+                <div className="absolute left-0 top-full mt-1 p-2 bg-background border border-border rounded-md shadow-lg z-10">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="flex items-center w-full mb-1"
+                    onClick={() => handleExport('md')}
+                  >
+                    <FileText size={14} className="mr-2" />
+                    <span>导出为 Markdown (.md)</span>
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="flex items-center w-full"
+                    onClick={() => handleExport('docx')}
+                  >
+                    <FileText size={14} className="mr-2" />
+                    <span>导出为 Word (.docx)</span>
+                  </Button>
+                </div>
+              )}
+            </div>
+            
+            {onRegenerateMessage && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="text-xs h-7 px-2"
+                onClick={() => onRegenerateMessage(message.id)}
+              >
+                <RefreshCcw size={14} className="mr-1" />
+                {t('regenerate')}
+              </Button>
+            )}
+            <Button variant="ghost" size="sm" className="text-xs h-7 px-2 ml-auto text-foreground-muted">
+              <InfoIcon size={14} className="mr-1" />
+              {t('feedback')}
+            </Button>
+          </div>
+        )}
       </motion.div>
     );
   };

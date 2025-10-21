@@ -62,6 +62,8 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
   const touchStartRef = useRef<number>(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [categoryStats, setCategoryStats] = useState<Record<string, number>>({});
+  const [isHoveringCard, setIsHoveringCard] = useState(false);
+  const [isQuestionClicked, setIsQuestionClicked] = useState(false);
 
   // 响应式设置 - 每页显示的卡片数量（桁面端3个，移动端1个）
   const [cardsPerPage, setCardsPerPage] = useState(3);
@@ -181,8 +183,8 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
 
   // 计算总页数 - 根据每页卡片数量动态计算
   const totalPages = Math.ceil(expertiseAreas.length / cardsPerPage);
-  const canGoPrevious = currentIndex > 0;
-  const canGoNext = currentIndex < totalPages - 1;
+  const canGoPrevious = true; // 无限循环，总是可以向前
+  const canGoNext = true; // 无限循环，总是可以向后
   
   // 实际的页面索引
   const actualPageIndex = currentIndex;
@@ -330,6 +332,11 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
 
   // 刷新建议问题
   const refreshQuestions = () => {
+    // 如果正在hover卡片或点击了问题，暂停刷新
+    if (isHoveringCard || isQuestionClicked) {
+      return;
+    }
+    
     setIsRefreshing(true);
     // 设置延迟以显示加载效果
     setTimeout(() => {
@@ -338,22 +345,34 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
     }, 600);
   };
 
-  // Carousel 导航
+  // Carousel 导航 - 无限循环
   const goToPrevious = useCallback(() => {
-    if (canGoPrevious && !isTransitioning) {
+    if (!isTransitioning) {
       setIsTransitioning(true);
-      setCurrentIndex(prev => Math.max(prev - 1, 0));
+      setCurrentIndex(prev => {
+        if (prev <= 0) {
+          // 如果是第一页，跳转到最后一页
+          return totalPages - 1;
+        }
+        return prev - 1;
+      });
       setTimeout(() => setIsTransitioning(false), 300);
     }
-  }, [canGoPrevious, isTransitioning]);
+  }, [isTransitioning, totalPages]);
 
   const goToNext = useCallback(() => {
-    if (canGoNext && !isTransitioning) {
+    if (!isTransitioning) {
       setIsTransitioning(true);
-      setCurrentIndex(prev => Math.min(prev + 1, totalPages - 1));
+      setCurrentIndex(prev => {
+        if (prev >= totalPages - 1) {
+          // 如果是最后一页，跳转到第一页
+          return 0;
+        }
+        return prev + 1;
+      });
       setTimeout(() => setIsTransitioning(false), 300);
     }
-  }, [canGoNext, isTransitioning, totalPages]);
+  }, [isTransitioning, totalPages]);
 
   const goToPage = (pageIndex: number) => {
     if (pageIndex !== actualPageIndex && !isTransitioning) {
@@ -483,56 +502,46 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
         transition={{ duration: 0.4, delay: 0.1 }}
         className={cn("relative", styles.carouselContainer)}
       >
-        {/* 左右导航按钮 */}
-        <AnimatePresence>
-          {canGoPrevious && (
-            <motion.div
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -10 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Button
-                variant="outline"
-                size="sm"
-                className={cn(
-                  "w-10 h-10 rounded-full shadow-md",
-                  styles.navigationButton,
-                  styles.navigationButtonLeft
-                )}
-                onClick={goToPrevious}
-                disabled={!canGoPrevious || isTransitioning}
-              >
-                <ChevronLeft size={18} />
-              </Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* 左右导航按钮 - 无限循环，一直显示 */}
+        <motion.div
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <Button
+            variant="outline"
+            size="sm"
+            className={cn(
+              "w-10 h-10 rounded-full shadow-md",
+              styles.navigationButton,
+              styles.navigationButtonLeft
+            )}
+            onClick={goToPrevious}
+            disabled={isTransitioning}
+          >
+            <ChevronLeft size={18} />
+          </Button>
+        </motion.div>
 
-        <AnimatePresence>
-          {canGoNext && (
-            <motion.div
-              initial={{ opacity: 0, x: 10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 10 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Button
-                variant="outline"
-                size="sm"
-                className={cn(
-                  "w-10 h-10 rounded-full shadow-md",
-                  styles.navigationButton,
-                  styles.navigationButtonRight
-                )}
-                onClick={goToNext}
-                disabled={!canGoNext || isTransitioning}
-              >
-                <ChevronRight size={18} />
-              </Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0, x: 10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <Button
+            variant="outline"
+            size="sm"
+            className={cn(
+              "w-10 h-10 rounded-full shadow-md",
+              styles.navigationButton,
+              styles.navigationButtonRight
+            )}
+            onClick={goToNext}
+            disabled={isTransitioning}
+          >
+            <ChevronRight size={18} />
+          </Button>
+        </motion.div>
 
         {/* Carousel 内容区域 */}
         <div
@@ -549,58 +558,48 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          {/* 垂直导航按钮 - 仅在移动端显示 */}
+          {/* 垂直导航按钮 - 仅在移动端显示，无限循环 */}
           {isMobile && (
             <>
-              <AnimatePresence>
-                {canGoPrevious && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className={cn(
-                        "rounded-full shadow-md",
-                        styles.verticalNavigationButton,
-                        styles.verticalNavigationButtonUp
-                      )}
-                      onClick={goToPrevious}
-                      disabled={!canGoPrevious || isTransitioning}
-                    >
-                      <ChevronUp size={14} />
-                    </Button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "rounded-full shadow-md",
+                    styles.verticalNavigationButton,
+                    styles.verticalNavigationButtonUp
+                  )}
+                  onClick={goToPrevious}
+                  disabled={isTransitioning}
+                >
+                  <ChevronUp size={14} />
+                </Button>
+              </motion.div>
 
-              <AnimatePresence>
-                {canGoNext && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className={cn(
-                        "rounded-full shadow-md",
-                        styles.verticalNavigationButton,
-                        styles.verticalNavigationButtonDown
-                      )}
-                      onClick={goToNext}
-                      disabled={!canGoNext || isTransitioning}
-                    >
-                      <ChevronDown size={14} />
-                    </Button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "rounded-full shadow-md",
+                    styles.verticalNavigationButton,
+                    styles.verticalNavigationButtonDown
+                  )}
+                  onClick={goToNext}
+                  disabled={isTransitioning}
+                >
+                  <ChevronDown size={14} />
+                </Button>
+              </motion.div>
             </>
           )}
           <div 
@@ -639,6 +638,8 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
                             styles.expertiseCard
                           )}
                           onClick={() => handleCardClick(area)}
+                          onMouseEnter={() => setIsHoveringCard(true)}
+                          onMouseLeave={() => setIsHoveringCard(false)}
                         >
                           <CardContent className={cn(
                             "p-6 flex flex-col justify-between h-full",
@@ -681,7 +682,12 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
                                     initial={{ opacity: 0, y: 5 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.2, delay: index * 0.1 }}
-                                    onClick={(e) => handleQuestionClick(question, e, area.key)}
+                                    onClick={(e) => {
+                                      setIsQuestionClicked(true);
+                                      handleQuestionClick(question, e, area.key);
+                                      // 3秒后重置点击状态
+                                      setTimeout(() => setIsQuestionClicked(false), 3000);
+                                    }}
                                     className={cn(
                                       "w-full text-left p-2 bg-background-secondary hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-all duration-300 border border-transparent hover:border-primary-200 dark:hover:border-primary-800 hover:translate-x-1 hover:shadow-sm group/question",
                                       isMobile && "p-3 text-sm"
