@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useGamification } from '@/hooks/useGamification';
 import { supabase } from '@/lib/supabase';
@@ -130,7 +130,27 @@ export default function Profile() {
     company: '',
     website_url: ''
   });
+  
+  // 分页状态
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const navigate = useNavigate();
+
+  // 合并stories和drafts，按更新时间排序
+  const allStories = useMemo(() => {
+    const published = userStories.map(story => ({ ...story, isDraft: false }));
+    const drafts = draftStories.map(story => ({ ...story, isDraft: true }));
+    return [...published, ...drafts].sort((a, b) => 
+      new Date(b.updated_at || b.created_at).getTime() - new Date(a.updated_at || a.created_at).getTime()
+    );
+  }, [userStories, draftStories]);
+
+  // 分页计算
+  const totalPages = Math.ceil(allStories.length / itemsPerPage);
+  const paginatedStories = allStories.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   useEffect(() => {
     if (user) {
@@ -832,7 +852,7 @@ export default function Profile() {
               </div>
               
               <p className="text-gray-600 mb-4">
-                {user.user_metadata?.bio || t('profile.no_bio', 'No bio available')}
+                {profile?.bio || user.user_metadata?.bio || t('profile.no_bio', 'No bio available')}
               </p>
               
               <div className="flex items-center space-x-4 text-sm text-gray-500">
@@ -907,86 +927,12 @@ export default function Profile() {
       </div>
 
       {/* Main Content Tabs */}
-      <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-7">
-          <TabsTrigger value="overview">{t('profile.tabs.overview', 'Overview')}</TabsTrigger>
+      <Tabs defaultValue="stories" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="stories">{t('profile.tabs.stories', 'Stories')}</TabsTrigger>
-          <TabsTrigger value="drafts">
-            {t('profile.tabs.drafts', 'Drafts')} {draftStories.length > 0 && <Badge variant="secondary" className="ml-1">{draftStories.length}</Badge>}
-          </TabsTrigger>
-          <TabsTrigger value="saved">{t('profile.tabs.saved', 'Saved')}</TabsTrigger>
           <TabsTrigger value="submissions">{t('profile.tabs.submissions', 'Submissions')}</TabsTrigger>
-          <TabsTrigger value="achievements">{t('profile.tabs.achievements', 'Achievements')}</TabsTrigger>
-          <TabsTrigger value="activity">{t('profile.tabs.activity', 'Activity')}</TabsTrigger>
+          <TabsTrigger value="interaction">{t('profile.tabs.interaction', 'Interaction')}</TabsTrigger>
         </TabsList>
-
-        {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Recent Badges */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Trophy className="w-5 h-5 mr-2" />
-                  {t('profile.recent_badges', 'Recent Badges')}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {(!badges || badges.length === 0) ? (
-                  <p className="text-gray-500 text-center py-4">
-                    {t('profile.no_badges', 'No badges earned yet')}
-                  </p>
-                ) : (
-                  <div className="space-y-3">
-                    {(badges || []).slice(0, 5).map((badge) => (
-                      <div key={badge.id} className="flex items-center space-x-3">
-                        <div className={`w-10 h-10 rounded-full ${getBadgeColor(badge.badge_type)} flex items-center justify-center text-white`}>
-                          {getBadgeIcon(badge.badge_type)}
-                        </div>
-                        <div className="flex-1">
-                          <p className="font-medium text-foreground">{badge.badge_name}</p>
-                          <p className="text-sm text-gray-500">{badge.badge_description}</p>
-                        </div>
-                        <span className="text-xs text-gray-400">
-                          {formatDate(badge.earned_at)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Recent Activity */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Activity className="w-5 h-5 mr-2" />
-                  {t('profile.recent_activity', 'Recent Activity')}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {(!activities || activities.length === 0) ? (
-                  <p className="text-gray-500 text-center py-4">
-                    {t('profile.no_activity', 'No recent activity')}
-                  </p>
-                ) : (
-                  <div className="space-y-3">
-                    {(activities || []).slice(0, 5).map((activity) => (
-                      <div key={activity.id} className="flex items-start space-x-3">
-                        <div className="w-2 h-2 bg-blue-600 rounded-full mt-2"></div>
-                        <div className="flex-1">
-                          <p className="text-sm text-foreground">{activity.activity_description}</p>
-                          <p className="text-xs text-gray-500">{formatDate(activity.created_at)}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
 
         {/* Stories Tab */}
         <TabsContent value="stories">
@@ -994,72 +940,15 @@ export default function Profile() {
             <CardHeader>
               <CardTitle>{t('profile.my_stories', 'My Stories')}</CardTitle>
               <CardDescription>
-                {t('profile.stories_desc', 'Stories you have published')}
+                {t('profile.stories_desc', 'All your stories and drafts')}
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {userStories.length === 0 ? (
-                <p className="text-gray-500 text-center py-8">
-                  {t('profile.no_stories', 'No stories published yet')}
-                </p>
-              ) : (
-                <div className="space-y-4">
-                  {userStories.map((story: any) => (
-                    <div key={story.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow">
-                      <div className="flex items-start justify-between mb-2">
-                        <h3 className="font-semibold text-gray-900 dark:text-gray-100 flex-1">{story.title}</h3>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => navigate(`/edit-story/${story.id}`)}
-                        >
-                          <Edit3 className="w-4 h-4 mr-1" />
-                          {t('common.edit', 'Edit')}
-                        </Button>
-                      </div>
-                      <p className="text-gray-600 dark:text-gray-400 text-sm mb-3 line-clamp-2">{story.content}</p>
-                      <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
-                        <span>{formatDate(story.created_at)}</span>
-                        <div className="flex items-center space-x-4">
-                          <span className="flex items-center">
-                            <Heart className="w-4 h-4 mr-1" />
-                            {story.like_count}
-                          </span>
-                          <span className="flex items-center">
-                            <MessageSquare className="w-4 h-4 mr-1" />
-                            {story.comment_count}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Drafts Tab */}
-        <TabsContent value="drafts">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span>{t('profile.my_drafts', 'My Drafts')}</span>
-                <Button onClick={() => navigate('/create-story')} size="sm">
-                  <PlusCircle className="w-4 h-4 mr-2" />
-                  {t('story.create', 'Create Story')}
-                </Button>
-              </CardTitle>
-              <CardDescription>
-                {t('profile.drafts_desc', 'Unpublished drafts - only visible to you')}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {draftStories.length === 0 ? (
+              {allStories.length === 0 ? (
                 <div className="text-center py-12">
                   <FileText className="w-16 h-16 mx-auto text-gray-300 mb-4" />
                   <p className="text-gray-500 mb-4">
-                    {t('profile.no_drafts', 'No drafts yet')}
+                    {t('profile.no_stories', 'No stories yet')}
                   </p>
                   <Button onClick={() => navigate('/create-story')} variant="outline">
                     <PlusCircle className="w-4 h-4 mr-2" />
@@ -1067,73 +956,73 @@ export default function Profile() {
                   </Button>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {draftStories.map((draft: any) => (
-                    <div 
-                      key={draft.id} 
-                      className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer group"
-                      onClick={() => navigate(`/edit-story/${draft.id}`)}
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <h3 className="font-semibold text-gray-900 dark:text-gray-100 group-hover:text-primary-600 transition-colors">
-                          {draft.title}
-                        </h3>
-                        <Badge variant="outline" className="ml-2">Draft</Badge>
+                <>
+                  <div className="space-y-4">
+                    {paginatedStories.map((story: any) => (
+                      <div key={story.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-semibold text-gray-900 dark:text-gray-100">{story.title}</h3>
+                              {story.isDraft && (
+                                <Badge variant="secondary" className="text-xs">
+                                  {t('common.draft', 'Draft')}
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => navigate(`/edit-story/${story.id}`)}
+                          >
+                            <Edit3 className="w-4 h-4 mr-1" />
+                            {t('common.edit', 'Edit')}
+                          </Button>
+                        </div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm mb-3 line-clamp-2">{story.content}</p>
+                        <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+                          <span>{formatDate(story.updated_at || story.created_at)}</span>
+                          <div className="flex items-center space-x-4">
+                            <span className="flex items-center">
+                              <Heart className="w-4 h-4 mr-1" />
+                              {story.like_count || 0}
+                            </span>
+                            <span className="flex items-center">
+                              <MessageSquare className="w-4 h-4 mr-1" />
+                              {story.comment_count || 0}
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                      <p className="text-gray-600 dark:text-gray-400 text-sm mb-3 line-clamp-2">
-                        {draft.excerpt || draft.content?.substring(0, 150) + '...' || 'No content yet'}
-                      </p>
-                      <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
-                        <span className="flex items-center">
-                          <Clock className="w-4 h-4 mr-1" />
-                          {t('profile.last_edited', 'Last edited')} {formatDate(draft.updated_at)}
-                        </span>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/edit-story/${draft.id}`);
-                          }}
-                        >
-                          <Edit3 className="w-4 h-4 mr-1" />
-                          {t('common.edit', 'Edit')}
-                        </Button>
-                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* 分页控件 */}
+                  {totalPages > 1 && (
+                    <div className="flex items-center justify-center space-x-2 mt-6">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                      >
+                        {t('common.previous', 'Previous')}
+                      </Button>
+                      <span className="text-sm text-gray-500">
+                        {t('common.page', 'Page')} {currentPage} {t('common.of', 'of')} {totalPages}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                      >
+                        {t('common.next', 'Next')}
+                      </Button>
                     </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Saved Stories Tab */}
-        <TabsContent value="saved">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('profile.saved_stories', 'Saved Stories')}</CardTitle>
-              <CardDescription>
-                {t('profile.saved_desc', 'Stories you have saved for later')}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {savedStories.length === 0 ? (
-                <p className="text-foreground-secondary text-center py-8">
-                  {t('profile.no_saved', 'No saved stories yet')}
-                </p>
-              ) : (
-                <div className="space-y-4">
-                  {savedStories.map((save: any) => (
-                    <div key={save.id} className="border border-border rounded-lg p-4 hover:shadow-md dark:hover:shadow-lg transition-shadow bg-card">
-                      <h3 className="font-semibold text-foreground mb-2">{save.stories?.title}</h3>
-                      <p className="text-foreground-secondary text-sm mb-3 line-clamp-2">{save.stories?.content}</p>
-                      <div className="flex items-center justify-between text-sm text-foreground-secondary">
-                        <span>{t('profile.saved_on', 'Saved on')} {formatDate(save.created_at)}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                  )}
+                </>
               )}
             </CardContent>
           </Card>
@@ -1488,112 +1377,130 @@ export default function Profile() {
           </div>
         </TabsContent>
 
-        {/* Achievements Tab */}
-        <TabsContent value="achievements">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('profile.achievements_title', 'Achievements & Badges')}</CardTitle>
-              <CardDescription>
-                {t('profile.achievements_desc', 'Your progress and accomplishments on the platform')}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                {/* Badges */}
-                <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-4">{t('profile.badges', 'Badges')}</h3>
-                  {badges.length === 0 ? (
-                    <p className="text-gray-500 text-center py-4">
-                      {t('profile.no_badges', 'No badges earned yet')}
-                    </p>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {badges.map((badge) => (
-                        <div key={badge.id} className="border border-gray-200 rounded-lg p-4">
-                          <div className={`w-12 h-12 rounded-full ${getBadgeColor(badge.badge_type)} flex items-center justify-center text-white mb-3`}>
-                            {getBadgeIcon(badge.badge_type)}
-                          </div>
-                          <h4 className="font-semibold text-foreground">{badge.badge_name}</h4>
-                          <p className="text-sm text-gray-600 mb-2">{badge.badge_description}</p>
-                          <p className="text-xs text-gray-500">{formatDate(badge.earned_at)}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <Separator />
-
-                {/* Achievements Progress */}
-                <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-4">{t('profile.progress', 'Progress')}</h3>
-                  {achievements.length === 0 ? (
-                    <p className="text-gray-500 text-center py-4">
-                      {t('profile.no_achievements', 'No achievements tracked yet')}
-                    </p>
-                  ) : (
-                    <div className="space-y-4">
-                      {achievements.map((achievement) => (
-                        <div key={achievement.id} className="border border-gray-200 rounded-lg p-4">
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="font-medium text-foreground">{achievement.achievement_name}</h4>
-                            <span className="text-sm text-gray-500">
-                              {achievement.progress}/{achievement.target_value}
+        {/* Interaction Tab */}
+        <TabsContent value="interaction">
+          <div className="space-y-6">
+            {/* Liked Stories */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Heart className="w-5 h-5 mr-2" />
+                  {t('profile.liked_stories', 'Liked Stories')}
+                </CardTitle>
+                <CardDescription>
+                  {t('profile.liked_desc', 'Stories you have liked')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {savedStories.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">
+                    {t('profile.no_liked', 'No liked stories yet')}
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {savedStories.slice(0, 5).map((save: any) => (
+                      <div key={save.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <Link to={`/story/${save.stories?.id}`} className="block">
+                          <h3 className="font-semibold text-gray-900 dark:text-gray-100 hover:text-primary-600 transition-colors">
+                            {save.stories?.title}
+                          </h3>
+                          <p className="text-gray-600 dark:text-gray-400 text-sm mt-1 line-clamp-2">
+                            {save.stories?.content}
+                          </p>
+                          <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mt-2">
+                            <span>{t('profile.liked_on', 'Liked on')} {formatDate(save.created_at)}</span>
+                            <span className="flex items-center">
+                              <Heart className="w-4 h-4 mr-1 text-red-500" />
+                              {save.stories?.like_count || 0}
                             </span>
                           </div>
-                          <Progress 
-                            value={(achievement.progress / achievement.target_value) * 100} 
-                            className="mb-2"
-                          />
-                          {achievement.completed_at && (
-                            <Badge variant="success" className="text-xs">
-                              {t('profile.completed', 'Completed')} {formatDate(achievement.completed_at)}
-                            </Badge>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Activity Tab */}
-        <TabsContent value="activity">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('profile.activity_timeline', 'Activity Timeline')}</CardTitle>
-              <CardDescription>
-                {t('profile.activity_desc', 'Your recent actions and interactions on the platform')}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {activities.length === 0 ? (
-                <p className="text-gray-500 text-center py-8">
-                  {t('profile.no_activity', 'No recent activity')}
-                </p>
-              ) : (
-                <div className="space-y-4">
-                  {activities.map((activity) => (
-                    <div key={activity.id} className="flex items-start space-x-4 border-b border-gray-100 pb-4">
-                      <div className="w-3 h-3 bg-blue-600 rounded-full mt-2"></div>
-                      <div className="flex-1">
-                        <p className="text-foreground">{activity.activity_description}</p>
-                        <p className="text-sm text-gray-500 mt-1">{formatDate(activity.created_at)}</p>
-                        {activity.metadata && (
-                          <div className="mt-2 text-xs text-gray-400">
-                            <code>{JSON.stringify(activity.metadata, null, 2)}</code>
-                          </div>
-                        )}
+                        </Link>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                    {savedStories.length > 5 && (
+                      <div className="text-center">
+                        <Button variant="outline" onClick={() => navigate('/profile?tab=saved')}>
+                          {t('profile.view_all_liked', 'View All Liked Stories')}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Saved Stories */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <BookMarked className="w-5 h-5 mr-2" />
+                  {t('profile.saved_stories', 'Saved Stories')}
+                </CardTitle>
+                <CardDescription>
+                  {t('profile.saved_desc', 'Stories you have saved for later')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {savedStories.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">
+                    {t('profile.no_saved', 'No saved stories yet')}
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {savedStories.slice(0, 5).map((save: any) => (
+                      <div key={save.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <Link to={`/story/${save.stories?.id}`} className="block">
+                          <h3 className="font-semibold text-gray-900 dark:text-gray-100 hover:text-primary-600 transition-colors">
+                            {save.stories?.title}
+                          </h3>
+                          <p className="text-gray-600 dark:text-gray-400 text-sm mt-1 line-clamp-2">
+                            {save.stories?.content}
+                          </p>
+                          <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mt-2">
+                            <span>{t('profile.saved_on', 'Saved on')} {formatDate(save.created_at)}</span>
+                            <span className="flex items-center">
+                              <BookMarked className="w-4 h-4 mr-1 text-blue-500" />
+                            </span>
+                          </div>
+                        </Link>
+                      </div>
+                    ))}
+                    {savedStories.length > 5 && (
+                      <div className="text-center">
+                        <Button variant="outline" onClick={() => navigate('/profile?tab=saved')}>
+                          {t('profile.view_all_saved', 'View All Saved Stories')}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Comments */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <MessageSquare className="w-5 h-5 mr-2" />
+                  {t('profile.my_comments', 'My Comments')}
+                </CardTitle>
+                <CardDescription>
+                  {t('profile.comments_desc', 'Comments you have made on stories')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8">
+                  <MessageSquare className="w-16 h-16 mx-auto text-gray-300 mb-4" />
+                  <p className="text-gray-500 mb-4">
+                    {t('profile.no_comments', 'No comments yet')}
+                  </p>
+                  <p className="text-sm text-gray-400">
+                    {t('profile.comments_help', 'Start engaging with the community by commenting on stories!')}
+                  </p>
                 </div>
-              )}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

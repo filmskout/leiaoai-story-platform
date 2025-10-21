@@ -109,11 +109,15 @@
   }
 
   .navigationButtonLeft {
-    left: 5px;
+    left: 8px;
+    top: 8px;
+    transform: none;
   }
 
   .navigationButtonRight {
-    right: 5px;
+    right: 8px;
+    top: 8px;
+    transform: none;
   }
 }
 

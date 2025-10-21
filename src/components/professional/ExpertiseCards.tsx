@@ -177,13 +177,13 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
     }
   ];
 
-  // 计算总页数 - 实现无限循环
-  const totalPages = 4; // 固定4页
-  const canGoPrevious = true; // 无限循环，总是可以前进
-  const canGoNext = true; // 无限循环，总是可以后退
+  // 计算总页数 - 根据每页卡片数量动态计算
+  const totalPages = Math.ceil(expertiseAreas.length / cardsPerPage);
+  const canGoPrevious = currentIndex > 0;
+  const canGoNext = currentIndex < totalPages - 1;
   
-  // 实际的页面索引，处理循环逻辑
-  const actualPageIndex = ((currentIndex % totalPages) + totalPages) % totalPages;
+  // 实际的页面索引
+  const actualPageIndex = currentIndex;
 
   // 响应式监听
   useEffect(() => {
@@ -340,23 +340,15 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
   const goToPrevious = useCallback(() => {
     if (canGoPrevious && !isTransitioning) {
       setIsTransitioning(true);
-      setCurrentIndex(prev => {
-        const newIndex = prev - 1;
-        // 处理循环：如果到达-1，跳到最后一页
-        return newIndex < 0 ? totalPages - 1 : newIndex;
-      });
+      setCurrentIndex(prev => Math.max(prev - 1, 0));
       setTimeout(() => setIsTransitioning(false), 300);
     }
-  }, [canGoPrevious, isTransitioning, totalPages]);
+  }, [canGoPrevious, isTransitioning]);
 
   const goToNext = useCallback(() => {
     if (canGoNext && !isTransitioning) {
       setIsTransitioning(true);
-      setCurrentIndex(prev => {
-        const newIndex = prev + 1;
-        // 处理循环：如果超过最大页数，跳回第一页
-        return newIndex >= totalPages ? 0 : newIndex;
-      });
+      setCurrentIndex(prev => Math.min(prev + 1, totalPages - 1));
       setTimeout(() => setIsTransitioning(false), 300);
     }
   }, [canGoNext, isTransitioning, totalPages]);
