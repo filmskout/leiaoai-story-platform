@@ -5,11 +5,13 @@ import { cn } from '@/lib/utils';
 import { MessageSquare, Upload, Share2, Sparkles, TrendingUp, Globe2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { useMobileLayout } from '@/hooks/use-mobile';
 
 const About: React.FC = () => {
   const { actualTheme } = useTheme();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const isMobile = useMobileLayout();
   const isEnglish = i18n.language.startsWith('en');
 
   return (
@@ -17,13 +19,14 @@ const About: React.FC = () => {
       "min-h-screen transition-colors duration-300",
       actualTheme === 'dark' ? "bg-gray-900" : "bg-gray-50"
     )}>
-      {/* Hero Section */}
-      <div className={cn(
-        "relative py-20 px-4 sm:px-6 lg:px-8",
-        actualTheme === 'dark'
-          ? "bg-gradient-to-br from-gray-900 via-blue-900/20 to-purple-900/20"
-          : "bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50"
-      )}>
+      {/* Hero Section - 移动端隐藏 */}
+      {!isMobile && (
+        <div className={cn(
+          "relative py-20 px-4 sm:px-6 lg:px-8",
+          actualTheme === 'dark'
+            ? "bg-gradient-to-br from-gray-900 via-blue-900/20 to-purple-900/20"
+            : "bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50"
+        )}>
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
             <div className="inline-flex items-center justify-center mb-6">
@@ -60,6 +63,7 @@ const About: React.FC = () => {
           </div>
         </div>
       </div>
+      )}
 
       {/* Vision & Mission Section */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">

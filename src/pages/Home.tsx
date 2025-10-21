@@ -294,7 +294,7 @@ export default function Home() {
                   variants={itemVariants}
                   className="space-y-6"
                 >
-                  <QuickAIChatInput onSubmit={handleSendMessage} className="h-[400px]" />
+                  <QuickAIChatInput onSubmit={handleSendMessage} className="h-[320px]" />
                 </motion.div>
               )}
             </div>

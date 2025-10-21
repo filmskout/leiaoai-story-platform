@@ -31,7 +31,7 @@ export const PageHero: React.FC<PageHeroProps> = ({
   return (
     <section className={cn(
       "bg-gradient-subtle",
-      isMobile ? "py-8 px-4" : "py-12 px-4",
+      isMobile ? "hidden" : "py-12 px-4", // 移动端隐藏
       className
     )}>
       <div className="container-custom">

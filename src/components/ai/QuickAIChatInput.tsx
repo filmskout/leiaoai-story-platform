@@ -162,8 +162,8 @@ export function QuickAIChatInput({ className, onSubmit }: QuickAIChatInputProps)
             </DropdownMenu>
         </div>
 
-        {/* AI响应区域 - 简化版本 */}
-        <div className="h-[170px] overflow-hidden rounded-lg bg-background-secondary border border-border flex items-center justify-center">
+        {/* AI响应区域 - 压缩版本 */}
+        <div className="h-[120px] overflow-hidden rounded-lg bg-background-secondary border border-border flex items-center justify-center">
           {isLoading ? (
             <div className="flex items-center justify-center w-full h-full">
               <UnifiedLoader 
