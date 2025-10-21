@@ -138,10 +138,10 @@ export function AnswerModule({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
         className={cn(
-          'w-full p-4 transition-all duration-200',
+          'w-full transition-all duration-200',
           isUser 
-            ? 'bg-primary-50 dark:bg-primary-900/20' 
-            : 'bg-neutral-50 dark:bg-neutral-800/50'
+            ? 'bg-primary-50 dark:bg-primary-900/20 p-4' 
+            : 'bg-neutral-50 dark:bg-neutral-800/50 p-4'
         )}
       >
         <div className="flex items-center gap-2 mb-3">
@@ -358,10 +358,10 @@ export function AnswerModule({
 
       {/* 答案显示区域 */}
       <Card className={cn(
-        "min-h-[200px] p-0 overflow-hidden shadow w-full",
-        isMobile ? "rounded-none border-0" : "rounded-none border-0"
+        "min-h-[200px] overflow-hidden shadow w-full",
+        isMobile ? "rounded-none border-0 p-0" : "rounded-none border-0 p-0"
       )}>
-        <div className={cn("p-6", isMobile && "px-4")}>
+        <div className={cn("", isMobile && "")}>
           {messages.length === 0 ? (
             <motion.div 
               initial={{ opacity: 0, scale: 0.9 }}

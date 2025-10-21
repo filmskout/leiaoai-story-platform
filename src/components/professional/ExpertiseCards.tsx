@@ -673,7 +673,7 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
                             </div>
 
                             {/* 建议问题 */}
-                            <div className={cn("space-y-2 flex-1", isMobile && "space-y-3")}>
+                            <div className={cn("space-y-2 flex-1", isMobile && "space-y-2")}>
                               <h4 className="font-medium text-foreground-muted mb-2 text-sm">{t('professional_services.suggested_questions')}:</h4>
                               {randomQuestions.length > 0 ? (
                                 randomQuestions.map((question, index) => (
@@ -744,27 +744,7 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
         </div>
       </motion.div>
 
-      {/* 页面指示器 */}
-      {totalPages > 1 && (
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.2 }}
-          className={styles.pageIndicators}
-        >
-          {Array.from({ length: totalPages }).map((_, index) => (
-            <button
-              key={index}
-              onClick={() => goToPage(index)}
-              className={cn(
-                styles.pageIndicator,
-                actualPageIndex === index && styles.pageIndicatorActive
-              )}
-              aria-label={`第 ${index + 1} 页`}
-            />
-          ))}
-        </motion.div>
-      )}
+      {/* 页面指示器已移除 */}
 
       {/* 底部操作区 - 紧凑布局 */}
       <motion.div 
