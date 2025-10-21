@@ -288,15 +288,13 @@ export default function Home() {
                 </motion.div>
               </div>
               
-              {/* 右侧AI问答卡片 - 移动端隐藏 */}
-              {!isMobile && (
-                <motion.div 
-                  variants={itemVariants}
-                  className="space-y-6"
-                >
-                  <QuickAIChatInput onSubmit={handleSendMessage} className="h-[420px]" />
-                </motion.div>
-              )}
+              {/* 右侧AI问答卡片 - 移动端也显示 */}
+              <motion.div 
+                variants={itemVariants}
+                className="space-y-6"
+              >
+                <QuickAIChatInput onSubmit={handleSendMessage} className={cn("h-[420px]", isMobile && "h-[380px]")} />
+              </motion.div>
             </div>
           </div>
         </div>
