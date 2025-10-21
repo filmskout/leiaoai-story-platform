@@ -36,7 +36,7 @@ export default defineConfig({
   build: {
     // 增加chunk大小限制，避免大文件警告
     chunkSizeWarningLimit: 1000, // 从默认的500KB增加到1000KB
-    // 允许空模块
+    // 添加缓存破坏策略
     rollupOptions: {
       onwarn(warning, warn) {
         if (warning.code === 'MODULE_LEVEL_DIRECTIVE' || 
@@ -53,7 +53,11 @@ export default defineConfig({
           'vendor-ui': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-tabs'],
           'vendor-markdown': ['react-markdown', 'remark-gfm', 'rehype-highlight'],
           'html2canvas': ['html2canvas'],
-        }
+        },
+        // 添加文件名哈希，确保缓存破坏
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]'
       }
     },
   }

@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect, useState, Suspense, lazy } from 'react';
+import React from 'react';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { AdminProvider } from '@/contexts/AdminContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
@@ -15,32 +16,97 @@ import i18n from '@/i18n';
 import { DynamicMetaTags } from '@/components/ui/DynamicMetaTags';
 import { Toaster } from 'sonner';
 
-// Lazy load page components
-const Home = lazy(() => import('@/pages/Home'));
-const AuthNew = lazy(() => import('@/pages/Auth'));
-const AdminLogin = lazy(() => import('@/pages/AdminLogin'));
-const Profile = lazy(() => import('@/pages/Profile'));
-const StoryDetail = lazy(() => import('@/pages/StoryDetail'));
-const CreateStory = lazy(() => import('@/pages/CreateStory'));
-const EditStory = lazy(() => import('@/pages/EditStory'));
-const Stories = lazy(() => import('@/pages/Stories'));
-const UserProfile = lazy(() => import('@/pages/UserProfile'));
-const AuthCallback = lazy(() => import('@/pages/AuthCallback'));
-const AIChat = lazy(() => import('@/pages/AIChat'));
-const BPAnalysis = lazy(() => import('@/pages/BPAnalysis'));
-const Settings = lazy(() => import('@/pages/Settings'));
-const DebugStories = lazy(() => import('@/pages/DebugStories'));
-const About = lazy(() => import('@/pages/About'));
-const Privacy = lazy(() => import('@/pages/Privacy'));
-const Terms = lazy(() => import('@/pages/Terms'));
-const Contact = lazy(() => import('@/pages/Contact'));
-const Program = lazy(() => import('@/pages/Program'));
-const Events = lazy(() => import('@/pages/Events'));
-const ToolsReviews = lazy(() => import('@/pages/ToolsReviews'));
-const AICompaniesCatalog = lazy(() => import('@/pages/AICompaniesCatalog'));
-const CompanyDetail = lazy(() => import('@/pages/CompanyDetail'));
-const MonitoringDashboard = lazy(() => import('@/pages/MonitoringDashboard'));
-const ReconfigureData = lazy(() => import('@/pages/ReconfigureData'));
+// Lazy load page components with error handling
+const lazyWithRetry = (importFunc: () => Promise<any>) => {
+  return lazy(() => {
+    return importFunc().catch((error) => {
+      console.error('Failed to load module:', error);
+      // 如果是网络错误或模块加载失败，尝试重新加载页面
+      if (error.message.includes('Failed to fetch') || error.message.includes('Loading chunk')) {
+        console.log('Retrying module load...');
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        });
+      }
+      throw error;
+    });
+  });
+};
+
+const Home = lazyWithRetry(() => import('@/pages/Home'));
+const AuthNew = lazyWithRetry(() => import('@/pages/Auth'));
+const AdminLogin = lazyWithRetry(() => import('@/pages/AdminLogin'));
+const Profile = lazyWithRetry(() => import('@/pages/Profile'));
+const StoryDetail = lazyWithRetry(() => import('@/pages/StoryDetail'));
+const CreateStory = lazyWithRetry(() => import('@/pages/CreateStory'));
+const EditStory = lazyWithRetry(() => import('@/pages/EditStory'));
+const Stories = lazyWithRetry(() => import('@/pages/Stories'));
+const UserProfile = lazyWithRetry(() => import('@/pages/UserProfile'));
+const AuthCallback = lazyWithRetry(() => import('@/pages/AuthCallback'));
+const AIChat = lazyWithRetry(() => import('@/pages/AIChat'));
+const BPAnalysis = lazyWithRetry(() => import('@/pages/BPAnalysis'));
+const Settings = lazyWithRetry(() => import('@/pages/Settings'));
+const DebugStories = lazyWithRetry(() => import('@/pages/DebugStories'));
+const About = lazyWithRetry(() => import('@/pages/About'));
+const Privacy = lazyWithRetry(() => import('@/pages/Privacy'));
+const Terms = lazyWithRetry(() => import('@/pages/Terms'));
+const Contact = lazyWithRetry(() => import('@/pages/Contact'));
+const Program = lazyWithRetry(() => import('@/pages/Program'));
+const Events = lazyWithRetry(() => import('@/pages/Events'));
+const ToolsReviews = lazyWithRetry(() => import('@/pages/ToolsReviews'));
+const AICompaniesCatalog = lazyWithRetry(() => import('@/pages/AICompaniesCatalog'));
+const CompanyDetail = lazyWithRetry(() => import('@/pages/CompanyDetail'));
+const MonitoringDashboard = lazyWithRetry(() => import('@/pages/MonitoringDashboard'));
+const ReconfigureData = lazyWithRetry(() => import('@/pages/ReconfigureData'));
+
+// Error boundary for dynamic imports
+class ChunkLoadErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error?: Error }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    // 检查是否是chunk加载错误
+    if (error.message.includes('Loading chunk') || error.message.includes('Failed to fetch')) {
+      return { hasError: true, error };
+    }
+    return null;
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('Chunk load error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex items-center justify-center min-h-screen bg-gray-50">
+          <div className="text-center max-w-md mx-auto">
+            <div className="text-red-500 text-6xl mb-4">⚠️</div>
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">页面加载失败</h2>
+            <p className="text-gray-600 mb-4">
+              模块加载失败，可能是缓存问题。请刷新页面重试。
+            </p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              刷新页面
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 // Loading fallback component
 const PageLoader = () => (
@@ -191,8 +257,9 @@ function AppRoutes() {
   }
 
   return (
-    <Suspense fallback={<PageLoader />}>
-      <Routes>
+    <ChunkLoadErrorBoundary>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
         {/* Authentication routes */}
         <Route path="/auth" element={
           <PublicRoute>
@@ -260,7 +327,8 @@ function AppRoutes() {
         {/* Catch all route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </Suspense>
+      </Suspense>
+    </ChunkLoadErrorBoundary>
   );
 }
 
