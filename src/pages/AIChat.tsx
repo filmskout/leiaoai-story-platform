@@ -27,7 +27,12 @@ export default function AIChat() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const questionParam = searchParams.get('question');
-  const locationState = location.state as { autoAsk?: boolean, question?: string } | null;
+  const locationState = location.state as { 
+    autoAsk?: boolean, 
+    question?: string, 
+    sessionId?: string,
+    from?: string 
+  } | null;
   const isMobile = useMobileLayout();
   const { selectedChatModel, setSelectedChatModel, modelConfigs } = useAI();
   
@@ -45,7 +50,8 @@ export default function AIChat() {
     handleVoiceInput,
     regenerateMessage,
     clearError,
-    selectQuestion
+    selectQuestion,
+    switchSession
   } = useSmartAIChat();
   
   // 使用 ref 来跟踪是否已经自动提问过（避免重复触发）
@@ -82,6 +88,14 @@ export default function AIChat() {
   // 保存待发送的消息引用
   const pendingQuestionRef = useRef<{ question: string; category?: string } | null>(null);
 
+  // 处理从Profile传来的session ID
+  useEffect(() => {
+    if (locationState?.sessionId && locationState?.from === 'profile') {
+      console.log('🔵 Loading session from Profile:', locationState.sessionId);
+      switchSession(locationState.sessionId);
+    }
+  }, [locationState?.sessionId, locationState?.from, switchSession]);
+
   // 自动提问初始问题
   useEffect(() => {
     console.log('🔵 AIChat: Auto-ask effect triggered', { 
@@ -94,9 +108,9 @@ export default function AIChat() {
       isLoading
     });
 
-    // 如果已经自动提问过了，跳过
-    if (hasAutoAskedRef.current) {
-      console.log('⏭️ Already auto-asked, skipping');
+    // 如果已经自动提问过了，或者是从Profile来的session，跳过
+    if (hasAutoAskedRef.current || locationState?.from === 'profile') {
+      console.log('⏭️ Already auto-asked or loading from profile, skipping');
       return;
     }
 

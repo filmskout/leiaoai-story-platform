@@ -31,7 +31,8 @@ export function useSmartAIChat() {
     isLoading,
     error,
     sendMessage: originalSendMessage,
-    createNewSession
+    createNewSession,
+    switchSession
   } = useAIChat();
   
   const [inputMessage, setInputMessage] = useState('');
@@ -143,11 +144,11 @@ export function useSmartAIChat() {
     if (messageIndex > 0) {
       const userMessage = currentMessages[messageIndex - 1];
       if (userMessage.role === 'user') {
-        // 重新发送用户消息
-        await sendMessage(userMessage.content);
+        // 直接发送原始用户消息，不添加语言前缀
+        await originalSendMessage(userMessage.content);
       }
     }
-  }, [currentMessages, sendMessage]);
+  }, [currentMessages, originalSendMessage]);
 
   // 清理错误
   const clearError = useCallback(() => {
@@ -176,6 +177,7 @@ export function useSmartAIChat() {
     regenerateMessage,
     clearError,
     selectQuestion,
+    switchSession, // 添加切换session功能
     
     // 原始数据
     currentSession,

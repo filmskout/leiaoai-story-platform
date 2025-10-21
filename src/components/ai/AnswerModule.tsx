@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAI } from '@/contexts/AIContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { type ChatMessage } from '@/hooks/useAIChat';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -60,6 +61,7 @@ export function AnswerModule({
   onQuestionSelect
 }: AnswerModuleProps) {
   const { t, i18n } = useTranslation();
+  const { profile } = useAuth();
   const isMobile = useMediaQuery('(max-width: 768px)');
   
   const {
@@ -154,7 +156,7 @@ export function AnswerModule({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-sm font-medium text-foreground">
-              {isUser ? t('user.profile') : (
+              {isUser ? (profile?.full_name || profile?.username || t('user.profile')) : (
                 i18n.language.startsWith('zh') ? '蕾奥君' : 'LeiaoAI Agent'
               )}
             </span>
