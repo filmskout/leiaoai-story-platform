@@ -69,14 +69,16 @@ async function checkEnvironment() {
   console.log('🔍 检查环境变量...');
   
   const requiredVars = [
-    'VITE_SUPABASE_URL',
-    'VITE_SUPABASE_ANON_KEY',
+    'SUPABASE_URL',
+    'SUPABASE_ANON_KEY',
     'OPENAI_API_KEY'
   ];
   
   const optionalVars = [
     'SUPABASE_SERVICE_ROLE_KEY',
-    'DEEPSEEK_API_KEY'
+    'DEEPSEEK_API_KEY',
+    'VITE_SUPABASE_URL',
+    'VITE_SUPABASE_ANON_KEY'
   ];
   
   let allRequired = true;

@@ -5,10 +5,10 @@
 ### 1. Supabase配置
 ```bash
 # Supabase项目URL
-export VITE_SUPABASE_URL="https://your-project.supabase.co"
+export SUPABASE_URL="https://your-project.supabase.co"
 
 # Supabase匿名密钥
-export VITE_SUPABASE_ANON_KEY="your-anon-key"
+export SUPABASE_ANON_KEY="your-anon-key"
 
 # Supabase服务角色密钥（推荐，用于脚本操作）
 export SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
@@ -26,13 +26,28 @@ export OPENAI_API_KEY="your-openai-api-key"
 export DEEPSEEK_API_KEY="your-deepseek-api-key"
 ```
 
+## Vercel环境变量配置
+
+如果您使用Vercel部署，请在Vercel Dashboard中设置以下环境变量：
+
+### 必需变量
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY` 
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `OPENAI_API_KEY`
+
+### 可选变量
+- `DEEPSEEK_API_KEY`
+
+**注意**：脚本会自动兼容VITE前缀的环境变量，但推荐使用标准的环境变量名称。
+
 ## 环境变量设置方法
 
 ### 方法1：创建.env文件
 在项目根目录创建`.env`文件：
 ```bash
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 OPENAI_API_KEY=your-openai-api-key
 DEEPSEEK_API_KEY=your-deepseek-api-key
@@ -40,8 +55,8 @@ DEEPSEEK_API_KEY=your-deepseek-api-key
 
 ### 方法2：临时设置（当前终端会话）
 ```bash
-export VITE_SUPABASE_URL="https://your-project.supabase.co"
-export VITE_SUPABASE_ANON_KEY="your-anon-key"
+export SUPABASE_URL="https://your-project.supabase.co"
+export SUPABASE_ANON_KEY="your-anon-key"
 export SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
 export OPENAI_API_KEY="your-openai-api-key"
 export DEEPSEEK_API_KEY="your-deepseek-api-key"
@@ -94,7 +109,7 @@ npm run reconfigure-all
 
 ### 常见错误
 1. **"Missing Supabase environment variables"**
-   - 检查VITE_SUPABASE_URL和VITE_SUPABASE_ANON_KEY是否正确设置
+   - 检查SUPABASE_URL和SUPABASE_ANON_KEY是否正确设置
 
 2. **"Missing OpenAI API key"**
    - 检查OPENAI_API_KEY是否正确设置
