@@ -15,7 +15,7 @@ export default function ReconfigureData() {
     setError(null);
 
     try {
-      const response = await fetch('/api/reconfigure-data', {
+      const response = await fetch('/api/unified?action=reconfigure', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
