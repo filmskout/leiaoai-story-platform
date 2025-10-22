@@ -35,7 +35,14 @@ export default function ReconfigureData() {
     setIsLoadingToken(true);
     try {
       const response = await fetch('/api/unified?action=auth-token');
-      const data = await response.json();
+      let data: any = null;
+      try {
+        data = await response.json();
+      } catch (e) {
+        // 服务器返回了非JSON（可能是平台错误页），给出更清晰提示
+        const text = await response.text();
+        throw new Error(`服务器返回了非JSON响应: ${text?.slice(0, 120)}...`);
+      }
       
       if (data.success) {
         setAuthToken(data.token);
@@ -394,7 +401,7 @@ export default function ReconfigureData() {
               ) : (
                 <>
                   <XCircle className="h-4 w-4 text-red-600" />
-                  <span className="text-sm text-red-600">认证token获取失败</span>
+                <span className="text-sm text-red-600">认证token获取失败，可手动输入</span>
                 </>
               )}
             </div>
@@ -407,6 +414,21 @@ export default function ReconfigureData() {
               重新获取
             </Button>
           </div>
+
+        {/* 手动输入ADMIN_TOKEN兜底 */}
+        {!authToken && (
+          <div className="grid grid-cols-1 gap-2">
+            <input
+              type="password"
+              placeholder="在此粘贴ADMIN_TOKEN（仅本地/受信环境使用）"
+              className="border rounded px-3 py-2 text-sm"
+              onChange={(e) => setAuthToken(e.target.value || null)}
+            />
+            <div className="text-xs text-gray-500">
+              如API返回非JSON导致自动获取失败，可临时手动输入。建议同时检查服务端环境变量是否正确配置。
+            </div>
+          </div>
+        )}
 
           {/* 数据库清理 */}
           <div className="space-y-3">
