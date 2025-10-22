@@ -31,6 +31,7 @@
     "fetch-domestic": "npx tsx scripts/fetch_domestic_companies.ts",
     "setup-updates": "npx tsx scripts/setup_periodic_updates.ts",
     "reconfigure-all": "npx tsx scripts/comprehensive_reconfiguration.ts",
+    "generate-full-data": "npx tsx scripts/batched_ai_data_generator.ts",
     "setup-env": "./setup-env.sh"
   },
   "dependencies": {
