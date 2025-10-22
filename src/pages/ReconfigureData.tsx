@@ -40,7 +40,9 @@ export default function ReconfigureData() {
         data = await response.json();
       } catch (e) {
         // 服务器返回了非JSON（可能是平台错误页），给出更清晰提示
-        const text = await response.text();
+        // 克隆响应以避免body stream already read错误
+        const clonedResponse = response.clone();
+        const text = await clonedResponse.text();
         throw new Error(`服务器返回了非JSON响应: ${text?.slice(0, 120)}...`);
       }
       
@@ -282,7 +284,9 @@ export default function ReconfigureData() {
       try {
         data = await response.json();
       } catch (e) {
-        const text = await response.text();
+        // 克隆响应以避免body stream already read错误
+        const clonedResponse = response.clone();
+        const text = await clonedResponse.text();
         throw new Error(`服务器返回了非JSON响应: ${text?.slice(0, 200)}...`);
       }
 
