@@ -35,16 +35,18 @@ export default function ReconfigureData() {
     setIsLoadingToken(true);
     try {
       const response = await fetch('/api/unified?action=auth-token');
-      let data: any = null;
-      try {
-        data = await response.json();
-      } catch (e) {
-        // 服务器返回了非JSON（可能是平台错误页），给出更清晰提示
-        // 克隆响应以避免body stream already read错误
-        const clonedResponse = response.clone();
-        const text = await clonedResponse.text();
-        throw new Error(`服务器返回了非JSON响应: ${text?.slice(0, 120)}...`);
+      
+      // 检查响应状态和内容类型
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
+      
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error(`服务器返回了非JSON响应 (Content-Type: ${contentType})`);
+      }
+
+      const data = await response.json();
       
       if (data.success) {
         setAuthToken(data.token);
@@ -279,16 +281,17 @@ export default function ReconfigureData() {
         })
       });
 
-      // 兼容后端在异常情况下返回非JSON（如平台错误页或代理插入）
-      let data: any = null;
-      try {
-        data = await response.json();
-      } catch (e) {
-        // 克隆响应以避免body stream already read错误
-        const clonedResponse = response.clone();
-        const text = await clonedResponse.text();
-        throw new Error(`服务器返回了非JSON响应: ${text?.slice(0, 200)}...`);
+      // 检查响应状态和内容类型
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
+      
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error(`服务器返回了非JSON响应 (Content-Type: ${contentType})`);
+      }
+
+      const data = await response.json();
 
       if (data.success) {
         setClearResult(data);
