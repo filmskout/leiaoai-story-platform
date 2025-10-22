@@ -148,7 +148,7 @@ async function handleReconfigure(req: any, res: any) {
     }
 
     // 运行重新配置脚本
-    const { stdout, stderr } = await execAsync('tsx scripts/comprehensive_reconfiguration.ts');
+    const { stdout, stderr } = await execAsync('npx tsx scripts/comprehensive_reconfiguration.ts');
     
     return res.status(200).json({
       success: true,
