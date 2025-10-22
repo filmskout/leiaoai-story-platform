@@ -8,7 +8,7 @@ import { Bot, ArrowRight, Sparkles, Send, ChevronDown, Mic, MicOff } from 'lucid
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { UnifiedLoader } from '@/components/ui/UnifiedLoader';
-import { useMobileLayout } from '@/hooks/useMobileLayout';
+import { useMobileLayout } from '@/hooks/use-mobile';
 import {
   DropdownMenu,
   DropdownMenuContent,
