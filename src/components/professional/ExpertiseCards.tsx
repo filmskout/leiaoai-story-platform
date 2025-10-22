@@ -383,7 +383,12 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
   };
 
   // 拖拽和触摸事件处理
-  const handleDragStart = (clientX: number) => {
+  const handleDragStart = (clientX: number, target?: HTMLElement) => {
+    // 检查是否点击在导航按钮上
+    if (target && (target.closest('.navigationButton') || target.closest('button'))) {
+      return; // 不启动拖拽
+    }
+    
     setIsDragging(true);
     setDragStartX(clientX);
     setDragOffset(0);
@@ -398,7 +403,7 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
 
   const handleDragEnd = () => {
     if (isDragging) {
-      const threshold = 100; // 拖拽阈值
+      const threshold = 80; // 降低拖拽阈值，提高响应性
       
       if (dragOffset > threshold && canGoPrevious) {
         goToPrevious();
@@ -414,7 +419,7 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
   // 鼠标事件
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
-    handleDragStart(e.clientX);
+    handleDragStart(e.clientX, e.target as HTMLElement);
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -429,7 +434,7 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
   const handleTouchStart = (e: React.TouchEvent) => {
     const touch = e.touches[0];
     touchStartRef.current = touch.clientX;
-    handleDragStart(touch.clientX);
+    handleDragStart(touch.clientX, e.target as HTMLElement);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
