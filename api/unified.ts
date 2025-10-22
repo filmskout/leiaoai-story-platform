@@ -1590,6 +1590,19 @@ async function handleClearDatabase(req: any, res: any) {
       try {
         console.log(`🔄 清理表: ${table}`);
         
+        // 先检查表是否存在
+        const { data: tableExists, error: checkError } = await supabase
+          .from(table)
+          .select('id')
+          .limit(1);
+
+        if (checkError) {
+          console.log(`⚠️ 表 ${table} 不存在或无法访问:`, checkError.message);
+          results.push({ table, success: false, error: `表不存在: ${checkError.message}` });
+          errorCount++;
+          continue;
+        }
+
         const { error } = await supabase
           .from(table)
           .delete()
@@ -1613,9 +1626,10 @@ async function handleClearDatabase(req: any, res: any) {
 
     console.log(`📊 清理完成: ${clearedCount} 个表成功, ${errorCount} 个表失败`);
 
+    // 即使有错误也返回成功，但包含错误详情
     return res.status(200).json({
       success: true,
-      message: '数据库清理完成',
+      message: `数据库清理完成: ${clearedCount} 个表成功, ${errorCount} 个表失败`,
       results: {
         clearedCount,
         errorCount,
