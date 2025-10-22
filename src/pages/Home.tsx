@@ -187,6 +187,16 @@ export default function Home() {
                   </motion.p>
                 </motion.div>
                 
+                {/* 移动端QuickAIChatInput放在按钮上方 */}
+                {isMobile && (
+                  <motion.div 
+                    variants={itemVariants}
+                    className="mb-6"
+                  >
+                    <QuickAIChatInput onSubmit={handleSendMessage} className="h-[320px]" />
+                  </motion.div>
+                )}
+
                 <motion.div 
                   variants={itemVariants}
                   className={cn(
@@ -288,13 +298,15 @@ export default function Home() {
                 </motion.div>
               </div>
               
-              {/* 右侧AI问答卡片 - 移动端也显示 */}
-              <motion.div 
-                variants={itemVariants}
-                className="space-y-6"
-              >
-                <QuickAIChatInput onSubmit={handleSendMessage} className={cn("h-[420px]", isMobile && "h-[380px]")} />
-              </motion.div>
+              {/* 右侧AI问答卡片 - 仅桌面端显示 */}
+              {!isMobile && (
+                <motion.div 
+                  variants={itemVariants}
+                  className="space-y-6"
+                >
+                  <QuickAIChatInput onSubmit={handleSendMessage} className="h-[420px]" />
+                </motion.div>
+              )}
             </div>
           </div>
         </div>
