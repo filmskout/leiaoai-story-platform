@@ -277,7 +277,14 @@ export default function ReconfigureData() {
         })
       });
 
-      const data = await response.json();
+      // 兼容后端在异常情况下返回非JSON（如平台错误页或代理插入）
+      let data: any = null;
+      try {
+        data = await response.json();
+      } catch (e) {
+        const text = await response.text();
+        throw new Error(`服务器返回了非JSON响应: ${text?.slice(0, 200)}...`);
+      }
 
       if (data.success) {
         setClearResult(data);
@@ -285,7 +292,7 @@ export default function ReconfigureData() {
         setError(data.error || '数据库清理失败');
       }
     } catch (err: any) {
-      setError(err.message);
+      setError(`数据库清理失败: ${err.message}`);
     } finally {
       setIsClearing(false);
     }
