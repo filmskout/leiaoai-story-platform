@@ -45,20 +45,20 @@
 }
 
 /* 响应式优化 */
-/* 移动端禁用悬停效果 - 调整红标区域高度 */
+/* 移动端禁用悬停效果 - 平衡红标区域高度 */
 @media (max-width: 768px) {
   .carouselContainer {
     padding: 0;
     margin: 0;
     height: auto;
-    min-height: 50vh; /* 从35vh增加到50vh */
-    max-height: 70vh; /* 从50vh增加到70vh */
+    min-height: 42vh; /* 调整到42vh */
+    max-height: 58vh; /* 调整到58vh */
   }
   
   .carouselContent {
     height: auto;
-    min-height: 50vh; /* 从35vh增加到50vh */
-    max-height: 70vh; /* 从50vh增加到70vh */
+    min-height: 42vh; /* 调整到42vh */
+    max-height: 58vh; /* 调整到58vh */
     border-radius: 0;
   }
   
@@ -66,20 +66,20 @@
     gap: 0;
     padding: 0;
     height: auto;
-    min-height: 50vh; /* 从35vh增加到50vh */
-    max-height: 70vh; /* 从50vh增加到70vh */
+    min-height: 42vh; /* 调整到42vh */
+    max-height: 58vh; /* 调整到58vh */
   }
   
   .expertiseCard {
     margin: 0;
     border-radius: 0;
-    min-height: 50vh; /* 从35vh增加到50vh */
-    max-height: 70vh; /* 从50vh增加到70vh */
+    min-height: 42vh; /* 调整到42vh */
+    max-height: 58vh; /* 调整到58vh */
     height: auto;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 16px 12px; /* 从12px 8px增加到16px 12px */
+    padding: 14px 10px; /* 调整到14px 10px */
   }
   
   .expertiseCard:hover {
