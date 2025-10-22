@@ -3,6 +3,7 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
+import BackgroundTaskManager, { TaskType } from '@/lib/BackgroundTaskManager';
 
 const execAsync = promisify(exec);
 
@@ -275,6 +276,16 @@ export default async function handler(req: any, res: any) {
       
       case 'clear-database':
         return handleClearDatabase(req, res);
+      
+      // Agent模式相关接口
+      case 'start-agent-task':
+        return handleStartAgentTask(req, res);
+      
+      case 'check-task-status':
+        return handleCheckTaskStatus(req, res);
+      
+      case 'get-task-list':
+        return handleGetTaskList(req, res);
       
       default:
         return res.status(400).json({ error: 'Invalid action' });
@@ -1424,6 +1435,122 @@ async function handleCreateToolStory(req: any, res: any) {
 
   // 这里可以添加创建工具故事的具体实现
   return res.status(200).json({ message: 'Create Tool Story endpoint' });
+}
+
+// Agent模式 - 启动后台任务
+async function handleStartAgentTask(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { token, taskType } = req.body;
+  if (token !== process.env.ADMIN_TOKEN && token !== 'admin-token-123') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    const taskManager = BackgroundTaskManager.getInstance();
+    
+    // 创建任务
+    const taskId = await taskManager.createTask(taskType as TaskType);
+    
+    // 异步启动任务（不等待完成）
+    taskManager.startTask(taskId).catch(error => {
+      console.error(`❌ 后台任务执行失败: ${taskId}`, error);
+    });
+
+    console.log(`🚀 Agent任务已启动: ${taskId}`);
+    
+    return res.status(200).json({
+      success: true,
+      message: 'Agent任务已启动',
+      taskId,
+      status: 'started',
+      checkUrl: `/api/unified?action=check-task-status&taskId=${taskId}`,
+      note: '任务在后台执行，您可以关闭浏览器。完成后请查询任务状态。'
+    });
+
+  } catch (error: any) {
+    console.error('❌ 启动Agent任务失败:', error);
+    return res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+}
+
+// Agent模式 - 查询任务状态
+async function handleCheckTaskStatus(req: any, res: any) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { taskId } = req.query;
+  if (!taskId) {
+    return res.status(400).json({ error: 'Missing taskId parameter' });
+  }
+
+  try {
+    const taskManager = BackgroundTaskManager.getInstance();
+    
+    // 获取任务状态
+    const taskStatus = await taskManager.getTaskStatus(taskId);
+    
+    // 获取任务日志
+    const taskLogs = await taskManager.getTaskLogs(taskId, 20);
+
+    return res.status(200).json({
+      success: true,
+      task: taskStatus,
+      logs: taskLogs,
+      isCompleted: taskStatus.status === 'completed',
+      isFailed: taskStatus.status === 'failed',
+      isRunning: taskStatus.status === 'running'
+    });
+
+  } catch (error: any) {
+    console.error(`❌ 查询任务状态失败: ${taskId}`, error);
+    return res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+}
+
+// Agent模式 - 获取所有任务列表
+async function handleGetTaskList(req: any, res: any) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { token } = req.query;
+  if (token !== process.env.ADMIN_TOKEN && token !== 'admin-token-123') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    const { data: tasks, error } = await supabase
+      .from('background_tasks')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(50);
+
+    if (error) {
+      throw error;
+    }
+
+    return res.status(200).json({
+      success: true,
+      tasks: tasks || []
+    });
+
+  } catch (error: any) {
+    console.error('❌ 获取任务列表失败:', error);
+    return res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
 }
 
 // 数据库清理处理

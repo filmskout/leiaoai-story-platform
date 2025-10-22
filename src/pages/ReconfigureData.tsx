@@ -24,6 +24,11 @@ export default function ReconfigureData() {
   });
   const [isClearing, setIsClearing] = useState(false);
   const [clearResult, setClearResult] = useState<any>(null);
+  const [agentMode, setAgentMode] = useState(false);
+  const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
+  const [taskStatus, setTaskStatus] = useState<any>(null);
+  const [taskLogs, setTaskLogs] = useState<any[]>([]);
+  const [isCheckingStatus, setIsCheckingStatus] = useState(false);
 
   // 获取认证token
   const fetchAuthToken = async () => {
@@ -123,6 +128,127 @@ export default function ReconfigureData() {
     }
   };
 
+  // Agent模式 - 启动后台任务
+  const handleStartAgentTask = async () => {
+    if (!authToken) {
+      setError('认证token未获取，请刷新页面重试');
+      return;
+    }
+
+    setIsRunning(true);
+    setResult(null);
+    setError(null);
+    setTaskStatus(null);
+    setTaskLogs([]);
+
+    try {
+      const taskType = generationMode === 'full' ? 'generate-full-data' : 'reconfigure';
+      
+      const response = await fetch('/api/unified?action=start-agent-task', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          token: authToken,
+          taskType: taskType
+        })
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setCurrentTaskId(data.taskId);
+        setResult({
+          success: true,
+          message: data.message,
+          taskId: data.taskId,
+          note: data.note
+        });
+        
+        // 开始轮询任务状态
+        startStatusPolling(data.taskId);
+      } else {
+        setError(data.error || '启动Agent任务失败');
+      }
+    } catch (err: any) {
+      setError(`启动Agent任务失败: ${err.message}`);
+    } finally {
+      setIsRunning(false);
+    }
+  };
+
+  // 开始轮询任务状态
+  const startStatusPolling = (taskId: string) => {
+    const pollInterval = setInterval(async () => {
+      try {
+        await checkTaskStatus(taskId);
+      } catch (error) {
+        console.error('轮询任务状态失败:', error);
+      }
+    }, 3000); // 每3秒检查一次
+
+    // 存储interval ID以便清理
+    (window as any).statusPollingInterval = pollInterval;
+  };
+
+  // 检查任务状态
+  const checkTaskStatus = async (taskId: string) => {
+    setIsCheckingStatus(true);
+    
+    try {
+      const response = await fetch(`/api/unified?action=check-task-status&taskId=${taskId}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setTaskStatus(data.task);
+        setTaskLogs(data.logs || []);
+        
+        // 更新进度
+        if (data.task.progress) {
+          setProgress({
+            current: data.task.progress.current || 0,
+            total: data.task.progress.total || 0,
+            currentStep: data.task.current_step || '',
+            details: data.logs?.map((log: any) => `${log.created_at}: ${log.message}`) || []
+          });
+        }
+        
+        // 如果任务完成或失败，停止轮询
+        if (data.isCompleted || data.isFailed) {
+          clearInterval((window as any).statusPollingInterval);
+          setIsRunning(false);
+          
+          if (data.isCompleted) {
+            setResult(prev => ({
+              ...prev,
+              message: 'Agent任务已完成！',
+              completed: true
+            }));
+          } else if (data.isFailed) {
+            setError(`Agent任务失败: ${data.task.error_message || '未知错误'}`);
+          }
+        }
+      } else {
+        setError(data.error || '查询任务状态失败');
+      }
+    } catch (err: any) {
+      setError(`查询任务状态失败: ${err.message}`);
+    } finally {
+      setIsCheckingStatus(false);
+    }
+  };
+
+  // 手动检查任务状态
+  const handleCheckStatus = async () => {
+    if (!currentTaskId) {
+      setError('没有正在运行的任务');
+      return;
+    }
+    
+    await checkTaskStatus(currentTaskId);
+  };
+
   const handleClearDatabase = async () => {
     if (!authToken) {
       setError('认证token未获取，请刷新页面重试');
@@ -177,6 +303,43 @@ export default function ReconfigureData() {
               请确保在Vercel中已正确配置所有环境变量。
             </AlertDescription>
           </Alert>
+
+          {/* 执行模式选择 */}
+          <div className="space-y-3">
+            <label className="text-sm font-medium">选择执行模式：</label>
+            <div className="grid grid-cols-2 gap-3">
+              <div 
+                className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+                  !agentMode 
+                    ? 'border-green-500 bg-green-50' 
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+                onClick={() => setAgentMode(false)}
+              >
+                <div className="font-medium text-sm">实时模式</div>
+                <div className="text-xs text-gray-600 mt-1">
+                  需要保持浏览器打开
+                  <br />实时显示进度和日志
+                  <br />适合：快速测试和小规模数据
+                </div>
+              </div>
+              <div 
+                className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+                  agentMode 
+                    ? 'border-purple-500 bg-purple-50' 
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+                onClick={() => setAgentMode(true)}
+              >
+                <div className="font-medium text-sm">Agent模式</div>
+                <div className="text-xs text-gray-600 mt-1">
+                  后台执行，可关闭浏览器
+                  <br />断网续传，任务状态查询
+                  <br />适合：大规模数据生成
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* 生成模式选择 */}
           <div className="space-y-3">
@@ -296,23 +459,46 @@ export default function ReconfigureData() {
             </div>
           )}
 
-          <Button 
-            onClick={handleReconfigure} 
-            disabled={isRunning || !authToken || isLoadingToken}
-            className="w-full"
-          >
-            {isRunning ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {generationMode === 'full' ? '正在生成完整数据...' : '正在重新配置...'}
-              </>
-            ) : (
-              <>
-                <Play className="mr-2 h-4 w-4" />
-                {generationMode === 'full' ? '开始生成完整数据' : '开始重新配置'}
-              </>
+          <div className="space-y-2">
+            <Button 
+              onClick={agentMode ? handleStartAgentTask : handleReconfigure} 
+              disabled={isRunning || !authToken || isLoadingToken}
+              className="w-full"
+            >
+              {isRunning ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {agentMode ? '启动Agent任务中...' : (generationMode === 'full' ? '正在生成完整数据...' : '正在重新配置...')}
+                </>
+              ) : (
+                <>
+                  <Play className="mr-2 h-4 w-4" />
+                  {agentMode ? '启动Agent任务' : (generationMode === 'full' ? '开始生成完整数据' : '开始重新配置')}
+                </>
+              )}
+            </Button>
+            
+            {agentMode && currentTaskId && (
+              <Button
+                onClick={handleCheckStatus}
+                disabled={isCheckingStatus}
+                variant="outline"
+                className="w-full"
+              >
+                {isCheckingStatus ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    检查状态中...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    检查任务状态
+                  </>
+                )}
+              </Button>
             )}
-          </Button>
+          </div>
 
           {clearResult && (
             <Alert className="border-orange-200 bg-orange-50">
@@ -347,8 +533,18 @@ export default function ReconfigureData() {
             <Alert className="border-green-200 bg-green-50">
               <CheckCircle className="h-4 w-4 text-green-600" />
               <AlertDescription className="text-green-800">
-                <strong>数据生成成功！</strong>
-                <div className="mt-2 space-y-2">
+                <div className="space-y-2">
+                  <div className="font-medium">{result.message}</div>
+                  {result.taskId && (
+                    <div className="text-sm">
+                      <strong>Task ID:</strong> {result.taskId}
+                    </div>
+                  )}
+                  {result.note && (
+                    <div className="text-sm italic">
+                      {result.note}
+                    </div>
+                  )}
                   {result.result?.steps?.map((step: any, index: number) => (
                     <div key={index} className="text-sm">
                       <span className="font-medium">✓ {step.step}:</span> {step.message}
@@ -359,6 +555,63 @@ export default function ReconfigureData() {
                       {result.result.summary}
                     </div>
                   )}
+                </div>
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Agent模式任务状态显示 */}
+          {agentMode && taskStatus && (
+            <Alert className="border-blue-200 bg-blue-50">
+              <CheckCircle className="h-4 w-4 text-blue-600" />
+              <AlertDescription className="text-blue-800">
+                <div className="space-y-2">
+                  <div className="font-medium">Agent任务状态</div>
+                  <div className="text-sm">
+                    <strong>状态:</strong> {taskStatus.status}
+                  </div>
+                  {taskStatus.progress && (
+                    <div className="text-sm">
+                      <strong>进度:</strong> {taskStatus.progress.current}/{taskStatus.progress.total} 
+                      ({Math.round(taskStatus.progress.percentage || 0)}%)
+                    </div>
+                  )}
+                  {taskStatus.current_step && (
+                    <div className="text-sm">
+                      <strong>当前步骤:</strong> {taskStatus.current_step}
+                    </div>
+                  )}
+                  {taskStatus.started_at && (
+                    <div className="text-sm">
+                      <strong>开始时间:</strong> {new Date(taskStatus.started_at).toLocaleString()}
+                    </div>
+                  )}
+                  {taskStatus.completed_at && (
+                    <div className="text-sm">
+                      <strong>完成时间:</strong> {new Date(taskStatus.completed_at).toLocaleString()}
+                    </div>
+                  )}
+                </div>
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Agent模式任务日志显示 */}
+          {agentMode && taskLogs.length > 0 && (
+            <Alert className="border-gray-200 bg-gray-50">
+              <AlertDescription>
+                <div className="space-y-2">
+                  <div className="font-medium text-gray-800">任务日志</div>
+                  <div className="max-h-40 overflow-y-auto text-sm">
+                    {taskLogs.map((log: any, index: number) => (
+                      <div key={index} className={`py-1 ${log.log_level === 'error' ? 'text-red-600' : log.log_level === 'warning' ? 'text-yellow-600' : 'text-gray-600'}`}>
+                        <span className="text-xs text-gray-500">
+                          {new Date(log.created_at).toLocaleTimeString()}
+                        </span>
+                        <span className="ml-2">{log.message}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </AlertDescription>
             </Alert>
