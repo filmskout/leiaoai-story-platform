@@ -277,6 +277,9 @@ export default async function handler(req: any, res: any) {
       case 'clear-database':
         return handleClearDatabase(req, res);
       
+      case 'test-database':
+        return handleTestDatabase(req, res);
+      
       // Agent模式相关接口
       case 'start-agent-task':
         return handleStartAgentTask(req, res);
@@ -1670,3 +1673,81 @@ async function handleClearDatabase(req: any, res: any) {
     });
   }
 }
+
+// 数据库测试处理
+async function handleTestDatabase(req: any, res: any) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  try {
+    console.log('🔍 开始数据库连接测试...');
+    
+    // 检查环境变量
+    const envCheck = {
+      SUPABASE_URL: process.env.SUPABASE_URL ? '✅ Set' : '❌ Missing',
+      SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY ? '✅ Set' : '❌ Missing',
+      SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY ? '✅ Set' : '❌ Missing',
+      ADMIN_TOKEN: process.env.ADMIN_TOKEN ? '✅ Set' : '❌ Missing'
+    };
+    
+    console.log('📋 环境变量检查:', envCheck);
+    
+    // 测试Supabase连接
+    let connectionTest = '❌ Failed';
+    let tableTest = '❌ Failed';
+    let errorDetails = null;
+    
+    try {
+      const { data, error } = await supabase.from('companies').select('id').limit(1);
+      if (error) {
+        if (error.code === 'PGRST116') {
+          connectionTest = '✅ Connected (table not found - OK)';
+          tableTest = '⚠️ Table not found';
+        } else {
+          connectionTest = '❌ Connection failed';
+          errorDetails = error;
+        }
+      } else {
+        connectionTest = '✅ Connected';
+        tableTest = '✅ Table accessible';
+      }
+    } catch (connError: any) {
+      connectionTest = '❌ Connection error';
+      errorDetails = connError;
+    }
+    
+    console.log('🔗 连接测试结果:', connectionTest);
+    console.log('📊 表测试结果:', tableTest);
+    
+    return res.status(200).json({
+      success: true,
+      message: '数据库测试完成',
+      results: {
+        environment: envCheck,
+        connection: connectionTest,
+        tableAccess: tableTest,
+        errorDetails: errorDetails ? {
+          message: errorDetails.message,
+          code: errorDetails.code,
+          name: errorDetails.name
+        } : null,
+        timestamp: new Date().toISOString()
+      }
+    });
+    
+  } catch (error: any) {
+    console.error('❌ 数据库测试失败:', error);
+    return res.status(500).json({
+      success: false,
+      error: `数据库测试失败: ${error.message}`,
+      details: {
+        errorType: error.name,
+        errorCode: error.code,
+        timestamp: new Date().toISOString()
+      }
+    });
+  }
+}
+
+export default handler;
