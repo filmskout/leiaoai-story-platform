@@ -110,18 +110,52 @@ Format as JSON with these fields: description, founded_year, headquarters, produ
 // 生成新闻故事（增强版，包含新闻链接）
 async function generateNewsStoryWithLinks(companyName: string, isOverseas: boolean) {
   try {
-    // 模拟获取真实新闻源
+    // 真实主流科技媒体源
     const newsSources = isOverseas ? [
-      'TechCrunch', 'The Verge', 'Wired', 'MIT Technology Review', 'VentureBeat',
-      'Forbes Technology', 'Bloomberg Technology', 'Reuters Technology'
+      'a16z (Andreessen Horowitz)', 'AI Business', 'TechCrunch', 'MIT Technology Review', 
+      'IEEE Spectrum', 'AI Magazine', 'ZDNet', 'Artificial Intelligence News', 
+      'Datafloq', 'Emerj Artificial Intelligence Research'
     ] : [
-      '36氪', '虎嗅', '钛媒体', '雷锋网', '机器之心', '量子位', '新智元'
+      '36氪', '机器之心', '量子位 (QbitAI)', '极客公园', '极客邦科技', 
+      '硅星人', '硅星GenAI', '智东西', 'APPSO', 'WayToAGI'
     ];
 
     const randomSource = newsSources[Math.floor(Math.random() * newsSources.length)];
-    const newsUrl = isOverseas 
-      ? `https://techcrunch.com/2024/01/15/${companyName.toLowerCase()}-ai-innovation/`
-      : `https://36kr.com/p/20240115${companyName}AI创新`;
+    
+    // 根据选择的媒体源生成对应的URL
+    const getNewsUrl = (source: string, companyName: string, isOverseas: boolean) => {
+      if (isOverseas) {
+        switch (source) {
+          case 'a16z (Andreessen Horowitz)': return `https://a16z.com/ai/${companyName.toLowerCase()}-ai-innovation/`;
+          case 'AI Business': return `https://aibusiness.com/${companyName.toLowerCase()}-ai-breakthrough/`;
+          case 'TechCrunch': return `https://techcrunch.com/category/artificial-intelligence/${companyName.toLowerCase()}-ai-innovation/`;
+          case 'MIT Technology Review': return `https://www.technologyreview.com/topic/artificial-intelligence/${companyName.toLowerCase()}-ai-advancement/`;
+          case 'IEEE Spectrum': return `https://spectrum.ieee.org/artificial-intelligence/${companyName.toLowerCase()}-ai-research/`;
+          case 'AI Magazine': return `https://aimagazine.com/${companyName.toLowerCase()}-ai-development/`;
+          case 'ZDNet': return `https://www.zdnet.com/topic/artificial-intelligence/${companyName.toLowerCase()}-ai-innovation/`;
+          case 'Artificial Intelligence News': return `https://www.artificialintelligence-news.com/${companyName.toLowerCase()}-ai-breakthrough/`;
+          case 'Datafloq': return `https://datafloq.com/categories/artificial-intelligence/${companyName.toLowerCase()}-ai-advancement/`;
+          case 'Emerj Artificial Intelligence Research': return `https://emerj.com/${companyName.toLowerCase()}-ai-research/`;
+          default: return `https://techcrunch.com/category/artificial-intelligence/${companyName.toLowerCase()}-ai-innovation/`;
+        }
+      } else {
+        switch (source) {
+          case '36氪': return `https://36kr.com/motif/327686782977/${companyName}AI创新`;
+          case '机器之心': return `https://www.jiqizhixin.com/${companyName.toLowerCase()}-ai-innovation`;
+          case '量子位 (QbitAI)': return `https://www.qbitai.com/${companyName.toLowerCase()}-ai-breakthrough`;
+          case '极客公园': return `https://www.geekpark.net/${companyName.toLowerCase()}-ai-advancement`;
+          case '极客邦科技': return `https://www.geekpark.net/news/${companyName.toLowerCase()}-ai-development`;
+          case '硅星人': return `https://guixingren.com/${companyName.toLowerCase()}-ai-innovation`;
+          case '硅星GenAI': return `https://guixingren.com/genai/${companyName.toLowerCase()}-ai-breakthrough`;
+          case '智东西': return `https://zhidx.com/${companyName.toLowerCase()}-ai-advancement`;
+          case 'APPSO': return `https://appso.com/${companyName.toLowerCase()}-ai-development`;
+          case 'WayToAGI': return `https://waytoagi.com/${companyName.toLowerCase()}-ai-research`;
+          default: return `https://36kr.com/motif/327686782977/${companyName}AI创新`;
+        }
+      }
+    };
+    
+    const newsUrl = getNewsUrl(randomSource, companyName, isOverseas);
 
     const prompt = isOverseas
       ? `Generate a 350-500 word news story about ${companyName} based on recent AI industry developments. Include:
@@ -132,7 +166,8 @@ async function generateNewsStoryWithLinks(companyName: string, isOverseas: boole
 5. Industry trends and implications
 
 Write in English, professional tone, suitable for investors and tech enthusiasts.
-Include a reference to the source: ${randomSource}`
+Include a reference to the source: ${randomSource}
+Make it sound like a real news article from ${randomSource} with proper journalistic style.`
 
       : `基于${companyName}最近的AI行业发展，生成一篇350-500字的新闻故事，包括：
 1. 最近的产品发布或更新
@@ -142,7 +177,8 @@ Include a reference to the source: ${randomSource}`
 5. 行业趋势和影响
 
 用中文写作，专业语调，适合投资人和技术爱好者。
-包含新闻来源引用：${randomSource}`;
+包含新闻来源引用：${randomSource}
+让文章听起来像${randomSource}的真实新闻报道，具有适当的新闻风格。`;
 
     const response = await openai.chat.completions.create({
       model: 'gpt-4',
