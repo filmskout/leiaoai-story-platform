@@ -45,20 +45,20 @@
 }
 
 /* 响应式优化 */
-/* 移动端禁用悬停效果 - 压缩红标区域 */
+/* 移动端禁用悬停效果 - 调整红标区域高度 */
 @media (max-width: 768px) {
   .carouselContainer {
     padding: 0;
     margin: 0;
     height: auto;
-    min-height: 35vh; /* 从45vh减少到35vh */
-    max-height: 50vh; /* 从65vh减少到50vh */
+    min-height: 50vh; /* 从35vh增加到50vh */
+    max-height: 70vh; /* 从50vh增加到70vh */
   }
   
   .carouselContent {
     height: auto;
-    min-height: 35vh; /* 从45vh减少到35vh */
-    max-height: 50vh; /* 从65vh减少到50vh */
+    min-height: 50vh; /* 从35vh增加到50vh */
+    max-height: 70vh; /* 从50vh增加到70vh */
     border-radius: 0;
   }
   
@@ -66,20 +66,20 @@
     gap: 0;
     padding: 0;
     height: auto;
-    min-height: 35vh; /* 从45vh减少到35vh */
-    max-height: 50vh; /* 从65vh减少到50vh */
+    min-height: 50vh; /* 从35vh增加到50vh */
+    max-height: 70vh; /* 从50vh增加到70vh */
   }
   
   .expertiseCard {
     margin: 0;
     border-radius: 0;
-    min-height: 35vh; /* 从45vh减少到35vh */
-    max-height: 50vh; /* 从65vh减少到50vh */
+    min-height: 50vh; /* 从35vh增加到50vh */
+    max-height: 70vh; /* 从50vh增加到70vh */
     height: auto;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 12px 8px; /* 从16px 12px减少到12px 8px */
+    padding: 16px 12px; /* 从12px 8px增加到16px 12px */
   }
   
   .expertiseCard:hover {
@@ -87,16 +87,20 @@
     box-shadow: none;
   }
   
+  /* 移动端导航按钮移到右下角 */
   .navigationButtonLeft {
-    left: 4px;
-    top: 20px;
+    left: auto;
+    right: 60px; /* 左按钮在右按钮左边 */
+    bottom: 16px;
+    top: auto;
     transform: none;
     z-index: 50;
   }
 
   .navigationButtonRight {
-    right: 4px;
-    top: 20px;
+    right: 16px; /* 右按钮在最右边 */
+    bottom: 16px;
+    top: auto;
     transform: none;
     z-index: 50;
   }
@@ -133,21 +137,26 @@
 
 @media (max-width: 768px) {
   .navigationButton {
-    width: 32px !important;
-    height: 32px !important;
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(12px);
+    width: 36px !important;
+    height: 36px !important;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(16px);
     border: 1px solid rgba(0, 0, 0, 0.1);
     color: rgba(0, 0, 0, 0.8);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    transition: all 0.2s ease;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    border-radius: 50%;
   }
 
   .navigationButton:hover {
     background: rgba(255, 255, 255, 1);
     color: rgba(0, 0, 0, 1);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-    transform: scale(1.05);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    transform: scale(1.1);
+  }
+
+  .navigationButton:active {
+    transform: scale(0.95);
   }
 
   .navigationButtonLeft {
@@ -181,18 +190,22 @@
   /* 移动端深色模式 */
   @media (max-width: 768px) {
     .navigationButton {
-      background: rgba(30, 41, 59, 0.9);
+      background: rgba(30, 41, 59, 0.95);
       border-color: rgba(255, 255, 255, 0.2);
       color: rgba(255, 255, 255, 0.9);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
     }
 
     .navigationButton:hover {
       background: rgba(30, 41, 59, 1);
       color: rgba(255, 255, 255, 1);
       border-color: rgba(255, 255, 255, 0.3);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-      transform: scale(1.05);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      transform: scale(1.1);
+    }
+
+    .navigationButton:active {
+      transform: scale(0.95);
     }
   }
 }
