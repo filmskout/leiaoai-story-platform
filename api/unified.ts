@@ -1567,19 +1567,31 @@ async function handleClearDatabase(req: any, res: any) {
   try {
     console.log('🧹 开始清理数据库...');
     
-    // 定义需要清理的表（按依赖关系排序）
+    // 检查环境变量
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Supabase配置缺失: SUPABASE_URL或SUPABASE_KEY未设置');
+    }
+    
+    console.log('✅ Supabase配置检查通过');
+    
+    // 测试Supabase连接
+    try {
+      const { data, error } = await supabase.from('companies').select('id').limit(1);
+      if (error && error.code !== 'PGRST116') { // PGRST116 = table not found, which is OK
+        throw new Error(`Supabase连接测试失败: ${error.message}`);
+      }
+      console.log('✅ Supabase连接测试通过');
+    } catch (connError: any) {
+      console.log('⚠️ Supabase连接测试警告:', connError.message);
+      // 继续执行，可能只是表不存在
+    }
+    
+    // 定义需要清理的表（按依赖关系排序）- 先只清理核心表
     const tablesToClear = [
-      'tool_stories',
-      'company_stories', 
-      'tool_ratings',
-      'company_ratings',
-      'user_favorites',
-      'tool_stats',
-      'company_stats',
-      'tools',
+      'companies',
+      'tools', 
       'fundings',
-      'stories',
-      'companies'
+      'stories'
     ];
 
     const results = [];
@@ -1640,10 +1652,21 @@ async function handleClearDatabase(req: any, res: any) {
 
   } catch (error: any) {
     console.error('❌ 数据库清理失败:', error);
+    console.error('❌ 错误详情:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+      code: error.code
+    });
+    
     return res.status(500).json({
       success: false,
-      error: error.message,
-      stack: error.stack
+      error: `数据库清理失败: ${error.message}`,
+      details: {
+        errorType: error.name,
+        errorCode: error.code,
+        timestamp: new Date().toISOString()
+      }
     });
   }
 }
