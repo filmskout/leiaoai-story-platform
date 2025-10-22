@@ -512,14 +512,14 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
             variant="outline"
             size="sm"
             className={cn(
-              "w-10 h-10 rounded-full shadow-md",
+              "rounded-full shadow-md",
               styles.navigationButton,
               styles.navigationButtonLeft
             )}
             onClick={goToPrevious}
             disabled={isTransitioning}
           >
-            <ChevronLeft size={18} />
+            <ChevronLeft size={16} />
           </Button>
         </motion.div>
 
@@ -532,14 +532,14 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
             variant="outline"
             size="sm"
             className={cn(
-              "w-10 h-10 rounded-full shadow-md",
+              "rounded-full shadow-md",
               styles.navigationButton,
               styles.navigationButtonRight
             )}
             onClick={goToNext}
             disabled={isTransitioning}
           >
-            <ChevronRight size={18} />
+            <ChevronRight size={16} />
           </Button>
         </motion.div>
 
@@ -558,50 +558,7 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          {/* 垂直导航按钮 - 仅在移动端显示，无限循环 */}
-          {isMobile && (
-            <>
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className={cn(
-                    "rounded-full shadow-md",
-                    styles.verticalNavigationButton,
-                    styles.verticalNavigationButtonUp
-                  )}
-                  onClick={goToPrevious}
-                  disabled={isTransitioning}
-                >
-                  <ChevronUp size={14} />
-                </Button>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className={cn(
-                    "rounded-full shadow-md",
-                    styles.verticalNavigationButton,
-                    styles.verticalNavigationButtonDown
-                  )}
-                  onClick={goToNext}
-                  disabled={isTransitioning}
-                >
-                  <ChevronDown size={14} />
-                </Button>
-              </motion.div>
-            </>
-          )}
+          {/* 垂直导航按钮已移除 */}
           <div 
             className={cn(
               "flex transition-transform duration-300 ease-in-out",

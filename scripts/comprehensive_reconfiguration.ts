@@ -17,14 +17,19 @@ const steps: Step[] = [
     description: '清理现有凌乱的数据，重置数据库'
   },
   {
-    name: '海外公司数据',
-    script: 'tsx scripts/fetch_overseas_companies.ts',
-    description: '使用GPT-5获取海外AI公司最新信息'
+    name: '海外公司数据增强',
+    script: 'tsx scripts/enhanced_overseas_companies.ts',
+    description: '使用GPT-5获取海外AI公司最新信息，搜索新闻并生成Stories'
   },
   {
-    name: '国内公司数据',
-    script: 'tsx scripts/fetch_domestic_companies.ts',
-    description: '使用DeepSeek获取国内AI公司最新信息'
+    name: '国内公司数据增强',
+    script: 'tsx scripts/enhanced_domestic_companies.ts',
+    description: '使用DeepSeek获取国内AI公司最新信息，搜索新闻并生成Stories'
+  },
+  {
+    name: 'Stories互联互通',
+    script: 'tsx scripts/stories_integration.ts',
+    description: '设置Stories与公司/工具页面的互联互通，创建评分系统'
   },
   {
     name: '定期更新机制',

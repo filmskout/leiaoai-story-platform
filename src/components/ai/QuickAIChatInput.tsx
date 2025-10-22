@@ -8,6 +8,7 @@ import { Bot, ArrowRight, Sparkles, Send, ChevronDown, Mic, MicOff } from 'lucid
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { UnifiedLoader } from '@/components/ui/UnifiedLoader';
+import { useMobileLayout } from '@/hooks/useMobileLayout';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -75,6 +76,7 @@ export function QuickAIChatInput({ className, onSubmit }: QuickAIChatInputProps)
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const navigate = useNavigate();
+  const isMobile = useMobileLayout();
 
   // 模拟AI响应的欢迎消息
   useEffect(() => {
@@ -263,8 +265,11 @@ export function QuickAIChatInput({ className, onSubmit }: QuickAIChatInputProps)
             </DropdownMenu>
         </div>
 
-        {/* AI响应区域 - 压缩版本 */}
-        <div className="h-[120px] overflow-hidden rounded-lg bg-background-secondary border border-border flex items-center justify-center">
+        {/* AI响应区域 - 移动端压缩版本 */}
+        <div className={cn(
+          "overflow-hidden rounded-lg bg-background-secondary border border-border flex items-center justify-center",
+          isMobile ? "h-[80px]" : "h-[120px]"
+        )}>
           {isLoading ? (
             <div className="flex items-center justify-center w-full h-full">
               <UnifiedLoader 
@@ -298,7 +303,7 @@ export function QuickAIChatInput({ className, onSubmit }: QuickAIChatInputProps)
             onKeyDown={handleKeyDown}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            placeholder={t('ai_chat.placeholder')}
+            placeholder={isMobile ? "" : t('ai_chat.placeholder')}
             className="resize-none min-h-[60px] pr-20 transition-all duration-200 focus:border-primary-300 focus:ring-primary-300"
             disabled={isLoading}
           />
@@ -337,8 +342,11 @@ export function QuickAIChatInput({ className, onSubmit }: QuickAIChatInputProps)
           </Button>
         </div>
         
-        {/* 示例问题 */}
-        <div className="flex flex-wrap gap-2 py-2">
+        {/* 示例问题 - 移动端优化布局 */}
+        <div className={cn(
+          "flex flex-wrap gap-2",
+          isMobile ? "py-1" : "py-2"
+        )}>
           {sampleQuestions.map((question, index) => (
             <button
               key={index}
@@ -349,10 +357,18 @@ export function QuickAIChatInput({ className, onSubmit }: QuickAIChatInputProps)
                 }
                 adjustTextareaHeight();
               }}
-              className="inline-flex items-center gap-1 px-3 py-2 text-xs rounded-full bg-background-secondary border border-border hover:border-primary-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-200"
+              className={cn(
+                "inline-flex items-center gap-1 px-3 py-2 text-xs rounded-full bg-background-secondary border border-border hover:border-primary-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-200",
+                isMobile && "flex-1 min-w-0"
+              )}
             >
-              <Sparkles size={10} className="text-primary-500" />
-              {question}
+              <Sparkles size={10} className="text-primary-500 flex-shrink-0" />
+              <span className={cn(
+                "truncate",
+                isMobile && "text-xs leading-tight"
+              )}>
+                {question}
+              </span>
             </button>
           ))}
         </div>

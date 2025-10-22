@@ -94,7 +94,7 @@
   }
 }
 
-/* 导航按钮定位优化 */
+/* 导航按钮定位优化 - 角落位置 */
 .navigationButton {
   position: absolute;
   top: 50%;
@@ -105,6 +105,8 @@
   border: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
+  width: 36px;
+  height: 36px;
 }
 
 .navigationButton:hover {
@@ -114,17 +116,17 @@
 }
 
 .navigationButtonLeft {
-  left: -20px;
+  left: 8px;
 }
 
 .navigationButtonRight {
-  right: -20px;
+  right: 8px;
 }
 
 @media (max-width: 768px) {
   .navigationButton {
-    width: 28px !important;
-    height: 28px !important;
+    width: 24px !important;
+    height: 24px !important;
     background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(8px);
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -132,14 +134,14 @@
   }
 
   .navigationButtonLeft {
-    left: 12px;
+    left: 8px;
     top: 50%;
     transform: translateY(-50%);
     z-index: 40;
   }
 
   .navigationButtonRight {
-    right: 12px;
+    right: 8px;
     top: 50%;
     transform: translateY(-50%);
     z-index: 40;
@@ -241,50 +243,4 @@
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
 }
 
-/* 垂直导航按钮样式 */
-.verticalNavigationButton {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 40;
-  width: 24px;
-  height: 24px;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-}
-
-.verticalNavigationButton:hover {
-  background: rgba(0, 0, 0, 0.8);
-  transform: translateX(-50%) scale(1.1);
-}
-
-.verticalNavigationButtonUp {
-  top: 8px;
-}
-
-.verticalNavigationButtonDown {
-  bottom: 8px;
-}
-
-/* 移动端垂直导航 */
-@media (max-width: 768px) {
-  .verticalNavigationButton {
-    width: 20px;
-    height: 20px;
-  }
-  
-  .verticalNavigationButtonUp {
-    top: 4px;
-  }
-  
-  .verticalNavigationButtonDown {
-    bottom: 4px;
-  }
-}
+/* 垂直导航按钮样式已移除 */
