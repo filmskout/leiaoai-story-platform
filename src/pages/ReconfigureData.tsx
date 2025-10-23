@@ -40,6 +40,10 @@ export default function ReconfigureData() {
   const [isLoadingCategories, setIsLoadingCategories] = useState(false);
   const [dataCompleteness, setDataCompleteness] = useState<any>(null);
   const [isCheckingCompleteness, setIsCheckingCompleteness] = useState(false);
+  const [batchResult, setBatchResult] = useState<any>(null);
+  const [isBatchGenerating, setIsBatchGenerating] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [batchSize, setBatchSize] = useState<number>(10);
 
   // 获取认证token
   const fetchAuthToken = async () => {
@@ -388,6 +392,60 @@ export default function ReconfigureData() {
       }
     } finally {
       setIsCheckingCompleteness(false);
+    }
+  };
+
+  // 批量补齐公司数据
+  const batchCompleteCompanies = async () => {
+    setIsBatchGenerating(true);
+    try {
+      console.log(`🚀 开始批量补齐公司数据 (分类: ${selectedCategory || '全部'}, 批次大小: ${batchSize})`);
+
+      const response = await fetch('/api/unified?action=batch-complete-companies', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          token: authToken,
+          category: selectedCategory || undefined,
+          batchSize: batchSize
+        }),
+        signal: AbortSignal.timeout(300000) // 5分钟超时
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        throw new Error(`服务器返回非JSON响应: ${text.substring(0, 100)}...`);
+      }
+
+      const result = await response.json();
+      console.log('🚀 批量生成结果:', result);
+
+      if (result.success) {
+        setBatchResult(result);
+        setError(null);
+        console.log(`✅ 批量生成完成: 成功 ${result.generated} 家，失败 ${result.failed} 家`);
+      } else {
+        throw new Error(result.error || '批量生成失败');
+      }
+    } catch (error: any) {
+      console.error('❌ 批量补齐公司数据失败:', error);
+
+      if (error.name === 'AbortError') {
+        setError('批量生成超时，请检查网络连接');
+      } else if (error instanceof TypeError) {
+        setError('网络连接失败，请检查网络连接或稍后重试');
+      } else {
+        setError(`批量生成失败: ${error.message}`);
+      }
+    } finally {
+      setIsBatchGenerating(false);
     }
   };
 
@@ -1051,6 +1109,137 @@ export default function ReconfigureData() {
               </AlertDescription>
             </Alert>
           )}
+
+          {/* 批量补齐公司数据 */}
+          <Card className="dark:bg-gray-800 dark:border-gray-700">
+            <CardHeader>
+              <CardTitle className="dark:text-white">批量补齐公司数据</CardTitle>
+              <CardDescription className="dark:text-gray-300">
+                一次性补齐200家AI公司的基础数据
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="text-sm font-medium dark:text-white mb-2 block">选择分类</label>
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  >
+                    <option value="">全部分类</option>
+                    <option value="techGiants">科技巨头 (50家)</option>
+                    <option value="aiUnicorns">AI独角兽 (40家)</option>
+                    <option value="aiTools">AI工具公司 (35家)</option>
+                    <option value="aiApplications">AI应用公司 (25家)</option>
+                    <option value="domesticGiants">国内大厂 (30家)</option>
+                    <option value="domesticUnicorns">国内独角兽 (20家)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium dark:text-white mb-2 block">批次大小</label>
+                  <select
+                    value={batchSize}
+                    onChange={(e) => setBatchSize(Number(e.target.value))}
+                    className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  >
+                    <option value={5}>5家公司</option>
+                    <option value={10}>10家公司</option>
+                    <option value={20}>20家公司</option>
+                    <option value={50}>50家公司</option>
+                  </select>
+                </div>
+                <div className="flex items-end">
+                  <Button
+                    onClick={batchCompleteCompanies}
+                    disabled={isBatchGenerating || !authToken}
+                    className="w-full dark:bg-green-600 dark:hover:bg-green-700"
+                  >
+                    {isBatchGenerating ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        生成中...
+                      </>
+                    ) : (
+                      <>
+                        <Play className="mr-2 h-4 w-4" />
+                        开始批量生成
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              {/* 批量生成结果显示 */}
+              {batchResult && (
+                <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <div className="text-center mb-4">
+                    <div className="text-lg font-bold dark:text-white">批量生成完成</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-300">
+                      {batchResult.category} - {batchResult.requested} 家公司
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4 text-center mb-4">
+                    <div>
+                      <div className="text-xl font-bold text-green-600 dark:text-green-400">
+                        {batchResult.generated}
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-300">成功生成</div>
+                    </div>
+                    <div>
+                      <div className="text-xl font-bold text-red-600 dark:text-red-400">
+                        {batchResult.failed}
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-300">生成失败</div>
+                    </div>
+                    <div>
+                      <div className="text-xl font-bold text-blue-600 dark:text-blue-400">
+                        {Math.round((batchResult.generated / batchResult.requested) * 100)}%
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-300">成功率</div>
+                    </div>
+                  </div>
+
+                  {batchResult.companies.length > 0 && (
+                    <div className="max-h-48 overflow-y-auto">
+                      <div className="text-sm font-medium dark:text-white mb-2">生成详情:</div>
+                      {batchResult.companies.map((company: any, index: number) => (
+                        <div key={index} className="flex items-center justify-between p-2 bg-white dark:bg-gray-600 rounded mb-1">
+                          <div className="flex-1">
+                            <div className="text-sm font-medium dark:text-white">{company.name}</div>
+                            <div className="text-xs text-gray-600 dark:text-gray-300">
+                              {company.isOverseas ? '海外公司' : '国内公司'}
+                            </div>
+                          </div>
+                          <div className={`text-sm font-bold ${
+                            company.status === 'success' 
+                              ? 'text-green-600 dark:text-green-400' 
+                              : 'text-red-600 dark:text-red-400'
+                          }`}>
+                            {company.status === 'success' ? '✅' : '❌'}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {batchResult.errors.length > 0 && (
+                    <div className="mt-4">
+                      <div className="text-sm font-medium dark:text-white mb-2">错误详情:</div>
+                      <div className="max-h-32 overflow-y-auto space-y-1">
+                        {batchResult.errors.map((error: string, index: number) => (
+                          <div key={index} className="text-xs text-red-600 dark:text-red-400">
+                            • {error}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           {/* 公司分类管理 */}
           <Card className="dark:bg-gray-800 dark:border-gray-700">

@@ -903,6 +903,9 @@ export default async function handler(req: any, res: any) {
               case 'check-data-completeness':
                 return handleCheckDataCompleteness(req, res);
 
+              case 'batch-complete-companies':
+                return handleBatchCompleteCompanies(req, res);
+
               default:
                 return res.status(400).json({ error: 'Invalid action' });
     }
@@ -1401,6 +1404,204 @@ async function handleCheckDataCompleteness(req: any, res: any) {
   } catch (error: any) {
     console.error('❌ 检查数据完整性失败:', error);
     return res.status(500).json({ 
+      success: false,
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+}
+
+// 批量补齐公司数据
+async function handleBatchCompleteCompanies(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { token, category, batchSize = 10 } = req.body;
+  if (token !== process.env.ADMIN_TOKEN && token !== 'admin-token-123') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    initClients();
+    
+    console.log(`🚀 开始批量补齐公司数据 (分类: ${category || '全部'}, 批次大小: ${batchSize})`);
+    
+    // 直接使用公司分类数据
+    const companyCategories = {
+      // 海外大厂 (50家)
+      techGiants: {
+        name: '科技巨头',
+        description: '大型科技公司的AI部门',
+        companies: [
+          'OpenAI', 'Google DeepMind', 'Microsoft AI', 'Meta AI', 'Apple AI',
+          'Amazon AI', 'Tesla AI', 'NVIDIA', 'IBM Watson', 'Intel AI',
+          'AMD AI', 'Qualcomm AI', 'Broadcom AI', 'Cisco AI', 'Oracle AI',
+          'Salesforce Einstein', 'Adobe AI', 'SAP AI', 'ServiceNow AI', 'Workday AI',
+          'Snowflake AI', 'Databricks', 'Palantir', 'C3.ai', 'UiPath',
+          'Automation Anywhere', 'Blue Prism', 'Pegasystems', 'Appian', 'Mendix',
+          'OutSystems', 'Zapier', 'Airtable', 'Notion AI', 'Figma AI',
+          'Canva AI', 'Slack AI', 'Zoom AI', 'Teams AI', 'Discord AI',
+          'Twilio AI', 'SendGrid AI', 'Mailchimp AI', 'HubSpot AI', 'Marketo AI',
+          'Pardot AI', 'Intercom AI', 'Zendesk AI', 'Freshworks AI', 'Monday.com AI'
+        ]
+      },
+      
+      // 海外AI独角兽 (40家)
+      aiUnicorns: {
+        name: 'AI独角兽',
+        description: '专注AI的独角兽公司',
+        companies: [
+          'Anthropic', 'Cohere', 'Hugging Face', 'Stability AI', 'Midjourney',
+          'Runway', 'Character.AI', 'Jasper', 'Copy.ai', 'Grammarly',
+          'Notion AI', 'Figma AI', 'Canva AI', 'Zapier AI', 'Airtable',
+          'Scale AI', 'Labelbox', 'Supervisely', 'Roboflow', 'CVAT',
+          'DataRobot', 'H2O.ai', 'Dataiku', 'Alteryx', 'Tableau',
+          'Looker AI', 'Mode AI', 'Periscope AI', 'Chartio AI', 'Metabase AI',
+          'Retool AI', 'Bubble AI', 'Webflow AI', 'Framer AI', 'Glide AI',
+          'Adalo AI', 'AppSheet AI', 'PowerApps AI', 'OutSystems AI', 'Mendix AI'
+        ]
+      },
+      
+      // 海外AI工具 (35家)
+      aiTools: {
+        name: 'AI工具公司',
+        description: '提供AI工具和服务的公司',
+        companies: [
+          'ElevenLabs', 'Murf', 'Speechify', 'Descript', 'Rev.com',
+          'Otter.ai', 'Loom', 'Synthesia', 'D-ID', 'Rephrase.ai',
+          'Hour One', 'DeepBrain', 'HeyGen', 'Pictory', 'InVideo',
+          'Lumen5', 'Animoto', 'Biteable', 'Renderforest', 'Moovly',
+          'Powtoon', 'Vyond', 'VideoScribe', 'Explain Everything', 'Prezi',
+          'Canva', 'Figma', 'Sketch', 'Adobe XD', 'InVision',
+          'Marvel', 'Principle', 'Framer', 'Webflow', 'Bubble'
+        ]
+      },
+      
+      // 海外AI应用 (25家)
+      aiApplications: {
+        name: 'AI应用公司',
+        description: '将AI应用于特定领域的公司',
+        companies: [
+          'Waymo', 'Cruise', 'Argo AI', 'Aurora', 'TuSimple',
+          'Embark', 'Plus', 'Pony.ai', 'WeRide', 'Momenta',
+          'AutoX', 'DeepRoute', 'Boston Dynamics', 'iRobot', 'Rethink Robotics',
+          'Universal Robots', 'ABB Robotics', 'KUKA', 'Fanuc', 'Yaskawa',
+          'Kawasaki', 'PathAI', 'Tempus', 'Flatiron Health', 'Veracyte'
+        ]
+      },
+      
+      // 国内大厂 (30家)
+      domesticGiants: {
+        name: '国内大厂',
+        description: '国内大型科技公司的AI部门',
+        companies: [
+          '百度AI', '阿里巴巴AI', '腾讯AI', '字节跳动AI', '美团AI',
+          '滴滴AI', '京东AI', '拼多多AI', '小米AI', '华为AI',
+          'OPPO AI', 'vivo AI', '一加AI', 'realme AI', '魅族AI',
+          '锤子AI', '联想AI', 'TCL AI', '海信AI', '创维AI',
+          '康佳AI', '长虹AI', '海尔AI', '美的AI', '格力AI',
+          '比亚迪AI', '长城AI', '吉利AI', '奇瑞AI', '江淮AI'
+        ]
+      },
+      
+      // 国内AI独角兽 (20家)
+      domesticUnicorns: {
+        name: '国内AI独角兽',
+        description: '国内专注AI的独角兽公司',
+        companies: [
+          '商汤科技', '旷视科技', '依图科技', '云从科技', '第四范式',
+          '明略科技', '思必驰', '科大讯飞', '海康威视', '大华股份',
+          '宇视科技', '天地伟业', '优必选', '达闼科技', '云迹科技',
+          '普渡科技', '擎朗智能', '猎豹移动', '新松机器人', '埃斯顿'
+        ]
+      }
+    };
+
+    const categories = companyCategories;
+    const existingCompanies = await supabase
+      .from('companies')
+      .select('name')
+      .then(result => result.data?.map(c => c.name) || []);
+
+    let companiesToGenerate: string[] = [];
+    let categoryName = '全部';
+
+    if (category && categories[category]) {
+      // 生成指定分类的缺失公司
+      const categoryData = categories[category];
+      companiesToGenerate = categoryData.missing.slice(0, batchSize);
+      categoryName = categoryData.name;
+    } else {
+      // 生成所有分类的缺失公司
+      Object.values(categories).forEach((cat: any) => {
+        companiesToGenerate.push(...cat.missing.slice(0, Math.ceil(batchSize / 6)));
+      });
+      companiesToGenerate = companiesToGenerate.slice(0, batchSize);
+    }
+
+    console.log(`📋 准备生成 ${companiesToGenerate.length} 家公司:`, companiesToGenerate);
+
+    const results = {
+      success: true,
+      message: `批量补齐 ${categoryName} 公司数据`,
+      category: categoryName,
+      requested: companiesToGenerate.length,
+      generated: 0,
+      failed: 0,
+      errors: [] as string[],
+      companies: [] as any[]
+    };
+
+    // 批量生成公司数据
+    for (let i = 0; i < companiesToGenerate.length; i++) {
+      const companyName = companiesToGenerate[i];
+      
+      try {
+        console.log(`🏢 [${i + 1}/${companiesToGenerate.length}] 生成公司: ${companyName}`);
+        
+        // 判断是国内还是海外公司
+        const isOverseas = !companyName.includes('AI') && !['百度AI', '阿里巴巴AI', '腾讯AI', '字节跳动AI', '美团AI', '滴滴AI', '京东AI', '拼多多AI', '小米AI', '华为AI', 'OPPO AI', 'vivo AI', '一加AI', 'realme AI', '魅族AI', '锤子AI', '联想AI', 'TCL AI', '海信AI', '创维AI', '康佳AI', '长虹AI', '海尔AI', '美的AI', '格力AI', '比亚迪AI', '长城AI', '吉利AI', '奇瑞AI', '江淮AI', '商汤科技', '旷视科技', '依图科技', '云从科技', '第四范式', '明略科技', '思必驰', '科大讯飞', '海康威视', '大华股份', '宇视科技', '天地伟业', '优必选', '达闼科技', '云迹科技', '普渡科技', '擎朗智能', '猎豹移动', '新松机器人', '埃斯顿'].includes(companyName);
+        
+        const result = await generateCompanyData(companyName, isOverseas);
+        
+        results.generated++;
+        results.companies.push({
+          name: companyName,
+          id: result.companyId,
+          isOverseas,
+          status: 'success'
+        });
+        
+        console.log(`✅ 成功生成: ${companyName}`);
+        
+        // 添加延迟避免API限制
+        if (i < companiesToGenerate.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+        
+      } catch (error: any) {
+        console.error(`❌ 生成失败: ${companyName}`, error);
+        results.failed++;
+        results.errors.push(`${companyName}: ${error.message}`);
+        results.companies.push({
+          name: companyName,
+          status: 'failed',
+          error: error.message
+        });
+      }
+    }
+
+    console.log(`🎉 批量生成完成! 成功: ${results.generated}, 失败: ${results.failed}`);
+    
+    return res.status(200).json({
+      ...results,
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error: any) {
+    console.error('❌ 批量补齐公司数据失败:', error);
+    return res.status(500).json({
       success: false,
       error: error.message,
       timestamp: new Date().toISOString()
