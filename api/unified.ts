@@ -1,4 +1,6 @@
 import 'dotenv/config';
+import { createClient } from '@supabase/supabase-js';
+import OpenAI from 'openai';
 
 // 检查环境变量
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -18,12 +20,10 @@ function initClients() {
   }
   
   if (!supabase) {
-    const { createClient } = require('@supabase/supabase-js');
     supabase = createClient(supabaseUrl, supabaseKey);
   }
   
   if (!openai) {
-    const OpenAI = require('openai').default;
     openai = new OpenAI({
       apiKey: openaiApiKey,
     });
@@ -52,7 +52,7 @@ async function handleTestDatabase(req: any, res: any) {
     // 测试Supabase连接
     let connectionTest = '❌ Failed';
     let tableTest = '❌ Failed';
-    let errorDetails = null;
+    let errorDetails: any = null;
     
     try {
       initClients();
@@ -131,7 +131,7 @@ async function handleClearDatabase(req: any, res: any) {
       'stories'
     ];
 
-    const results = [];
+    const results: any[] = [];
     let clearedCount = 0;
     let errorCount = 0;
 
