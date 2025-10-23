@@ -1567,6 +1567,14 @@ async function handleBatchCompleteCompanies(req: any, res: any) {
       categoryData.completionRate = Math.round((categoryData.existing / categoryData.total) * 100);
     });
 
+    console.log(`🔍 分类状态计算完成:`, Object.keys(categories).map(key => ({
+      key,
+      name: categories[key].name,
+      total: categories[key].total,
+      existing: categories[key].existing,
+      missing: categories[key].missing?.length || 0
+    })));
+
     let companiesToGenerate: string[] = [];
     let categoryName = '全部';
 
