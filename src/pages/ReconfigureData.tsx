@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Play, CheckCircle, XCircle } from 'lucide-react';
+import { Loader2, Play, CheckCircle, XCircle, BarChart3 } from 'lucide-react';
 
 export default function ReconfigureData() {
   const [isRunning, setIsRunning] = useState(false);
@@ -29,6 +29,8 @@ export default function ReconfigureData() {
   const [taskStatus, setTaskStatus] = useState<any>(null);
   const [taskLogs, setTaskLogs] = useState<any[]>([]);
   const [isCheckingStatus, setIsCheckingStatus] = useState(false);
+  const [dataProgress, setDataProgress] = useState<any>(null);
+  const [isCheckingProgress, setIsCheckingProgress] = useState(false);
 
   // 获取认证token
   const fetchAuthToken = async () => {
@@ -233,6 +235,54 @@ export default function ReconfigureData() {
 
     // 存储interval ID以便清理
     (window as any).statusPollingInterval = pollInterval;
+  };
+
+  // 检查数据生成进度
+  const checkDataProgress = async () => {
+    setIsCheckingProgress(true);
+    try {
+      console.log('🔍 检查数据生成进度...');
+      
+      const response = await fetch('/api/unified?action=data-progress', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        signal: AbortSignal.timeout(10000) // 10秒超时
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        throw new Error(`服务器返回非JSON响应: ${text.substring(0, 100)}...`);
+      }
+
+      const result = await response.json();
+      console.log('📊 数据进度结果:', result);
+      
+      if (result.success) {
+        setDataProgress(result);
+        console.log(`✅ 进度检查成功: ${result.progress.current}/${result.progress.target} (${result.progress.percentage}%)`);
+      } else {
+        throw new Error(result.error || '进度检查失败');
+      }
+    } catch (error: any) {
+      console.error('❌ 检查数据进度失败:', error);
+      
+      if (error.name === 'AbortError') {
+        throw new Error('进度检查超时，请检查网络连接');
+      } else if (error instanceof TypeError) {
+        throw new Error('网络连接失败，请检查网络连接或稍后重试');
+      } else {
+        throw new Error(`进度检查失败: ${error.message}`);
+      }
+    } finally {
+      setIsCheckingProgress(false);
+    }
   };
 
   // 检查任务状态
@@ -599,7 +649,109 @@ export default function ReconfigureData() {
                 )}
               </Button>
             )}
+
+            {/* 数据进度检查按钮 */}
+            <Button
+              onClick={checkDataProgress}
+              disabled={isCheckingProgress}
+              variant="outline"
+              className="w-full"
+            >
+              {isCheckingProgress ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  检查进度中...
+                </>
+              ) : (
+                <>
+                  <BarChart3 className="mr-2 h-4 w-4" />
+                  检查数据进度
+                </>
+              )}
+            </Button>
           </div>
+
+          {/* 数据进度显示 */}
+          {dataProgress && (
+            <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800">
+              <BarChart3 className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              <AlertDescription className="text-blue-800 dark:text-blue-200">
+                <strong>📊 数据生成进度报告</strong>
+                <div className="mt-3 space-y-3">
+                  {/* 总体进度 */}
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>总体进度</span>
+                      <span className="font-medium">
+                        {dataProgress.progress.current}/{dataProgress.progress.target} 
+                        ({dataProgress.progress.percentage}%)
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                      <div 
+                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${dataProgress.progress.percentage}%` }}
+                      ></div>
+                    </div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">
+                      状态: {dataProgress.progress.status === 'completed' ? '✅ 已完成' : '🔄 进行中'}
+                    </div>
+                  </div>
+
+                  {/* 详细数据统计 */}
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="font-medium">公司数据:</span>
+                      <span className="ml-2 text-green-600 dark:text-green-400">
+                        {dataProgress.data.companies.total} 家
+                      </span>
+                    </div>
+                    <div>
+                      <span className="font-medium">工具数据:</span>
+                      <span className="ml-2 text-blue-600 dark:text-blue-400">
+                        {dataProgress.data.tools} 个
+                      </span>
+                    </div>
+                    <div>
+                      <span className="font-medium">融资数据:</span>
+                      <span className="ml-2 text-purple-600 dark:text-purple-400">
+                        {dataProgress.data.fundings} 条
+                      </span>
+                    </div>
+                    <div>
+                      <span className="font-medium">故事数据:</span>
+                      <span className="ml-2 text-orange-600 dark:text-orange-400">
+                        {dataProgress.data.stories} 篇
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* 数据完整性 */}
+                  <div className="space-y-1 text-sm">
+                    <div className="font-medium">数据完整性:</div>
+                    <div className="grid grid-cols-3 gap-2 text-xs">
+                      <div>
+                        工具覆盖率: {dataProgress.completeness.companies_with_tools}%
+                      </div>
+                      <div>
+                        融资覆盖率: {dataProgress.completeness.companies_with_fundings}%
+                      </div>
+                      <div>
+                        故事覆盖率: {dataProgress.completeness.companies_with_stories}%
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 最后更新时间 */}
+                  {dataProgress.last_updated && (
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      最后更新: {new Date(dataProgress.last_updated).toLocaleString('zh-CN')}
+                    </div>
+                  )}
+                </div>
+              </AlertDescription>
+            </Alert>
+          )}
 
           {clearResult && (
             <Alert className="border-orange-200 bg-orange-50 dark:bg-orange-950 dark:border-orange-800">

@@ -826,14 +826,123 @@ export default async function handler(req: any, res: any) {
       case 'check-task-status':
         return handleCheckTaskStatus(req, res);
       
-      case 'get-task-list':
-        return handleGetTaskList(req, res);
-      
-      default:
-        return res.status(400).json({ error: 'Invalid action' });
+              case 'get-task-list':
+                return handleGetTaskList(req, res);
+
+              case 'data-progress':
+                return handleDataProgress(req, res);
+
+              default:
+                return res.status(400).json({ error: 'Invalid action' });
     }
   } catch (error: any) {
     console.error('API Error:', error);
     return res.status(500).json({ error: error.message });
+  }
+}
+
+// 数据进度检查函数
+async function handleDataProgress(req: any, res: any) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  try {
+    initClients();
+    
+    console.log('🔍 检查数据生成详细进度...');
+    
+    // 检查companies表 - 获取详细信息
+    const { data: companies, error: companiesError, count: companiesCount } = await supabase
+      .from('companies')
+      .select('id, name, created_at', { count: 'exact' });
+    
+    if (companiesError) {
+      console.error('❌ Companies表错误:', companiesError);
+    }
+    
+    // 检查tools表
+    const { count: toolsCount, error: toolsError } = await supabase
+      .from('tools')
+      .select('*', { count: 'exact', head: true });
+    
+    if (toolsError) {
+      console.error('❌ Tools表错误:', toolsError);
+    }
+    
+    // 检查fundings表
+    const { count: fundingsCount, error: fundingsError } = await supabase
+      .from('fundings')
+      .select('*', { count: 'exact', head: true });
+    
+    if (fundingsError) {
+      console.error('❌ Fundings表错误:', fundingsError);
+    }
+    
+    // 检查stories表
+    const { count: storiesCount, error: storiesError } = await supabase
+      .from('stories')
+      .select('*', { count: 'exact', head: true });
+    
+    if (storiesError) {
+      console.error('❌ Stories表错误:', storiesError);
+    }
+
+    // 计算进度
+    const totalExpected = 200; // 目标200家公司
+    const currentProgress = companiesCount || 0;
+    const progressPercentage = Math.round((currentProgress / totalExpected) * 100);
+    
+    const result = {
+      success: true,
+      message: '数据生成详细进度报告',
+      progress: {
+        current: currentProgress,
+        target: totalExpected,
+        percentage: progressPercentage,
+        status: currentProgress >= totalExpected ? 'completed' : 'in_progress'
+      },
+      data: {
+        companies: {
+          total: companiesCount || 0,
+          list: companies ? companies.map(c => ({
+            id: c.id,
+            name: c.name,
+            created_at: c.created_at
+          })) : []
+        },
+        tools: toolsCount || 0,
+        fundings: fundingsCount || 0,
+        stories: storiesCount || 0,
+        total_records: (companiesCount || 0) + (toolsCount || 0) + (fundingsCount || 0) + (storiesCount || 0)
+      },
+      completeness: {
+        companies_with_tools: Math.round(((toolsCount || 0) / Math.max(companiesCount || 1, 1)) * 100),
+        companies_with_stories: Math.round(((storiesCount || 0) / Math.max(companiesCount || 1, 1)) * 100),
+        companies_with_fundings: Math.round(((fundingsCount || 0) / Math.max(companiesCount || 1, 1)) * 100)
+      },
+      timestamp: new Date().toISOString(),
+      last_updated: companies && companies.length > 0 ? 
+        companies.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0].created_at : 
+        null
+    };
+    
+    console.log('📊 详细进度报告:', {
+      progress: `${currentProgress}/${totalExpected} (${progressPercentage}%)`,
+      companies: companiesCount,
+      tools: toolsCount,
+      fundings: fundingsCount,
+      stories: storiesCount
+    });
+    
+    return res.status(200).json(result);
+    
+  } catch (error: any) {
+    console.error('❌ 检查详细进度失败:', error);
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
   }
 }
