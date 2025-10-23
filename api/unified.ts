@@ -212,6 +212,10 @@ Make it sound like a real news article from ${randomSource} with proper journali
 包含新闻来源引用：${randomSource}
 让文章听起来像${randomSource}的真实新闻报道，具有适当的新闻风格。`;
 
+    console.log(`🤖 发送新闻生成请求: ${companyName} (${isOverseas ? '海外' : '国内'})`);
+    console.log(`📰 新闻来源: ${randomSource}`);
+    console.log(`🔗 新闻链接: ${newsUrl}`);
+
     const response = await openai.chat.completions.create({
       model: 'gpt-4',
       messages: [{ role: 'user', content: prompt }],
@@ -219,14 +223,25 @@ Make it sound like a real news article from ${randomSource} with proper journali
     });
 
     const content = response.choices[0]?.message?.content || '';
+    console.log(`📰 OpenAI响应长度: ${content.length} 字符`);
+    console.log(`📰 响应内容预览: ${content.substring(0, 100)}...`);
+    
     const contentWithLink = content + `\n\n原文链接：[${randomSource} - ${companyName} AI创新动态](${newsUrl})`;
     
-    return {
+    const result = {
       content: contentWithLink,
       source: randomSource,
       url: newsUrl,
       published_date: new Date().toISOString()
     };
+    
+    console.log(`✅ 新闻故事生成完成: ${companyName}`, {
+      contentLength: result.content.length,
+      source: result.source,
+      url: result.url
+    });
+    
+    return result;
   } catch (error) {
     console.error(`Failed to generate news story for ${companyName}:`, error);
     return {
@@ -310,9 +325,17 @@ async function generateCompanyData(companyName: string, isOverseas: boolean, ret
 
     // 生成新闻故事
     try {
+      console.log(`📰 开始生成新闻故事: ${companyName}`);
       const newsStory = await generateNewsStory(companyName, isOverseas);
-      if (newsStory.content) {
-        await supabase.from('stories').insert({
+      console.log(`📰 新闻故事生成结果:`, {
+        hasContent: !!newsStory.content,
+        contentLength: newsStory.content?.length || 0,
+        source: newsStory.source,
+        url: newsStory.url
+      });
+      
+      if (newsStory.content && newsStory.content.length > 50) {
+        const { error: storyInsertError } = await supabase.from('stories').insert({
           company_id: company.id,
           title: `${companyName} AI创新动态`,
           content: newsStory.content,
@@ -321,9 +344,17 @@ async function generateCompanyData(companyName: string, isOverseas: boolean, ret
           published_date: newsStory.published_date,
           created_at: new Date().toISOString()
         });
+        
+        if (storyInsertError) {
+          console.error(`❌ 新闻故事插入失败: ${companyName}`, storyInsertError);
+        } else {
+          console.log(`✅ 新闻故事插入成功: ${companyName}`);
+        }
+      } else {
+        console.warn(`⚠️ 新闻故事内容为空或太短: ${companyName}`, newsStory);
       }
     } catch (storyError) {
-      console.warn(`⚠️ 新闻故事生成失败: ${companyName}`, storyError);
+      console.error(`❌ 新闻故事生成失败: ${companyName}`, storyError);
     }
 
     console.log(`🎉 公司数据处理完成: ${companyName}`);
