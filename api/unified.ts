@@ -1046,11 +1046,11 @@ async function handleGenerateSingleCompany(req: any, res: any) {
     
     // 检查公司是否已存在
     const { data: existingCompany } = await supabase
-      .from('companies')
+          .from('companies')
       .select('id, name')
       .eq('name', companyName)
-      .single();
-    
+          .single();
+
     if (existingCompany) {
       return res.status(400).json({
         success: false,
@@ -1095,9 +1095,9 @@ async function handleGenerateSingleCompany(req: any, res: any) {
       success: false,
       error: error.message,
       timestamp: new Date().toISOString()
-    });
-  }
-}
+            });
+          }
+        }
 
 // 搜索公司Logo
 async function searchCompanyLogo(companyName: string): Promise<string | null> {
@@ -1306,48 +1306,66 @@ async function handleCheckDataCompleteness(req: any, res: any) {
       }
     };
 
+    // 批量获取所有相关数据以提高效率
+    const companyIds = companies.map(c => c.id);
+    
+    // 批量获取工具数据
+    const { data: toolsData } = await supabase
+      .from('tools')
+      .select('company_id')
+      .in('company_id', companyIds);
+    
+    // 批量获取融资数据
+    const { data: fundingsData } = await supabase
+      .from('fundings')
+      .select('company_id')
+      .in('company_id', companyIds);
+    
+    // 批量获取故事数据
+    const { data: storiesData } = await supabase
+      .from('stories')
+      .select('company_id')
+      .in('company_id', companyIds);
+
+    // 创建计数映射
+    const toolsCountMap = new Map<string, number>();
+    const fundingsCountMap = new Map<string, number>();
+    const storiesCountMap = new Map<string, number>();
+
+    toolsData?.forEach(tool => {
+      const count = toolsCountMap.get(tool.company_id) || 0;
+      toolsCountMap.set(tool.company_id, count + 1);
+    });
+
+    fundingsData?.forEach(funding => {
+      const count = fundingsCountMap.get(funding.company_id) || 0;
+      fundingsCountMap.set(funding.company_id, count + 1);
+    });
+
+    storiesData?.forEach(story => {
+      const count = storiesCountMap.get(story.company_id) || 0;
+      storiesCountMap.set(story.company_id, count + 1);
+    });
+
     // 检查每个公司的数据完整性
     for (const company of companies) {
+      const toolsCount = toolsCountMap.get(company.id) || 0;
+      const fundingsCount = fundingsCountMap.get(company.id) || 0;
+      const storiesCount = storiesCountMap.get(company.id) || 0;
+
       const companyReport = {
         id: company.id,
         name: company.name,
         hasDescription: !!company.description && company.description.length > 50,
         hasWebsite: !!company.website && company.website.startsWith('http'),
-        hasTools: false,
-        hasFundings: false,
-        hasStories: false,
-        toolsCount: 0,
-        fundingsCount: 0,
-        storiesCount: 0,
+        hasTools: toolsCount > 0,
+        hasFundings: fundingsCount > 0,
+        hasStories: storiesCount > 0,
+        toolsCount,
+        fundingsCount,
+        storiesCount,
         completenessScore: 0
       };
-
-      // 检查工具数据
-      const { count: toolsCount } = await supabase
-        .from('tools')
-        .select('*', { count: 'exact', head: true })
-        .eq('company_id', company.id);
-      
-      companyReport.toolsCount = toolsCount || 0;
-      companyReport.hasTools = (toolsCount || 0) > 0;
-
-      // 检查融资数据
-      const { count: fundingsCount } = await supabase
-        .from('fundings')
-        .select('*', { count: 'exact', head: true })
-        .eq('company_id', company.id);
-      
-      companyReport.fundingsCount = fundingsCount || 0;
-      companyReport.hasFundings = (fundingsCount || 0) > 0;
-
-      // 检查故事数据
-      const { count: storiesCount } = await supabase
-        .from('stories')
-        .select('*', { count: 'exact', head: true })
-        .eq('company_id', company.id);
-      
-      companyReport.storiesCount = storiesCount || 0;
-      companyReport.hasStories = (storiesCount || 0) > 0;
 
       // 计算完整性分数 (0-100)
       let score = 0;
@@ -1372,17 +1390,17 @@ async function handleCheckDataCompleteness(req: any, res: any) {
     completenessReport.companies.sort((a: any, b: any) => b.completenessScore - a.completenessScore);
 
     console.log('📊 数据完整性检查完成:', completenessReport.summary);
-    
+
     return res.status(200).json({
       success: true,
       message: '数据完整性检查报告',
       report: completenessReport,
       timestamp: new Date().toISOString()
     });
-    
+
   } catch (error: any) {
     console.error('❌ 检查数据完整性失败:', error);
-    return res.status(500).json({
+    return res.status(500).json({ 
       success: false,
       error: error.message,
       timestamp: new Date().toISOString()
