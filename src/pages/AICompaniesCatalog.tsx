@@ -170,9 +170,16 @@ export default function AICompaniesCatalog() {
     try {
       setLoading(true);
       const data = await listAICompaniesWithTools();
-      setCompanies(data);
+      console.log('📊 加载的公司数据:', data?.length || 0, '家公司');
+      setCompanies(data || []);
+      
+      // 如果没有数据，显示提示
+      if (!data || data.length === 0) {
+        console.log('⚠️ 数据库中没有公司数据，可能需要先运行数据生成');
+      }
     } catch (error) {
-      console.error('Error loading companies:', error);
+      console.error('❌ 加载公司数据失败:', error);
+      setCompanies([]);
     } finally {
       setLoading(false);
     }
@@ -420,6 +427,40 @@ export default function AICompaniesCatalog() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
+  // 如果没有数据，显示空状态
+  if (!loading && companies.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-8">
+          <div className="mb-6">
+            <Building className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              暂无AI公司数据
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              数据库中还没有AI公司数据，请先运行数据生成。
+            </p>
+          </div>
+          <div className="space-y-4">
+            <Button 
+              onClick={() => navigate('/reconfigure-data')}
+              className="w-full"
+            >
+              前往数据生成页面
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => window.location.reload()}
+              className="w-full"
+            >
+              刷新页面
+            </Button>
+          </div>
+        </div>
       </div>
     );
   }
