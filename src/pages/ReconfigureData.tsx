@@ -252,7 +252,7 @@ export default function ReconfigureData() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ token: adminToken }),
+        body: JSON.stringify({ token: authToken }),
         signal: AbortSignal.timeout(30000) // 30秒超时
       });
 
@@ -306,7 +306,7 @@ export default function ReconfigureData() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-          token: adminToken,
+          token: authToken,
           companyName: singleCompanyName.trim(),
           isOverseas: isOverseas,
           includeLogo: includeLogo
