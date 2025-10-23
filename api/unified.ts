@@ -832,12 +832,236 @@ export default async function handler(req: any, res: any) {
               case 'data-progress':
                 return handleDataProgress(req, res);
 
+              case 'clean-duplicates':
+                return handleCleanDuplicates(req, res);
+
+              case 'generate-single-company':
+                return handleGenerateSingleCompany(req, res);
+
               default:
                 return res.status(400).json({ error: 'Invalid action' });
     }
   } catch (error: any) {
     console.error('API Error:', error);
     return res.status(500).json({ error: error.message });
+  }
+}
+
+// 清理重复公司数据
+async function handleCleanDuplicates(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { token } = req.body;
+  if (token !== process.env.ADMIN_TOKEN && token !== 'admin-token-123') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    initClients();
+    
+    console.log('🧹 开始清理重复公司数据...');
+    
+    // 获取所有公司数据
+    const { data: companies, error: companiesError } = await supabase
+      .from('companies')
+      .select('id, name, created_at')
+      .order('created_at', { ascending: true });
+    
+    if (companiesError) {
+      throw new Error(`获取公司数据失败: ${companiesError.message}`);
+    }
+    
+    console.log(`📊 找到 ${companies.length} 家公司记录`);
+    
+    // 按名称分组，找出重复项
+    const companyGroups: { [key: string]: any[] } = {};
+    companies.forEach(company => {
+      if (!companyGroups[company.name]) {
+        companyGroups[company.name] = [];
+      }
+      companyGroups[company.name].push(company);
+    });
+    
+    // 找出重复的公司
+    const duplicates: { [key: string]: any[] } = {};
+    Object.keys(companyGroups).forEach(name => {
+      if (companyGroups[name].length > 1) {
+        duplicates[name] = companyGroups[name];
+      }
+    });
+    
+    console.log(`🔍 发现 ${Object.keys(duplicates).length} 个重复公司`);
+    
+    const results = {
+      total: companies.length,
+      duplicates: Object.keys(duplicates).length,
+      duplicateDetails: Object.keys(duplicates).map(name => ({
+        name,
+        count: duplicates[name].length,
+        ids: duplicates[name].map(c => c.id)
+      })),
+      cleaned: 0,
+      errors: 0
+    };
+    
+    // 清理重复数据（保留最早的记录）
+    for (const [name, duplicateCompanies] of Object.entries(duplicates)) {
+      console.log(`🧹 清理重复公司: ${name} (${duplicateCompanies.length} 条记录)`);
+      
+      // 按创建时间排序，保留最早的
+      const sortedCompanies = duplicateCompanies.sort((a, b) => 
+        new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      );
+      
+      const keepCompany = sortedCompanies[0];
+      const removeCompanies = sortedCompanies.slice(1);
+      
+      console.log(`✅ 保留: ${keepCompany.id} (${keepCompany.created_at})`);
+      
+      // 删除重复记录
+      for (const company of removeCompanies) {
+        try {
+          // 先删除相关的工具、融资、故事数据
+          await supabase.from('tools').delete().eq('company_id', company.id);
+          await supabase.from('fundings').delete().eq('company_id', company.id);
+          await supabase.from('stories').delete().eq('company_id', company.id);
+          
+          // 删除公司记录
+          await supabase.from('companies').delete().eq('id', company.id);
+          
+          console.log(`🗑️ 删除重复记录: ${company.id}`);
+          results.cleaned++;
+        } catch (error: any) {
+          console.error(`❌ 删除失败: ${company.id}`, error);
+          results.errors++;
+        }
+      }
+    }
+    
+    console.log(`🎉 清理完成! 删除了 ${results.cleaned} 条重复记录`);
+    
+    return res.status(200).json({
+      success: true,
+      message: `清理完成! 删除了 ${results.cleaned} 条重复记录`,
+      results,
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error: any) {
+    console.error('❌ 清理重复数据失败:', error);
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+}
+
+// 生成单个公司数据
+async function handleGenerateSingleCompany(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { token, companyName, isOverseas, includeLogo } = req.body;
+  if (token !== process.env.ADMIN_TOKEN && token !== 'admin-token-123') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  if (!companyName) {
+    return res.status(400).json({ error: '公司名称不能为空' });
+  }
+
+  try {
+    initClients();
+    
+    console.log(`🏢 开始生成单个公司数据: ${companyName} (${isOverseas ? '海外' : '国内'})`);
+    
+    // 检查公司是否已存在
+    const { data: existingCompany } = await supabase
+      .from('companies')
+      .select('id, name')
+      .eq('name', companyName)
+      .single();
+    
+    if (existingCompany) {
+      return res.status(400).json({
+        success: false,
+        error: `公司 "${companyName}" 已存在`,
+        existingCompany: {
+          id: existingCompany.id,
+          name: existingCompany.name
+        }
+      });
+    }
+    
+    // 生成公司数据
+    const result = await generateCompanyData(companyName, isOverseas);
+    
+    // 如果需要Logo，尝试搜索
+    let logoUrl = null;
+    if (includeLogo) {
+      try {
+        logoUrl = await searchCompanyLogo(companyName);
+        console.log(`🖼️ 找到Logo: ${logoUrl}`);
+      } catch (logoError) {
+        console.warn(`⚠️ Logo搜索失败: ${logoError}`);
+      }
+    }
+    
+    console.log(`✅ 公司数据生成完成: ${companyName}`);
+    
+    return res.status(200).json({
+      success: true,
+      message: `公司 "${companyName}" 数据生成完成`,
+      result: {
+        companyId: result.companyId,
+        logoUrl: logoUrl,
+        generatedAt: new Date().toISOString()
+      },
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error: any) {
+    console.error(`❌ 生成公司数据失败 (${companyName}):`, error);
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+}
+
+// 搜索公司Logo
+async function searchCompanyLogo(companyName: string): Promise<string | null> {
+  try {
+    // 使用OpenAI生成Logo搜索提示
+    const prompt = `请为AI公司"${companyName}"生成一个合适的Logo图片搜索关键词。返回一个简洁的英文关键词，用于在Unsplash等图片网站搜索公司Logo。只返回关键词，不要其他内容。`;
+    
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4',
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: 50,
+      temperature: 0.3
+    });
+    
+    const searchKeyword = response.choices[0]?.message?.content?.trim();
+    if (!searchKeyword) {
+      throw new Error('无法生成搜索关键词');
+    }
+    
+    // 使用Unsplash API搜索Logo
+    const unsplashUrl = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(searchKeyword)}&per_page=1&orientation=squarish`;
+    
+    // 注意：这里需要Unsplash API key，暂时返回null
+    console.log(`🔍 Logo搜索关键词: ${searchKeyword}`);
+    return null; // 暂时返回null，需要配置Unsplash API
+    
+  } catch (error: any) {
+    console.error('❌ Logo搜索失败:', error);
+    return null;
   }
 }
 

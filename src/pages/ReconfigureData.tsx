@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Play, CheckCircle, XCircle, BarChart3 } from 'lucide-react';
+import { Loader2, Play, CheckCircle, XCircle, BarChart3, Trash2 } from 'lucide-react';
 
 export default function ReconfigureData() {
   const [isRunning, setIsRunning] = useState(false);
@@ -31,6 +31,11 @@ export default function ReconfigureData() {
   const [isCheckingStatus, setIsCheckingStatus] = useState(false);
   const [dataProgress, setDataProgress] = useState<any>(null);
   const [isCheckingProgress, setIsCheckingProgress] = useState(false);
+  const [singleCompanyName, setSingleCompanyName] = useState('');
+  const [isOverseas, setIsOverseas] = useState(true);
+  const [includeLogo, setIncludeLogo] = useState(false);
+  const [isGeneratingSingle, setIsGeneratingSingle] = useState(false);
+  const [singleResult, setSingleResult] = useState<any>(null);
 
   // 获取认证token
   const fetchAuthToken = async () => {
@@ -235,6 +240,113 @@ export default function ReconfigureData() {
 
     // 存储interval ID以便清理
     (window as any).statusPollingInterval = pollInterval;
+  };
+
+  // 清理重复公司数据
+  const cleanDuplicates = async () => {
+    try {
+      console.log('🧹 开始清理重复公司数据...');
+      
+      const response = await fetch('/api/unified?action=clean-duplicates', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token: adminToken }),
+        signal: AbortSignal.timeout(30000) // 30秒超时
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        throw new Error(`服务器返回非JSON响应: ${text.substring(0, 100)}...`);
+      }
+
+      const result = await response.json();
+      console.log('🧹 清理结果:', result);
+      
+      if (result.success) {
+        setResult(result);
+        setError(null);
+        console.log(`✅ 清理完成: 删除了 ${result.results.cleaned} 条重复记录`);
+      } else {
+        throw new Error(result.error || '清理失败');
+      }
+    } catch (error: any) {
+      console.error('❌ 清理重复数据失败:', error);
+      
+      if (error.name === 'AbortError') {
+        setError('清理超时，请检查网络连接');
+      } else if (error instanceof TypeError) {
+        setError('网络连接失败，请检查网络连接或稍后重试');
+      } else {
+        setError(`清理失败: ${error.message}`);
+      }
+    }
+  };
+
+  // 生成单个公司数据
+  const generateSingleCompany = async () => {
+    if (!singleCompanyName.trim()) {
+      setError('请输入公司名称');
+      return;
+    }
+
+    setIsGeneratingSingle(true);
+    try {
+      console.log(`🏢 开始生成单个公司数据: ${singleCompanyName}`);
+      
+      const response = await fetch('/api/unified?action=generate-single-company', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          token: adminToken,
+          companyName: singleCompanyName.trim(),
+          isOverseas: isOverseas,
+          includeLogo: includeLogo
+        }),
+        signal: AbortSignal.timeout(60000) // 60秒超时
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        throw new Error(`服务器返回非JSON响应: ${text.substring(0, 100)}...`);
+      }
+
+      const result = await response.json();
+      console.log('🏢 单公司生成结果:', result);
+      
+      if (result.success) {
+        setSingleResult(result);
+        setError(null);
+        console.log(`✅ 公司数据生成完成: ${singleCompanyName}`);
+      } else {
+        throw new Error(result.error || '生成失败');
+      }
+    } catch (error: any) {
+      console.error('❌ 生成单个公司数据失败:', error);
+      
+      if (error.name === 'AbortError') {
+        setError('生成超时，请检查网络连接');
+      } else if (error instanceof TypeError) {
+        setError('网络连接失败，请检查网络连接或稍后重试');
+      } else {
+        setError(`生成失败: ${error.message}`);
+      }
+    } finally {
+      setIsGeneratingSingle(false);
+    }
   };
 
   // 检查数据生成进度
@@ -669,7 +781,92 @@ export default function ReconfigureData() {
                 </>
               )}
             </Button>
+
+            {/* 清理重复数据按钮 */}
+            <Button
+              onClick={cleanDuplicates}
+              variant="outline"
+              className="w-full"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              清理重复数据
+            </Button>
           </div>
+
+          {/* 单公司生成区域 */}
+          <Card className="border-purple-200 bg-purple-50 dark:bg-purple-950 dark:border-purple-800">
+            <CardHeader>
+              <CardTitle className="text-purple-800 dark:text-purple-200">
+                🏢 精准单公司生成
+              </CardTitle>
+              <CardDescription className="text-purple-600 dark:text-purple-400">
+                逐个生成公司数据，确保质量和完整性
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-purple-800 dark:text-purple-200">
+                  公司名称
+                </label>
+                <input
+                  type="text"
+                  value={singleCompanyName}
+                  onChange={(e) => setSingleCompanyName(e.target.value)}
+                  placeholder="例如: OpenAI, 商汤科技"
+                  className="w-full px-3 py-2 border border-purple-300 dark:border-purple-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                />
+              </div>
+              
+              <div className="flex space-x-4">
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    checked={isOverseas}
+                    onChange={() => setIsOverseas(true)}
+                    className="text-purple-600"
+                  />
+                  <span className="text-sm text-purple-800 dark:text-purple-200">海外公司</span>
+                </label>
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    checked={!isOverseas}
+                    onChange={() => setIsOverseas(false)}
+                    className="text-purple-600"
+                  />
+                  <span className="text-sm text-purple-800 dark:text-purple-200">国内公司</span>
+                </label>
+              </div>
+
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={includeLogo}
+                  onChange={(e) => setIncludeLogo(e.target.checked)}
+                  className="text-purple-600"
+                />
+                <span className="text-sm text-purple-800 dark:text-purple-200">包含Logo搜索</span>
+              </label>
+
+              <Button
+                onClick={generateSingleCompany}
+                disabled={isGeneratingSingle || !singleCompanyName.trim()}
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+              >
+                {isGeneratingSingle ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    生成中...
+                  </>
+                ) : (
+                  <>
+                    <Play className="mr-2 h-4 w-4" />
+                    生成公司数据
+                  </>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
 
           {/* 数据进度显示 */}
           {dataProgress && (
@@ -748,6 +945,40 @@ export default function ReconfigureData() {
                       最后更新: {new Date(dataProgress.last_updated).toLocaleString('zh-CN')}
                     </div>
                   )}
+                </div>
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* 单公司生成结果显示 */}
+          {singleResult && (
+            <Alert className="border-purple-200 bg-purple-50 dark:bg-purple-950 dark:border-purple-800">
+              <CheckCircle className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+              <AlertDescription className="text-purple-800 dark:text-purple-200">
+                <strong>🏢 公司数据生成完成！</strong>
+                <div className="mt-2 space-y-2">
+                  <div className="text-sm">
+                    <span className="font-medium">公司名称:</span>
+                    <span className="ml-2">{singleCompanyName}</span>
+                  </div>
+                  <div className="text-sm">
+                    <span className="font-medium">公司类型:</span>
+                    <span className="ml-2">{isOverseas ? '海外公司' : '国内公司'}</span>
+                  </div>
+                  <div className="text-sm">
+                    <span className="font-medium">公司ID:</span>
+                    <span className="ml-2 font-mono text-xs">{singleResult.result?.companyId}</span>
+                  </div>
+                  {singleResult.result?.logoUrl && (
+                    <div className="text-sm">
+                      <span className="font-medium">Logo:</span>
+                      <span className="ml-2 text-green-600 dark:text-green-400">✅ 已找到</span>
+                    </div>
+                  )}
+                  <div className="text-sm">
+                    <span className="font-medium">生成时间:</span>
+                    <span className="ml-2">{new Date(singleResult.result?.generatedAt).toLocaleString('zh-CN')}</span>
+                  </div>
                 </div>
               </AlertDescription>
             </Alert>
