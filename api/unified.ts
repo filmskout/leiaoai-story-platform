@@ -1573,17 +1573,22 @@ async function handleBatchCompleteCompanies(req: any, res: any) {
     if (category && categories[category]) {
       // 生成指定分类的缺失公司
       const categoryData = categories[category];
-      companiesToGenerate = categoryData.missing.slice(0, batchSize);
+      companiesToGenerate = (categoryData.missing || []).slice(0, batchSize);
       categoryName = categoryData.name;
     } else {
       // 生成所有分类的缺失公司
       Object.values(categories).forEach((cat: any) => {
-        companiesToGenerate.push(...cat.missing.slice(0, Math.ceil(batchSize / 6)));
+        companiesToGenerate.push(...(cat.missing || []).slice(0, Math.ceil(batchSize / 6)));
       });
       companiesToGenerate = companiesToGenerate.slice(0, batchSize);
     }
 
     console.log(`📋 准备生成 ${companiesToGenerate.length} 家公司:`, companiesToGenerate);
+    console.log(`📋 分类信息:`, {
+      requestedCategory: category,
+      availableCategories: Object.keys(categories),
+      categoryExists: category ? !!categories[category] : false
+    });
 
     const results = {
       success: true,
