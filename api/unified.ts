@@ -75,19 +75,32 @@ Format as JSON with these fields: description, founded_year, headquarters, produ
     });
 
     const content = response.choices[0]?.message?.content || '{}';
-
+    console.log(`🤖 OpenAI API响应 (${companyName}):`, content.substring(0, 200) + '...');
+    
     try {
-      return JSON.parse(content);
+      const parsedData = JSON.parse(content);
+      console.log(`✅ JSON解析成功 (${companyName}):`, Object.keys(parsedData));
+      return parsedData;
     } catch (parseError) {
       console.warn(`⚠️ JSON解析失败，使用默认数据: ${companyName}`, parseError);
-      // 返回默认数据结构
+      // 返回默认数据结构，根据公司类型使用不同语言
       return {
-        description: `${companyName}是一家领先的AI公司，专注于人工智能技术的研发和应用。`,
+        description: isOverseas 
+          ? `${companyName} is a leading AI company focused on artificial intelligence technology research and development.`
+          : `${companyName}是一家领先的AI公司，专注于人工智能技术的研发和应用。`,
         founded_year: new Date().getFullYear() - Math.floor(Math.random() * 10),
         headquarters: isOverseas ? 'San Francisco, CA' : '北京',
         products: [
-          { name: `${companyName} AI Platform`, description: 'AI平台服务', url: `https://${companyName.toLowerCase()}.com/platform` },
-          { name: `${companyName} AI Tools`, description: 'AI工具套件', url: `https://${companyName.toLowerCase()}.com/tools` }
+          { 
+            name: `${companyName} AI Platform`, 
+            description: isOverseas ? 'AI Platform Service' : 'AI平台服务', 
+            url: `https://${companyName.toLowerCase()}.com/platform` 
+          },
+          { 
+            name: `${companyName} AI Tools`, 
+            description: isOverseas ? 'AI Tools Suite' : 'AI工具套件', 
+            url: `https://${companyName.toLowerCase()}.com/tools` 
+          }
         ],
         funding_rounds: [
           { round: 'Series A', amount_usd: 10000000, investors: ['Venture Capital'], announced_on: '2023-01-01' }
@@ -99,14 +112,24 @@ Format as JSON with these fields: description, founded_year, headquarters, produ
     }
   } catch (error) {
     console.error(`❌ 获取公司详情失败: ${companyName}`, error);
-    // 返回默认数据结构
+    // 返回默认数据结构，根据公司类型使用不同语言
     return {
-      description: `${companyName}是一家领先的AI公司，专注于人工智能技术的研发和应用。`,
+      description: isOverseas 
+        ? `${companyName} is a leading AI company focused on artificial intelligence technology research and development.`
+        : `${companyName}是一家领先的AI公司，专注于人工智能技术的研发和应用。`,
       founded_year: new Date().getFullYear() - Math.floor(Math.random() * 10),
       headquarters: isOverseas ? 'San Francisco, CA' : '北京',
       products: [
-        { name: `${companyName} AI Platform`, description: 'AI平台服务', url: `https://${companyName.toLowerCase()}.com/platform` },
-        { name: `${companyName} AI Tools`, description: 'AI工具套件', url: `https://${companyName.toLowerCase()}.com/tools` }
+        { 
+          name: `${companyName} AI Platform`, 
+          description: isOverseas ? 'AI Platform Service' : 'AI平台服务', 
+          url: `https://${companyName.toLowerCase()}.com/platform` 
+        },
+        { 
+          name: `${companyName} AI Tools`, 
+          description: isOverseas ? 'AI Tools Suite' : 'AI工具套件', 
+          url: `https://${companyName.toLowerCase()}.com/tools` 
+        }
       ],
       funding_rounds: [
         { round: 'Series A', amount_usd: 10000000, investors: ['Venture Capital'], announced_on: '2023-01-01' }
