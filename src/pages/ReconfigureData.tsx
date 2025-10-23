@@ -107,17 +107,28 @@ export default function ReconfigureData() {
         });
       }, 2000);
 
-      const response = await fetch(`/api/unified?action=${action}`, {
+      const response = await fetch('/api/unified?action=generate-full-data', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          token: authToken // 使用从API获取的token
+          token: authToken,
+          generationMode: generationMode
         })
       });
 
       clearInterval(progressInterval);
+
+      // 检查响应状态和内容类型
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error(`服务器返回了非JSON响应 (Content-Type: ${contentType})`);
+      }
 
       const data = await response.json();
 
