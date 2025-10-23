@@ -327,33 +327,33 @@ export default function ReconfigureData() {
 
           {/* 执行模式选择 */}
           <div className="space-y-3">
-            <label className="text-sm font-medium">选择执行模式：</label>
+            <label className="text-sm font-medium text-foreground">选择执行模式：</label>
             <div className="grid grid-cols-2 gap-3">
-              <div 
+              <div
                 className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                  !agentMode 
-                    ? 'border-green-500 bg-green-50' 
-                    : 'border-gray-200 hover:border-gray-300'
+                  !agentMode
+                    ? 'border-green-500 bg-green-50 dark:bg-green-950 dark:border-green-400'
+                    : 'border-border hover:border-border/80'
                 }`}
                 onClick={() => setAgentMode(false)}
               >
-                <div className="font-medium text-sm">实时模式</div>
-                <div className="text-xs text-gray-600 mt-1">
+                <div className="font-medium text-sm text-foreground">实时模式</div>
+                <div className="text-xs text-muted-foreground mt-1">
                   需要保持浏览器打开
                   <br />实时显示进度和日志
                   <br />适合：快速测试和小规模数据
                 </div>
               </div>
-              <div 
+              <div
                 className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                  agentMode 
-                    ? 'border-purple-500 bg-purple-50' 
-                    : 'border-gray-200 hover:border-gray-300'
+                  agentMode
+                    ? 'border-purple-500 bg-purple-50 dark:bg-purple-950 dark:border-purple-400'
+                    : 'border-border hover:border-border/80'
                 }`}
                 onClick={() => setAgentMode(true)}
               >
-                <div className="font-medium text-sm">Agent模式</div>
-                <div className="text-xs text-gray-600 mt-1">
+                <div className="font-medium text-sm text-foreground">Agent模式</div>
+                <div className="text-xs text-muted-foreground mt-1">
                   后台执行，可关闭浏览器
                   <br />断网续传，任务状态查询
                   <br />适合：大规模数据生成
@@ -364,18 +364,18 @@ export default function ReconfigureData() {
 
           {/* 生成模式选择 */}
           <div className="space-y-3">
-            <label className="text-sm font-medium">选择生成模式：</label>
+            <label className="text-sm font-medium text-foreground">选择生成模式：</label>
             <div className="grid grid-cols-2 gap-3">
               <div 
                 className={`p-4 border rounded-lg cursor-pointer transition-colors ${
                   generationMode === 'quick' 
-                    ? 'border-blue-500 bg-blue-50' 
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-950 dark:border-blue-400' 
+                    : 'border-border hover:border-border/80'
                 }`}
                 onClick={() => setGenerationMode('quick')}
               >
-                <div className="font-medium text-sm">快速模式</div>
-                <div className="text-xs text-gray-600 mt-1">
+                <div className="font-medium text-sm text-foreground">快速模式</div>
+                <div className="text-xs text-muted-foreground mt-1">
                   处理40家公司（20海外+20国内）
                   <br />包含：公司信息、产品、融资、新闻故事
                   <br />预计时间：5-10分钟
@@ -384,13 +384,13 @@ export default function ReconfigureData() {
               <div 
                 className={`p-4 border rounded-lg cursor-pointer transition-colors ${
                   generationMode === 'full' 
-                    ? 'border-blue-500 bg-blue-50' 
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-950 dark:border-blue-400' 
+                    : 'border-border hover:border-border/80'
                 }`}
                 onClick={() => setGenerationMode('full')}
               >
-                <div className="font-medium text-sm">完整模式</div>
-                <div className="text-xs text-gray-600 mt-1">
+                <div className="font-medium text-sm text-foreground">完整模式</div>
+                <div className="text-xs text-muted-foreground mt-1">
                   处理200+家公司（100+海外+100+国内）
                   <br />包含：完整公司信息、产品、详细融资、新闻故事、原文链接
                   <br />预计时间：2-3小时
@@ -400,22 +400,22 @@ export default function ReconfigureData() {
           </div>
 
           {/* 认证状态 */}
-          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
             <div className="flex items-center gap-2">
               {isLoadingToken ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span className="text-sm">正在获取认证token...</span>
+                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">正在获取认证token...</span>
                 </>
               ) : authToken ? (
                 <>
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                  <span className="text-sm text-green-600">认证token已获取</span>
+                  <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                  <span className="text-sm text-green-600 dark:text-green-400">认证token已获取</span>
                 </>
               ) : (
                 <>
-                  <XCircle className="h-4 w-4 text-red-600" />
-                <span className="text-sm text-red-600">认证token获取失败，可手动输入</span>
+                  <XCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                <span className="text-sm text-red-600 dark:text-red-400">认证token获取失败，可手动输入</span>
                 </>
               )}
             </div>
@@ -435,10 +435,10 @@ export default function ReconfigureData() {
             <input
               type="password"
               placeholder="在此粘贴ADMIN_TOKEN（仅本地/受信环境使用）"
-              className="border rounded px-3 py-2 text-sm"
+              className="border border-input rounded px-3 py-2 text-sm bg-background text-foreground"
               onChange={(e) => setAuthToken(e.target.value || null)}
             />
-            <div className="text-xs text-gray-500">
+            <div className="text-xs text-muted-foreground">
               如API返回非JSON导致自动获取失败，可临时手动输入。建议同时检查服务端环境变量是否正确配置。
             </div>
           </div>
@@ -446,9 +446,9 @@ export default function ReconfigureData() {
 
           {/* 数据库清理 */}
           <div className="space-y-3">
-            <div className="p-4 border border-red-200 bg-red-50 rounded-lg">
-              <div className="font-medium text-sm text-red-800 mb-2">⚠️ 数据库清理</div>
-              <div className="text-xs text-red-600 mb-3">
+            <div className="p-4 border border-red-200 bg-red-50 dark:bg-red-950 dark:border-red-800 rounded-lg">
+              <div className="font-medium text-sm text-red-800 dark:text-red-200 mb-2">⚠️ 数据库清理</div>
+              <div className="text-xs text-red-600 dark:text-red-300 mb-3">
                 清理所有现有数据，为200+家公司的新数据做准备
                 <br />此操作不可逆，请谨慎操作！
               </div>
@@ -478,16 +478,16 @@ export default function ReconfigureData() {
           {isRunning && (
             <div className="space-y-3">
               <div className="flex items-center justify-between text-sm">
-                <span>{progress.currentStep}</span>
-                <span>{progress.current}/{progress.total}</span>
+                <span className="text-foreground">{progress.currentStep}</span>
+                <span className="text-muted-foreground">{progress.current}/{progress.total}</span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-muted rounded-full h-2">
                 <div 
-                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                  className="bg-primary h-2 rounded-full transition-all duration-300"
                   style={{ width: `${(progress.current / progress.total) * 100}%` }}
                 ></div>
               </div>
-              <div className="text-xs text-gray-600 space-y-1 max-h-20 overflow-y-auto">
+              <div className="text-xs text-muted-foreground space-y-1 max-h-20 overflow-y-auto">
                 {progress.details.map((detail, index) => (
                   <div key={index}>{detail}</div>
                 ))}
@@ -537,9 +537,9 @@ export default function ReconfigureData() {
           </div>
 
           {clearResult && (
-            <Alert className="border-orange-200 bg-orange-50">
-              <CheckCircle className="h-4 w-4 text-orange-600" />
-              <AlertDescription className="text-orange-800">
+            <Alert className="border-orange-200 bg-orange-50 dark:bg-orange-950 dark:border-orange-800">
+              <CheckCircle className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+              <AlertDescription className="text-orange-800 dark:text-orange-200">
                 <strong>数据库清理完成！</strong>
                 <div className="mt-2 space-y-2">
                   <div className="text-sm">
@@ -552,7 +552,7 @@ export default function ReconfigureData() {
                     📊 总计: {clearResult.results?.totalTables} 个表
                   </div>
                   {clearResult.results?.details && (
-                    <div className="text-xs bg-white p-2 rounded border max-h-32 overflow-y-auto">
+                    <div className="text-xs bg-background p-2 rounded border border-border max-h-32 overflow-y-auto">
                       {clearResult.results.details.map((detail: any, index: number) => (
                         <div key={index} className={detail.success ? 'text-green-600' : 'text-red-600'}>
                           {detail.success ? '✅' : '❌'} {detail.table}: {detail.success ? detail.message : detail.error}
@@ -566,9 +566,9 @@ export default function ReconfigureData() {
           )}
 
           {result && (
-            <Alert className="border-green-200 bg-green-50">
-              <CheckCircle className="h-4 w-4 text-green-600" />
-              <AlertDescription className="text-green-800">
+            <Alert className="border-green-200 bg-green-50 dark:bg-green-950 dark:border-green-800">
+              <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+              <AlertDescription className="text-green-800 dark:text-green-200">
                 <div className="space-y-2">
                   <div className="font-medium">{result.message}</div>
                   {result.taskId && (
@@ -587,7 +587,7 @@ export default function ReconfigureData() {
                     </div>
                   ))}
                   {result.result?.summary && (
-                    <div className="text-sm font-medium mt-2 p-2 bg-white rounded border">
+                    <div className="text-sm font-medium mt-2 p-2 bg-background rounded border border-border">
                       {result.result.summary}
                     </div>
                   )}
@@ -597,10 +597,10 @@ export default function ReconfigureData() {
           )}
 
           {/* Agent模式任务状态显示 */}
-          {agentMode && taskStatus && (
-            <Alert className="border-blue-200 bg-blue-50">
-              <CheckCircle className="h-4 w-4 text-blue-600" />
-              <AlertDescription className="text-blue-800">
+        {agentMode && taskStatus && (
+          <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800">
+            <CheckCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <AlertDescription className="text-blue-800 dark:text-blue-200">
                 <div className="space-y-2">
                   <div className="font-medium">Agent任务状态</div>
                   <div className="text-sm">
@@ -633,30 +633,30 @@ export default function ReconfigureData() {
           )}
 
           {/* Agent模式任务日志显示 */}
-          {agentMode && taskLogs.length > 0 && (
-            <Alert className="border-gray-200 bg-gray-50">
-              <AlertDescription>
-                <div className="space-y-2">
-                  <div className="font-medium text-gray-800">任务日志</div>
-                  <div className="max-h-40 overflow-y-auto text-sm">
-                    {taskLogs.map((log: any, index: number) => (
-                      <div key={index} className={`py-1 ${log.log_level === 'error' ? 'text-red-600' : log.log_level === 'warning' ? 'text-yellow-600' : 'text-gray-600'}`}>
-                        <span className="text-xs text-gray-500">
-                          {new Date(log.created_at).toLocaleTimeString()}
-                        </span>
-                        <span className="ml-2">{log.message}</span>
-                      </div>
-                    ))}
-                  </div>
+        {agentMode && taskLogs.length > 0 && (
+          <Alert className="border-border bg-muted">
+            <AlertDescription>
+              <div className="space-y-2">
+                <div className="font-medium text-foreground">任务日志</div>
+                <div className="max-h-40 overflow-y-auto text-sm">
+                  {taskLogs.map((log: any, index: number) => (
+                    <div key={index} className={`py-1 ${log.log_level === 'error' ? 'text-red-600 dark:text-red-400' : log.log_level === 'warning' ? 'text-yellow-600 dark:text-yellow-400' : 'text-muted-foreground'}`}>
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(log.created_at).toLocaleTimeString()}
+                      </span>
+                      <span className="ml-2">{log.message}</span>
+                    </div>
+                  ))}
                 </div>
-              </AlertDescription>
-            </Alert>
-          )}
+              </div>
+            </AlertDescription>
+          </Alert>
+        )}
 
           {error && (
-            <Alert className="border-red-200 bg-red-50">
-              <XCircle className="h-4 w-4 text-red-600" />
-              <AlertDescription className="text-red-800">
+            <Alert className="border-red-200 bg-red-50 dark:bg-red-950 dark:border-red-800">
+              <XCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+              <AlertDescription className="text-red-800 dark:text-red-200">
                 <strong>重新配置失败：</strong> {error}
               </AlertDescription>
             </Alert>
