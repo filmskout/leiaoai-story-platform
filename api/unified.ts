@@ -37,49 +37,115 @@ function initClients() {
   }
 }
 
-// 获取公司详细信息
+// 获取公司详细信息 - 深度研究模式
 async function getCompanyDetails(companyName: string, isOverseas: boolean) {
   try {
+    console.log(`🔬 开始深度研究模式分析: ${companyName}`);
+    
     const prompt = isOverseas 
-      ? `Please provide comprehensive information about ${companyName}, a leading AI company. Include:
-1. Company description (200-300 words)
-2. Founded year and headquarters location
-3. Key AI products/services/tools (list 3-5 with URLs)
-4. Recent funding rounds (last 3 rounds with amounts, investors, valuations)
-5. Company size (employees)
-6. Key executives
-7. Main competitors
-8. Recent news highlights (3-5 key points)
-9. Official website URL
-10. Market valuation (if available)
+      ? `You are a senior AI industry research analyst conducting a comprehensive deep research analysis on "${companyName}". This is a critical business intelligence report for investors and industry stakeholders.
 
-Format as JSON with these fields: description, founded_year, headquarters, products, funding_rounds, employee_count, executives, competitors, recent_news, website, valuation`
-      : `请提供${companyName}这家领先AI公司的详细信息，包括：
-1. 公司描述（200-300字）
-2. 成立年份和总部位置
-3. 主要AI产品/服务/工具（列出3-5个及URL）
-4. 最近融资轮次（最近3轮及金额、投资方、估值）
-5. 公司规模（员工数）
-6. 主要高管
-7. 主要竞争对手
-8. 最近新闻亮点（3-5个要点）
-9. 官方网站URL
-10. 市场估值（如有）
+Please conduct thorough research and provide detailed information in the following areas:
 
-请以JSON格式返回，包含这些字段：description, founded_year, headquarters, products, funding_rounds, employee_count, executives, competitors, recent_news, website, valuation`;
+**COMPANY FUNDAMENTALS:**
+1. Company description (300-400 words) - Mission, vision, core values, and strategic positioning
+2. Founded year, headquarters location, and key office locations
+3. Company size and growth trajectory (employee count, recent hiring trends)
+4. Leadership team and key executives (names, backgrounds, expertise)
+
+**BUSINESS MODEL & PRODUCTS:**
+5. Detailed AI products/services/tools portfolio (list 5-7 with specific URLs, technical capabilities, and market positioning)
+6. Revenue streams and business model (B2B, B2C, enterprise, consumer, etc.)
+7. Target markets and customer segments
+8. Pricing strategy and competitive pricing analysis
+
+**FINANCIAL & FUNDING:**
+9. Recent funding rounds (last 5 rounds with specific amounts, lead investors, valuations, and funding timeline)
+10. Current market valuation and valuation methodology
+11. Revenue growth trends and financial performance indicators
+12. Key partnerships and strategic alliances
+
+**COMPETITIVE LANDSCAPE:**
+13. Main competitors and competitive analysis
+14. Market share and industry positioning
+15. Unique value propositions and competitive advantages
+16. Technology differentiation and IP portfolio
+
+**MARKET IMPACT & NEWS:**
+17. Recent significant news highlights (5-7 key developments with dates and impact analysis)
+18. Industry recognition, awards, and achievements
+19. Regulatory compliance and industry certifications
+20. Future outlook and strategic initiatives
+
+**TECHNICAL ANALYSIS:**
+21. AI technology stack and core technologies
+22. Research and development focus areas
+23. Technical partnerships and collaborations
+24. Innovation pipeline and upcoming product launches
+
+Format as JSON with these fields: description, founded_year, headquarters, products, funding_rounds, employee_count, executives, competitors, recent_news, website, valuation, revenue_model, market_position, technology_stack, partnerships, awards, future_outlook
+
+Ensure all information is factual, current, and based on available public data. Use professional business analysis tone.`
+      : `你是一位资深AI行业研究分析师，正在对"${companyName}"进行全面的深度研究分析。这是一份面向投资人和行业利益相关者的关键商业情报报告。
+
+请进行深入研究并提供以下领域的详细信息：
+
+**公司基本面：**
+1. 公司描述（300-400字）- 使命、愿景、核心价值观和战略定位
+2. 成立年份、总部位置和主要办公地点
+3. 公司规模和增长轨迹（员工数量、近期招聘趋势）
+4. 领导团队和主要高管（姓名、背景、专业领域）
+
+**商业模式与产品：**
+5. 详细AI产品/服务/工具组合（列出5-7个，包含具体URL、技术能力和市场定位）
+6. 收入来源和商业模式（B2B、B2C、企业级、消费级等）
+7. 目标市场和客户群体
+8. 定价策略和竞争定价分析
+
+**财务与融资：**
+9. 近期融资轮次（最近5轮，包含具体金额、领投方、估值和融资时间线）
+10. 当前市场估值和估值方法
+11. 收入增长趋势和财务表现指标
+12. 关键合作伙伴和战略联盟
+
+**竞争格局：**
+13. 主要竞争对手和竞争分析
+14. 市场份额和行业定位
+15. 独特价值主张和竞争优势
+16. 技术差异化和知识产权组合
+
+**市场影响与新闻：**
+17. 近期重大新闻亮点（5-7个关键发展，包含日期和影响分析）
+18. 行业认可、奖项和成就
+19. 监管合规和行业认证
+20. 未来展望和战略举措
+
+**技术分析：**
+21. AI技术栈和核心技术
+22. 研发重点领域
+23. 技术合作伙伴和协作关系
+24. 创新管道和即将推出的产品
+
+请以JSON格式返回，包含这些字段：description, founded_year, headquarters, products, funding_rounds, employee_count, executives, competitors, recent_news, website, valuation, revenue_model, market_position, technology_stack, partnerships, awards, future_outlook
+
+确保所有信息都是事实性的、最新的，基于可用的公开数据。使用专业的商业分析语调。`;
+
+    console.log(`🤖 发送深度研究请求: ${companyName} (${isOverseas ? '海外' : '国内'})`);
 
     const response = await openai.chat.completions.create({
       model: 'gpt-4',
       messages: [{ role: 'user', content: prompt }],
-      temperature: 0.7,
+      temperature: 0.2, // 降低温度以获得更准确的研究结果
+      max_tokens: 3000, // 增加token限制以获得更详细的内容
     });
 
-    const content = response.choices[0]?.message?.content || '{}';
-    console.log(`🤖 OpenAI API响应 (${companyName}):`, content.substring(0, 200) + '...');
+    const content = response.choices[0]?.message?.content || '';
+    console.log(`🔬 深度研究响应长度: ${content.length} 字符`);
+    console.log(`🔬 响应内容预览: ${content.substring(0, 200)}...`);
     
     try {
       const parsedData = JSON.parse(content);
-      console.log(`✅ JSON解析成功 (${companyName}):`, Object.keys(parsedData));
+      console.log(`✅ 深度研究JSON解析成功: ${companyName}`, Object.keys(parsedData));
       return parsedData;
     } catch (parseError) {
       console.warn(`⚠️ JSON解析失败，使用默认数据: ${companyName}`, parseError);
@@ -111,7 +177,7 @@ Format as JSON with these fields: description, founded_year, headquarters, produ
       };
     }
   } catch (error) {
-    console.error(`❌ 获取公司详情失败: ${companyName}`, error);
+    console.error(`❌ 深度研究失败: ${companyName}`, error);
     // 返回默认数据结构，根据公司类型使用不同语言
     return {
       description: isOverseas 
@@ -190,27 +256,93 @@ async function generateNewsStory(companyName: string, isOverseas: boolean) {
     const newsUrl = getNewsUrl(randomSource, companyName, isOverseas);
 
     const prompt = isOverseas
-      ? `Generate a 350-500 word news story about ${companyName} based on recent AI industry developments. Include:
-1. Recent product launches or updates
-2. Funding or partnership announcements
-3. Market impact and competitive positioning
-4. Future outlook and strategic direction
-5. Industry trends and implications
+      ? `You are a senior technology journalist and AI industry analyst writing an in-depth investigative report for ${randomSource}. You have conducted extensive research on "${companyName}" and are preparing a comprehensive news article.
 
-Write in English, professional tone, suitable for investors and tech enthusiasts.
+**RESEARCH REQUIREMENTS:**
+Conduct thorough investigation and provide detailed analysis covering:
+
+**COMPANY ANALYSIS:**
+1. Recent strategic developments and business initiatives
+2. Product launches, updates, and technological innovations
+3. Market positioning and competitive strategy
+4. Financial performance and growth metrics
+5. Leadership changes and organizational developments
+
+**INDUSTRY CONTEXT:**
+6. Market trends and industry dynamics affecting the company
+7. Competitive landscape and market share analysis
+8. Regulatory environment and compliance developments
+9. Technology trends and innovation patterns
+10. Investment climate and funding environment
+
+**IMPACT ASSESSMENT:**
+11. Business impact of recent developments
+12. Market reaction and investor sentiment
+13. Customer and partner responses
+14. Long-term strategic implications
+15. Industry-wide implications and trends
+
+**FUTURE OUTLOOK:**
+16. Growth prospects and expansion plans
+17. Technology roadmap and innovation pipeline
+18. Market opportunities and challenges
+19. Strategic partnerships and collaborations
+20. Industry predictions and forecasts
+
+Write a comprehensive 500-700 word news article in professional journalistic style. Include:
+- Compelling headline and lead paragraph
+- Detailed analysis with specific facts and figures
+- Expert insights and industry context
+- Multiple perspectives and balanced reporting
+- Clear structure with subheadings
+- Professional tone suitable for investors and industry professionals
+
 Include a reference to the source: ${randomSource}
-Make it sound like a real news article from ${randomSource} with proper journalistic style.`
+Make it sound like a real investigative report from ${randomSource} with proper journalistic depth and analysis.`
 
-      : `基于${companyName}最近的AI行业发展，生成一篇350-500字的新闻故事，包括：
-1. 最近的产品发布或更新
-2. 融资或合作公告
-3. 市场影响和竞争定位
-4. 未来展望和战略方向
-5. 行业趋势和影响
+      : `你是一位资深科技记者和AI行业分析师，正在为${randomSource}撰写一份深度调查报告。你已经对"${companyName}"进行了广泛的研究，正在准备一篇全面的新闻报道。
 
-用中文写作，专业语调，适合投资人和技术爱好者。
+**研究要求：**
+进行深入调查并提供详细分析，涵盖：
+
+**公司分析：**
+1. 近期战略发展和业务举措
+2. 产品发布、更新和技术创新
+3. 市场定位和竞争策略
+4. 财务表现和增长指标
+5. 领导层变动和组织发展
+
+**行业背景：**
+6. 影响公司的市场趋势和行业动态
+7. 竞争格局和市场份额分析
+8. 监管环境和合规发展
+9. 技术趋势和创新模式
+10. 投资环境和融资氛围
+
+**影响评估：**
+11. 近期发展的商业影响
+12. 市场反应和投资者情绪
+13. 客户和合作伙伴反馈
+14. 长期战略影响
+15. 行业整体影响和趋势
+
+**未来展望：**
+16. 增长前景和扩张计划
+17. 技术路线图和创新管道
+18. 市场机遇和挑战
+19. 战略合作伙伴和协作关系
+20. 行业预测和展望
+
+撰写一篇500-700字的全面新闻报道，采用专业新闻风格。包括：
+- 引人注目的标题和导语段落
+- 包含具体事实和数据的详细分析
+- 专家见解和行业背景
+- 多角度和平衡的报道
+- 清晰的结构和副标题
+- 适合投资人和行业专业人士的专业语调
+
 包含新闻来源引用：${randomSource}
-让文章听起来像${randomSource}的真实新闻报道，具有适当的新闻风格。`;
+让文章听起来像${randomSource}的真实调查报告，具有适当的新闻深度和分析。`;
 
     console.log(`🤖 发送新闻生成请求: ${companyName} (${isOverseas ? '海外' : '国内'})`);
     console.log(`📰 新闻来源: ${randomSource}`);
@@ -219,12 +351,13 @@ Make it sound like a real news article from ${randomSource} with proper journali
     const response = await openai.chat.completions.create({
       model: 'gpt-4',
       messages: [{ role: 'user', content: prompt }],
-      temperature: 0.8,
+      temperature: 0.3, // 降低温度以获得更准确的研究结果
+      max_tokens: 2500, // 增加token限制以获得更详细的内容
     });
 
     const content = response.choices[0]?.message?.content || '';
-    console.log(`📰 OpenAI响应长度: ${content.length} 字符`);
-    console.log(`📰 响应内容预览: ${content.substring(0, 100)}...`);
+    console.log(`📰 深度研究新闻响应长度: ${content.length} 字符`);
+    console.log(`📰 响应内容预览: ${content.substring(0, 200)}...`);
     
     const contentWithLink = content + `\n\n原文链接：[${randomSource} - ${companyName} AI创新动态](${newsUrl})`;
     
@@ -235,7 +368,7 @@ Make it sound like a real news article from ${randomSource} with proper journali
       published_date: new Date().toISOString()
     };
     
-    console.log(`✅ 新闻故事生成完成: ${companyName}`, {
+    console.log(`✅ 深度研究新闻故事生成完成: ${companyName}`, {
       contentLength: result.content.length,
       source: result.source,
       url: result.url
@@ -806,9 +939,9 @@ async function handleStartAgentTask(req: any, res: any) {
     return res.status(500).json({
       success: false,
       error: error.message
-    });
-  }
-}
+            });
+          }
+        }
 
 // Agent模式 - 查询任务状态
 async function handleCheckTaskStatus(req: any, res: any) {
@@ -1053,7 +1186,7 @@ async function handleCleanDuplicates(req: any, res: any) {
     }
     
     console.log(`🎉 清理完成! 删除了 ${results.cleaned} 条重复记录`);
-
+    
     return res.status(200).json({
       success: true,
       message: `清理完成! 删除了 ${results.cleaned} 条重复记录`,
@@ -1063,7 +1196,7 @@ async function handleCleanDuplicates(req: any, res: any) {
 
   } catch (error: any) {
     console.error('❌ 清理重复数据失败:', error);
-    return res.status(500).json({ 
+    return res.status(500).json({
       success: false,
       error: error.message,
       timestamp: new Date().toISOString()
@@ -1281,7 +1414,7 @@ async function handleCompanyCategories(req: any, res: any) {
 
     // 获取当前数据库中的公司
     const { data: existingCompanies } = await supabase
-      .from('companies')
+          .from('companies')
       .select('name, created_at');
 
     const existingCompanyNames = existingCompanies?.map(c => c.name) || [];
@@ -1318,9 +1451,9 @@ async function handleCompanyCategories(req: any, res: any) {
       success: false,
       error: error.message,
       timestamp: new Date().toISOString()
-    });
-  }
-}
+            });
+          }
+        }
 
 // 检查数据完整性
 async function handleCheckDataCompleteness(req: any, res: any) {
@@ -1451,9 +1584,9 @@ async function handleCheckDataCompleteness(req: any, res: any) {
       success: false,
       error: error.message,
       timestamp: new Date().toISOString()
-    });
-  }
-}
+            });
+          }
+        }
 
 // 批量补齐公司数据
 async function handleBatchCompleteCompanies(req: any, res: any) {
@@ -1659,15 +1792,15 @@ async function handleBatchCompleteCompanies(req: any, res: any) {
     }
 
     console.log(`🎉 批量生成完成! 成功: ${results.generated}, 失败: ${results.failed}`);
-    
+
     return res.status(200).json({
       ...results,
       timestamp: new Date().toISOString()
     });
-    
+
   } catch (error: any) {
     console.error('❌ 批量补齐公司数据失败:', error);
-    return res.status(500).json({
+    return res.status(500).json({ 
       success: false,
       error: error.message,
       timestamp: new Date().toISOString()
@@ -1750,15 +1883,15 @@ async function handleGenerateToolsForCompanies(req: any, res: any) {
     }
 
     console.log(`🎉 工具数据生成完成! 成功: ${results.generated}, 失败: ${results.failed}`);
-    
+
     return res.status(200).json({
       ...results,
       timestamp: new Date().toISOString()
     });
-    
+
   } catch (error: any) {
     console.error('❌ 生成工具数据失败:', error);
-    return res.status(500).json({
+    return res.status(500).json({ 
       success: false,
       error: error.message,
       timestamp: new Date().toISOString()
@@ -1771,25 +1904,66 @@ async function generateToolsForCompany(companyName: string, companyId: string) {
   try {
     console.log(`🛠️ 开始为 ${companyName} 生成工具数据`);
     
-    // 使用OpenAI生成工具数据
-    const prompt = `为AI公司"${companyName}"生成3-5个相关的AI工具或产品。每个工具包含名称、描述和URL。
-    
-请以JSON格式返回，格式如下：
+    // 使用OpenAI生成工具数据 - 深度研究模式
+    const prompt = `You are a senior AI product analyst conducting deep research on "${companyName}". You have extensive knowledge of their technology stack, market positioning, and product portfolio.
+
+**RESEARCH REQUIREMENTS:**
+Conduct thorough analysis and provide detailed information about their AI tools and products:
+
+**PRODUCT PORTFOLIO ANALYSIS:**
+1. Core AI platforms and infrastructure tools
+2. Developer tools and APIs
+3. Enterprise solutions and SaaS products
+4. Consumer-facing applications
+5. Research tools and experimental features
+6. Integration tools and middleware
+7. Analytics and monitoring tools
+
+**TECHNICAL SPECIFICATIONS:**
+- Detailed technical capabilities and features
+- Target use cases and applications
+- Integration requirements and compatibility
+- Performance metrics and benchmarks
+- Security features and compliance
+- Scalability and deployment options
+
+**MARKET POSITIONING:**
+- Competitive advantages and unique features
+- Pricing models and business strategies
+- Target customer segments
+- Market adoption and user base
+- Industry recognition and awards
+
+For each tool/product, provide:
+- Name and category
+- Detailed description (100-150 words)
+- Technical capabilities and features
+- Target users and use cases
+- Official URL or documentation link
+- Market positioning and competitive advantages
+
+Format as JSON with this structure:
 {
   "tools": [
     {
-      "name": "工具名称",
-      "description": "工具描述",
-      "url": "https://example.com/tool1",
-      "category": "AI工具分类"
+      "name": "Tool Name",
+      "description": "Detailed description with technical capabilities, features, and use cases",
+      "url": "https://official-url.com",
+      "category": "AI Platform/Tools/Applications/etc",
+      "target_users": "Developers/Enterprises/Consumers/etc",
+      "key_features": ["Feature 1", "Feature 2", "Feature 3"],
+      "competitive_advantages": "Unique selling points and market differentiation"
     }
   ]
-}`;
+}
+
+Generate 5-7 comprehensive tools/products based on thorough research. Ensure all information is factual, current, and based on available public data.`;
 
     const response = await openai.chat.completions.create({
       model: 'gpt-4',
       messages: [{ role: 'user', content: prompt }],
-      temperature: 0.7,
+      temperature: 0.3, // 降低温度以获得更准确的研究结果
+      max_tokens: 2000, // 增加token限制以获得更详细的内容
     });
 
     const content = response.choices[0]?.message?.content || '{}';
