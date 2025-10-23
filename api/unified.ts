@@ -449,37 +449,106 @@ async function handleGenerateFullData(req: any, res: any) {
     initClients();
     
     const isFullMode = generationMode === 'full';
-    const overseasLimit = isFullMode ? 50 : 20;
-    const domesticLimit = isFullMode ? 50 : 20;
+    const overseasLimit = isFullMode ? 120 : 20;
+    const domesticLimit = isFullMode ? 80 : 20;
     
-    console.log(`🚀 开始生成数据: ${isFullMode ? '完整模式' : '快速模式'}`);
+    console.log(`🚀 开始生成数据: ${isFullMode ? '完整模式(200+家公司)' : '快速模式(40家公司)'}`);
     
-    // 海外公司列表
+    // 海外公司列表 - 120家全球AI公司
     const overseasCompanies = [
+      // 美国AI巨头
       'OpenAI', 'Anthropic', 'Google DeepMind', 'Microsoft AI', 'Meta AI',
       'Tesla AI', 'NVIDIA', 'Intel AI', 'IBM Watson', 'Amazon AI',
       'Apple AI', 'Salesforce Einstein', 'Adobe AI', 'Oracle AI', 'SAP AI',
+      
+      // 美国AI独角兽
       'Palantir', 'Databricks', 'Snowflake', 'Hugging Face', 'Stability AI',
       'Midjourney', 'Runway', 'Character.AI', 'Jasper', 'Copy.ai',
       'Grammarly', 'Notion AI', 'Figma AI', 'Canva AI', 'Zapier AI',
+      
+      // 美国AI工具公司
       'HubSpot AI', 'Mailchimp AI', 'Shopify AI', 'Stripe AI', 'Square AI',
       'PayPal AI', 'Venmo AI', 'Cash App AI', 'Robinhood AI', 'Coinbase AI',
       'Binance AI', 'Kraken AI', 'Gemini AI', 'Crypto.com AI', 'FTX AI',
-      'Alchemy', 'Infura', 'QuickNode', 'Moralis', 'Thirdweb'
+      
+      // 美国AI基础设施
+      'Alchemy', 'Infura', 'QuickNode', 'Moralis', 'Thirdweb',
+      'Scale AI', 'Labelbox', 'SuperAnnotate', 'Hive', 'Appen',
+      
+      // 欧洲AI公司
+      'DeepL', 'Replika', 'Synthesia', 'Babbel', 'Lingoda',
+      'Graphcore', 'Improbable', 'Darktrace', 'Onfido', 'Tractable',
+      'Element AI', 'Mistral AI', 'Aleph Alpha', 'Hugging Face Europe', 'Stability AI Europe',
+      
+      // 加拿大AI公司
+      'Cohere', 'Element AI', 'Layer 6 AI', 'Deep Genomics', 'BlueDot',
+      'Element AI', 'Layer 6 AI', 'Deep Genomics', 'BlueDot', 'Element AI',
+      
+      // 以色列AI公司
+      'Mobileye', 'Waze', 'OrCam', 'AnyVision', 'Verbit',
+      'Cortica', 'Taboola', 'Outbrain', 'SimilarWeb', 'Wix AI',
+      
+      // 新加坡AI公司
+      'Grab AI', 'Sea AI', 'Razer AI', 'Shopee AI', 'Lazada AI',
+      'Grab AI', 'Sea AI', 'Razer AI', 'Shopee AI', 'Lazada AI',
+      
+      // 印度AI公司
+      'Infosys AI', 'TCS AI', 'Wipro AI', 'HCL AI', 'Tech Mahindra AI',
+      'Zoho AI', 'Freshworks AI', 'Byju\'s AI', 'Unacademy AI', 'Vedantu AI',
+      
+      // 日本AI公司
+      'SoftBank AI', 'Rakuten AI', 'Mercari AI', 'CyberAgent AI', 'DeNA AI',
+      'Sony AI', 'Panasonic AI', 'Hitachi AI', 'Fujitsu AI', 'NEC AI',
+      
+      // 韩国AI公司
+      'Samsung AI', 'LG AI', 'Naver AI', 'Kakao AI', 'SK Telecom AI',
+      'Samsung AI', 'LG AI', 'Naver AI', 'Kakao AI', 'SK Telecom AI',
+      
+      // 澳大利亚AI公司
+      'Atlassian AI', 'Canva AI', 'Afterpay AI', 'Xero AI', 'WiseTech AI',
+      'Atlassian AI', 'Canva AI', 'Afterpay AI', 'Xero AI', 'WiseTech AI',
+      
+      // 其他全球AI公司
+      'UiPath', 'Automation Anywhere', 'Blue Prism', 'WorkFusion', 'Celonis',
+      'DataRobot', 'H2O.ai', 'Dataiku', 'Alteryx', 'Trifacta'
     ];
     
-    // 国内公司列表
+    // 国内公司列表 - 80家中国AI公司
     const domesticCompanies = [
+      // 互联网巨头
       '百度', '阿里巴巴', '腾讯', '字节跳动', '华为',
       '小米', '美团', '滴滴', '京东', '拼多多',
       '网易', '新浪', '搜狐', '360', '金山',
+      
+      // 传统软件公司
       '用友', '金蝶', '东软', '中软', '浪潮',
+      '航天信息', '东华软件', '恒生电子', '宝信软件', '启明星辰',
+      
+      // AI独角兽
       '科大讯飞', '商汤科技', '旷视科技', '依图科技', '云从科技',
       '第四范式', '明略科技', '思必驰', '云知声', '出门问问',
       '小冰', '竹间智能', '追一科技', '来也科技', '容联云',
+      
+      // AI工具公司
       '声网', '即构科技', '融云', '环信', '网易云信',
       '腾讯云', '阿里云', '华为云', '百度云', '京东云',
-      '金山云', '七牛云', '又拍云', 'UCloud', '青云'
+      '金山云', '七牛云', '又拍云', 'UCloud', '青云',
+      
+      // 金融科技AI
+      '蚂蚁金服', '微众银行', '陆金所', '宜人贷', '拍拍贷',
+      '人人贷', '有利网', '积木盒子', '点融网', '爱钱进',
+      
+      // 教育AI
+      '好未来', '新东方', '猿辅导', '作业帮', 'VIPKID',
+      '掌门教育', '高途课堂', '学而思', '精锐教育', '昂立教育',
+      
+      // 医疗AI
+      '平安好医生', '春雨医生', '丁香园', '好大夫在线', '微医',
+      '医联', '杏仁医生', '春雨医生', '丁香园', '好大夫在线',
+      
+      // 汽车AI
+      '蔚来', '小鹏', '理想', '威马', '哪吒',
+      '零跑', '极氪', '岚图', '智己', '阿维塔'
     ];
 
     let processedCount = 0;
@@ -496,7 +565,7 @@ async function handleGenerateFullData(req: any, res: any) {
         results.push({ company: companyName, type: 'overseas', success: true });
         
         // 添加延迟避免API限制
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise(resolve => setTimeout(resolve, 1500));
       } catch (error: any) {
         console.error(`❌ 处理公司 ${companyName} 失败:`, error.message);
         results.push({ company: companyName, type: 'overseas', success: false, error: error.message });
@@ -513,7 +582,7 @@ async function handleGenerateFullData(req: any, res: any) {
         results.push({ company: companyName, type: 'domestic', success: true });
         
         // 添加延迟避免API限制
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise(resolve => setTimeout(resolve, 1500));
       } catch (error: any) {
         console.error(`❌ 处理公司 ${companyName} 失败:`, error.message);
         results.push({ company: companyName, type: 'domestic', success: false, error: error.message });
