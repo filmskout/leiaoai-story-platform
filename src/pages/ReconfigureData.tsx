@@ -212,11 +212,22 @@ export default function ReconfigureData() {
 
   // 开始轮询任务状态
   const startStatusPolling = (taskId: string) => {
+    let retryCount = 0;
+    const maxRetries = 3;
+    
     const pollInterval = setInterval(async () => {
       try {
         await checkTaskStatus(taskId);
+        retryCount = 0; // 重置重试计数
       } catch (error) {
         console.error('轮询任务状态失败:', error);
+        retryCount++;
+        
+        if (retryCount >= maxRetries) {
+          console.error('轮询失败次数过多，停止轮询');
+          clearInterval(pollInterval);
+          setError('任务状态查询失败次数过多，请手动检查任务状态');
+        }
       }
     }, 3000); // 每3秒检查一次
 
@@ -229,7 +240,18 @@ export default function ReconfigureData() {
     setIsCheckingStatus(true);
     
     try {
-      const response = await fetch(`/api/unified?action=check-task-status&taskId=${taskId}`);
+      console.log(`🔍 查询任务状态: ${taskId}`);
+      
+      const response = await fetch(`/api/unified?action=check-task-status&taskId=${taskId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // 添加超时处理
+        signal: AbortSignal.timeout(10000) // 10秒超时
+      });
+      
+      console.log(`📡 响应状态: ${response.status} ${response.statusText}`);
       
       // 检查响应状态和内容类型
       if (!response.ok) {
@@ -242,6 +264,7 @@ export default function ReconfigureData() {
       }
 
       const data = await response.json();
+      console.log(`📊 任务状态数据:`, data);
       
       if (data.success) {
         setTaskStatus(data.task);
@@ -273,10 +296,20 @@ export default function ReconfigureData() {
           }
         }
       } else {
+        console.error('❌ 任务状态查询失败:', data.error);
         setError(data.error || '查询任务状态失败');
       }
     } catch (err: any) {
-      setError(`查询任务状态失败: ${err.message}`);
+      console.error('❌ 查询任务状态异常:', err);
+      
+      // 更详细的错误信息
+      if (err.name === 'AbortError') {
+        setError('查询任务状态超时，请检查网络连接');
+      } else if (err.name === 'TypeError' && err.message.includes('fetch')) {
+        setError('网络连接失败，请检查网络连接或稍后重试');
+      } else {
+        setError(`查询任务状态失败: ${err.message}`);
+      }
     } finally {
       setIsCheckingStatus(false);
     }
