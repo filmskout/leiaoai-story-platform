@@ -1558,6 +1558,15 @@ async function handleBatchCompleteCompanies(req: any, res: any) {
       .select('name')
       .then(result => result.data?.map(c => c.name) || []);
 
+    // 为每个分类添加状态信息
+    Object.keys(categories).forEach(categoryKey => {
+      const categoryData = categories[categoryKey] as any;
+      categoryData.total = categoryData.companies.length;
+      categoryData.existing = categoryData.companies.filter((name: string) => existingCompanies.includes(name)).length;
+      categoryData.missing = categoryData.companies.filter((name: string) => !existingCompanies.includes(name));
+      categoryData.completionRate = Math.round((categoryData.existing / categoryData.total) * 100);
+    });
+
     let companiesToGenerate: string[] = [];
     let categoryName = '全部';
 
