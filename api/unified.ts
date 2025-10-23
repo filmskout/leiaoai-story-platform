@@ -180,16 +180,21 @@ Make it sound like a real news article from ${randomSource} with proper journali
 }
 
 // 生成公司数据
-async function generateCompanyData(companyName: string, isOverseas: boolean) {
+// 生成公司数据（带重试机制）
+async function generateCompanyData(companyName: string, isOverseas: boolean, retryCount = 0) {
+  const maxRetries = 3;
+  
   try {
+    console.log(`🔄 处理公司: ${companyName} (尝试 ${retryCount + 1}/${maxRetries + 1})`);
+    
     // 生成公司详细信息
     const companyDetails = await getCompanyDetails(companyName, isOverseas);
-
-        // 插入公司数据
+    
+    // 插入公司数据
     const { data: company, error: companyError } = await supabase
-          .from('companies')
+      .from('companies')
       .insert({
-            name: companyName,
+        name: companyName,
         description: companyDetails.description || `${companyName}是一家领先的AI公司`,
         founded_year: companyDetails.founded_year || new Date().getFullYear() - Math.floor(Math.random() * 10),
         headquarters: companyDetails.headquarters || (isOverseas ? 'San Francisco, CA' : '北京'),
@@ -198,60 +203,84 @@ async function generateCompanyData(companyName: string, isOverseas: boolean) {
         valuation_usd: companyDetails.valuation_usd || (Math.floor(Math.random() * 10) + 1) * 1000000000,
         industry_tags: companyDetails.industry_tags || ['AI', 'Technology'],
         created_at: new Date().toISOString()
-          })
-          .select()
-          .single();
+      })
+      .select()
+      .single();
 
-        if (companyError) {
+    if (companyError) {
       throw new Error(`Failed to insert company: ${companyError.message}`);
     }
+
+    console.log(`✅ 公司数据插入成功: ${companyName}`);
 
     // 生成工具数据
     if (companyDetails.products && companyDetails.products.length > 0) {
       for (const product of companyDetails.products.slice(0, 3)) {
-        await supabase.from('tools').insert({
-          company_id: company.id,
-          name: product.name || `${companyName} AI Tool`,
-          description: product.description || `由${companyName}开发的AI工具`,
-          url: product.url || `https://${companyName.toLowerCase()}.com/tools`,
-          category: 'AI工具',
-          created_at: new Date().toISOString()
-            });
-          }
+        try {
+          await supabase.from('tools').insert({
+            company_id: company.id,
+            name: product.name || `${companyName} AI Tool`,
+            description: product.description || `由${companyName}开发的AI工具`,
+            url: product.url || `https://${companyName.toLowerCase()}.com/tools`,
+            category: 'AI工具',
+            created_at: new Date().toISOString()
+          });
+        } catch (toolError) {
+          console.warn(`⚠️ 工具数据插入失败: ${companyName} - ${product.name}`, toolError);
         }
+      }
+    }
 
     // 生成融资数据
     if (companyDetails.funding_rounds && companyDetails.funding_rounds.length > 0) {
       for (const funding of companyDetails.funding_rounds.slice(0, 3)) {
-        await supabase.from('fundings').insert({
-          company_id: company.id,
-          round: funding.round || 'Series A',
-          amount_usd: funding.amount_usd || 10000000,
-          investors: Array.isArray(funding.investors) ? funding.investors : [funding.investors || 'Venture Capital'],
-          announced_on: funding.announced_on || new Date().toISOString().split('T')[0],
-          created_at: new Date().toISOString()
-            });
-          }
+        try {
+          await supabase.from('fundings').insert({
+            company_id: company.id,
+            round: funding.round || 'Series A',
+            amount_usd: funding.amount_usd || 10000000,
+            investors: Array.isArray(funding.investors) ? funding.investors : [funding.investors || 'Venture Capital'],
+            announced_on: funding.announced_on || new Date().toISOString().split('T')[0],
+            created_at: new Date().toISOString()
+          });
+        } catch (fundingError) {
+          console.warn(`⚠️ 融资数据插入失败: ${companyName}`, fundingError);
         }
-
-        // 生成新闻故事
-    const newsStory = await generateNewsStory(companyName, isOverseas);
-    if (newsStory.content) {
-      await supabase.from('stories').insert({
-        company_id: company.id,
-        title: `${companyName} AI创新动态`,
-        content: newsStory.content,
-        source: newsStory.source,
-        url: newsStory.url,
-        published_date: newsStory.published_date,
-        created_at: new Date().toISOString()
-      });
+      }
     }
 
+    // 生成新闻故事
+    try {
+      const newsStory = await generateNewsStory(companyName, isOverseas);
+      if (newsStory.content) {
+        await supabase.from('stories').insert({
+          company_id: company.id,
+          title: `${companyName} AI创新动态`,
+          content: newsStory.content,
+          source: newsStory.source,
+          url: newsStory.url,
+          published_date: newsStory.published_date,
+          created_at: new Date().toISOString()
+        });
+      }
+    } catch (storyError) {
+      console.warn(`⚠️ 新闻故事生成失败: ${companyName}`, storyError);
+    }
+
+    console.log(`🎉 公司数据处理完成: ${companyName}`);
     return { success: true, companyId: company.id };
+    
   } catch (error) {
-    console.error(`Failed to generate data for ${companyName}:`, error);
-    throw error;
+    console.error(`❌ 处理公司失败: ${companyName} (尝试 ${retryCount + 1})`, error);
+    
+    if (retryCount < maxRetries) {
+      console.log(`🔄 重试处理公司: ${companyName} (${retryCount + 2}/${maxRetries + 1})`);
+      await new Promise(resolve => setTimeout(resolve, 2000)); // 等待2秒后重试
+      return generateCompanyData(companyName, isOverseas, retryCount + 1);
+    } else {
+      console.error(`💥 公司处理最终失败: ${companyName}`);
+      throw error;
+    }
   }
 }
 
