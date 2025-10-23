@@ -53,9 +53,9 @@ async function generateSingleCompany() {
         founded_year: 2015,
         headquarters: 'San Francisco, CA',
         website: 'https://openai.com',
-        employee_count: 1500,
-        valuation: '$29B',
-        is_overseas: true,
+        employee_count_range: '1000-5000',
+        valuation_usd: 29000000000,
+        industry_tags: ['AI', 'Machine Learning', 'Language Models'],
         created_at: new Date().toISOString()
       })
       .select()
@@ -87,10 +87,9 @@ async function generateSingleCompany() {
     const { error: fundingError } = await supabase.from('fundings').insert({
       company_id: company.id,
       round: 'Series C',
-      amount: '$10B',
-      investors: 'Microsoft',
-      valuation: '$29B',
-      date: new Date().toISOString(),
+      amount_usd: 10000000000,
+      investors: ['Microsoft'],
+      announced_on: new Date().toISOString().split('T')[0],
       created_at: new Date().toISOString()
     });
 
