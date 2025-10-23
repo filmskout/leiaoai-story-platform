@@ -154,7 +154,7 @@ export default function ReconfigureData() {
 
     try {
       const taskType = generationMode === 'full' ? 'generate-full-data' : 'reconfigure';
-      
+
       const response = await fetch('/api/unified?action=start-agent-task', {
         method: 'POST',
         headers: {
@@ -166,8 +166,18 @@ export default function ReconfigureData() {
         })
       });
 
-      const data = await response.json();
+      // 检查响应状态和内容类型
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
       
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error(`服务器返回了非JSON响应 (Content-Type: ${contentType})`);
+      }
+
+      const data = await response.json();
+
       if (data.success) {
         setCurrentTaskId(data.taskId);
         setResult({
@@ -176,7 +186,7 @@ export default function ReconfigureData() {
           taskId: data.taskId,
           note: data.note
         });
-        
+
         // 开始轮询任务状态
         startStatusPolling(data.taskId);
       } else {
@@ -209,6 +219,17 @@ export default function ReconfigureData() {
     
     try {
       const response = await fetch(`/api/unified?action=check-task-status&taskId=${taskId}`);
+      
+      // 检查响应状态和内容类型
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error(`服务器返回了非JSON响应 (Content-Type: ${contentType})`);
+      }
+
       const data = await response.json();
       
       if (data.success) {
