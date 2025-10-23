@@ -194,9 +194,9 @@ async function generateCompanyData(companyName: string, isOverseas: boolean) {
         founded_year: companyDetails.founded_year || new Date().getFullYear() - Math.floor(Math.random() * 10),
         headquarters: companyDetails.headquarters || (isOverseas ? 'San Francisco, CA' : '北京'),
         website: companyDetails.website || `https://${companyName.toLowerCase()}.com`,
-        employee_count: companyDetails.employee_count || Math.floor(Math.random() * 1000) + 100,
-        valuation: companyDetails.valuation || `$${Math.floor(Math.random() * 10) + 1}B`,
-        is_overseas: isOverseas,
+        employee_count_range: companyDetails.employee_count_range || `${Math.floor(Math.random() * 1000) + 100}-${Math.floor(Math.random() * 2000) + 1000}`,
+        valuation_usd: companyDetails.valuation_usd || (Math.floor(Math.random() * 10) + 1) * 1000000000,
+        industry_tags: companyDetails.industry_tags || ['AI', 'Technology'],
         created_at: new Date().toISOString()
           })
           .select()
@@ -226,10 +226,9 @@ async function generateCompanyData(companyName: string, isOverseas: boolean) {
         await supabase.from('fundings').insert({
           company_id: company.id,
           round: funding.round || 'Series A',
-          amount: funding.amount || '$10M',
-          investors: funding.investors || 'Venture Capital',
-          valuation: funding.valuation || '$100M',
-          date: funding.date || new Date().toISOString(),
+          amount_usd: funding.amount_usd || 10000000,
+          investors: Array.isArray(funding.investors) ? funding.investors : [funding.investors || 'Venture Capital'],
+          announced_on: funding.announced_on || new Date().toISOString().split('T')[0],
           created_at: new Date().toISOString()
             });
           }
@@ -401,7 +400,7 @@ async function handleClearDatabase(req: any, res: any) {
     }
 
     console.log(`📊 清理完成: ${clearedCount} 个表成功, ${errorCount} 个表失败`);
-
+    
     return res.status(200).json({
       success: true,
       message: `数据库清理完成: ${clearedCount} 个表成功, ${errorCount} 个表失败`,
@@ -430,9 +429,9 @@ async function handleClearDatabase(req: any, res: any) {
         errorCode: error.code,
         timestamp: new Date().toISOString()
       }
-            });
-          }
-        }
+    });
+  }
+}
 
 // 生成完整数据
 async function handleGenerateFullData(req: any, res: any) {
@@ -722,7 +721,7 @@ async function handleCheckTaskStatus(req: any, res: any) {
 
   } catch (error: any) {
     console.error(`❌ 查询任务状态失败: ${taskId}`, error);
-    return res.status(500).json({
+    return res.status(500).json({ 
       success: false,
       error: error.message
     });
