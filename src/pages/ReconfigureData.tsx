@@ -44,6 +44,8 @@ export default function ReconfigureData() {
   const [isBatchGenerating, setIsBatchGenerating] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [batchSize, setBatchSize] = useState<number>(10);
+  const [toolsResult, setToolsResult] = useState<any>(null);
+  const [isGeneratingTools, setIsGeneratingTools] = useState(false);
 
   // 获取认证token
   const fetchAuthToken = async () => {
@@ -392,6 +394,59 @@ export default function ReconfigureData() {
       }
     } finally {
       setIsCheckingCompleteness(false);
+    }
+  };
+
+  // 批量生成工具数据
+  const generateToolsForCompanies = async () => {
+    setIsGeneratingTools(true);
+    try {
+      console.log(`🛠️ 开始批量生成工具数据 (批次大小: ${batchSize})`);
+
+      const response = await fetch('/api/unified?action=generate-tools-for-companies', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          token: authToken,
+          batchSize: batchSize
+        }),
+        signal: AbortSignal.timeout(300000) // 5分钟超时
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        throw new Error(`服务器返回非JSON响应: ${text.substring(0, 100)}...`);
+      }
+
+      const result = await response.json();
+      console.log('🛠️ 工具生成结果:', result);
+
+      if (result.success) {
+        setToolsResult(result);
+        setError(null);
+        console.log(`✅ 工具生成完成: 成功 ${result.generated} 家，失败 ${result.failed} 家`);
+      } else {
+        throw new Error(result.error || '工具生成失败');
+      }
+    } catch (error: any) {
+      console.error('❌ 批量生成工具数据失败:', error);
+
+      if (error.name === 'AbortError') {
+        setError('工具生成超时，请检查网络连接');
+      } else if (error instanceof TypeError) {
+        setError('网络连接失败，请检查网络连接或稍后重试');
+      } else {
+        setError(`工具生成失败: ${error.message}`);
+      }
+    } finally {
+      setIsGeneratingTools(false);
     }
   };
 
@@ -1109,6 +1164,61 @@ export default function ReconfigureData() {
               </AlertDescription>
             </Alert>
           )}
+
+          {/* 工具数据生成 */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              🛠️ 工具数据生成
+            </h3>
+            <div className="space-y-4">
+              <div className="flex items-center space-x-4">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  批次大小:
+                </label>
+                <select
+                  value={batchSize}
+                  onChange={(e) => setBatchSize(Number(e.target.value))}
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  <option value={5}>5家公司</option>
+                  <option value={10}>10家公司</option>
+                  <option value={20}>20家公司</option>
+                </select>
+              </div>
+              <button
+                onClick={generateToolsForCompanies}
+                disabled={isGeneratingTools || !authToken}
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-md transition-colors"
+              >
+                {isGeneratingTools ? '🛠️ 生成中...' : '🛠️ 开始生成工具数据'}
+              </button>
+            </div>
+            
+            {toolsResult && (
+              <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+                <h4 className="font-medium text-gray-900 dark:text-white mb-2">
+                  工具生成结果
+                </h4>
+                <div className="text-sm text-gray-600 dark:text-gray-300">
+                  <p>请求: {toolsResult.requested} 家公司</p>
+                  <p>成功: {toolsResult.generated} 家</p>
+                  <p>失败: {toolsResult.failed} 家</p>
+                  {toolsResult.companies && toolsResult.companies.length > 0 && (
+                    <div className="mt-2">
+                      <p className="font-medium">详细结果:</p>
+                      <ul className="list-disc list-inside space-y-1">
+                        {toolsResult.companies.map((company: any, index: number) => (
+                          <li key={index} className={company.status === 'success' ? 'text-green-600' : 'text-red-600'}>
+                            {company.name}: {company.status === 'success' ? `✅ 生成${company.toolsGenerated}个工具` : `❌ ${company.error}`}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* 批量补齐公司数据 */}
           <Card className="dark:bg-gray-800 dark:border-gray-700">
