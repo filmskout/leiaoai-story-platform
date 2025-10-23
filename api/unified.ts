@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
+import BackgroundTaskManager, { TaskType } from '../lib/BackgroundTaskManager';
 
 // 检查环境变量
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -41,12 +42,12 @@ async function handleTestDatabase(req: any, res: any) {
     
     // 检查环境变量
     const envCheck = {
-      SUPABASE_URL: process.env.SUPABASE_URL ? '✅ Set' : '❌ Missing',
-      SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY ? '✅ Set' : '❌ Missing',
-      SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY ? '✅ Set' : '❌ Missing',
-      ADMIN_TOKEN: process.env.ADMIN_TOKEN ? '✅ Set' : '❌ Missing'
-    };
-    
+    SUPABASE_URL: process.env.SUPABASE_URL ? '✅ Set' : '❌ Missing',
+    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY ? '✅ Set' : '❌ Missing',
+    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY ? '✅ Set' : '❌ Missing',
+    ADMIN_TOKEN: process.env.ADMIN_TOKEN ? '✅ Set' : '❌ Missing'
+  };
+
     console.log('📋 环境变量检查:', envCheck);
     
     // 测试Supabase连接
@@ -95,7 +96,7 @@ async function handleTestDatabase(req: any, res: any) {
     
   } catch (error: any) {
     console.error('❌ 数据库测试失败:', error);
-    return res.status(500).json({
+    return res.status(500).json({ 
       success: false,
       error: `数据库测试失败: ${error.message}`,
       details: {
@@ -220,18 +221,26 @@ async function handleStartAgentTask(req: any, res: any) {
   }
 
   try {
-    // 简化版Agent任务 - 直接执行而不使用BackgroundTaskManager
-    const taskId = `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    initClients();
+    const taskManager = BackgroundTaskManager.getInstance();
     
+    // 创建任务
+    const taskId = await taskManager.createTask(taskType as TaskType);
+    
+    // 异步启动任务（不等待完成）
+    taskManager.startTask(taskId).catch(error => {
+      console.error(`❌ 后台任务执行失败: ${taskId}`, error);
+    });
+
     console.log(`🚀 Agent任务已启动: ${taskId}`);
     
-    // 返回任务ID，但实际执行会在前端进行
     return res.status(200).json({
       success: true,
       message: 'Agent任务已启动',
       taskId,
       status: 'started',
-      note: '注意：当前为简化版Agent模式，任务在前端执行'
+      checkUrl: `/api/unified?action=check-task-status&taskId=${taskId}`,
+      note: '任务在后台执行，您可以关闭浏览器。完成后请查询任务状态。'
     });
 
   } catch (error: any) {
@@ -255,32 +264,27 @@ async function handleCheckTaskStatus(req: any, res: any) {
   }
 
   try {
-    // 简化版状态查询
+    initClients();
+    const taskManager = BackgroundTaskManager.getInstance();
+    
+    // 获取任务状态
+    const taskStatus = await taskManager.getTaskStatus(taskId);
+    
+    // 获取任务日志
+    const taskLogs = await taskManager.getTaskLogs(taskId, 20);
+
     return res.status(200).json({
       success: true,
-      task: {
-        id: taskId,
-        status: 'completed',
-        progress: { current: 100, total: 100, percentage: 100 },
-        current_step: '任务已完成',
-        started_at: new Date().toISOString(),
-        completed_at: new Date().toISOString()
-      },
-      logs: [
-        {
-          log_level: 'info',
-          message: '简化版Agent模式 - 任务状态查询',
-          created_at: new Date().toISOString()
-        }
-      ],
-      isCompleted: true,
-      isFailed: false,
-      isRunning: false
+      task: taskStatus,
+      logs: taskLogs,
+      isCompleted: taskStatus.status === 'completed',
+      isFailed: taskStatus.status === 'failed',
+      isRunning: taskStatus.status === 'running'
     });
 
   } catch (error: any) {
     console.error(`❌ 查询任务状态失败: ${taskId}`, error);
-    return res.status(500).json({
+    return res.status(500).json({ 
       success: false,
       error: error.message
     });
@@ -299,23 +303,25 @@ async function handleGetTaskList(req: any, res: any) {
   }
 
   try {
-    // 简化版任务列表
+    initClients();
+    const { data: tasks, error } = await supabase
+      .from('background_tasks')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(50);
+
+    if (error) {
+      throw error;
+    }
+
     return res.status(200).json({
       success: true,
-      tasks: [
-        {
-          task_id: 'demo_task_001',
-          task_type: 'generate-full-data',
-          status: 'completed',
-          created_at: new Date().toISOString(),
-          completed_at: new Date().toISOString()
-        }
-      ]
+      tasks: tasks || []
     });
 
   } catch (error: any) {
     console.error('❌ 获取任务列表失败:', error);
-    return res.status(500).json({
+    return res.status(500).json({ 
       success: false,
       error: error.message
     });
@@ -336,7 +342,8 @@ export default async function handler(req: any, res: any) {
 
   try {
     // 对于需要数据库的操作，先初始化客户端
-    if (action === 'test-database' || action === 'clear-database') {
+    if (action === 'test-database' || action === 'clear-database' || 
+        action === 'start-agent-task' || action === 'check-task-status' || action === 'get-task-list') {
       initClients();
     }
 
