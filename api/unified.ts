@@ -3,7 +3,7 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
-import BackgroundTaskManager, { TaskType } from '@/lib/BackgroundTaskManager';
+// import BackgroundTaskManager, { TaskType } from '@/lib/BackgroundTaskManager';
 
 const execAsync = promisify(exec);
 
@@ -281,14 +281,14 @@ export default async function handler(req: any, res: any) {
         return handleTestDatabase(req, res);
       
       // Agent模式相关接口
-      case 'start-agent-task':
-        return handleStartAgentTask(req, res);
+      // case 'start-agent-task':
+      //   return handleStartAgentTask(req, res);
       
-      case 'check-task-status':
-        return handleCheckTaskStatus(req, res);
+      // case 'check-task-status':
+      //   return handleCheckTaskStatus(req, res);
       
-      case 'get-task-list':
-        return handleGetTaskList(req, res);
+      // case 'get-task-list':
+      //   return handleGetTaskList(req, res);
       
       default:
         return res.status(400).json({ error: 'Invalid action' });
@@ -1441,6 +1441,7 @@ async function handleCreateToolStory(req: any, res: any) {
 }
 
 // Agent模式 - 启动后台任务
+/*
 async function handleStartAgentTask(req: any, res: any) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -1481,8 +1482,10 @@ async function handleStartAgentTask(req: any, res: any) {
     });
   }
 }
+*/
 
 // Agent模式 - 查询任务状态
+/*
 async function handleCheckTaskStatus(req: any, res: any) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -1519,8 +1522,10 @@ async function handleCheckTaskStatus(req: any, res: any) {
     });
   }
 }
+*/
 
 // Agent模式 - 获取所有任务列表
+/*
 async function handleGetTaskList(req: any, res: any) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -1555,6 +1560,7 @@ async function handleGetTaskList(req: any, res: any) {
     });
   }
 }
+*/
 
 // 数据库清理处理
 async function handleClearDatabase(req: any, res: any) {
