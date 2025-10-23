@@ -937,6 +937,9 @@ export default async function handler(req: any, res: any) {
               case 'batch-complete-companies':
                 return handleBatchCompleteCompanies(req, res);
 
+              case 'test-news-generation':
+                return handleTestNewsGeneration(req, res);
+
               default:
                 return res.status(400).json({ error: 'Invalid action' });
     }
@@ -1632,6 +1635,58 @@ async function handleBatchCompleteCompanies(req: any, res: any) {
     
   } catch (error: any) {
     console.error('❌ 批量补齐公司数据失败:', error);
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+}
+
+// 测试新闻生成
+async function handleTestNewsGeneration(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { token, companyName = '测试公司', isOverseas = true } = req.body;
+  if (token !== process.env.ADMIN_TOKEN && token !== 'admin-token-123') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    initClients();
+    
+    console.log(`🧪 测试新闻生成: ${companyName} (${isOverseas ? '海外' : '国内'})`);
+    
+    const newsStory = await generateNewsStory(companyName, isOverseas);
+    
+    console.log(`🧪 新闻生成测试结果:`, {
+      hasContent: !!newsStory.content,
+      contentLength: newsStory.content?.length || 0,
+      source: newsStory.source,
+      url: newsStory.url,
+      contentPreview: newsStory.content?.substring(0, 200) + '...'
+    });
+    
+    return res.status(200).json({
+      success: true,
+      message: '新闻生成测试完成',
+      result: {
+        companyName,
+        isOverseas,
+        hasContent: !!newsStory.content,
+        contentLength: newsStory.content?.length || 0,
+        source: newsStory.source,
+        url: newsStory.url,
+        contentPreview: newsStory.content?.substring(0, 300) + '...',
+        fullContent: newsStory.content
+      },
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error: any) {
+    console.error('❌ 新闻生成测试失败:', error);
     return res.status(500).json({
       success: false,
       error: error.message,
