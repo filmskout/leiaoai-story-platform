@@ -897,6 +897,12 @@ export default async function handler(req: any, res: any) {
               case 'generate-single-company':
                 return handleGenerateSingleCompany(req, res);
 
+              case 'company-categories':
+                return handleCompanyCategories(req, res);
+
+              case 'check-data-completeness':
+                return handleCheckDataCompleteness(req, res);
+
               default:
                 return res.status(400).json({ error: 'Invalid action' });
     }
@@ -1059,16 +1065,16 @@ async function handleGenerateSingleCompany(req: any, res: any) {
     // 生成公司数据
     const result = await generateCompanyData(companyName, isOverseas);
     
-    // 如果需要Logo，尝试搜索
-    let logoUrl = null;
-    if (includeLogo) {
-      try {
-        logoUrl = await searchCompanyLogo(companyName);
-        console.log(`🖼️ 找到Logo: ${logoUrl}`);
-      } catch (logoError) {
-        console.warn(`⚠️ Logo搜索失败: ${logoError}`);
-      }
-    }
+                // 如果需要Logo，尝试搜索
+                let logoUrl: string | null = null;
+                if (includeLogo) {
+                  try {
+                    logoUrl = await searchCompanyLogo(companyName);
+                    console.log(`🖼️ 找到Logo: ${logoUrl}`);
+                  } catch (logoError) {
+                    console.warn(`⚠️ Logo搜索失败: ${logoError}`);
+                  }
+                }
     
     console.log(`✅ 公司数据生成完成: ${companyName}`);
 
@@ -1121,6 +1127,266 @@ async function searchCompanyLogo(companyName: string): Promise<string | null> {
   } catch (error: any) {
     console.error('❌ Logo搜索失败:', error);
     return null;
+  }
+}
+
+// 公司分类和完整性检查
+async function handleCompanyCategories(req: any, res: any) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  try {
+    initClients();
+    
+    console.log('📊 生成AI公司分类清单...');
+    
+    // 完整的200家AI公司分类
+    const companyCategories = {
+      // 海外大厂 (50家)
+      techGiants: {
+        name: '科技巨头',
+        description: '大型科技公司的AI部门',
+        companies: [
+          'OpenAI', 'Google DeepMind', 'Microsoft AI', 'Meta AI', 'Apple AI',
+          'Amazon AI', 'Tesla AI', 'NVIDIA', 'IBM Watson', 'Intel AI',
+          'AMD AI', 'Qualcomm AI', 'Broadcom AI', 'Cisco AI', 'Oracle AI',
+          'Salesforce Einstein', 'Adobe AI', 'SAP AI', 'ServiceNow AI', 'Workday AI',
+          'Snowflake AI', 'Databricks', 'Palantir', 'C3.ai', 'UiPath',
+          'Automation Anywhere', 'Blue Prism', 'Pegasystems', 'Appian', 'Mendix',
+          'OutSystems', 'Zapier', 'Airtable', 'Notion AI', 'Figma AI',
+          'Canva AI', 'Slack AI', 'Zoom AI', 'Teams AI', 'Discord AI',
+          'Twilio AI', 'SendGrid AI', 'Mailchimp AI', 'HubSpot AI', 'Marketo AI',
+          'Pardot AI', 'Intercom AI', 'Zendesk AI', 'Freshworks AI', 'Monday.com AI'
+        ]
+      },
+      
+      // 海外AI独角兽 (40家)
+      aiUnicorns: {
+        name: 'AI独角兽',
+        description: '专注AI的独角兽公司',
+        companies: [
+          'Anthropic', 'Cohere', 'Hugging Face', 'Stability AI', 'Midjourney',
+          'Runway', 'Character.AI', 'Jasper', 'Copy.ai', 'Grammarly',
+          'Notion AI', 'Figma AI', 'Canva AI', 'Zapier AI', 'Airtable',
+          'Scale AI', 'Labelbox', 'Supervisely', 'Roboflow', 'CVAT',
+          'DataRobot', 'H2O.ai', 'Dataiku', 'Alteryx', 'Tableau',
+          'Looker AI', 'Mode AI', 'Periscope AI', 'Chartio AI', 'Metabase AI',
+          'Retool AI', 'Bubble AI', 'Webflow AI', 'Framer AI', 'Glide AI',
+          'Adalo AI', 'AppSheet AI', 'PowerApps AI', 'OutSystems AI', 'Mendix AI'
+        ]
+      },
+      
+      // 海外AI工具 (35家)
+      aiTools: {
+        name: 'AI工具公司',
+        description: '提供AI工具和服务的公司',
+        companies: [
+          'ElevenLabs', 'Murf', 'Speechify', 'Descript', 'Rev.com',
+          'Otter.ai', 'Loom', 'Synthesia', 'D-ID', 'Rephrase.ai',
+          'Hour One', 'DeepBrain', 'HeyGen', 'Pictory', 'InVideo',
+          'Lumen5', 'Animoto', 'Biteable', 'Renderforest', 'Moovly',
+          'Powtoon', 'Vyond', 'VideoScribe', 'Explain Everything', 'Prezi',
+          'Canva', 'Figma', 'Sketch', 'Adobe XD', 'InVision',
+          'Marvel', 'Principle', 'Framer', 'Webflow', 'Bubble'
+        ]
+      },
+      
+      // 海外AI应用 (25家)
+      aiApplications: {
+        name: 'AI应用公司',
+        description: '将AI应用于特定领域的公司',
+        companies: [
+          'Waymo', 'Cruise', 'Argo AI', 'Aurora', 'TuSimple',
+          'Embark', 'Plus', 'Pony.ai', 'WeRide', 'Momenta',
+          'AutoX', 'DeepRoute', 'Boston Dynamics', 'iRobot', 'Rethink Robotics',
+          'Universal Robots', 'ABB Robotics', 'KUKA', 'Fanuc', 'Yaskawa',
+          'Kawasaki', 'PathAI', 'Tempus', 'Flatiron Health', 'Veracyte'
+        ]
+      },
+      
+      // 国内大厂 (30家)
+      domesticGiants: {
+        name: '国内大厂',
+        description: '国内大型科技公司的AI部门',
+        companies: [
+          '百度AI', '阿里巴巴AI', '腾讯AI', '字节跳动AI', '美团AI',
+          '滴滴AI', '京东AI', '拼多多AI', '小米AI', '华为AI',
+          'OPPO AI', 'vivo AI', '一加AI', 'realme AI', '魅族AI',
+          '锤子AI', '联想AI', 'TCL AI', '海信AI', '创维AI',
+          '康佳AI', '长虹AI', '海尔AI', '美的AI', '格力AI',
+          '比亚迪AI', '长城AI', '吉利AI', '奇瑞AI', '江淮AI'
+        ]
+      },
+      
+      // 国内AI独角兽 (20家)
+      domesticUnicorns: {
+        name: '国内AI独角兽',
+        description: '国内专注AI的独角兽公司',
+        companies: [
+          '商汤科技', '旷视科技', '依图科技', '云从科技', '第四范式',
+          '明略科技', '思必驰', '科大讯飞', '海康威视', '大华股份',
+          '宇视科技', '天地伟业', '优必选', '达闼科技', '云迹科技',
+          '普渡科技', '擎朗智能', '猎豹移动', '新松机器人', '埃斯顿'
+        ]
+      }
+    };
+
+    // 获取当前数据库中的公司
+    const { data: existingCompanies } = await supabase
+      .from('companies')
+      .select('name, created_at');
+
+    const existingCompanyNames = existingCompanies?.map(c => c.name) || [];
+
+    // 为每个分类添加状态信息
+    Object.keys(companyCategories).forEach(categoryKey => {
+      const category = companyCategories[categoryKey] as any;
+      category.total = category.companies.length;
+      category.existing = category.companies.filter((name: string) => existingCompanyNames.includes(name)).length;
+      category.missing = category.companies.filter((name: string) => !existingCompanyNames.includes(name));
+      category.completionRate = Math.round((category.existing / category.total) * 100);
+    });
+
+    const result = {
+      success: true,
+      message: 'AI公司分类清单',
+      categories: companyCategories,
+      summary: {
+        totalCompanies: Object.values(companyCategories).reduce((sum, cat: any) => sum + cat.total, 0),
+        existingCompanies: existingCompanyNames.length,
+        missingCompanies: Object.values(companyCategories).reduce((sum, cat: any) => sum + cat.missing.length, 0),
+        overallCompletionRate: Math.round((existingCompanyNames.length / Object.values(companyCategories).reduce((sum, cat: any) => sum + cat.total, 0)) * 100)
+      },
+      timestamp: new Date().toISOString()
+    };
+
+    console.log('📊 公司分类统计:', result.summary);
+    
+    return res.status(200).json(result);
+
+  } catch (error: any) {
+    console.error('❌ 获取公司分类失败:', error);
+    return res.status(500).json({ 
+      success: false,
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+}
+
+// 检查数据完整性
+async function handleCheckDataCompleteness(req: any, res: any) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  try {
+    initClients();
+    
+    console.log('🔍 检查数据完整性...');
+    
+    // 获取所有公司数据
+    const { data: companies, error: companiesError } = await supabase
+      .from('companies')
+      .select('id, name, description, website, created_at');
+    
+    if (companiesError) {
+      throw new Error(`获取公司数据失败: ${companiesError.message}`);
+    }
+
+    const completenessReport = {
+      companies: [] as any[],
+      summary: {
+        totalCompanies: companies.length,
+        companiesWithTools: 0,
+        companiesWithFundings: 0,
+        companiesWithStories: 0,
+        companiesWithCompleteData: 0
+      }
+    };
+
+    // 检查每个公司的数据完整性
+    for (const company of companies) {
+      const companyReport = {
+        id: company.id,
+        name: company.name,
+        hasDescription: !!company.description && company.description.length > 50,
+        hasWebsite: !!company.website && company.website.startsWith('http'),
+        hasTools: false,
+        hasFundings: false,
+        hasStories: false,
+        toolsCount: 0,
+        fundingsCount: 0,
+        storiesCount: 0,
+        completenessScore: 0
+      };
+
+      // 检查工具数据
+      const { count: toolsCount } = await supabase
+        .from('tools')
+        .select('*', { count: 'exact', head: true })
+        .eq('company_id', company.id);
+      
+      companyReport.toolsCount = toolsCount || 0;
+      companyReport.hasTools = (toolsCount || 0) > 0;
+
+      // 检查融资数据
+      const { count: fundingsCount } = await supabase
+        .from('fundings')
+        .select('*', { count: 'exact', head: true })
+        .eq('company_id', company.id);
+      
+      companyReport.fundingsCount = fundingsCount || 0;
+      companyReport.hasFundings = (fundingsCount || 0) > 0;
+
+      // 检查故事数据
+      const { count: storiesCount } = await supabase
+        .from('stories')
+        .select('*', { count: 'exact', head: true })
+        .eq('company_id', company.id);
+      
+      companyReport.storiesCount = storiesCount || 0;
+      companyReport.hasStories = (storiesCount || 0) > 0;
+
+      // 计算完整性分数 (0-100)
+      let score = 0;
+      if (companyReport.hasDescription) score += 20;
+      if (companyReport.hasWebsite) score += 10;
+      if (companyReport.hasTools) score += 25;
+      if (companyReport.hasFundings) score += 25;
+      if (companyReport.hasStories) score += 20;
+      
+      companyReport.completenessScore = score;
+
+      // 更新汇总统计
+      if (companyReport.hasTools) completenessReport.summary.companiesWithTools++;
+      if (companyReport.hasFundings) completenessReport.summary.companiesWithFundings++;
+      if (companyReport.hasStories) completenessReport.summary.companiesWithStories++;
+      if (score >= 80) completenessReport.summary.companiesWithCompleteData++;
+
+      completenessReport.companies.push(companyReport);
+    }
+
+    // 按完整性分数排序
+    completenessReport.companies.sort((a: any, b: any) => b.completenessScore - a.completenessScore);
+
+    console.log('📊 数据完整性检查完成:', completenessReport.summary);
+    
+    return res.status(200).json({
+      success: true,
+      message: '数据完整性检查报告',
+      report: completenessReport,
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error: any) {
+    console.error('❌ 检查数据完整性失败:', error);
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
   }
 }
 

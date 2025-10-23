@@ -36,6 +36,10 @@ export default function ReconfigureData() {
   const [includeLogo, setIncludeLogo] = useState(false);
   const [isGeneratingSingle, setIsGeneratingSingle] = useState(false);
   const [singleResult, setSingleResult] = useState<any>(null);
+  const [companyCategories, setCompanyCategories] = useState<any>(null);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(false);
+  const [dataCompleteness, setDataCompleteness] = useState<any>(null);
+  const [isCheckingCompleteness, setIsCheckingCompleteness] = useState(false);
 
   // 获取认证token
   const fetchAuthToken = async () => {
@@ -286,6 +290,104 @@ export default function ReconfigureData() {
       } else {
         setError(`清理失败: ${error.message}`);
       }
+    }
+  };
+
+  // 获取公司分类
+  const loadCompanyCategories = async () => {
+    setIsLoadingCategories(true);
+    try {
+      console.log('📊 加载公司分类...');
+
+      const response = await fetch('/api/unified?action=company-categories', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        signal: AbortSignal.timeout(15000) // 15秒超时
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        throw new Error(`服务器返回非JSON响应: ${text.substring(0, 100)}...`);
+      }
+
+      const result = await response.json();
+      console.log('📊 公司分类结果:', result);
+
+      if (result.success) {
+        setCompanyCategories(result);
+        setError(null);
+        console.log(`✅ 公司分类加载成功: ${result.summary.totalCompanies} 家公司`);
+      } else {
+        throw new Error(result.error || '加载公司分类失败');
+      }
+    } catch (error: any) {
+      console.error('❌ 加载公司分类失败:', error);
+
+      if (error.name === 'AbortError') {
+        setError('加载超时，请检查网络连接');
+      } else if (error instanceof TypeError) {
+        setError('网络连接失败，请检查网络连接或稍后重试');
+      } else {
+        setError(`加载失败: ${error.message}`);
+      }
+    } finally {
+      setIsLoadingCategories(false);
+    }
+  };
+
+  // 检查数据完整性
+  const checkDataCompleteness = async () => {
+    setIsCheckingCompleteness(true);
+    try {
+      console.log('🔍 检查数据完整性...');
+
+      const response = await fetch('/api/unified?action=check-data-completeness', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        signal: AbortSignal.timeout(20000) // 20秒超时
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        throw new Error(`服务器返回非JSON响应: ${text.substring(0, 100)}...`);
+      }
+
+      const result = await response.json();
+      console.log('🔍 数据完整性结果:', result);
+
+      if (result.success) {
+        setDataCompleteness(result);
+        setError(null);
+        console.log(`✅ 数据完整性检查完成: ${result.report.summary.totalCompanies} 家公司`);
+      } else {
+        throw new Error(result.error || '检查数据完整性失败');
+      }
+    } catch (error: any) {
+      console.error('❌ 检查数据完整性失败:', error);
+
+      if (error.name === 'AbortError') {
+        setError('检查超时，请检查网络连接');
+      } else if (error instanceof TypeError) {
+        setError('网络连接失败，请检查网络连接或稍后重试');
+      } else {
+        setError(`检查失败: ${error.message}`);
+      }
+    } finally {
+      setIsCheckingCompleteness(false);
     }
   };
 
@@ -949,6 +1051,170 @@ export default function ReconfigureData() {
               </AlertDescription>
             </Alert>
           )}
+
+          {/* 公司分类管理 */}
+          <Card className="dark:bg-gray-800 dark:border-gray-700">
+            <CardHeader>
+              <CardTitle className="dark:text-white">AI公司分类管理</CardTitle>
+              <CardDescription className="dark:text-gray-300">
+                查看200家AI公司的完整分类和完成状态
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex gap-2">
+                <Button
+                  onClick={loadCompanyCategories}
+                  disabled={isLoadingCategories}
+                  className="flex-1 dark:bg-blue-600 dark:hover:bg-blue-700"
+                >
+                  {isLoadingCategories ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      加载中...
+                    </>
+                  ) : (
+                    <>
+                      <BarChart3 className="mr-2 h-4 w-4" />
+                      加载公司分类
+                    </>
+                  )}
+                </Button>
+                <Button
+                  onClick={checkDataCompleteness}
+                  disabled={isCheckingCompleteness}
+                  className="flex-1 dark:bg-green-600 dark:hover:bg-green-700"
+                >
+                  {isCheckingCompleteness ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      检查中...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="mr-2 h-4 w-4" />
+                      检查完整性
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              {/* 公司分类显示 */}
+              {companyCategories && (
+                <div className="space-y-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                      {companyCategories.summary.overallCompletionRate}%
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-300">
+                      完成度 ({companyCategories.summary.existingCompanies}/{companyCategories.summary.totalCompanies} 家公司)
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {Object.entries(companyCategories.categories).map(([key, category]: [string, any]) => (
+                      <div key={key} className="p-3 bg-white dark:bg-gray-600 rounded-lg">
+                        <div className="flex justify-between items-center mb-2">
+                          <h4 className="font-semibold dark:text-white">{category.name}</h4>
+                          <span className="text-sm text-gray-600 dark:text-gray-300">
+                            {category.completionRate}%
+                          </span>
+                        </div>
+                        <div className="text-xs text-gray-600 dark:text-gray-300 mb-2">
+                          {category.description}
+                        </div>
+                        <div className="w-full bg-gray-200 dark:bg-gray-500 rounded-full h-2 mb-2">
+                          <div
+                            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${category.completionRate}%` }}
+                          />
+                        </div>
+                        <div className="text-xs text-gray-600 dark:text-gray-300">
+                          {category.existing}/{category.total} 家公司
+                        </div>
+                        {category.missing.length > 0 && (
+                          <div className="mt-2">
+                            <div className="text-xs font-medium dark:text-white mb-1">缺失公司:</div>
+                            <div className="max-h-20 overflow-y-auto">
+                              {category.missing.slice(0, 5).map((name: string, index: number) => (
+                                <div key={index} className="text-xs text-red-600 dark:text-red-400">
+                                  • {name}
+                                </div>
+                              ))}
+                              {category.missing.length > 5 && (
+                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                  ...还有 {category.missing.length - 5} 家
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 数据完整性显示 */}
+              {dataCompleteness && (
+                <div className="space-y-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <div className="text-center">
+                    <div className="text-lg font-bold dark:text-white">数据完整性报告</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-300">
+                      {dataCompleteness.report.summary.totalCompanies} 家公司的详细分析
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                    <div>
+                      <div className="text-xl font-bold text-blue-600 dark:text-blue-400">
+                        {dataCompleteness.report.summary.companiesWithTools}
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-300">有工具数据</div>
+                    </div>
+                    <div>
+                      <div className="text-xl font-bold text-green-600 dark:text-green-400">
+                        {dataCompleteness.report.summary.companiesWithFundings}
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-300">有融资数据</div>
+                    </div>
+                    <div>
+                      <div className="text-xl font-bold text-purple-600 dark:text-purple-400">
+                        {dataCompleteness.report.summary.companiesWithStories}
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-300">有故事数据</div>
+                    </div>
+                    <div>
+                      <div className="text-xl font-bold text-orange-600 dark:text-orange-400">
+                        {dataCompleteness.report.summary.companiesWithCompleteData}
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-300">数据完整</div>
+                    </div>
+                  </div>
+
+                  <div className="max-h-64 overflow-y-auto">
+                    <div className="text-sm font-medium dark:text-white mb-2">公司完整性详情:</div>
+                    {dataCompleteness.report.companies.map((company: any, index: number) => (
+                      <div key={index} className="flex items-center justify-between p-2 bg-white dark:bg-gray-600 rounded mb-1">
+                        <div className="flex-1">
+                          <div className="text-sm font-medium dark:text-white">{company.name}</div>
+                          <div className="text-xs text-gray-600 dark:text-gray-300">
+                            {company.hasDescription ? '✓' : '✗'} 描述
+                            {company.hasWebsite ? ' ✓' : ' ✗'} 网站
+                            {company.hasTools ? ' ✓' : ' ✗'} 工具({company.toolsCount})
+                            {company.hasFundings ? ' ✓' : ' ✗'} 融资({company.fundingsCount})
+                            {company.hasStories ? ' ✓' : ' ✗'} 故事({company.storiesCount})
+                          </div>
+                        </div>
+                        <div className="text-sm font-bold text-blue-600 dark:text-blue-400">
+                          {company.completenessScore}%
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           {/* 单公司生成结果显示 */}
           {singleResult && (
