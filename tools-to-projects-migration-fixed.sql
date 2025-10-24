@@ -44,6 +44,11 @@ BEGIN
         -- 更新user_favorites表的外键列名（如果存在）
         IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'user_favorites' AND column_name = 'tool_id') THEN
             ALTER TABLE public.user_favorites RENAME COLUMN tool_id TO project_id;
+        ELSIF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'user_favorites') THEN
+            -- 如果user_favorites表存在但没有tool_id列，添加project_id列
+            IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'user_favorites' AND column_name = 'project_id') THEN
+                ALTER TABLE public.user_favorites ADD COLUMN project_id uuid;
+            END IF;
         END IF;
         
         -- 更新company_stats表的列名（如果存在）
@@ -184,9 +189,11 @@ BEGIN
     
     -- 为user_favorites添加外键约束
     IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'user_favorites') THEN
-        IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'user_favorites_project_id_fkey' AND table_name = 'user_favorites') THEN
-            ALTER TABLE public.user_favorites ADD CONSTRAINT user_favorites_project_id_fkey 
-                FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+        IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'user_favorites' AND column_name = 'project_id') THEN
+            IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'user_favorites_project_id_fkey' AND table_name = 'user_favorites') THEN
+                ALTER TABLE public.user_favorites ADD CONSTRAINT user_favorites_project_id_fkey 
+                    FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+            END IF;
         END IF;
     END IF;
     
