@@ -174,10 +174,13 @@ export default function AICompaniesCatalog() {
 
   useEffect(() => {
     loadCompanies();
-    if (isAuthenticated) {
+  }, []);
+
+  useEffect(() => {
+    if (isAuthenticated && companies.length > 0) {
       loadUserData();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, companies]);
 
   useEffect(() => {
     applyFilters();
