@@ -87,29 +87,7 @@
     box-shadow: none;
   }
   
-  /* 移动端导航按钮优化 - 垂直居中对齐 */
-  .navigationButtonLeft {
-    left: auto;
-    right: 60px; /* 左按钮在右按钮左边 */
-    bottom: 20px;
-    top: auto;
-    transform: none;
-    z-index: 50;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .navigationButtonRight {
-    right: 20px; /* 右按钮在最右边 */
-    bottom: 20px;
-    top: auto;
-    transform: none;
-    z-index: 50;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+  
 }
 
 /* 导航按钮定位优化 - 角落位置 */
@@ -154,30 +132,34 @@
     border-radius: 50%;
     font-weight: 600;
     font-size: 16px;
+    /* 重置基础定位 */
+    top: auto !important;
+    transform: none !important;
   }
 
   .navigationButton:hover {
     background: rgba(255, 255, 255, 1);
     color: rgba(0, 0, 0, 1);
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
-    transform: scale(1.05);
+    transform: scale(1.05) !important;
   }
 
   .navigationButton:active {
-    transform: scale(0.95);
+    transform: scale(0.95) !important;
   }
 
+  /* 移动端按钮定位 - 确保垂直对齐 */
   .navigationButtonLeft {
     left: 12px;
     top: 50%;
-    transform: translateY(-50%);
+    transform: translateY(-50%) !important;
     z-index: 40;
   }
 
   .navigationButtonRight {
     right: 12px;
     top: 50%;
-    transform: translateY(-50%);
+    transform: translateY(-50%) !important;
     z-index: 40;
   }
 }
@@ -209,11 +191,11 @@
       color: rgba(255, 255, 255, 1);
       border-color: rgba(255, 255, 255, 0.3);
       box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
-      transform: scale(1.05);
+      transform: scale(1.05) !important;
     }
 
     .navigationButton:active {
-      transform: scale(0.95);
+      transform: scale(0.95) !important;
     }
   }
 }
