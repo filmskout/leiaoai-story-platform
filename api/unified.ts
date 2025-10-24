@@ -1595,6 +1595,14 @@ export default async function handler(req: any, res: any) {
   }
 
   const { action } = req.method === 'POST' ? req.body : req.query;
+  
+  // 调试信息
+  console.log('API请求:', {
+    method: req.method,
+    action: action,
+    body: req.body,
+    query: req.query
+  });
 
   try {
     switch (action) {
