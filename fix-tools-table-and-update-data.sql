@@ -9,10 +9,23 @@ AND table_schema = 'public'
 ORDER BY ordinal_position;
 
 -- 添加缺失的字段（如果不存在）
+-- 修复tools表
 ALTER TABLE public.tools 
 ADD COLUMN IF NOT EXISTS url TEXT,
 ADD COLUMN IF NOT EXISTS category TEXT,
 ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW();
+
+-- 修复companies表
+ALTER TABLE public.companies 
+ADD COLUMN IF NOT EXISTS detailed_description TEXT,
+ADD COLUMN IF NOT EXISTS website TEXT,
+ADD COLUMN IF NOT EXISTS founded_year INTEGER,
+ADD COLUMN IF NOT EXISTS headquarters TEXT,
+ADD COLUMN IF NOT EXISTS employee_count_range TEXT,
+ADD COLUMN IF NOT EXISTS valuation_usd BIGINT,
+ADD COLUMN IF NOT EXISTS industry_tags TEXT[],
+ADD COLUMN IF NOT EXISTS logo_base64 TEXT,
+ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW();
 
 -- 第二步：更新公司数据
 -- 更新OpenAI
