@@ -547,7 +547,7 @@ async function generateCompanyData(companyName: string, isOverseas: boolean, use
     if (companyDetails.products && companyDetails.products.length > 0) {
       for (const product of companyDetails.products.slice(0, 3)) {
         try {
-          await supabase.from('tools').insert({
+          await supabase.from('projects').insert({
             company_id: company.id,
             name: product.name || `${companyName} AI Tool`,
             description: product.description || `由${companyName}开发的AI工具`,
@@ -684,8 +684,8 @@ async function handleTestDatabase(req: any, res: any) {
     
     console.log('🔗 连接测试结果:', connectionTest);
     console.log('📊 表测试结果:', tableTest);
-    
-    return res.status(200).json({
+
+  return res.status(200).json({
       success: true,
       message: '数据库测试完成',
       results: {
@@ -734,7 +734,7 @@ async function handleClearDatabase(req: any, res: any) {
     // 定义需要清理的表（按依赖关系排序）
     const tablesToClear = [
       'companies',
-      'tools', 
+      'projects', 
       'fundings',
       'stories'
     ];
@@ -784,7 +784,7 @@ async function handleClearDatabase(req: any, res: any) {
     console.log(`📊 清理完成: ${clearedCount} 个表成功, ${errorCount} 个表失败`);
     
     return res.status(200).json({
-      success: true,
+    success: true,
       message: `数据库清理完成: ${clearedCount} 个表成功, ${errorCount} 个表失败`,
       results: {
         clearedCount,
@@ -974,7 +974,7 @@ async function handleGenerateFullData(req: any, res: any) {
     const failureCount = results.filter(r => !r.success).length;
 
     console.log(`📊 数据生成完成: ${successCount} 家公司成功, ${failureCount} 家公司失败`);
-
+    
     return res.status(200).json({
       success: true,
       message: `数据生成完成: ${successCount} 家公司成功, ${failureCount} 家公司失败`,
@@ -988,7 +988,7 @@ async function handleGenerateFullData(req: any, res: any) {
 
   } catch (error: any) {
     console.error('❌ 数据生成失败:', error);
-    return res.status(500).json({ 
+    return res.status(500).json({
       success: false,
       error: `数据生成失败: ${error.message}`,
       details: {
@@ -1043,7 +1043,7 @@ async function handleStartAgentTask(req: any, res: any) {
         }
         
         console.log(`✅ 任务完成: ${taskId}`);
-      } catch (error) {
+  } catch (error) {
         console.error(`❌ 任务失败: ${taskId}`, error);
       }
     }, 1000);
@@ -1162,7 +1162,7 @@ async function handleInsertCompanyData(req: any, res: any) {
 
     // 检查公司是否已存在
     const { data: existingCompany } = await supabase
-      .from('companies')
+          .from('companies')
       .select('id, name')
       .eq('name', companyData.name)
       .single();
@@ -1526,7 +1526,7 @@ export default async function handler(req: any, res: any) {
               case 'test-news-generation':
                 return handleTestNewsGeneration(req, res);
 
-              case 'generate-tools-for-companies':
+              case 'generate-projects-for-companies':
                 return handleGenerateToolsForCompanies(req, res);
               
               case 'fix-database-schema':
@@ -1627,7 +1627,7 @@ async function handleCleanDuplicates(req: any, res: any) {
       for (const company of removeCompanies) {
         try {
           // 先删除相关的工具、融资、故事数据
-          await supabase.from('tools').delete().eq('company_id', company.id);
+          await supabase.from('projects').delete().eq('company_id', company.id);
           await supabase.from('fundings').delete().eq('company_id', company.id);
           await supabase.from('stories').delete().eq('company_id', company.id);
           
@@ -1715,7 +1715,7 @@ async function handleGenerateSingleCompany(req: any, res: any) {
                 }
     
     console.log(`✅ 公司数据生成完成: ${companyName}`);
-
+    
     return res.status(200).json({
       success: true,
       message: `公司 "${companyName}" 数据生成完成`,
@@ -1729,13 +1729,13 @@ async function handleGenerateSingleCompany(req: any, res: any) {
 
   } catch (error: any) {
     console.error(`❌ 生成公司数据失败 (${companyName}):`, error);
-    return res.status(500).json({ 
+    return res.status(500).json({
       success: false,
       error: error.message,
       timestamp: new Date().toISOString()
-            });
-          }
-        }
+    });
+  }
+}
 
 // 搜索公司Logo
 async function searchCompanyLogo(companyName: string): Promise<string | null> {
@@ -1947,8 +1947,8 @@ async function handleCheckDataCompleteness(req: any, res: any) {
     // 批量获取所有相关数据以提高效率
     const companyIds = companies.map(c => c.id);
     
-    // 批量获取工具数据
-    const { data: toolsData } = await supabase
+    // 批量获取项目数据
+    const { data: projectsData } = await supabase
       .from('projects')
       .select('company_id')
       .in('company_id', companyIds);
@@ -1970,9 +1970,9 @@ async function handleCheckDataCompleteness(req: any, res: any) {
     const fundingsCountMap = new Map<string, number>();
     const storiesCountMap = new Map<string, number>();
 
-    toolsData?.forEach(tool => {
-      const count = projectsCountMap.get(tool.company_id) || 0;
-      projectsCountMap.set(tool.company_id, count + 1);
+    projectsData?.forEach(project => {
+      const count = projectsCountMap.get(project.company_id) || 0;
+      projectsCountMap.set(project.company_id, count + 1);
     });
 
     fundingsData?.forEach(funding => {
@@ -2224,7 +2224,7 @@ async function handleBatchCompleteCompanies(req: any, res: any) {
         
         results.generated++;
         results.companies.push({
-          name: companyName,
+            name: companyName,
           id: result.companyId,
           isOverseas,
           status: 'success'
@@ -2245,9 +2245,9 @@ async function handleBatchCompleteCompanies(req: any, res: any) {
           name: companyName,
           status: 'failed',
           error: error.message
-        });
-      }
-    }
+            });
+          }
+        }
 
     console.log(`🎉 批量生成完成! 成功: ${results.generated}, 失败: ${results.failed}`);
 
@@ -2262,9 +2262,9 @@ async function handleBatchCompleteCompanies(req: any, res: any) {
       success: false,
       error: error.message,
       timestamp: new Date().toISOString()
-    });
-  }
-}
+            });
+          }
+        }
 
 // 为公司生成工具数据
 async function handleGenerateToolsForCompanies(req: any, res: any) {
@@ -2286,7 +2286,7 @@ async function handleGenerateToolsForCompanies(req: any, res: any) {
     const { data: companiesWithoutTools } = await supabase
       .from('companies')
       .select('id, name')
-      .not('id', 'in', `(SELECT DISTINCT company_id FROM tools WHERE company_id IS NOT NULL)`);
+      .not('id', 'in', `(SELECT DISTINCT company_id FROM projects WHERE company_id IS NOT NULL)`);
 
     console.log(`📋 找到 ${companiesWithoutTools?.length || 0} 家没有工具数据的公司`);
 
@@ -2309,18 +2309,18 @@ async function handleGenerateToolsForCompanies(req: any, res: any) {
       try {
         console.log(`🛠️ [${i + 1}/${companiesToProcess.length}] 为公司生成工具: ${company.name}`);
         
-        // 生成工具数据
-        const tools = await generateToolsForCompany(company.name, company.id, false); // 工具生成暂时使用OpenAI
+        // 生成项目数据
+        const projects = await generateProjectsForCompany(company.name, company.id, false); // 项目生成暂时使用OpenAI
         
         results.generated++;
         results.companies.push({
           name: company.name,
           id: company.id,
-          toolsGenerated: tools.length,
+          projectsGenerated: projects.length,
           status: 'success'
         });
         
-        console.log(`✅ 成功生成 ${tools.length} 个工具: ${company.name}`);
+        console.log(`✅ 成功生成 ${projects.length} 个项目: ${company.name}`);
         
         // 添加延迟避免API限制
         if (i < companiesToProcess.length - 1) {
@@ -2357,16 +2357,16 @@ async function handleGenerateToolsForCompanies(req: any, res: any) {
   }
 }
 
-// 为单个公司生成工具数据
-async function generateToolsForCompany(companyName: string, companyId: string, useDeepSeek = false) {
+// 为单个公司生成项目数据
+async function generateProjectsForCompany(companyName: string, companyId: string, useDeepSeek = false) {
   try {
-    console.log(`🛠️ 开始为 ${companyName} 生成工具数据`);
+    console.log(`🛠️ 开始为 ${companyName} 生成项目数据`);
     
-    // 使用OpenAI生成工具数据 - 深度研究模式
+    // 使用OpenAI生成项目数据 - 深度研究模式
     const prompt = `You are a senior AI product analyst conducting deep research on "${companyName}". You have extensive knowledge of their technology stack, market positioning, and product portfolio.
 
 **RESEARCH REQUIREMENTS:**
-Conduct thorough analysis and provide detailed information about their AI tools and products:
+Conduct thorough analysis and provide detailed information about their AI projects and products:
 
 **PRODUCT PORTFOLIO ANALYSIS:**
 1. Core AI platforms and infrastructure tools
@@ -2402,7 +2402,7 @@ For each tool/product, provide:
 
 Format as JSON with this structure:
 {
-  "tools": [
+  "projects": [
     {
       "name": "Tool Name",
       "description": "Detailed description with technical capabilities, features, and use cases",
@@ -2415,9 +2415,9 @@ Format as JSON with this structure:
   ]
 }
 
-Generate 5-7 comprehensive tools/products based on thorough research. Ensure all information is factual, current, and based on available public data.`;
+Generate 5-7 comprehensive projects/products based on thorough research. Ensure all information is factual, current, and based on available public data.`;
 
-    console.log(`🛠️ 发送工具生成请求: ${companyName} ${useDeepSeek ? '[DeepSeek]' : '[OpenAI]'}`);
+    console.log(`🛠️ 发送项目生成请求: ${companyName} ${useDeepSeek ? '[DeepSeek]' : '[OpenAI]'}`);
     
     // 选择API客户端
     const client = useDeepSeek ? deepseek : openai;
@@ -2435,40 +2435,64 @@ Generate 5-7 comprehensive tools/products based on thorough research. Ensure all
     });
 
     const content = response.choices[0]?.message?.content || '{}';
-    console.log(`🛠️ ${useDeepSeek ? 'DeepSeek' : 'OpenAI'}工具生成响应: ${content.substring(0, 200)}...`);
+    console.log(`🛠️ ${useDeepSeek ? 'DeepSeek' : 'OpenAI'}项目生成响应: ${content.substring(0, 200)}...`);
     
-    let toolsData;
+    let projectsData;
     try {
-      toolsData = JSON.parse(content);
+      projectsData = JSON.parse(content);
     } catch (parseError) {
-      console.warn(`⚠️ JSON解析失败，使用默认工具数据: ${companyName}`);
-      toolsData = {
-        tools: [
+      console.warn(`⚠️ JSON解析失败，使用默认项目数据: ${companyName}`);
+      projectsData = {
+        projects: [
           {
             name: `${companyName} AI Platform`,
             description: `由${companyName}开发的AI平台`,
             url: `https://${companyName.toLowerCase()}.com/platform`,
-            category: 'AI平台'
+            category: 'AI平台',
+            project_type: 'AI Product',
+            pricing_model: 'SaaS',
+            target_audience: 'Enterprise',
+            technology_stack: ['AI/ML', 'Cloud Computing'],
+            use_cases: ['Automation', 'Analytics'],
+            integrations: ['API', 'SDK'],
+            documentation_url: `https://${companyName.toLowerCase()}.com/docs`,
+            github_url: `https://github.com/${companyName.toLowerCase()}`,
+            demo_url: `https://${companyName.toLowerCase()}.com/demo`,
+            pricing_url: `https://${companyName.toLowerCase()}.com/pricing`,
+            launch_date: '2020-01-01',
+            status: 'Active'
           },
           {
             name: `${companyName} AI Tools`,
             description: `由${companyName}提供的AI工具套件`,
             url: `https://${companyName.toLowerCase()}.com/tools`,
-            category: 'AI工具'
+            category: 'AI工具',
+            project_type: 'AI Product',
+            pricing_model: 'Freemium',
+            target_audience: 'Developers',
+            technology_stack: ['AI/ML', 'API'],
+            use_cases: ['Development', 'Integration'],
+            integrations: ['REST API', 'SDK'],
+            documentation_url: `https://${companyName.toLowerCase()}.com/docs`,
+            github_url: `https://github.com/${companyName.toLowerCase()}`,
+            demo_url: `https://${companyName.toLowerCase()}.com/demo`,
+            pricing_url: `https://${companyName.toLowerCase()}.com/pricing`,
+            launch_date: '2020-01-01',
+            status: 'Active'
           }
         ]
       };
     }
 
-    const tools = toolsData.tools || [];
-    console.log(`🛠️ 准备插入 ${tools.length} 个工具到数据库`);
+    const projects = projectsData.projects || [];
+    console.log(`🛠️ 准备插入 ${projects.length} 个项目到数据库`);
 
-    // 插入工具数据到数据库
-    const insertedTools: any[] = [];
-    for (const tool of tools) {
+    // 插入项目数据到数据库
+    const insertedProjects: any[] = [];
+    for (const project of projects) {
       try {
         const { data: insertedTool, error: insertError } = await supabase
-          .from('tools')
+          .from('projects')
           .insert({
             company_id: companyId,
             name: tool.name || `${companyName} Tool`,
@@ -2525,7 +2549,7 @@ async function handleTestNewsGeneration(req: any, res: any) {
       url: newsStory.url,
       contentPreview: newsStory.content?.substring(0, 200) + '...'
     });
-    
+
     return res.status(200).json({
       success: true,
       message: '新闻生成测试完成',
@@ -2541,10 +2565,10 @@ async function handleTestNewsGeneration(req: any, res: any) {
       },
       timestamp: new Date().toISOString()
     });
-    
+
   } catch (error: any) {
     console.error('❌ 新闻生成测试失败:', error);
-    return res.status(500).json({
+    return res.status(500).json({ 
       success: false,
       error: error.message,
       timestamp: new Date().toISOString()
