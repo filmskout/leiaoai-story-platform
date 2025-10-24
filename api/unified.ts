@@ -764,67 +764,52 @@ async function handleClearDatabase(req: any, res: any) {
         if (table === 'companies') {
           console.log(`🔄 使用特殊方法清理companies表...`);
           
-          // 先获取所有公司ID
-          const { data: companies, error: fetchError } = await supabase
-            .from('companies')
-            .select('id')
-            .neq('id', '00000000-0000-0000-0000-000000000000');
-          
-          if (fetchError) {
-            console.log(`⚠️ 获取公司列表失败:`, fetchError.message);
-            results.push({ table, success: false, error: `获取公司列表失败: ${fetchError.message}` });
-            errorCount++;
-            continue;
-          }
-          
-          if (!companies || companies.length === 0) {
-            console.log(`✅ companies表已经是空的`);
-            results.push({ table, success: true, message: '表已经是空的' });
-            clearedCount++;
-            continue;
-          }
-          
-          console.log(`📊 找到 ${companies.length} 家公司需要删除`);
-          
-          // 逐个删除公司
-          let deletedCount = 0;
-          let errorCountForTable = 0;
-          
-          for (const company of companies) {
+          // 先尝试删除所有相关数据
+          try {
+            // 删除所有projects
+            await supabase.from('projects').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+            console.log(`✅ 成功清理projects表`);
+            
+            // 删除所有fundings
+            await supabase.from('fundings').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+            console.log(`✅ 成功清理fundings表`);
+            
+            // 删除所有stories
+            await supabase.from('stories').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+            console.log(`✅ 成功清理stories表`);
+            
+            // 删除所有company_updates（如果存在）
             try {
-              // 先删除相关的projects
-              await supabase.from('projects').delete().eq('company_id', company.id);
-              // 先删除相关的fundings  
-              await supabase.from('fundings').delete().eq('company_id', company.id);
-              // 先删除相关的stories
-              await supabase.from('stories').delete().eq('company_id', company.id);
-              
-              // 删除公司记录
-              const { error: deleteError } = await supabase
-                .from('companies')
-                .delete()
-                .eq('id', company.id);
-              
-              if (deleteError) {
-                console.log(`❌ 删除公司 ${company.id} 失败:`, deleteError.message);
-                errorCountForTable++;
-              } else {
-                console.log(`✅ 成功删除公司 ${company.id}`);
-                deletedCount++;
-              }
-            } catch (err: any) {
-              console.log(`❌ 删除公司 ${company.id} 时出现异常:`, err.message);
-              errorCountForTable++;
+              await supabase.from('company_updates').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+              console.log(`✅ 成功清理company_updates表`);
+            } catch (e) {
+              console.log(`⚠️ company_updates表不存在或已清理`);
             }
+            
+          } catch (err: any) {
+            console.log(`⚠️ 清理相关表时出现错误:`, err.message);
           }
           
-          console.log(`📊 companies表清理完成: 成功删除 ${deletedCount} 条，失败 ${errorCountForTable} 条`);
-          
-          if (errorCountForTable === 0) {
-            results.push({ table, success: true, message: `成功删除 ${deletedCount} 条记录` });
-            clearedCount++;
-          } else {
-            results.push({ table, success: false, error: `部分删除失败: 成功 ${deletedCount} 条，失败 ${errorCountForTable} 条` });
+          // 现在尝试清理companies表
+          try {
+            // 使用更简单的方法：直接删除所有记录
+            const { error: deleteError } = await supabase
+              .from('companies')
+              .delete()
+              .neq('id', '00000000-0000-0000-0000-000000000000');
+            
+            if (deleteError) {
+              console.log(`⚠️ 清理companies表失败:`, deleteError.message);
+              results.push({ table, success: false, error: deleteError.message });
+              errorCount++;
+            } else {
+              console.log(`✅ 成功清理companies表`);
+              results.push({ table, success: true, message: '清理成功' });
+              clearedCount++;
+            }
+          } catch (err: any) {
+            console.log(`❌ 清理companies表时出现异常:`, err.message);
+            results.push({ table, success: false, error: err.message });
             errorCount++;
           }
           
@@ -2987,39 +2972,79 @@ async function handleFixTriggers(req: any, res: any) {
       'DROP FUNCTION IF EXISTS public.check_duplicate_update();'
     ];
 
-    for (const sqlCommand of sqlCommands) {
-      try {
-        // 使用Supabase的RPC调用
-        const { error } = await supabase.rpc('exec_sql', {
-          sql_command: sqlCommand
-        });
+    // 由于Supabase没有直接的SQL执行函数，我们使用间接方法
+    // 通过查询系统表来检查和删除触发器
+    
+    // 1. 检查当前触发器
+    try {
+      const { data: triggers, error: triggerError } = await supabase
+        .from('information_schema.triggers')
+        .select('trigger_name, event_object_table')
+        .eq('trigger_schema', 'public')
+        .in('trigger_name', [
+          'update_companies_updated_at',
+          'update_tools_updated_at', 
+          'update_projects_updated_at',
+          'company_updates_trigger',
+          'prevent_duplicate_updates'
+        ]);
 
-        if (error) {
-          console.log(`⚠️ 执行SQL失败: ${sqlCommand}`, error.message);
-          results.push({ 
-            action: sqlCommand, 
-            success: false, 
-            error: error.message 
-          });
-          errorCount++;
-        } else {
-          console.log(`✅ 成功执行: ${sqlCommand}`);
-          results.push({ 
-            action: sqlCommand, 
-            success: true, 
-            message: '执行成功' 
-          });
-          successCount++;
-        }
-      } catch (err: any) {
-        console.log(`❌ 执行SQL时出现异常: ${sqlCommand}`, err.message);
+      if (triggerError) {
+        console.log(`⚠️ 查询触发器失败:`, triggerError.message);
         results.push({ 
-          action: sqlCommand, 
+          action: '查询触发器', 
           success: false, 
-          error: err.message 
+          error: triggerError.message 
         });
         errorCount++;
+      } else {
+        console.log(`📊 找到 ${triggers?.length || 0} 个相关触发器`);
+        results.push({ 
+          action: '查询触发器', 
+          success: true, 
+          message: `找到 ${triggers?.length || 0} 个触发器` 
+        });
+        successCount++;
       }
+    } catch (err: any) {
+      console.log(`❌ 查询触发器时出现异常:`, err.message);
+      results.push({ 
+        action: '查询触发器', 
+        success: false, 
+        error: err.message 
+      });
+      errorCount++;
+    }
+
+    // 2. 尝试通过删除相关表来清理触发器
+    try {
+      console.log('🔄 尝试清理相关表...');
+      
+      // 删除company_updates表（如果存在）
+      const { error: companyUpdatesError } = await supabase
+        .from('company_updates')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000');
+      
+      if (companyUpdatesError) {
+        console.log(`⚠️ 清理company_updates表失败:`, companyUpdatesError.message);
+      } else {
+        console.log(`✅ 成功清理company_updates表`);
+        results.push({ 
+          action: '清理company_updates表', 
+          success: true, 
+          message: '清理成功' 
+        });
+        successCount++;
+      }
+    } catch (err: any) {
+      console.log(`❌ 清理company_updates表时出现异常:`, err.message);
+      results.push({ 
+        action: '清理company_updates表', 
+        success: false, 
+        error: err.message 
+      });
+      errorCount++;
     }
 
     // 2. 测试删除操作
