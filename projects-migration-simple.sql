@@ -2,6 +2,17 @@
 -- 分步执行，避免DO块中的表创建问题
 
 -- ============================================
+-- 步骤0：检查现有表结构
+-- ============================================
+
+-- 显示当前数据库中存在的所有表
+SELECT 'Current tables in database:' as info;
+SELECT table_name, table_schema 
+FROM information_schema.tables 
+WHERE table_schema = 'public' 
+ORDER BY table_name;
+
+-- ============================================
 -- 步骤1：检查并创建projects表
 -- ============================================
 
@@ -140,6 +151,10 @@ END $$;
 -- 步骤8：添加外键约束
 -- ============================================
 
+-- ============================================
+-- 步骤8：添加外键约束
+-- ============================================
+
 -- 为project_ratings添加外键约束
 DO $$ 
 BEGIN
@@ -148,9 +163,12 @@ BEGIN
             FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
     END IF;
     
-    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'project_ratings_user_id_fkey' AND table_name = 'project_ratings') THEN
-        ALTER TABLE public.project_ratings ADD CONSTRAINT project_ratings_user_id_fkey 
-            FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+    -- 检查users表是否存在，如果存在则添加外键约束
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'users') THEN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'project_ratings_user_id_fkey' AND table_name = 'project_ratings') THEN
+            ALTER TABLE public.project_ratings ADD CONSTRAINT project_ratings_user_id_fkey 
+                FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+        END IF;
     END IF;
 END $$;
 
@@ -189,9 +207,12 @@ END $$;
 -- 为user_favorites添加外键约束
 DO $$ 
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'user_favorites_user_id_fkey' AND table_name = 'user_favorites') THEN
-        ALTER TABLE public.user_favorites ADD CONSTRAINT user_favorites_user_id_fkey 
-            FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+    -- 检查users表是否存在，如果存在则添加外键约束
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'users') THEN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'user_favorites_user_id_fkey' AND table_name = 'user_favorites') THEN
+            ALTER TABLE public.user_favorites ADD CONSTRAINT user_favorites_user_id_fkey 
+                FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+        END IF;
     END IF;
     
     IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'user_favorites_project_id_fkey' AND table_name = 'user_favorites') THEN
