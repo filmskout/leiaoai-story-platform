@@ -60,24 +60,21 @@ import {
   getUserFavorites
 } from '@/services/tools';
 
-type Project = {
+type Tool = {
   id: string;
   name: string;
   category: string;
   description: string;
   url?: string;
-  project_type?: string;
-  pricing_model?: string;
-  target_audience?: string;
-  technology_stack?: string[];
-  use_cases?: string[];
-  integrations?: string[];
-  documentation_url?: string;
-  github_url?: string;
-  demo_url?: string;
-  pricing_url?: string;
-  launch_date?: string;
-  status?: string;
+  website?: string;
+  logo_url?: string;
+  industry_tags: string[];
+  free_tier?: boolean;
+  api_available?: boolean;
+  tool_stats?: { average_rating?: number; total_ratings?: number };
+  tool_category?: string;
+  tool_subcategory?: string;
+  focus_areas?: string[];
 };
 
 type Company = {
@@ -92,7 +89,7 @@ type Company = {
   logo_url?: string;
   logo_base64?: string;
   valuation_usd?: number;
-  projects: Project[];
+  tools: Tool[];
   fundings: any[];
   stories: any[];
   company_type?: string;
@@ -112,14 +109,14 @@ export default function AICompaniesCatalog() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCompanyType, setSelectedCompanyType] = useState('all');
   const [selectedCompanyTier, setSelectedCompanyTier] = useState('all');
-  const [selectedProjectCategory, setSelectedProjectCategory] = useState('all');
+  const [selectedToolCategory, setSelectedToolCategory] = useState('all');
   const [sortBy, setSortBy] = useState('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
   const [userRatings, setUserRatings] = useState<Record<string, number>>({});
   const [userFavorites, setUserFavorites] = useState<Set<string>>(new Set());
-  const [storyDialog, setStoryDialog] = useState<{ open: boolean; project?: Project; company?: Company }>({ open: false });
+  const [storyDialog, setStoryDialog] = useState<{ open: boolean; tool?: Tool; company?: Company }>({ open: false });
   const [storyContent, setStoryContent] = useState('');
   const [storyTitle, setStoryTitle] = useState('');
 
@@ -172,7 +169,7 @@ export default function AICompaniesCatalog() {
 
   useEffect(() => {
     applyFilters();
-  }, [companies, searchQuery, selectedCompanyType, selectedCompanyTier, selectedProjectCategory, sortBy, sortOrder]);
+  }, [companies, searchQuery, selectedCompanyType, selectedCompanyTier, selectedToolCategory, sortBy, sortOrder]);
 
   const loadCompanies = async () => {
     try {
@@ -200,9 +197,9 @@ export default function AICompaniesCatalog() {
       // Load user ratings
       const ratings: Record<string, number> = {};
       for (const company of companies) {
-        for (const project of company.projects) {
-          const rating = await getUserRating(project.id, user.id);
-          if (rating) ratings[project.id] = rating;
+        for (const tool of company.tools) {
+          const rating = await getUserRating(tool.id, user.id);
+          if (rating) ratings[tool.id] = rating;
         }
       }
       setUserRatings(ratings);
@@ -225,9 +222,9 @@ export default function AICompaniesCatalog() {
         company.name.toLowerCase().includes(query) ||
         company.description.toLowerCase().includes(query) ||
         company.industry_tags.some(tag => tag.toLowerCase().includes(query)) ||
-        company.projects.some(project => 
-          project.name.toLowerCase().includes(query) ||
-          project.description.toLowerCase().includes(query)
+        company.tools.some(tool => 
+          tool.name.toLowerCase().includes(query) ||
+          tool.description.toLowerCase().includes(query)
         )
       );
     }
@@ -246,10 +243,10 @@ export default function AICompaniesCatalog() {
       );
     }
 
-    // Project category filter
-    if (selectedProjectCategory !== 'all') {
+    // Tool category filter
+    if (selectedToolCategory !== 'all') {
       filtered = filtered.filter(company => 
-        company.projects.some(project => project.category === selectedProjectCategory)
+        company.tools.some(tool => tool.tool_category === selectedToolCategory)
       );
     }
 
@@ -267,17 +264,17 @@ export default function AICompaniesCatalog() {
           aValue = tierOrder[a.company_tier as keyof typeof tierOrder] || 5;
           bValue = tierOrder[b.company_tier as keyof typeof tierOrder] || 5;
           break;
-        case 'projects_count':
-          aValue = a.projects.length;
-          bValue = b.projects.length;
+        case 'tools_count':
+          aValue = a.tools.length;
+          bValue = b.tools.length;
           break;
         case 'valuation':
           aValue = a.valuation_usd || 0;
           bValue = b.valuation_usd || 0;
           break;
         case 'rating':
-          aValue = a.projects.length > 0 ? 4.5 : 0; // Default rating for projects
-          bValue = b.projects.length > 0 ? 4.5 : 0;
+          aValue = a.tools.reduce((sum, tool) => sum + (tool.tool_stats?.average_rating || 0), 0) / a.tools.length || 0;
+          bValue = b.tools.reduce((sum, tool) => sum + (tool.tool_stats?.average_rating || 0), 0) / b.tools.length || 0;
           break;
         case 'founded_year':
           aValue = a.founded_year || 0;
@@ -701,7 +698,7 @@ export default function AICompaniesCatalog() {
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div className="flex items-center gap-2">
                         <Wrench className="w-4 h-4 text-muted-foreground" />
-                        <span>{company.projects.length} projects</span>
+                        <span>{company.tools.length} tools</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <DollarSign className="w-4 h-4 text-muted-foreground" />
@@ -732,7 +729,7 @@ export default function AICompaniesCatalog() {
                     <div className="space-y-2">
                       <h4 className="text-sm font-medium flex items-center gap-2">
                         <Wrench className="w-4 h-4" />
-                        Key Projects
+                        Key Tools
                       </h4>
                       <div className="space-y-2">
                         {company.projects.slice(0, 2).map((project) => (
@@ -841,7 +838,7 @@ export default function AICompaniesCatalog() {
                               </div>
                               <div className="flex items-center gap-1">
                                 <Wrench className="w-4 h-4" />
-                                <span>{company.projects.length} projects</span>
+                                <span>{company.tools.length} tools</span>
                               </div>
                               <div className="flex items-center gap-1">
                                 <DollarSign className="w-4 h-4" />

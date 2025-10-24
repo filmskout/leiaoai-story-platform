@@ -1538,6 +1538,9 @@ export default async function handler(req: any, res: any) {
               case 'insert-company-data':
                 return handleInsertCompanyData(req, res);
               
+              case 'ai-chat':
+                return handleAIChat(req, res);
+              
               default:
                 return res.status(400).json({ error: 'Invalid action' });
             }
@@ -2653,4 +2656,202 @@ async function handleDataProgress(req: any, res: any) {
       timestamp: new Date().toISOString()
     });
   }
+}
+
+// AI聊天处理函数
+async function handleAIChat(req: NextApiRequest, res: NextApiResponse) {
+  try {
+    const { message, model = 'deepseek', sessionId, language = 'zh' } = req.body;
+    
+    if (!message) {
+      return res.status(400).json({ error: 'Message is required' });
+    }
+    
+    console.log('🤖 AI Chat Request:', { model, messageLength: message.length, language });
+    
+    // 获取API密钥
+    const openaiApiKey = process.env.OPENAI_API_KEY;
+    const deepseekApiKey = process.env.DEEPSEEK_API_KEY;
+    const qwenApiKey = process.env.QWEN_API_KEY;
+    
+    let response: string;
+    let usedModel: string;
+    
+    // 根据模型选择API
+    if (model === 'openai' || model === 'gpt-4') {
+      if (!openaiApiKey) {
+        return res.status(400).json({ error: 'missing OPENAI_API_KEY' });
+      }
+      
+      const openaiResponse = await callOpenAI(message, openaiApiKey, language);
+      response = openaiResponse;
+      usedModel = 'gpt-4';
+      
+    } else if (model === 'deepseek') {
+      if (!deepseekApiKey) {
+        return res.status(400).json({ error: 'missing DEEPSEEK_API_KEY' });
+      }
+      
+      const deepseekResponse = await callDeepSeek(message, deepseekApiKey, language);
+      response = deepseekResponse;
+      usedModel = 'deepseek-chat';
+      
+    } else if (model === 'qwen') {
+      if (!qwenApiKey) {
+        return res.status(400).json({ error: 'missing QWEN_API_KEY' });
+      }
+      
+      const qwenResponse = await callQwen(message, qwenApiKey, language);
+      response = qwenResponse;
+      usedModel = 'qwen-turbo';
+      
+    } else {
+      // 默认尝试DeepSeek，然后OpenAI，最后Qwen
+      if (deepseekApiKey) {
+        try {
+          const deepseekResponse = await callDeepSeek(message, deepseekApiKey, language);
+          response = deepseekResponse;
+          usedModel = 'deepseek-chat';
+        } catch (error) {
+          console.log('DeepSeek failed, trying OpenAI...');
+          if (openaiApiKey) {
+            const openaiResponse = await callOpenAI(message, openaiApiKey, language);
+            response = openaiResponse;
+            usedModel = 'gpt-4';
+          } else if (qwenApiKey) {
+            const qwenResponse = await callQwen(message, qwenApiKey, language);
+            response = qwenResponse;
+            usedModel = 'qwen-turbo';
+          } else {
+            throw new Error('No API keys available');
+          }
+        }
+      } else if (openaiApiKey) {
+        const openaiResponse = await callOpenAI(message, openaiApiKey, language);
+        response = openaiResponse;
+        usedModel = 'gpt-4';
+      } else if (qwenApiKey) {
+        const qwenResponse = await callQwen(message, qwenApiKey, language);
+        response = qwenResponse;
+        usedModel = 'qwen-turbo';
+      } else {
+        throw new Error('No API keys available');
+      }
+    }
+    
+    console.log('✅ AI Chat Response:', { model: usedModel, responseLength: response.length });
+    
+    return res.status(200).json({
+      success: true,
+      response: response,
+      model: usedModel,
+      sessionId: sessionId,
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error: any) {
+    console.error('❌ AI Chat Error:', error);
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+}
+
+// OpenAI API调用
+async function callOpenAI(message: string, apiKey: string, language: string): Promise<string> {
+  const systemPrompt = language.startsWith('zh') 
+    ? '你是一个专业的AI助手，请用中文回答用户的问题。'
+    : 'You are a professional AI assistant. Please answer user questions in English.';
+    
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'gpt-4',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: message }
+      ],
+      temperature: 0.7,
+      max_tokens: 2000
+    })
+  });
+  
+  if (!response.ok) {
+    throw new Error(`OpenAI API error: ${response.status}`);
+  }
+  
+  const data = await response.json();
+  return data.choices[0].message.content;
+}
+
+// DeepSeek API调用
+async function callDeepSeek(message: string, apiKey: string, language: string): Promise<string> {
+  const systemPrompt = language.startsWith('zh') 
+    ? '你是一个专业的AI助手，请用中文回答用户的问题。'
+    : 'You are a professional AI assistant. Please answer user questions in English.';
+    
+  const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'deepseek-chat',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: message }
+      ],
+      temperature: 0.7,
+      max_tokens: 2000
+    })
+  });
+  
+  if (!response.ok) {
+    throw new Error(`DeepSeek API error: ${response.status}`);
+  }
+  
+  const data = await response.json();
+  return data.choices[0].message.content;
+}
+
+// Qwen API调用
+async function callQwen(message: string, apiKey: string, language: string): Promise<string> {
+  const systemPrompt = language.startsWith('zh') 
+    ? '你是一个专业的AI助手，请用中文回答用户的问题。'
+    : 'You are a professional AI assistant. Please answer user questions in English.';
+    
+  const response = await fetch('https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'qwen-turbo',
+      input: {
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: message }
+        ]
+      },
+      parameters: {
+        temperature: 0.7,
+        max_tokens: 2000
+      }
+    })
+  });
+  
+  if (!response.ok) {
+    throw new Error(`Qwen API error: ${response.status}`);
+  }
+  
+  const data = await response.json();
+  return data.output.text;
 }
