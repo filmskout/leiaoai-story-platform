@@ -149,9 +149,9 @@ export default function AICompaniesCatalog() {
     { value: 'Emerging', label: 'Emerging', icon: Target, color: 'text-green-500' }
   ];
 
-  // Tool category filters
-  const toolCategories = [
-    { value: 'all', label: 'All Tool Categories' },
+  // Project category filters
+  const projectCategories = [
+    { value: 'all', label: 'All Project Categories' },
     { value: 'LLM & Language Models', label: 'LLM & Language Models', icon: Layers, color: 'text-purple-500' },
     { value: 'Image Processing & Generation', label: 'Image Processing & Generation', icon: Target, color: 'text-pink-500' },
     { value: 'Video Processing & Generation', label: 'Video Processing & Generation', icon: Target, color: 'text-red-500' },
@@ -584,13 +584,13 @@ export default function AICompaniesCatalog() {
               </div>
 
               <div>
-                <Label className="text-sm font-medium mb-2 block">Tool Category</Label>
-                <Select value={selectedToolCategory} onValueChange={setSelectedToolCategory}>
+                <Label className="text-sm font-medium mb-2 block">Project Category</Label>
+                <Select value={selectedProjectCategory} onValueChange={setSelectedProjectCategory}>
                   <SelectTrigger className="h-11">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
-                    {toolCategories.map(category => (
+                    {projectCategories.map(category => (
                       <SelectItem key={category.value} value={category.value}>
                         <div className="flex items-center gap-2">
                           {category.icon && <category.icon className={`w-4 h-4 ${category.color}`} />}
@@ -651,7 +651,7 @@ export default function AICompaniesCatalog() {
             {searchQuery && ` matching "${searchQuery}"`}
             {selectedCompanyType !== 'all' && ` of type ${selectedCompanyType}`}
             {selectedCompanyTier !== 'all' && ` at ${selectedCompanyTier} tier`}
-            {selectedToolCategory !== 'all' && ` with ${selectedToolCategory} tools`}
+            {selectedProjectCategory !== 'all' && ` with ${selectedProjectCategory} projects`}
           </p>
         </div>
 
