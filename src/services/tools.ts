@@ -1,14 +1,14 @@
 import { supabase } from '@/lib/supabase';
 
-// 获取AI公司及其工具套件
+// 获取AI公司及其项目套件
 export async function listAICompaniesWithTools() {
   const { data, error } = await supabase
     .from('companies')
     .select(`
       *,
-      tools:tools(*, tool_stats:tool_stats(*)),
+      projects:projects(*),
       fundings:fundings(*),
-      company_stats:company_stats(*)
+      stories:stories(*)
     `)
     .order('name');
   if (error) throw error;
