@@ -5,7 +5,7 @@ import fs from 'fs';
 
 // Configuration
 const ADMIN_TOKEN = 'R8mn6AEgDmpKaAxE56XrejEbrL6AfBEn';
-const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || 'sk-55e94a8cacc041e29b3d43310575e2dd';
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const QWEN_API_KEY = process.env.QWEN_API_KEY;
 
