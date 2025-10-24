@@ -6,10 +6,15 @@ FROM information_schema.triggers
 WHERE trigger_schema = 'public' 
 AND trigger_name LIKE '%company%' OR trigger_name LIKE '%tool%' OR trigger_name LIKE '%project%';
 
--- 删除旧的触发器
+-- 删除旧的触发器（包括所有可能的触发器名称）
 DROP TRIGGER IF EXISTS update_company_stats_trigger ON companies;
 DROP TRIGGER IF EXISTS update_company_stats_from_projects_trigger ON projects;
 DROP TRIGGER IF EXISTS update_company_stats_from_stories_trigger ON company_stories;
+DROP TRIGGER IF EXISTS trigger_update_company_stats_tool ON projects;
+DROP TRIGGER IF EXISTS trigger_update_company_stats_story ON company_stories;
+DROP TRIGGER IF EXISTS trigger_update_company_stats ON companies;
+DROP TRIGGER IF EXISTS trigger_update_company_stats ON projects;
+DROP TRIGGER IF EXISTS trigger_update_company_stats ON company_stories;
 
 -- 删除旧的函数
 DROP FUNCTION IF EXISTS update_company_stats();
