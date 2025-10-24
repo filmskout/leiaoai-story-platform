@@ -3506,36 +3506,80 @@ async function handleGenerateRealData(req: any, res: any) {
 
 请确保所有信息都是真实、准确、最新的。使用JSON格式返回，包含所有字段。`;
         
-        // 调用DeepSeek API
-        const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: 'deepseek-chat',
-            messages: [
-              {
-                role: 'system',
-                content: '你是一个专业的AI行业分析师，擅长收集和分析AI公司的真实信息。请提供准确、详细、最新的数据。'
+        // 优先使用Qwen，备用DeepSeek
+        let response;
+        let apiName = 'Qwen';
+        
+        // 尝试Qwen API
+        if (process.env.QWEN_API_KEY) {
+          try {
+            response = await fetch('https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${process.env.QWEN_API_KEY}`,
+                'Content-Type': 'application/json',
               },
-              {
-                role: 'user',
-                content: prompt
-              }
-            ],
-            temperature: 0.3,
-            max_tokens: 4000
-          })
-        });
+              body: JSON.stringify({
+                model: 'qwen-max',
+                input: {
+                  messages: [
+                    {
+                      role: 'system',
+                      content: '你是一个专业的AI行业分析师，擅长收集和分析AI公司的真实信息。请提供准确、详细、最新的数据。'
+                    },
+                    {
+                      role: 'user',
+                      content: prompt
+                    }
+                  ]
+                },
+                parameters: {
+                  temperature: 0.3,
+                  max_tokens: 4000,
+                  top_p: 0.8
+                }
+              })
+            });
+          } catch (error) {
+            console.log(`   🔄 Qwen API失败，尝试DeepSeek...`);
+            apiName = 'DeepSeek';
+          }
+        } else {
+          apiName = 'DeepSeek';
+        }
+        
+        // 如果Qwen不可用，使用DeepSeek
+        if (!response || !response.ok) {
+          response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              model: 'deepseek-chat',
+              messages: [
+                {
+                  role: 'system',
+                  content: '你是一个专业的AI行业分析师，擅长收集和分析AI公司的真实信息。请提供准确、详细、最新的数据。'
+                },
+                {
+                  role: 'user',
+                  content: prompt
+                }
+              ],
+              temperature: 0.3,
+              max_tokens: 4000
+            })
+          });
+        }
 
         if (!response.ok) {
-          throw new Error(`DeepSeek API error: ${response.status}`);
+          throw new Error(`${apiName} API error: ${response.status}`);
         }
 
         const data = await response.json();
-        const aiResponse = data.choices[0].message.content;
+        const aiResponse = apiName === 'Qwen' ? data.output.text : data.choices[0].message.content;
         
         // 解析AI响应
         let companyData;
