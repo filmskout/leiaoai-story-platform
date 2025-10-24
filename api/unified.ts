@@ -1594,7 +1594,7 @@ export default async function handler(req: any, res: any) {
     return res.status(200).end();
   }
 
-  const { action } = req.query;
+  const { action } = req.method === 'POST' ? req.body : req.query;
 
   try {
     switch (action) {
