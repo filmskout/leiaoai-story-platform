@@ -1193,20 +1193,33 @@ async function handleInsertCompanyData(req: any, res: any) {
 
       console.log(`✅ 公司数据更新成功: ${companyData.name}`);
 
-      // 插入产品数据
-      if (companyData.data.products && companyData.data.products.length > 0) {
-        // 先删除现有工具
-        await supabase.from('tools').delete().eq('company_id', existingCompany.id);
-        
-        // 插入新工具
-        for (const product of companyData.data.products) {
-          await supabase.from('tools').insert({
-            company_id: existingCompany.id,
-            name: product.name,
-            description: product.description,
-            url: product.url,
-            category: 'AI工具',
-            created_at: new Date().toISOString()
+              // 插入项目数据
+              if (companyData.data.projects && companyData.data.projects.length > 0) {
+                // 先删除现有项目
+                await supabase.from('projects').delete().eq('company_id', existingCompany.id);
+                
+                // 插入新项目
+                for (const project of companyData.data.projects) {
+                  await supabase.from('projects').insert({
+                    company_id: existingCompany.id,
+                    name: project.name,
+                    description: project.description,
+                    url: project.url,
+                    category: project.category || 'AI Product',
+                    project_type: project.project_type || 'AI Product',
+                    launch_date: project.launch_date,
+                    status: project.status || 'Active',
+                    pricing_model: project.pricing_model,
+                    target_audience: project.target_audience,
+                    technology_stack: project.technology_stack,
+                    use_cases: project.use_cases,
+                    integrations: project.integrations,
+                    documentation_url: project.documentation_url,
+                    github_url: project.github_url,
+                    demo_url: project.demo_url,
+                    pricing_url: project.pricing_url,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
             });
           }
         }
@@ -1264,19 +1277,32 @@ async function handleInsertCompanyData(req: any, res: any) {
 
       console.log(`✅ 公司创建成功: ${companyData.name} (ID: ${newCompany.id})`);
 
-      // 插入产品数据
-      if (companyData.data.products && companyData.data.products.length > 0) {
-        for (const product of companyData.data.products) {
-          await supabase.from('tools').insert({
-            company_id: newCompany.id,
-            name: product.name,
-            description: product.description,
-            url: product.url,
-            category: 'AI工具',
-            created_at: new Date().toISOString()
+              // 插入项目数据
+              if (companyData.data.projects && companyData.data.projects.length > 0) {
+                for (const project of companyData.data.projects) {
+                  await supabase.from('projects').insert({
+                    company_id: newCompany.id,
+                    name: project.name,
+                    description: project.description,
+                    url: project.url,
+                    category: project.category || 'AI Product',
+                    project_type: project.project_type || 'AI Product',
+                    launch_date: project.launch_date,
+                    status: project.status || 'Active',
+                    pricing_model: project.pricing_model,
+                    target_audience: project.target_audience,
+                    technology_stack: project.technology_stack,
+                    use_cases: project.use_cases,
+                    integrations: project.integrations,
+                    documentation_url: project.documentation_url,
+                    github_url: project.github_url,
+                    demo_url: project.demo_url,
+                    pricing_url: project.pricing_url,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
           });
-        }
-      }
+                }
+              }
 
       // 插入融资数据
       if (companyData.data.funding_rounds && companyData.data.funding_rounds.length > 0) {
@@ -1920,7 +1946,7 @@ async function handleCheckDataCompleteness(req: any, res: any) {
     
     // 批量获取工具数据
     const { data: toolsData } = await supabase
-      .from('tools')
+      .from('projects')
       .select('company_id')
       .in('company_id', companyIds);
     
@@ -1937,13 +1963,13 @@ async function handleCheckDataCompleteness(req: any, res: any) {
       .in('company_id', companyIds);
 
     // 创建计数映射
-    const toolsCountMap = new Map<string, number>();
+    const projectsCountMap = new Map<string, number>();
     const fundingsCountMap = new Map<string, number>();
     const storiesCountMap = new Map<string, number>();
 
     toolsData?.forEach(tool => {
-      const count = toolsCountMap.get(tool.company_id) || 0;
-      toolsCountMap.set(tool.company_id, count + 1);
+      const count = projectsCountMap.get(tool.company_id) || 0;
+      projectsCountMap.set(tool.company_id, count + 1);
     });
 
     fundingsData?.forEach(funding => {
@@ -1958,7 +1984,7 @@ async function handleCheckDataCompleteness(req: any, res: any) {
 
     // 检查每个公司的数据完整性
     for (const company of companies) {
-      const toolsCount = toolsCountMap.get(company.id) || 0;
+      const projectsCount = projectsCountMap.get(company.id) || 0;
       const fundingsCount = fundingsCountMap.get(company.id) || 0;
       const storiesCount = storiesCountMap.get(company.id) || 0;
 
@@ -1967,10 +1993,10 @@ async function handleCheckDataCompleteness(req: any, res: any) {
         name: company.name,
         hasDescription: !!company.description && company.description.length > 50,
         hasWebsite: !!company.website && company.website.startsWith('http'),
-        hasTools: toolsCount > 0,
+        hasProjects: projectsCount > 0,
         hasFundings: fundingsCount > 0,
         hasStories: storiesCount > 0,
-        toolsCount,
+        projectsCount,
         fundingsCount,
         storiesCount,
         completenessScore: 0
@@ -2543,13 +2569,13 @@ async function handleDataProgress(req: any, res: any) {
       console.error('❌ Companies表错误:', companiesError);
     }
     
-    // 检查tools表
-    const { count: toolsCount, error: toolsError } = await supabase
-      .from('tools')
+    // 检查projects表
+    const { count: projectsCount, error: projectsError } = await supabase
+      .from('projects')
       .select('*', { count: 'exact', head: true });
     
-    if (toolsError) {
-      console.error('❌ Tools表错误:', toolsError);
+    if (projectsError) {
+      console.error('❌ Projects表错误:', projectsError);
     }
     
     // 检查fundings表
@@ -2593,13 +2619,13 @@ async function handleDataProgress(req: any, res: any) {
             created_at: c.created_at
           })) : []
         },
-        tools: toolsCount || 0,
+        projects: projectsCount || 0,
         fundings: fundingsCount || 0,
         stories: storiesCount || 0,
-        total_records: (companiesCount || 0) + (toolsCount || 0) + (fundingsCount || 0) + (storiesCount || 0)
+        total_records: (companiesCount || 0) + (projectsCount || 0) + (fundingsCount || 0) + (storiesCount || 0)
       },
       completeness: {
-        companies_with_tools: Math.round(((toolsCount || 0) / Math.max(companiesCount || 1, 1)) * 100),
+        companies_with_projects: Math.round(((projectsCount || 0) / Math.max(companiesCount || 1, 1)) * 100),
         companies_with_stories: Math.round(((storiesCount || 0) / Math.max(companiesCount || 1, 1)) * 100),
         companies_with_fundings: Math.round(((fundingsCount || 0) / Math.max(companiesCount || 1, 1)) * 100)
       },
@@ -2612,7 +2638,7 @@ async function handleDataProgress(req: any, res: any) {
     console.log('📊 详细进度报告:', {
       progress: `${currentProgress}/${totalExpected} (${progressPercentage}%)`,
       companies: companiesCount,
-      tools: toolsCount,
+      projects: projectsCount,
       fundings: fundingsCount,
       stories: storiesCount
     });
