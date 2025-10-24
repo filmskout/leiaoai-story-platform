@@ -790,23 +790,83 @@ async function handleClearDatabase(req: any, res: any) {
             console.log(`⚠️ 清理相关表时出现错误:`, err.message);
           }
           
-          // 现在尝试清理companies表
+          // 现在尝试清理companies表 - 使用强制方法
           try {
-            // 使用更简单的方法：直接删除所有记录
-            const { error: deleteError } = await supabase
-              .from('companies')
-              .delete()
-              .neq('id', '00000000-0000-0000-0000-000000000000');
+            console.log(`🔄 尝试强制清理companies表...`);
             
-            if (deleteError) {
-              console.log(`⚠️ 清理companies表失败:`, deleteError.message);
-              results.push({ table, success: false, error: deleteError.message });
-              errorCount++;
-            } else {
-              console.log(`✅ 成功清理companies表`);
-              results.push({ table, success: true, message: '清理成功' });
-              clearedCount++;
+            // 方法1: 尝试使用原生SQL删除
+            try {
+              const { error: sqlError } = await supabase.rpc('exec_sql', {
+                sql_command: 'DELETE FROM public.companies WHERE id != \'00000000-0000-0000-0000-000000000000\';'
+              });
+              
+              if (!sqlError) {
+                console.log(`✅ 通过SQL成功清理companies表`);
+                results.push({ table, success: true, message: '通过SQL清理成功' });
+                clearedCount++;
+                continue;
+              } else {
+                console.log(`⚠️ SQL删除失败:`, sqlError.message);
+              }
+            } catch (sqlErr: any) {
+              console.log(`⚠️ SQL删除异常:`, sqlErr.message);
             }
+            
+            // 方法2: 尝试逐个删除
+            console.log(`🔄 尝试逐个删除companies记录...`);
+            
+            const { data: companies, error: fetchError } = await supabase
+              .from('companies')
+              .select('id')
+              .neq('id', '00000000-0000-0000-0000-000000000000')
+              .limit(100);
+            
+            if (fetchError) {
+              throw new Error(`获取公司列表失败: ${fetchError.message}`);
+            }
+            
+            if (!companies || companies.length === 0) {
+              console.log(`✅ companies表已经是空的`);
+              results.push({ table, success: true, message: '表已经是空的' });
+              clearedCount++;
+              continue;
+            }
+            
+            console.log(`📊 找到 ${companies.length} 家公司需要删除`);
+            
+            let deletedCount = 0;
+            let errorCountForTable = 0;
+            
+            for (const company of companies) {
+              try {
+                // 使用原生SQL删除单条记录
+                const { error: singleDeleteError } = await supabase.rpc('exec_sql', {
+                  sql_command: `DELETE FROM public.companies WHERE id = '${company.id}';`
+                });
+                
+                if (singleDeleteError) {
+                  console.log(`❌ 删除公司 ${company.id} 失败:`, singleDeleteError.message);
+                  errorCountForTable++;
+                } else {
+                  console.log(`✅ 成功删除公司 ${company.id}`);
+                  deletedCount++;
+                }
+              } catch (err: any) {
+                console.log(`❌ 删除公司 ${company.id} 时出现异常:`, err.message);
+                errorCountForTable++;
+              }
+            }
+            
+            console.log(`📊 companies表清理完成: 成功删除 ${deletedCount} 条，失败 ${errorCountForTable} 条`);
+            
+            if (errorCountForTable === 0) {
+              results.push({ table, success: true, message: `成功删除 ${deletedCount} 条记录` });
+              clearedCount++;
+            } else {
+              results.push({ table, success: false, error: `部分删除失败: 成功 ${deletedCount} 条，失败 ${errorCountForTable} 条` });
+              errorCount++;
+            }
+            
           } catch (err: any) {
             console.log(`❌ 清理companies表时出现异常:`, err.message);
             results.push({ table, success: false, error: err.message });
