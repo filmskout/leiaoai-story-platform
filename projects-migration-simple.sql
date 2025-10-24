@@ -141,46 +141,73 @@ END $$;
 -- ============================================
 
 -- 为project_ratings添加外键约束
-ALTER TABLE public.project_ratings 
-ADD CONSTRAINT IF NOT EXISTS project_ratings_project_id_fkey 
-FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
-
-ALTER TABLE public.project_ratings 
-ADD CONSTRAINT IF NOT EXISTS project_ratings_user_id_fkey 
-FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'project_ratings_project_id_fkey' AND table_name = 'project_ratings') THEN
+        ALTER TABLE public.project_ratings ADD CONSTRAINT project_ratings_project_id_fkey 
+            FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'project_ratings_user_id_fkey' AND table_name = 'project_ratings') THEN
+        ALTER TABLE public.project_ratings ADD CONSTRAINT project_ratings_user_id_fkey 
+            FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+    END IF;
+END $$;
 
 -- 为project_stats添加外键约束
-ALTER TABLE public.project_stats 
-ADD CONSTRAINT IF NOT EXISTS project_stats_project_id_fkey 
-FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'project_stats_project_id_fkey' AND table_name = 'project_stats') THEN
+        ALTER TABLE public.project_stats ADD CONSTRAINT project_stats_project_id_fkey 
+            FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+    END IF;
+END $$;
 
 -- 为project_stories添加外键约束
-ALTER TABLE public.project_stories 
-ADD CONSTRAINT IF NOT EXISTS project_stories_project_id_fkey 
-FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
-
-ALTER TABLE public.project_stories 
-ADD CONSTRAINT IF NOT EXISTS project_stories_story_id_fkey 
-FOREIGN KEY (story_id) REFERENCES public.stories(id) ON DELETE CASCADE;
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'project_stories_project_id_fkey' AND table_name = 'project_stories') THEN
+        ALTER TABLE public.project_stories ADD CONSTRAINT project_stories_project_id_fkey 
+            FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'project_stories_story_id_fkey' AND table_name = 'project_stories') THEN
+        ALTER TABLE public.project_stories ADD CONSTRAINT project_stories_story_id_fkey 
+            FOREIGN KEY (story_id) REFERENCES public.stories(id) ON DELETE CASCADE;
+    END IF;
+END $$;
 
 -- 为project_versions添加外键约束
-ALTER TABLE public.project_versions 
-ADD CONSTRAINT IF NOT EXISTS project_versions_project_id_fkey 
-FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'project_versions_project_id_fkey' AND table_name = 'project_versions') THEN
+        ALTER TABLE public.project_versions ADD CONSTRAINT project_versions_project_id_fkey 
+            FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+    END IF;
+END $$;
 
 -- 为user_favorites添加外键约束
-ALTER TABLE public.user_favorites 
-ADD CONSTRAINT IF NOT EXISTS user_favorites_user_id_fkey 
-FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
-
-ALTER TABLE public.user_favorites 
-ADD CONSTRAINT IF NOT EXISTS user_favorites_project_id_fkey 
-FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'user_favorites_user_id_fkey' AND table_name = 'user_favorites') THEN
+        ALTER TABLE public.user_favorites ADD CONSTRAINT user_favorites_user_id_fkey 
+            FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'user_favorites_project_id_fkey' AND table_name = 'user_favorites') THEN
+        ALTER TABLE public.user_favorites ADD CONSTRAINT user_favorites_project_id_fkey 
+            FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+    END IF;
+END $$;
 
 -- 为company_stats添加外键约束
-ALTER TABLE public.company_stats 
-ADD CONSTRAINT IF NOT EXISTS company_stats_company_id_fkey 
-FOREIGN KEY (company_id) REFERENCES public.companies(id) ON DELETE CASCADE;
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'company_stats_company_id_fkey' AND table_name = 'company_stats') THEN
+        ALTER TABLE public.company_stats ADD CONSTRAINT company_stats_company_id_fkey 
+            FOREIGN KEY (company_id) REFERENCES public.companies(id) ON DELETE CASCADE;
+    END IF;
+END $$;
 
 -- ============================================
 -- 步骤9：创建索引
@@ -216,11 +243,28 @@ DROP POLICY IF EXISTS tool_ratings_read_all ON public.project_ratings;
 DROP POLICY IF EXISTS tool_stats_read_all ON public.project_stats;
 
 -- 创建新的RLS策略
-CREATE POLICY IF NOT EXISTS projects_read_all ON public.projects FOR SELECT USING (true);
-CREATE POLICY IF NOT EXISTS project_ratings_read_all ON public.project_ratings FOR SELECT USING (true);
-CREATE POLICY IF NOT EXISTS project_stats_read_all ON public.project_stats FOR SELECT USING (true);
-CREATE POLICY IF NOT EXISTS project_stories_read_all ON public.project_stories FOR SELECT USING (true);
-CREATE POLICY IF NOT EXISTS project_versions_read_all ON public.project_versions FOR SELECT USING (true);
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'projects_read_all' AND tablename = 'projects') THEN
+        CREATE POLICY projects_read_all ON public.projects FOR SELECT USING (true);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'project_ratings_read_all' AND tablename = 'project_ratings') THEN
+        CREATE POLICY project_ratings_read_all ON public.project_ratings FOR SELECT USING (true);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'project_stats_read_all' AND tablename = 'project_stats') THEN
+        CREATE POLICY project_stats_read_all ON public.project_stats FOR SELECT USING (true);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'project_stories_read_all' AND tablename = 'project_stories') THEN
+        CREATE POLICY project_stories_read_all ON public.project_stories FOR SELECT USING (true);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'project_versions_read_all' AND tablename = 'project_versions') THEN
+        CREATE POLICY project_versions_read_all ON public.project_versions FOR SELECT USING (true);
+    END IF;
+END $$;
 
 -- ============================================
 -- 步骤11：验证结果
