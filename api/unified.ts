@@ -3464,7 +3464,16 @@ async function handleGenerateRealData(req: any, res: any) {
     
     for (let i = 0; i < companies.length; i++) {
       const companyName = companies[i];
-      const isOverseas = !companyName.includes('AI') || companyName.includes('Google') || companyName.includes('Microsoft') || companyName.includes('Meta') || companyName.includes('Amazon') || companyName.includes('Apple') || companyName.includes('Tesla') || companyName.includes('NVIDIA') || companyName.includes('Intel') || companyName.includes('IBM') || companyName.includes('OpenAI') || companyName.includes('Anthropic') || companyName.includes('Cohere') || companyName.includes('Hugging Face') || companyName.includes('Stability AI') || companyName.includes('Midjourney') || companyName.includes('Character.AI') || companyName.includes('Jasper AI') || companyName.includes('Copy.ai') || companyName.includes('Grammarly') || companyName.includes('Notion AI') || companyName.includes('GitHub Copilot') || companyName.includes('Tabnine') || companyName.includes('CodeWhisperer') || companyName.includes('Cursor') || companyName.includes('Replit') || companyName.includes('Runway ML') || companyName.includes('Pika Labs') || companyName.includes('Synthesia') || companyName.includes('D-ID') || companyName.includes('HeyGen');
+      // 判断是否为海外公司
+      const overseasCompanies = [
+        'OpenAI', 'Google DeepMind', 'Microsoft AI', 'Meta AI', 'Amazon AI',
+        'Apple AI', 'Tesla AI', 'NVIDIA', 'Intel AI', 'IBM Watson',
+        'Anthropic', 'Cohere', 'Hugging Face', 'Stability AI', 'Midjourney',
+        'Character.AI', 'Jasper AI', 'Copy.ai', 'Grammarly', 'Notion AI',
+        'GitHub Copilot', 'Tabnine', 'CodeWhisperer', 'Cursor', 'Replit',
+        'Runway ML', 'Pika Labs', 'Synthesia', 'D-ID', 'HeyGen'
+      ];
+      const isOverseas = overseasCompanies.includes(companyName);
       
       try {
         console.log(`\n🏢 正在生成公司数据: ${companyName} (${i + 1}/${companies.length})`);
