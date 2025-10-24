@@ -183,7 +183,7 @@ export async function searchAICompanies(query: string) {
     .from('companies')
     .select(`
       *,
-      tools:tools(*, tool_stats:tool_stats(*)),
+      projects:projects(*, project_stats:project_stats(*)),
       company_stats:company_stats(*)
     `)
     .or(`name.ilike.%${query}%, description.ilike.%${query}%, industry_tags.cs.{${query}}`)
@@ -194,13 +194,13 @@ export async function searchAICompanies(query: string) {
 
 export async function searchTools(query: string) {
   const { data, error } = await supabase
-    .from('tools')
+    .from('projects')
     .select(`
       *,
       company:companies(*),
-      tool_stats:tool_stats(*)
+      project_stats:project_stats(*)
     `)
-    .or(`name.ilike.%${query}%, description.ilike.%${query}%, industry_tags.cs.{${query}}`)
+    .or(`name.ilike.%${query}%, description.ilike.%${query}%, category.ilike.%${query}%`)
     .order('name');
   if (error) throw error;
   return data;
@@ -209,11 +209,11 @@ export async function searchTools(query: string) {
 // 按类别筛选
 export async function getToolsByCategory(category: string) {
   const { data, error } = await supabase
-    .from('tools')
+    .from('projects')
     .select(`
       *,
       company:companies(*),
-      tool_stats:tool_stats(*)
+      project_stats:project_stats(*)
     `)
     .eq('category', category)
     .order('name');
@@ -224,11 +224,11 @@ export async function getToolsByCategory(category: string) {
 // 按公司筛选
 export async function getToolsByCompany(companyId: string) {
   const { data, error } = await supabase
-    .from('tools')
+    .from('projects')
     .select(`
       *,
       company:companies(*),
-      tool_stats:tool_stats(*)
+      project_stats:project_stats(*)
     `)
     .eq('company_id', companyId)
     .order('name');
@@ -236,29 +236,29 @@ export async function getToolsByCompany(companyId: string) {
   return data;
 }
 
-// 获取热门工具（按评分排序）
+// 获取热门项目（按评分排序）
 export async function getTopRatedTools(limit: number = 20) {
   const { data, error } = await supabase
-    .from('tools')
+    .from('projects')
     .select(`
       *,
       company:companies(*),
-      tool_stats:tool_stats(*)
+      project_stats:project_stats(*)
     `)
-    .order('tool_stats.average_rating', { ascending: false })
+    .order('project_stats.average_rating', { ascending: false })
     .limit(limit);
   if (error) throw error;
   return data;
 }
 
-// 获取最新工具
+// 获取最新项目
 export async function getLatestTools(limit: number = 20) {
   const { data, error } = await supabase
-    .from('tools')
+    .from('projects')
     .select(`
       *,
       company:companies(*),
-      tool_stats:tool_stats(*)
+      project_stats:project_stats(*)
     `)
     .order('created_at', { ascending: false })
     .limit(limit);
@@ -269,7 +269,7 @@ export async function getLatestTools(limit: number = 20) {
 // 保留原有函数以保持兼容性
 export async function listToolsWithCompany() {
   const { data, error } = await supabase
-    .from('tools')
+    .from('projects')
     .select('*, company:companies(*), fundings:companies!inner(id, fundings:fundings(*))')
     .limit(100);
   if (error) throw error;
