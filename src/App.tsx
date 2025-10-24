@@ -59,7 +59,7 @@ const ToolsReviews = lazyWithRetry(() => import('@/pages/ToolsReviews'));
 const AICompaniesCatalog = lazyWithRetry(() => import('@/pages/AICompaniesCatalog'));
 const CompanyDetail = lazyWithRetry(() => import('@/pages/CompanyDetail'));
 const MonitoringDashboard = lazyWithRetry(() => import('@/pages/MonitoringDashboard'));
-const ReconfigureData = lazyWithRetry(() => import('@/pages/ReconfigureData'));
+const ReconfigureData = lazyWithRetry(() => import('@/pages/ReconfigureDataSimplified'));
 
 // Error boundary for dynamic imports
 class ChunkLoadErrorBoundary extends React.Component<
