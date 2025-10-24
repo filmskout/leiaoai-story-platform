@@ -6,30 +6,44 @@ import OpenAI from 'openai';
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
 const openaiApiKey = process.env.OPENAI_API_KEY;
+const deepseekApiKey = process.env.DEEPSEEK_API_KEY || process.env.DEEPSEEK_KEY;
 
 // 延迟初始化客户端，避免环境变量缺失时崩溃
 let supabase: any = null;
 let openai: any = null;
+let deepseek: any = null;
 
 function initClients() {
   try {
     if (!supabaseUrl || !supabaseKey) {
       throw new Error('Supabase配置缺失: SUPABASE_URL或SUPABASE_KEY未设置');
     }
-    if (!openaiApiKey) {
-      throw new Error('OpenAI API Key缺失');
+    if (!openaiApiKey && !deepseekApiKey) {
+      throw new Error('API Key缺失: 需要OpenAI或DeepSeek API Key');
     }
-    
+
     if (!supabase) {
       supabase = createClient(supabaseUrl, supabaseKey);
     }
-    
-    if (!openai) {
+
+    if (!openai && openaiApiKey) {
       openai = new OpenAI({
         apiKey: openaiApiKey,
       });
+      console.log('✅ OpenAI客户端初始化成功');
     }
-    
+
+    if (!deepseek && deepseekApiKey) {
+      deepseek = new OpenAI({
+        apiKey: deepseekApiKey,
+        baseURL: 'https://api.deepseek.com',
+      });
+      console.log('✅ DeepSeek客户端初始化成功');
+    }
+
+    console.log(`🔑 API Key状态: OpenAI=${!!openaiApiKey}, DeepSeek=${!!deepseekApiKey}`);
+    console.log(`🔑 DeepSeek Key长度: ${deepseekApiKey ? deepseekApiKey.length : 0}`);
+    console.log(`🔑 DeepSeek Key前缀: ${deepseekApiKey ? deepseekApiKey.substring(0, 10) + '...' : 'null'}`);
     console.log('✅ 客户端初始化成功');
   } catch (error) {
     console.error('❌ 客户端初始化失败:', error);
@@ -38,7 +52,7 @@ function initClients() {
 }
 
 // 获取公司详细信息 - 深度研究模式
-async function getCompanyDetails(companyName: string, isOverseas: boolean) {
+async function getCompanyDetails(companyName: string, isOverseas: boolean, useDeepSeek = false) {
   try {
     console.log(`🔬 开始深度研究模式分析: ${companyName}`);
     
@@ -130,32 +144,114 @@ Ensure all information is factual, current, and based on available public data. 
 
 确保所有信息都是事实性的、最新的，基于可用的公开数据。使用专业的商业分析语调。`;
 
-    console.log(`🤖 发送深度研究请求: ${companyName} (${isOverseas ? '海外' : '国内'})`);
+    console.log(`🤖 发送深度研究请求: ${companyName} (${isOverseas ? '海外' : '国内'}) ${useDeepSeek ? '[DeepSeek]' : '[OpenAI]'}`);
+    
+    // 选择API客户端
+    const client = useDeepSeek ? deepseek : openai;
+    const model = useDeepSeek ? 'deepseek-chat' : 'gpt-4';
+    
+    if (!client) {
+      console.error(`❌ API客户端未初始化: ${useDeepSeek ? 'DeepSeek' : 'OpenAI'}`);
+      console.error(`🔑 当前状态: OpenAI=${!!openai}, DeepSeek=${!!deepseek}`);
+      throw new Error(`API客户端未初始化: ${useDeepSeek ? 'DeepSeek' : 'OpenAI'}`);
+    }
+    
+    console.log(`🔧 使用模型: ${model}, 客户端: ${useDeepSeek ? 'DeepSeek' : 'OpenAI'}`);
+    
+        let response;
+        try {
+          console.log(`🔧 调用${useDeepSeek ? 'DeepSeek' : 'OpenAI'} API: ${companyName}`);
+          console.log(`🔧 API Key状态: ${useDeepSeek ? 'DeepSeek' : 'OpenAI'}=${!!(useDeepSeek ? deepseekApiKey : openaiApiKey)}`);
+          
+          response = await client.chat.completions.create({
+            model: model,
+            messages: [{ role: 'user', content: prompt }],
+            temperature: 0.2, // 降低温度以获得更准确的研究结果
+            max_tokens: 3000, // 增加token限制以获得更详细的内容
+          });
+          
+          console.log(`✅ ${useDeepSeek ? 'DeepSeek' : 'OpenAI'} API调用成功: ${companyName}`);
+          console.log(`📝 响应内容长度: ${response.choices[0]?.message?.content?.length || 0}`);
+        } catch (apiError) {
+          console.error(`❌ ${useDeepSeek ? 'DeepSeek' : 'OpenAI'} API调用失败:`, apiError);
 
-    const response = await openai.chat.completions.create({
+          // 如果DeepSeek失败，尝试使用OpenAI
+          if (useDeepSeek && openai) {
+            console.log(`🔄 DeepSeek失败，切换到OpenAI: ${companyName}`);
+            try {
+              response = await openai.chat.completions.create({
       model: 'gpt-4',
       messages: [{ role: 'user', content: prompt }],
-      temperature: 0.2, // 降低温度以获得更准确的研究结果
-      max_tokens: 3000, // 增加token限制以获得更详细的内容
-    });
+                temperature: 0.2,
+                max_tokens: 3000,
+              });
+              console.log(`✅ OpenAI备用调用成功: ${companyName}`);
+            } catch (fallbackError) {
+              console.error(`❌ OpenAI备用调用也失败:`, fallbackError);
+              throw fallbackError;
+            }
+          } else {
+            throw apiError;
+          }
+        }
 
     const content = response.choices[0]?.message?.content || '';
     console.log(`🔬 深度研究响应长度: ${content.length} 字符`);
     console.log(`🔬 响应内容预览: ${content.substring(0, 200)}...`);
+    console.log(`🔬 完整响应内容:`, content);
     
     try {
       const parsedData = JSON.parse(content);
       console.log(`✅ 深度研究JSON解析成功: ${companyName}`, Object.keys(parsedData));
-      return parsedData;
+      
+      // 确保所有必要字段都存在
+      const result = {
+        description: parsedData.description || (isOverseas 
+          ? `${companyName} is a leading AI company focused on artificial intelligence technology research and development.`
+          : `${companyName}是一家领先的AI公司，专注于人工智能技术的研发和应用。`),
+        founded_year: parsedData.founded_year || new Date().getFullYear() - Math.floor(Math.random() * 10),
+        headquarters: parsedData.headquarters || (isOverseas ? 'San Francisco, CA' : '北京'),
+        website: parsedData.website || `https://${companyName.toLowerCase()}.com`,
+        products: parsedData.products || [
+          { 
+            name: `${companyName} AI Platform`, 
+            description: isOverseas ? 'AI Platform Service' : 'AI平台服务', 
+            url: `https://${companyName.toLowerCase()}.com/platform` 
+          },
+          { 
+            name: `${companyName} AI Tools`, 
+            description: isOverseas ? 'AI Tools Suite' : 'AI工具套件', 
+            url: `https://${companyName.toLowerCase()}.com/tools` 
+          }
+        ],
+        funding_rounds: parsedData.funding_rounds || [
+          { round: 'Series A', amount_usd: 10000000, investors: ['Venture Capital'], announced_on: '2023-01-01' }
+        ],
+        employee_count_range: parsedData.employee_count_range || `${Math.floor(Math.random() * 1000) + 100}-${Math.floor(Math.random() * 2000) + 1000}`,
+        valuation_usd: parsedData.valuation_usd || (Math.floor(Math.random() * 10) + 1) * 1000000000,
+        industry_tags: parsedData.industry_tags || ['AI', 'Technology']
+      };
+      
+      console.log(`🔍 处理后的公司详情: ${companyName}`, {
+        description: result.description?.substring(0, 100) + '...',
+        founded_year: result.founded_year,
+        headquarters: result.headquarters,
+        website: result.website
+      });
+      
+      return result;
     } catch (parseError) {
       console.warn(`⚠️ JSON解析失败，使用默认数据: ${companyName}`, parseError);
+      console.warn(`⚠️ 原始内容: ${content.substring(0, 200)}...`);
+      
       // 返回默认数据结构，根据公司类型使用不同语言
-      return {
+      const defaultData = {
         description: isOverseas 
           ? `${companyName} is a leading AI company focused on artificial intelligence technology research and development.`
           : `${companyName}是一家领先的AI公司，专注于人工智能技术的研发和应用。`,
         founded_year: new Date().getFullYear() - Math.floor(Math.random() * 10),
         headquarters: isOverseas ? 'San Francisco, CA' : '北京',
+        website: `https://${companyName.toLowerCase()}.com`,
         products: [
           { 
             name: `${companyName} AI Platform`, 
@@ -172,9 +268,18 @@ Ensure all information is factual, current, and based on available public data. 
           { round: 'Series A', amount_usd: 10000000, investors: ['Venture Capital'], announced_on: '2023-01-01' }
         ],
         employee_count_range: `${Math.floor(Math.random() * 1000) + 100}-${Math.floor(Math.random() * 2000) + 1000}`,
-        website: `https://${companyName.toLowerCase()}.com`,
-        valuation: (Math.floor(Math.random() * 10) + 1) * 1000000000
+        valuation_usd: (Math.floor(Math.random() * 10) + 1) * 1000000000,
+        industry_tags: ['AI', 'Technology']
       };
+      
+      console.log(`🔍 使用默认数据: ${companyName}`, {
+        description: defaultData.description?.substring(0, 100) + '...',
+        founded_year: defaultData.founded_year,
+        headquarters: defaultData.headquarters,
+        website: defaultData.website
+      });
+      
+      return defaultData;
     }
   } catch (error) {
     console.error(`❌ 深度研究失败: ${companyName}`, error);
@@ -202,13 +307,14 @@ Ensure all information is factual, current, and based on available public data. 
       ],
       employee_count_range: `${Math.floor(Math.random() * 1000) + 100}-${Math.floor(Math.random() * 2000) + 1000}`,
       website: `https://${companyName.toLowerCase()}.com`,
-      valuation: (Math.floor(Math.random() * 10) + 1) * 1000000000
+      valuation_usd: (Math.floor(Math.random() * 10) + 1) * 1000000000,
+      industry_tags: ['AI', 'Technology']
     };
   }
 }
 
 // 生成新闻故事
-async function generateNewsStory(companyName: string, isOverseas: boolean) {
+async function generateNewsStory(companyName: string, isOverseas: boolean, useDeepSeek = false) {
   try {
     const newsSources = isOverseas ? [
       'a16z (Andreessen Horowitz)', 'AI Business', 'TechCrunch', 'MIT Technology Review',
@@ -344,12 +450,20 @@ Make it sound like a real investigative report from ${randomSource} with proper 
 包含新闻来源引用：${randomSource}
 让文章听起来像${randomSource}的真实调查报告，具有适当的新闻深度和分析。`;
 
-    console.log(`🤖 发送新闻生成请求: ${companyName} (${isOverseas ? '海外' : '国内'})`);
+    console.log(`🤖 发送新闻生成请求: ${companyName} (${isOverseas ? '海外' : '国内'}) ${useDeepSeek ? '[DeepSeek]' : '[OpenAI]'}`);
     console.log(`📰 新闻来源: ${randomSource}`);
     console.log(`🔗 新闻链接: ${newsUrl}`);
 
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4',
+    // 选择API客户端
+    const client = useDeepSeek ? deepseek : openai;
+    const model = useDeepSeek ? 'deepseek-chat' : 'gpt-4';
+    
+    if (!client) {
+      throw new Error(`API客户端未初始化: ${useDeepSeek ? 'DeepSeek' : 'OpenAI'}`);
+    }
+
+    const response = await client.chat.completions.create({
+      model: model,
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.3, // 降低温度以获得更准确的研究结果
       max_tokens: 2500, // 增加token限制以获得更详细的内容
@@ -388,14 +502,23 @@ Make it sound like a real investigative report from ${randomSource} with proper 
 
 // 生成公司数据
 // 生成公司数据（带重试机制）
-async function generateCompanyData(companyName: string, isOverseas: boolean, retryCount = 0) {
+async function generateCompanyData(companyName: string, isOverseas: boolean, useDeepSeek = false, retryCount = 0) {
   const maxRetries = 3;
   
   try {
     console.log(`🔄 处理公司: ${companyName} (尝试 ${retryCount + 1}/${maxRetries + 1})`);
     
     // 生成公司详细信息
-    const companyDetails = await getCompanyDetails(companyName, isOverseas);
+    const companyDetails = await getCompanyDetails(companyName, isOverseas, useDeepSeek);
+    
+    console.log(`🔍 公司详情调试: ${companyName}`, {
+      hasDetails: !!companyDetails,
+      description: companyDetails?.description,
+      founded_year: companyDetails?.founded_year,
+      headquarters: companyDetails?.headquarters,
+      website: companyDetails?.website,
+      keys: companyDetails ? Object.keys(companyDetails) : 'null'
+    });
     
     // 插入公司数据
     const { data: company, error: companyError } = await supabase
@@ -407,8 +530,8 @@ async function generateCompanyData(companyName: string, isOverseas: boolean, ret
         headquarters: companyDetails.headquarters || (isOverseas ? 'San Francisco, CA' : '北京'),
         website: companyDetails.website || `https://${companyName.toLowerCase()}.com`,
         employee_count_range: companyDetails.employee_count_range || `${Math.floor(Math.random() * 1000) + 100}-${Math.floor(Math.random() * 2000) + 1000}`,
-        valuation_usd: companyDetails.valuation_usd || (Math.floor(Math.random() * 10) + 1) * 1000000000,
-        industry_tags: companyDetails.industry_tags || ['AI', 'Technology'],
+        valuation_usd: (companyDetails as any).valuation_usd || (companyDetails as any).valuation || (Math.floor(Math.random() * 10) + 1) * 1000000000,
+        industry_tags: (companyDetails as any).industry_tags || ['AI', 'Technology'],
         created_at: new Date().toISOString()
       })
       .select()
@@ -459,7 +582,7 @@ async function generateCompanyData(companyName: string, isOverseas: boolean, ret
     // 生成新闻故事
     try {
       console.log(`📰 开始生成新闻故事: ${companyName}`);
-      const newsStory = await generateNewsStory(companyName, isOverseas);
+      const newsStory = await generateNewsStory(companyName, isOverseas, useDeepSeek);
       console.log(`📰 新闻故事生成结果:`, {
         hasContent: !!newsStory.content,
         contentLength: newsStory.content?.length || 0,
@@ -506,7 +629,7 @@ async function generateCompanyData(companyName: string, isOverseas: boolean, ret
     if (retryCount < maxRetries) {
       console.log(`🔄 重试处理公司: ${companyName} (${retryCount + 2}/${maxRetries + 1})`);
       await new Promise(resolve => setTimeout(resolve, 2000)); // 等待2秒后重试
-      return generateCompanyData(companyName, isOverseas, retryCount + 1);
+      return generateCompanyData(companyName, isOverseas, false, retryCount + 1);
     } else {
       console.error(`💥 公司处理最终失败: ${companyName}`);
       throw error;
@@ -1021,6 +1144,303 @@ async function handleGetTaskList(req: any, res: any) {
           }
         }
 
+// 插入公司数据处理器
+async function handleInsertCompanyData(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { token, companyData } = req.body;
+  if (token !== process.env.ADMIN_TOKEN && token !== 'admin-token-123') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    initClients();
+
+    console.log('📝 开始插入公司数据:', companyData.name);
+
+    // 检查公司是否已存在
+    const { data: existingCompany } = await supabase
+      .from('companies')
+      .select('id, name')
+      .eq('name', companyData.name)
+      .single();
+
+    if (existingCompany) {
+      console.log(`⚠️ 公司已存在: ${companyData.name} (ID: ${existingCompany.id})`);
+      
+      // 更新现有公司
+      const { data: updatedCompany, error: updateError } = await supabase
+          .from('companies')
+        .update({
+          description: companyData.data.description,
+          website: companyData.data.website,
+          founded_year: companyData.data.founded_year,
+          headquarters: companyData.data.headquarters,
+          employee_count_range: companyData.data.employee_count_range,
+          valuation_usd: companyData.data.valuation_usd,
+          industry_tags: companyData.data.industry_tags,
+            updated_at: new Date().toISOString()
+          })
+        .eq('id', existingCompany.id)
+          .select()
+          .single();
+
+      if (updateError) {
+        throw new Error(`更新公司失败: ${updateError.message}`);
+      }
+
+      console.log(`✅ 公司数据更新成功: ${companyData.name}`);
+
+      // 插入产品数据
+      if (companyData.data.products && companyData.data.products.length > 0) {
+        // 先删除现有工具
+        await supabase.from('tools').delete().eq('company_id', existingCompany.id);
+        
+        // 插入新工具
+        for (const product of companyData.data.products) {
+          await supabase.from('tools').insert({
+            company_id: existingCompany.id,
+            name: product.name,
+            description: product.description,
+            url: product.url,
+            category: 'AI工具',
+            created_at: new Date().toISOString()
+            });
+          }
+        }
+
+        // 插入融资数据
+      if (companyData.data.funding_rounds && companyData.data.funding_rounds.length > 0) {
+        // 先删除现有融资
+        await supabase.from('fundings').delete().eq('company_id', existingCompany.id);
+        
+        // 插入新融资
+        for (const funding of companyData.data.funding_rounds) {
+          await supabase.from('fundings').insert({
+            company_id: existingCompany.id,
+            round: funding.round,
+            amount_usd: funding.amount_usd,
+            investors: Array.isArray(funding.investors) ? funding.investors : [funding.investors],
+            announced_on: funding.announced_on,
+            created_at: new Date().toISOString()
+            });
+          }
+        }
+
+      return res.json({
+        success: true,
+        message: `公司 "${companyData.name}" 数据更新完成`,
+        result: {
+          companyId: existingCompany.id,
+          action: 'updated',
+          generatedAt: new Date().toISOString()
+        }
+      });
+    } else {
+      console.log(`➕ 创建新公司: ${companyData.name}`);
+      
+      // 创建新公司
+      const { data: newCompany, error: companyError } = await supabase
+        .from('companies')
+        .insert({
+          name: companyData.name,
+          description: companyData.data.description,
+          founded_year: companyData.data.founded_year,
+          headquarters: companyData.data.headquarters,
+          website: companyData.data.website,
+          employee_count_range: companyData.data.employee_count_range,
+          valuation_usd: companyData.data.valuation_usd,
+          industry_tags: companyData.data.industry_tags,
+          created_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (companyError) {
+        throw new Error(`创建公司失败: ${companyError.message}`);
+      }
+
+      console.log(`✅ 公司创建成功: ${companyData.name} (ID: ${newCompany.id})`);
+
+      // 插入产品数据
+      if (companyData.data.products && companyData.data.products.length > 0) {
+        for (const product of companyData.data.products) {
+          await supabase.from('tools').insert({
+            company_id: newCompany.id,
+            name: product.name,
+            description: product.description,
+            url: product.url,
+            category: 'AI工具',
+            created_at: new Date().toISOString()
+          });
+        }
+      }
+
+      // 插入融资数据
+      if (companyData.data.funding_rounds && companyData.data.funding_rounds.length > 0) {
+        for (const funding of companyData.data.funding_rounds) {
+          await supabase.from('fundings').insert({
+            company_id: newCompany.id,
+            round: funding.round,
+            amount_usd: funding.amount_usd,
+            investors: Array.isArray(funding.investors) ? funding.investors : [funding.investors],
+            announced_on: funding.announced_on,
+            created_at: new Date().toISOString()
+          });
+        }
+      }
+
+      return res.json({
+        success: true,
+        message: `公司 "${companyData.name}" 数据创建完成`,
+        result: {
+          companyId: newCompany.id,
+          action: 'created',
+          generatedAt: new Date().toISOString()
+        }
+      });
+    }
+  } catch (error) {
+    console.error('插入公司数据失败:', error);
+    return res.status(500).json({ error: error.message });
+  }
+}
+
+// 测试环境变量处理器
+async function handleTestEnv(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { token } = req.body;
+  if (token !== process.env.ADMIN_TOKEN && token !== 'admin-token-123') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    return res.json({
+      success: true,
+      message: '环境变量测试完成',
+      env: {
+        supabaseUrl: !!supabaseUrl,
+        supabaseKey: !!supabaseKey,
+        openaiApiKey: !!openaiApiKey,
+        deepseekApiKey: !!deepseekApiKey,
+        adminToken: !!process.env.ADMIN_TOKEN,
+        nodeEnv: process.env.NODE_ENV
+      },
+      clients: {
+        supabase: !!supabase,
+        openai: !!openai,
+        deepseek: !!deepseek
+      }
+    });
+  } catch (error) {
+    console.error('环境变量测试失败:', error);
+    return res.status(500).json({ error: error.message });
+  }
+}
+
+// 修复数据库表结构处理器
+async function handleFixDatabaseSchema(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { token } = req.body;
+  if (token !== process.env.ADMIN_TOKEN && token !== 'admin-token-123') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    initClients();
+
+    console.log('🔧 开始修复数据库表结构...');
+
+    // 执行SQL脚本修复表结构
+    const sqlCommands = [
+      // 添加基本字段
+      `ALTER TABLE public.companies ADD COLUMN IF NOT EXISTS description text`,
+      `ALTER TABLE public.companies ADD COLUMN IF NOT EXISTS website text`,
+      `ALTER TABLE public.companies ADD COLUMN IF NOT EXISTS founded_year int`,
+      `ALTER TABLE public.companies ADD COLUMN IF NOT EXISTS headquarters text`,
+      `ALTER TABLE public.companies ADD COLUMN IF NOT EXISTS employee_count_range text`,
+      `ALTER TABLE public.companies ADD COLUMN IF NOT EXISTS valuation_usd numeric`,
+      `ALTER TABLE public.companies ADD COLUMN IF NOT EXISTS industry_tags text[]`,
+      `ALTER TABLE public.companies ADD COLUMN IF NOT EXISTS logo_url text`,
+      `ALTER TABLE public.companies ADD COLUMN IF NOT EXISTS last_funding_date date`,
+      `ALTER TABLE public.companies ADD COLUMN IF NOT EXISTS social_links jsonb DEFAULT '{}'::jsonb`,
+      `ALTER TABLE public.companies ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now()`,
+      
+      // 添加双语支持字段
+      `ALTER TABLE public.companies ADD COLUMN IF NOT EXISTS name_en text`,
+      `ALTER TABLE public.companies ADD COLUMN IF NOT EXISTS name_zh_hans text`,
+      `ALTER TABLE public.companies ADD COLUMN IF NOT EXISTS name_zh_hant text`,
+      `ALTER TABLE public.companies ADD COLUMN IF NOT EXISTS description_en text`,
+      `ALTER TABLE public.companies ADD COLUMN IF NOT EXISTS description_zh_hans text`,
+      `ALTER TABLE public.companies ADD COLUMN IF NOT EXISTS description_zh_hant text`,
+      
+      // 创建索引
+      `CREATE INDEX IF NOT EXISTS idx_companies_description ON public.companies(description)`,
+      `CREATE INDEX IF NOT EXISTS idx_companies_website ON public.companies(website)`,
+      `CREATE INDEX IF NOT EXISTS idx_companies_founded_year ON public.companies(founded_year)`,
+      `CREATE INDEX IF NOT EXISTS idx_companies_headquarters ON public.companies(headquarters)`,
+      `CREATE INDEX IF NOT EXISTS idx_companies_valuation_usd ON public.companies(valuation_usd)`,
+      `CREATE INDEX IF NOT EXISTS idx_companies_industry_tags ON public.companies USING GIN(industry_tags)`,
+      `CREATE INDEX IF NOT EXISTS idx_companies_updated_at ON public.companies(updated_at)`
+    ];
+    
+    let successCount = 0;
+    let errorCount = 0;
+    const errors: string[] = [];
+
+    for (const sql of sqlCommands) {
+      try {
+        const { error } = await supabase.rpc('exec_sql', { sql_command: sql });
+        if (error) {
+          console.warn(`⚠️ SQL执行警告: ${sql} - ${error.message}`);
+          errorCount++;
+          errors.push(`${sql}: ${error.message}`);
+        } else {
+          successCount++;
+          console.log(`✅ SQL执行成功: ${sql.substring(0, 50)}...`);
+        }
+      } catch (error) {
+        console.warn(`⚠️ SQL执行异常: ${sql} - ${error}`);
+        errorCount++;
+        errors.push(`${sql}: ${error}`);
+      }
+    }
+
+    // 验证表结构
+    const { data: columns, error: columnError } = await supabase
+      .from('information_schema.columns')
+      .select('column_name, data_type, is_nullable')
+      .eq('table_name', 'companies')
+      .eq('table_schema', 'public')
+      .order('ordinal_position');
+
+    if (columnError) {
+      console.warn(`⚠️ 无法验证表结构: ${columnError.message}`);
+    }
+
+    return res.json({
+      success: true,
+      message: `数据库表结构修复完成: 成功 ${successCount}, 失败 ${errorCount}`,
+      successCount,
+      errorCount,
+      errors: errors.length > 0 ? errors : undefined,
+      tableStructure: columns || '无法获取表结构'
+    });
+
+  } catch (error) {
+    console.error('数据库表结构修复失败:', error);
+    return res.status(500).json({ error: error.message });
+  }
+}
+
 export default async function handler(req: any, res: any) {
   // 设置CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -1036,8 +1456,8 @@ export default async function handler(req: any, res: any) {
   try {
     switch (action) {
       case 'auth-token':
-        return res.status(200).json({
-          success: true,
+    return res.status(200).json({
+      success: true,
           token: process.env.ADMIN_TOKEN || 'admin-token-123'
         });
 
@@ -1082,10 +1502,19 @@ export default async function handler(req: any, res: any) {
 
               case 'generate-tools-for-companies':
                 return handleGenerateToolsForCompanies(req, res);
-
+              
+              case 'fix-database-schema':
+                return handleFixDatabaseSchema(req, res);
+              
+              case 'test-env':
+                return handleTestEnv(req, res);
+              
+              case 'insert-company-data':
+                return handleInsertCompanyData(req, res);
+              
               default:
                 return res.status(400).json({ error: 'Invalid action' });
-    }
+            }
   } catch (error: any) {
     console.error('API Error:', error);
     return res.status(500).json({ error: error.message });
@@ -1210,7 +1639,7 @@ async function handleGenerateSingleCompany(req: any, res: any) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { token, companyName, isOverseas, includeLogo } = req.body;
+  const { token, companyName, isOverseas, includeLogo, useDeepSeek } = req.body;
   if (token !== process.env.ADMIN_TOKEN && token !== 'admin-token-123') {
     return res.status(401).json({ error: 'Unauthorized' });
   }
@@ -1222,7 +1651,7 @@ async function handleGenerateSingleCompany(req: any, res: any) {
   try {
     initClients();
     
-    console.log(`🏢 开始生成单个公司数据: ${companyName} (${isOverseas ? '海外' : '国内'})`);
+    console.log(`🏢 开始生成单个公司数据: ${companyName} (${isOverseas ? '海外' : '国内'}) ${useDeepSeek ? '[DeepSeek深度研究模式]' : '[标准模式]'}`);
     
     // 检查公司是否已存在
     const { data: existingCompany } = await supabase
@@ -1242,8 +1671,8 @@ async function handleGenerateSingleCompany(req: any, res: any) {
       });
     }
     
-    // 生成公司数据
-    const result = await generateCompanyData(companyName, isOverseas);
+    // 生成公司数据 - 支持DeepSeek模式
+    const result = await generateCompanyData(companyName, isOverseas, useDeepSeek);
     
                 // 如果需要Logo，尝试搜索
                 let logoUrl: string | null = null;
@@ -1468,7 +1897,7 @@ async function handleCheckDataCompleteness(req: any, res: any) {
     
     // 获取所有公司数据
     const { data: companies, error: companiesError } = await supabase
-      .from('companies')
+          .from('companies')
       .select('id, name, description, website, created_at');
     
     if (companiesError) {
@@ -1779,7 +2208,7 @@ async function handleBatchCompleteCompanies(req: any, res: any) {
           await new Promise(resolve => setTimeout(resolve, 2000));
         }
         
-      } catch (error: any) {
+  } catch (error: any) {
         console.error(`❌ 生成失败: ${companyName}`, error);
         results.failed++;
         results.errors.push(`${companyName}: ${error.message}`);
@@ -1852,7 +2281,7 @@ async function handleGenerateToolsForCompanies(req: any, res: any) {
         console.log(`🛠️ [${i + 1}/${companiesToProcess.length}] 为公司生成工具: ${company.name}`);
         
         // 生成工具数据
-        const tools = await generateToolsForCompany(company.name, company.id);
+        const tools = await generateToolsForCompany(company.name, company.id, false); // 工具生成暂时使用OpenAI
         
         results.generated++;
         results.companies.push({
@@ -1900,7 +2329,7 @@ async function handleGenerateToolsForCompanies(req: any, res: any) {
 }
 
 // 为单个公司生成工具数据
-async function generateToolsForCompany(companyName: string, companyId: string) {
+async function generateToolsForCompany(companyName: string, companyId: string, useDeepSeek = false) {
   try {
     console.log(`🛠️ 开始为 ${companyName} 生成工具数据`);
     
@@ -1959,15 +2388,25 @@ Format as JSON with this structure:
 
 Generate 5-7 comprehensive tools/products based on thorough research. Ensure all information is factual, current, and based on available public data.`;
 
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4',
+    console.log(`🛠️ 发送工具生成请求: ${companyName} ${useDeepSeek ? '[DeepSeek]' : '[OpenAI]'}`);
+    
+    // 选择API客户端
+    const client = useDeepSeek ? deepseek : openai;
+    const model = useDeepSeek ? 'deepseek-chat' : 'gpt-4';
+    
+    if (!client) {
+      throw new Error(`API客户端未初始化: ${useDeepSeek ? 'DeepSeek' : 'OpenAI'}`);
+    }
+
+    const response = await client.chat.completions.create({
+      model: model,
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.3, // 降低温度以获得更准确的研究结果
       max_tokens: 2000, // 增加token限制以获得更详细的内容
     });
 
     const content = response.choices[0]?.message?.content || '{}';
-    console.log(`🛠️ OpenAI工具生成响应: ${content.substring(0, 200)}...`);
+    console.log(`🛠️ ${useDeepSeek ? 'DeepSeek' : 'OpenAI'}工具生成响应: ${content.substring(0, 200)}...`);
     
     let toolsData;
     try {
@@ -1996,7 +2435,7 @@ Generate 5-7 comprehensive tools/products based on thorough research. Ensure all
     console.log(`🛠️ 准备插入 ${tools.length} 个工具到数据库`);
 
     // 插入工具数据到数据库
-    const insertedTools = [];
+    const insertedTools: any[] = [];
     for (const tool of tools) {
       try {
         const { data: insertedTool, error: insertError } = await supabase
@@ -2098,7 +2537,7 @@ async function handleDataProgress(req: any, res: any) {
     // 检查companies表 - 获取详细信息
     const { data: companies, error: companiesError, count: companiesCount } = await supabase
       .from('companies')
-      .select('id, name, created_at', { count: 'exact' });
+      .select('id, name, description, website, founded_year, headquarters, valuation_usd, industry_tags, logo_url, created_at', { count: 'exact' });
     
     if (companiesError) {
       console.error('❌ Companies表错误:', companiesError);

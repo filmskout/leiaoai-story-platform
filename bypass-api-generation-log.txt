@@ -1,0 +1,16 @@
+[2025-10-24T01:27:42.296Z] 🚀 开始绕过API生成AI公司数据
+[2025-10-24T01:27:42.299Z] 📦 处理批次 1/14 (3 家公司)
+[2025-10-24T01:27:42.299Z] 🔬 生成公司数据: OpenAI (海外)
+[2025-10-24T01:28:11.628Z] ❌ 公司数据生成失败: OpenAI - JSON解析失败: Unexpected token '`', "```json
+{
+"... is not valid JSON
+[2025-10-24T01:28:11.630Z] ❌ 批次1 - OpenAI: 生成失败 - JSON解析失败: Unexpected token '`', "```json
+{
+"... is not valid JSON
+[2025-10-24T01:28:16.631Z] 🔬 生成公司数据: Google DeepMind (海外)
+[2025-10-24T01:28:35.377Z] 🚀 开始绕过API生成AI公司数据
+[2025-10-24T01:28:35.380Z] 📦 处理批次 1/14 (3 家公司)
+[2025-10-24T01:28:35.380Z] 🔬 生成公司数据: OpenAI (海外)
+[2025-10-24T01:28:35.450Z] ❌ 公司数据生成失败: OpenAI - Client network socket disconnected before secure TLS connection was established
+[2025-10-24T01:28:35.450Z] ❌ 批次1 - OpenAI: 生成失败 - Client network socket disconnected before secure TLS connection was established
+[2025-10-24T01:28:40.453Z] 🔬 生成公司数据: Google DeepMind (海外)
