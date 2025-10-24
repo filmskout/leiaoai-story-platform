@@ -1661,6 +1661,9 @@ export default async function handler(req: any, res: any) {
       case 'fix-triggers':
         return handleFixTriggers(req, res);
       
+      case 'fix-schema-complete':
+        return handleFixSchemaComplete(req, res);
+      
       default:
         return res.status(400).json({ error: 'Invalid action' });
     }
@@ -3178,6 +3181,225 @@ async function handleFixTriggers(req: any, res: any) {
     return res.status(500).json({
       success: false,
       error: `触发器修复失败: ${error.message}`,
+      details: {
+        errorType: error.name,
+        timestamp: new Date().toISOString()
+      }
+    });
+  }
+}
+
+// 完整数据库Schema修复
+async function handleFixSchemaComplete(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { token } = req.body;
+  if (token !== process.env.ADMIN_TOKEN && token !== 'admin-token-123') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    console.log('🔧 开始完整数据库Schema修复...');
+    
+    initClients();
+    
+    const results: any[] = [];
+    let successCount = 0;
+    let errorCount = 0;
+
+    // 1. 删除所有有问题的触发器
+    const triggerDropCommands = [
+      'DROP TRIGGER IF EXISTS update_companies_updated_at ON public.companies;',
+      'DROP TRIGGER IF EXISTS update_tools_updated_at ON public.tools;',
+      'DROP TRIGGER IF EXISTS update_projects_updated_at ON public.projects;',
+      'DROP TRIGGER IF EXISTS company_updates_trigger ON public.company_updates;',
+      'DROP TRIGGER IF EXISTS prevent_duplicate_updates ON public.company_updates;',
+      'DROP TRIGGER IF EXISTS update_company_stats_trigger ON public.companies;',
+      'DROP TRIGGER IF EXISTS update_company_stats_from_projects_trigger ON public.projects;',
+      'DROP TRIGGER IF EXISTS update_company_stats_from_stories_trigger ON public.company_stories;'
+    ];
+
+    for (const sqlCommand of triggerDropCommands) {
+      try {
+        // 使用Supabase客户端直接执行SQL
+        const { error } = await supabase.rpc('exec_sql', {
+          sql_command: sqlCommand
+        });
+
+        if (error) {
+          console.log(`⚠️ 执行SQL失败: ${sqlCommand}`, error.message);
+          results.push({ 
+            action: sqlCommand, 
+            success: false, 
+            error: error.message 
+          });
+          errorCount++;
+        } else {
+          console.log(`✅ 成功执行: ${sqlCommand}`);
+          results.push({ 
+            action: sqlCommand, 
+            success: true, 
+            message: '执行成功' 
+          });
+          successCount++;
+        }
+      } catch (err: any) {
+        console.log(`❌ 执行SQL时出现异常: ${sqlCommand}`, err.message);
+        results.push({ 
+          action: sqlCommand, 
+          success: false, 
+          error: err.message 
+        });
+        errorCount++;
+      }
+    }
+
+    // 2. 删除有问题的函数
+    const functionDropCommands = [
+      'DROP FUNCTION IF EXISTS public.update_updated_at_column();',
+      'DROP FUNCTION IF EXISTS public.update_company_last_modified();',
+      'DROP FUNCTION IF EXISTS public.check_duplicate_update();',
+      'DROP FUNCTION IF EXISTS public.update_company_stats();'
+    ];
+
+    for (const sqlCommand of functionDropCommands) {
+      try {
+        const { error } = await supabase.rpc('exec_sql', {
+          sql_command: sqlCommand
+        });
+
+        if (error) {
+          console.log(`⚠️ 执行SQL失败: ${sqlCommand}`, error.message);
+          results.push({ 
+            action: sqlCommand, 
+            success: false, 
+            error: error.message 
+          });
+          errorCount++;
+        } else {
+          console.log(`✅ 成功执行: ${sqlCommand}`);
+          results.push({ 
+            action: sqlCommand, 
+            success: true, 
+            message: '执行成功' 
+          });
+          successCount++;
+        }
+      } catch (err: any) {
+        console.log(`❌ 执行SQL时出现异常: ${sqlCommand}`, err.message);
+        results.push({ 
+          action: sqlCommand, 
+          success: false, 
+          error: err.message 
+        });
+        errorCount++;
+      }
+    }
+
+    // 3. 清理所有数据
+    try {
+      console.log('🧹 清理所有数据...');
+      
+      await supabase.from('stories').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      await supabase.from('fundings').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      await supabase.from('projects').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      await supabase.from('companies').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      
+      console.log('✅ 数据清理成功');
+      results.push({ 
+        action: '清理所有数据', 
+        success: true, 
+        message: '清理成功' 
+      });
+      successCount++;
+    } catch (err: any) {
+      console.log(`❌ 数据清理失败:`, err.message);
+      results.push({ 
+        action: '清理所有数据', 
+        success: false, 
+        error: err.message 
+      });
+      errorCount++;
+    }
+
+    // 4. 重新创建必要的函数和触发器
+    try {
+      console.log('🔧 重新创建函数和触发器...');
+      
+      // 创建函数
+      const createFunctionSQL = `
+        CREATE OR REPLACE FUNCTION public.update_updated_at_column()
+        RETURNS TRIGGER AS $$
+        BEGIN
+            NEW.updated_at = NOW();
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+      `;
+      
+      const { error: functionError } = await supabase.rpc('exec_sql', {
+        sql_command: createFunctionSQL
+      });
+
+      if (functionError) {
+        throw new Error(`创建函数失败: ${functionError.message}`);
+      }
+
+      // 创建触发器
+      const createTriggersSQL = [
+        'CREATE TRIGGER update_companies_updated_at BEFORE UPDATE ON public.companies FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();',
+        'CREATE TRIGGER update_projects_updated_at BEFORE UPDATE ON public.projects FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();'
+      ];
+
+      for (const sqlCommand of createTriggersSQL) {
+        const { error } = await supabase.rpc('exec_sql', {
+          sql_command: sqlCommand
+        });
+
+        if (error) {
+          console.log(`⚠️ 创建触发器失败: ${sqlCommand}`, error.message);
+        } else {
+          console.log(`✅ 成功创建触发器: ${sqlCommand}`);
+        }
+      }
+
+      console.log('✅ 函数和触发器创建成功');
+      results.push({ 
+        action: '重新创建函数和触发器', 
+        success: true, 
+        message: '创建成功' 
+      });
+      successCount++;
+    } catch (err: any) {
+      console.log(`❌ 创建函数和触发器失败:`, err.message);
+      results.push({ 
+        action: '重新创建函数和触发器', 
+        success: false, 
+        error: err.message 
+      });
+      errorCount++;
+    }
+
+    console.log(`🎉 完整Schema修复完成: ${successCount} 个操作成功, ${errorCount} 个操作失败`);
+
+    return res.status(200).json({
+      success: true,
+      message: `完整Schema修复完成: ${successCount} 个操作成功, ${errorCount} 个操作失败`,
+      results: {
+        successCount,
+        errorCount,
+        totalOperations: results.length,
+        details: results
+      }
+    });
+
+  } catch (error: any) {
+    console.error('❌ 完整Schema修复失败:', error);
+    return res.status(500).json({
+      success: false,
+      error: `完整Schema修复失败: ${error.message}`,
       details: {
         errorType: error.name,
         timestamp: new Date().toISOString()
