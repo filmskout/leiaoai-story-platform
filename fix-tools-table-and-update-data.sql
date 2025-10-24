@@ -232,28 +232,28 @@ DELETE FROM public.stories WHERE company_id IN (
 );
 
 -- 插入OpenAI的新闻故事
-INSERT INTO public.stories (company_id, title, content, source_url, published_at, created_at) 
-SELECT id, 'OpenAI发布GPT-4，AI能力再上新台阶', 'OpenAI近日发布了其最新的大型语言模型GPT-4，该模型在多个基准测试中表现优异，展现了强大的文本理解和生成能力。GPT-4不仅在传统的语言任务上有所提升，还在数学、编程、创意写作等领域展现出令人印象深刻的能力。这一发布标志着人工智能技术发展的新里程碑，为各行各业的应用提供了更强大的AI支持。', 'https://techcrunch.com/2023/03/14/openai-gpt-4-release', '2023-03-14', NOW()
+INSERT INTO public.stories (company_id, title, content, source_url, published_at, created_at, category) 
+SELECT id, 'OpenAI发布GPT-4，AI能力再上新台阶', 'OpenAI近日发布了其最新的大型语言模型GPT-4，该模型在多个基准测试中表现优异，展现了强大的文本理解和生成能力。GPT-4不仅在传统的语言任务上有所提升，还在数学、编程、创意写作等领域展现出令人印象深刻的能力。这一发布标志着人工智能技术发展的新里程碑，为各行各业的应用提供了更强大的AI支持。', 'https://techcrunch.com/2023/03/14/openai-gpt-4-release', '2023-03-14', NOW(), 'AI新闻'
 FROM public.companies WHERE name = 'OpenAI';
 
 -- 插入Google DeepMind的新闻故事
-INSERT INTO public.stories (company_id, title, content, source_url, published_at, created_at) 
-SELECT id, 'DeepMind AlphaFold突破蛋白质结构预测难题', 'Google DeepMind的AlphaFold系统在蛋白质结构预测方面取得了重大突破，成功预测了超过2亿个蛋白质的结构。这一成就对生物医学研究具有重要意义，为药物发现和疾病治疗提供了重要工具。AlphaFold的突破性进展展示了AI在科学发现中的巨大潜力，为生命科学研究开辟了新的道路。', 'https://www.nature.com/articles/d41586-021-02025-4', '2021-07-22', NOW()
+INSERT INTO public.stories (company_id, title, content, source_url, published_at, created_at, category) 
+SELECT id, 'DeepMind AlphaFold突破蛋白质结构预测难题', 'Google DeepMind的AlphaFold系统在蛋白质结构预测方面取得了重大突破，成功预测了超过2亿个蛋白质的结构。这一成就对生物医学研究具有重要意义，为药物发现和疾病治疗提供了重要工具。AlphaFold的突破性进展展示了AI在科学发现中的巨大潜力，为生命科学研究开辟了新的道路。', 'https://www.nature.com/articles/d41586-021-02025-4', '2021-07-22', NOW(), 'AI新闻'
 FROM public.companies WHERE name = 'Google DeepMind';
 
 -- 插入百度AI的新闻故事
-INSERT INTO public.stories (company_id, title, content, source_url, published_at, created_at) 
-SELECT id, '百度文心一言正式发布，中文AI助手迎来新突破', '百度正式发布了其大语言模型产品文心一言，这是国内首个对标ChatGPT的AI助手产品。文心一言基于百度自研的ERNIE技术，在中文理解和生成方面具有显著优势，能够进行自然语言对话、文本生成、知识问答等多种任务。这一发布标志着中国在AI大模型领域的重要进展，为中文AI应用提供了强有力的支持。', 'https://36kr.com/p/2171234567890', '2023-03-16', NOW()
+INSERT INTO public.stories (company_id, title, content, source_url, published_at, created_at, category) 
+SELECT id, '百度文心一言正式发布，中文AI助手迎来新突破', '百度正式发布了其大语言模型产品文心一言，这是国内首个对标ChatGPT的AI助手产品。文心一言基于百度自研的ERNIE技术，在中文理解和生成方面具有显著优势，能够进行自然语言对话、文本生成、知识问答等多种任务。这一发布标志着中国在AI大模型领域的重要进展，为中文AI应用提供了强有力的支持。', 'https://36kr.com/p/2171234567890', '2023-03-16', NOW(), 'AI新闻'
 FROM public.companies WHERE name = '百度AI';
 
 -- 插入腾讯AI的新闻故事
-INSERT INTO public.stories (company_id, title, content, source_url, published_at, created_at) 
-SELECT id, '腾讯元宝AI助手上线，AI应用再添新成员', '腾讯正式发布了其AI助手产品腾讯元宝，这是基于腾讯自研大语言模型开发的智能助手。腾讯元宝能够进行对话、写作、编程等多种任务，为用户提供智能化的服务体验。这一产品的发布进一步丰富了腾讯的AI产品矩阵，展现了腾讯在人工智能领域的持续投入和创新成果。', 'https://www.geekpark.net/news/355202', '2023-04-20', NOW()
+INSERT INTO public.stories (company_id, title, content, source_url, published_at, created_at, category) 
+SELECT id, '腾讯元宝AI助手上线，AI应用再添新成员', '腾讯正式发布了其AI助手产品腾讯元宝，这是基于腾讯自研大语言模型开发的智能助手。腾讯元宝能够进行对话、写作、编程等多种任务，为用户提供智能化的服务体验。这一产品的发布进一步丰富了腾讯的AI产品矩阵，展现了腾讯在人工智能领域的持续投入和创新成果。', 'https://www.geekpark.net/news/355202', '2023-04-20', NOW(), 'AI新闻'
 FROM public.companies WHERE name = '腾讯AI';
 
 -- 插入Anthropic的新闻故事
-INSERT INTO public.stories (company_id, title, content, source_url, published_at, created_at) 
-SELECT id, 'Anthropic获得4.5亿美元融资，AI安全研究获重要支持', '专注于AI安全研究的公司Anthropic宣布获得4.5亿美元的C轮融资，投资方包括Google、Salesforce Ventures等知名机构。这笔融资将用于进一步推进AI安全研究，开发更安全、有益的AI系统。Anthropic的Constitutional AI方法为AI安全研究提供了新的思路，其Claude产品在安全性和有用性方面获得了广泛认可。', 'https://techcrunch.com/2023/05/23/anthropic-funding', '2023-05-23', NOW()
+INSERT INTO public.stories (company_id, title, content, source_url, published_at, created_at, category) 
+SELECT id, 'Anthropic获得4.5亿美元融资，AI安全研究获重要支持', '专注于AI安全研究的公司Anthropic宣布获得4.5亿美元的C轮融资，投资方包括Google、Salesforce Ventures等知名机构。这笔融资将用于进一步推进AI安全研究，开发更安全、有益的AI系统。Anthropic的Constitutional AI方法为AI安全研究提供了新的思路，其Claude产品在安全性和有用性方面获得了广泛认可。', 'https://techcrunch.com/2023/05/23/anthropic-funding', '2023-05-23', NOW(), 'AI新闻'
 FROM public.companies WHERE name = 'Anthropic';
 
 -- 验证更新结果
