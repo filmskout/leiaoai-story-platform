@@ -60,7 +60,7 @@ import {
   getUserFavorites
 } from '@/services/tools';
 
-type Tool = {
+type Project = {
   id: string;
   name: string;
   category: string;
@@ -71,10 +71,22 @@ type Tool = {
   industry_tags: string[];
   free_tier?: boolean;
   api_available?: boolean;
-  tool_stats?: { average_rating?: number; total_ratings?: number };
-  tool_category?: string;
-  tool_subcategory?: string;
+  project_stats?: { average_rating?: number; total_ratings?: number };
+  project_category?: string;
+  project_subcategory?: string;
   focus_areas?: string[];
+  project_type?: string;
+  pricing_model?: string;
+  target_audience?: string;
+  technology_stack?: string[];
+  use_cases?: string[];
+  integrations?: string[];
+  documentation_url?: string;
+  github_url?: string;
+  demo_url?: string;
+  pricing_url?: string;
+  launch_date?: string;
+  status?: string;
 };
 
 type Company = {
@@ -89,7 +101,7 @@ type Company = {
   logo_url?: string;
   logo_base64?: string;
   valuation_usd?: number;
-  tools: Tool[];
+  projects: Project[];
   fundings: any[];
   stories: any[];
   company_type?: string;
@@ -109,14 +121,14 @@ export default function AICompaniesCatalog() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCompanyType, setSelectedCompanyType] = useState('all');
   const [selectedCompanyTier, setSelectedCompanyTier] = useState('all');
-  const [selectedToolCategory, setSelectedToolCategory] = useState('all');
+  const [selectedProjectCategory, setSelectedProjectCategory] = useState('all');
   const [sortBy, setSortBy] = useState('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
   const [userRatings, setUserRatings] = useState<Record<string, number>>({});
   const [userFavorites, setUserFavorites] = useState<Set<string>>(new Set());
-  const [storyDialog, setStoryDialog] = useState<{ open: boolean; tool?: Tool; company?: Company }>({ open: false });
+  const [storyDialog, setStoryDialog] = useState<{ open: boolean; project?: Project; company?: Company }>({ open: false });
   const [storyContent, setStoryContent] = useState('');
   const [storyTitle, setStoryTitle] = useState('');
 
@@ -169,7 +181,7 @@ export default function AICompaniesCatalog() {
 
   useEffect(() => {
     applyFilters();
-  }, [companies, searchQuery, selectedCompanyType, selectedCompanyTier, selectedToolCategory, sortBy, sortOrder]);
+  }, [companies, searchQuery, selectedCompanyType, selectedCompanyTier, selectedProjectCategory, sortBy, sortOrder]);
 
   const loadCompanies = async () => {
     try {
@@ -197,9 +209,9 @@ export default function AICompaniesCatalog() {
       // Load user ratings
       const ratings: Record<string, number> = {};
       for (const company of companies) {
-        for (const tool of company.tools) {
-          const rating = await getUserRating(tool.id, user.id);
-          if (rating) ratings[tool.id] = rating;
+        for (const project of company.projects) {
+          const rating = await getUserRating(project.id, user.id);
+          if (rating) ratings[project.id] = rating;
         }
       }
       setUserRatings(ratings);
@@ -222,9 +234,9 @@ export default function AICompaniesCatalog() {
         company.name.toLowerCase().includes(query) ||
         company.description.toLowerCase().includes(query) ||
         company.industry_tags.some(tag => tag.toLowerCase().includes(query)) ||
-        company.tools.some(tool => 
-          tool.name.toLowerCase().includes(query) ||
-          tool.description.toLowerCase().includes(query)
+        company.projects.some(project => 
+          project.name.toLowerCase().includes(query) ||
+          project.description.toLowerCase().includes(query)
         )
       );
     }
@@ -243,10 +255,10 @@ export default function AICompaniesCatalog() {
       );
     }
 
-    // Tool category filter
-    if (selectedToolCategory !== 'all') {
+    // Project category filter
+    if (selectedProjectCategory !== 'all') {
       filtered = filtered.filter(company => 
-        company.tools.some(tool => tool.tool_category === selectedToolCategory)
+        company.projects.some(project => project.project_category === selectedProjectCategory)
       );
     }
 
@@ -264,17 +276,17 @@ export default function AICompaniesCatalog() {
           aValue = tierOrder[a.company_tier as keyof typeof tierOrder] || 5;
           bValue = tierOrder[b.company_tier as keyof typeof tierOrder] || 5;
           break;
-        case 'tools_count':
-          aValue = a.tools.length;
-          bValue = b.tools.length;
+        case 'projects_count':
+          aValue = a.projects.length;
+          bValue = b.projects.length;
           break;
         case 'valuation':
           aValue = a.valuation_usd || 0;
           bValue = b.valuation_usd || 0;
           break;
         case 'rating':
-          aValue = a.tools.reduce((sum, tool) => sum + (tool.tool_stats?.average_rating || 0), 0) / a.tools.length || 0;
-          bValue = b.tools.reduce((sum, tool) => sum + (tool.tool_stats?.average_rating || 0), 0) / b.tools.length || 0;
+          aValue = a.projects.reduce((sum, project) => sum + (project.project_stats?.average_rating || 0), 0) / a.projects.length || 0;
+          bValue = b.projects.reduce((sum, project) => sum + (project.project_stats?.average_rating || 0), 0) / b.projects.length || 0;
           break;
         case 'founded_year':
           aValue = a.founded_year || 0;
@@ -698,7 +710,7 @@ export default function AICompaniesCatalog() {
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div className="flex items-center gap-2">
                         <Wrench className="w-4 h-4 text-muted-foreground" />
-                        <span>{company.tools.length} tools</span>
+                        <span>{company.projects.length} projects</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <DollarSign className="w-4 h-4 text-muted-foreground" />
@@ -729,16 +741,16 @@ export default function AICompaniesCatalog() {
                     <div className="space-y-2">
                       <h4 className="text-sm font-medium flex items-center gap-2">
                         <Wrench className="w-4 h-4" />
-                        Key Tools
+                        Key Projects
                       </h4>
                       <div className="space-y-2">
                         {company.projects.slice(0, 2).map((project) => (
                           <div key={project.id} className="flex items-center justify-between p-2 bg-muted/50 rounded-lg">
                             <div className="flex items-center gap-2 min-w-0 flex-1">
                               <div className="w-6 h-6 rounded bg-background flex items-center justify-center">
-                                {project.url ? (
+                                {project.logo_url ? (
                                   <img
-                                    src={project.url}
+                                    src={project.logo_url}
                                     alt={project.name}
                                     className="w-full h-full object-contain"
                                   />
@@ -748,31 +760,31 @@ export default function AICompaniesCatalog() {
                               </div>
                               <div className="min-w-0 flex-1">
                                 <span className="text-sm font-medium truncate block">{project.name}</span>
-                                {project.category && (
-                                  <span className="text-xs text-muted-foreground truncate block">{project.category}</span>
+                                {project.project_category && (
+                                  <span className="text-xs text-muted-foreground truncate block">{project.project_category}</span>
                                 )}
                               </div>
                             </div>
                             <div className="flex items-center gap-1">
-                              {renderStars(tool.tool_stats?.average_rating || 0, tool.id, true)}
+                              {renderStars(project.project_stats?.average_rating || 0, project.id, true)}
                               <Button
                                 size="sm"
                                 variant="ghost"
-                                onClick={() => handleFavorite(tool.id)}
+                                onClick={() => handleFavorite(project.id)}
                                 className="hover:bg-muted/50 p-1 sm:p-2"
                               >
                                 <Heart 
                                   className={`w-3 h-3 sm:w-4 sm:h-4 ${
-                                    userFavorites.has(tool.id) 
+                                    userFavorites.has(project.id) 
                                       ? 'text-red-500 fill-red-500' 
                                       : 'text-muted-foreground hover:text-red-500'
-                                  }`} 
+                                  }`}
                                 />
                               </Button>
                               <Button
                                 size="sm"
                                 variant="ghost"
-                                onClick={() => openStoryDialog(tool, company)}
+                                onClick={() => openStoryDialog(project, company)}
                                 className="hover:bg-muted/50 p-1 sm:p-2"
                               >
                                 <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -780,9 +792,9 @@ export default function AICompaniesCatalog() {
                             </div>
                           </div>
                         ))}
-                        {company.tools.length > 2 && (
+                        {company.projects.length > 2 && (
                           <p className="text-xs text-muted-foreground text-center">
-                            +{company.tools.length - 2} more tools
+                            +{company.projects.length - 2} more projects
                           </p>
                         )}
                       </div>
@@ -838,7 +850,7 @@ export default function AICompaniesCatalog() {
                               </div>
                               <div className="flex items-center gap-1">
                                 <Wrench className="w-4 h-4" />
-                                <span>{company.tools.length} tools</span>
+                                <span>{company.projects.length} projects</span>
                               </div>
                               <div className="flex items-center gap-1">
                                 <DollarSign className="w-4 h-4" />
