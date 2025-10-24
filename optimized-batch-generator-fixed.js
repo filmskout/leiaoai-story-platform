@@ -1,8 +1,12 @@
-// 优化的批量数据生成脚本
+// 优化的批量数据生成脚本 - 修复版本
 // 多模型协作，token优化，批量处理
 
 import https from 'https';
 import fs from 'fs';
+import dotenv from 'dotenv';
+
+// 加载环境变量
+dotenv.config();
 
 // 环境变量配置
 const SUPABASE_URL = process.env.SUPABASE_URL;
@@ -10,6 +14,18 @@ const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const QWEN_API_KEY = process.env.QWEN_API_KEY;
+
+// 检查环境变量
+console.log('🔍 检查环境变量配置...');
+console.log(`DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY ? '✅ 已配置' : '❌ 未配置'}`);
+console.log(`OPENAI_API_KEY: ${OPENAI_API_KEY ? '✅ 已配置' : '❌ 未配置'}`);
+console.log(`SUPABASE_URL: ${SUPABASE_URL ? '✅ 已配置' : '❌ 未配置'}`);
+console.log(`SUPABASE_SERVICE_KEY: ${SUPABASE_SERVICE_KEY ? '✅ 已配置' : '❌ 未配置'}`);
+
+if (!DEEPSEEK_API_KEY || !OPENAI_API_KEY || !SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
+  console.error('❌ 环境变量配置不完整，请检查 .env 文件');
+  process.exit(1);
+}
 
 // 公司分类和优先级
 const COMPANY_TIERS = {
@@ -37,16 +53,16 @@ const COMPANY_TIERS = {
     'Slack', 'Discord', 'Zoom', 'Teams', 'Google Workspace',
     'Microsoft 365', 'Dropbox', 'Box', 'OneDrive', 'iCloud',
     'GitHub', 'GitLab', 'Bitbucket', 'Jira', 'Confluence',
-    'Linear', 'Notion', 'Obsidian', 'Roam Research', 'LogSeq',
-    'Craft', 'Bear', 'Ulysses', 'Scrivener', 'Final Draft',
-    'Procreate', 'Sketch', 'Adobe Creative Suite', 'Figma', 'Canva'
+    'Linear', 'Obsidian', 'Roam Research', 'LogSeq', 'Craft',
+    'Bear', 'Ulysses', 'Scrivener', 'Final Draft', 'Procreate',
+    'Sketch', 'Adobe Creative Suite'
   ],
   'Tier 4 - AI应用公司': [
-    'Grammarly', 'Hemingway', 'ProWritingAid', 'Ginger', 'LanguageTool',
-    'DeepL', 'Google Translate', 'Microsoft Translator', 'Amazon Translate',
+    'Hemingway', 'ProWritingAid', 'Ginger', 'LanguageTool',
+    'Google Translate', 'Microsoft Translator', 'Amazon Translate',
     'Reverso', 'Linguee', 'PONS', 'Collins', 'Oxford', 'Cambridge',
-    'Duolingo', 'Babbel', 'Rosetta Stone', 'Busuu', 'Memrise',
-    'Anki', 'Quizlet', 'Kahoot', 'Mentimeter', 'Poll Everywhere',
+    'Duolingo', 'Rosetta Stone', 'Busuu', 'Memrise', 'Anki',
+    'Quizlet', 'Kahoot', 'Mentimeter', 'Poll Everywhere',
     'Typeform', 'SurveyMonkey', 'Google Forms', 'Microsoft Forms', 'JotForm',
     'Calendly', 'Acuity Scheduling', 'When2meet', 'Doodle', 'WhenIsGood',
     'Buffer', 'Hootsuite', 'Sprout Social', 'Later', 'Planoly'
@@ -123,6 +139,9 @@ async function callDeepSeek(prompt, maxTokens = 4000) {
 
   try {
     const response = await callAPI(url, options);
+    if (!response.choices || !response.choices[0] || !response.choices[0].message) {
+      throw new Error('DeepSeek API响应格式错误');
+    }
     return response.choices[0].message.content;
   } catch (error) {
     console.error('DeepSeek API调用失败:', error.message);
@@ -159,6 +178,9 @@ async function callOpenAI(prompt, maxTokens = 4000) {
 
   try {
     const response = await callAPI(url, options);
+    if (!response.choices || !response.choices[0] || !response.choices[0].message) {
+      throw new Error('OpenAI API响应格式错误');
+    }
     return response.choices[0].message.content;
   } catch (error) {
     console.error('OpenAI API调用失败:', error.message);
@@ -509,7 +531,7 @@ async function generateCompanyData(companyName, tier) {
 async function batchGenerateData() {
   console.log('🚀 开始批量生成AI公司数据');
   console.log('📊 目标: 200+家AI公司');
-  console.log('🔬 方法: 多模型协作 (DeepSeek -> OpenAI -> Qwen)');
+  console.log('🔬 方法: 多模型协作 (DeepSeek -> OpenAI)');
   console.log('⏰ 开始时间:', new Date().toLocaleString());
   console.log('');
   
