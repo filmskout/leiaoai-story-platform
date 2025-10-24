@@ -42,11 +42,11 @@ BEGIN
             updated_at timestamptz DEFAULT now()
         );
         
-        -- 创建project_ratings表
+        -- 创建project_ratings表（先不添加外键约束）
         CREATE TABLE public.project_ratings (
             id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-            project_id uuid REFERENCES public.projects(id) ON DELETE CASCADE,
-            user_id uuid REFERENCES public.users(id) ON DELETE CASCADE,
+            project_id uuid,
+            user_id uuid,
             rating integer CHECK (rating >= 1 AND rating <= 5),
             review_text text,
             created_at timestamptz DEFAULT now(),
@@ -54,10 +54,10 @@ BEGIN
             UNIQUE(project_id, user_id)
         );
         
-        -- 创建project_stats表
+        -- 创建project_stats表（先不添加外键约束）
         CREATE TABLE public.project_stats (
             id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-            project_id uuid REFERENCES public.projects(id) ON DELETE CASCADE,
+            project_id uuid,
             total_ratings integer DEFAULT 0,
             average_rating numeric(3,2) DEFAULT 0,
             total_views integer DEFAULT 0,
@@ -65,18 +65,18 @@ BEGIN
             updated_at timestamptz DEFAULT now()
         );
         
-        -- 创建project_stories表
+        -- 创建project_stories表（先不添加外键约束）
         CREATE TABLE public.project_stories (
             id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-            project_id uuid REFERENCES public.projects(id) ON DELETE CASCADE,
-            story_id uuid REFERENCES public.stories(id) ON DELETE CASCADE,
+            project_id uuid,
+            story_id uuid,
             created_at timestamptz DEFAULT now()
         );
         
-        -- 创建project_versions表
+        -- 创建project_versions表（先不添加外键约束）
         CREATE TABLE public.project_versions (
             id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-            project_id uuid REFERENCES public.projects(id) ON DELETE CASCADE,
+            project_id uuid,
             version_number text NOT NULL,
             release_notes text,
             release_date date,
@@ -161,7 +161,58 @@ BEGIN
 END $$;
 
 -- ============================================
--- 步骤4：创建索引
+-- 步骤4：添加外键约束
+-- ============================================
+
+DO $$ 
+BEGIN
+    -- 为project_ratings添加外键约束
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'project_ratings') THEN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'project_ratings_project_id_fkey' AND table_name = 'project_ratings') THEN
+            ALTER TABLE public.project_ratings ADD CONSTRAINT project_ratings_project_id_fkey 
+                FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+        END IF;
+        
+        IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'project_ratings_user_id_fkey' AND table_name = 'project_ratings') THEN
+            ALTER TABLE public.project_ratings ADD CONSTRAINT project_ratings_user_id_fkey 
+                FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+        END IF;
+    END IF;
+    
+    -- 为project_stats添加外键约束
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'project_stats') THEN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'project_stats_project_id_fkey' AND table_name = 'project_stats') THEN
+            ALTER TABLE public.project_stats ADD CONSTRAINT project_stats_project_id_fkey 
+                FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+        END IF;
+    END IF;
+    
+    -- 为project_stories添加外键约束
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'project_stories') THEN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'project_stories_project_id_fkey' AND table_name = 'project_stories') THEN
+            ALTER TABLE public.project_stories ADD CONSTRAINT project_stories_project_id_fkey 
+                FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+        END IF;
+        
+        IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'project_stories_story_id_fkey' AND table_name = 'project_stories') THEN
+            ALTER TABLE public.project_stories ADD CONSTRAINT project_stories_story_id_fkey 
+                FOREIGN KEY (story_id) REFERENCES public.stories(id) ON DELETE CASCADE;
+        END IF;
+    END IF;
+    
+    -- 为project_versions添加外键约束
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'project_versions') THEN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'project_versions_project_id_fkey' AND table_name = 'project_versions') THEN
+            ALTER TABLE public.project_versions ADD CONSTRAINT project_versions_project_id_fkey 
+                FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+        END IF;
+    END IF;
+    
+    RAISE NOTICE 'Successfully added foreign key constraints';
+END $$;
+
+-- ============================================
+-- 步骤5：创建索引
 -- ============================================
 
 -- 删除可能存在的旧索引
@@ -178,7 +229,7 @@ CREATE INDEX IF NOT EXISTS idx_user_favorites_project ON public.user_favorites(p
 CREATE INDEX IF NOT EXISTS idx_company_stats_company ON public.company_stats(company_id);
 
 -- ============================================
--- 步骤5：设置RLS策略
+-- 步骤6：设置RLS策略
 -- ============================================
 
 -- 为新表启用RLS
@@ -201,7 +252,7 @@ CREATE POLICY project_stories_read_all ON public.project_stories FOR SELECT USIN
 CREATE POLICY project_versions_read_all ON public.project_versions FOR SELECT USING (true);
 
 -- ============================================
--- 步骤6：验证结果
+-- 步骤7：验证结果
 -- ============================================
 
 -- 检查表是否存在
