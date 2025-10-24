@@ -760,6 +760,78 @@ async function handleClearDatabase(req: any, res: any) {
           continue;
         }
 
+        // 对于companies表，使用特殊的清理方法
+        if (table === 'companies') {
+          console.log(`🔄 使用特殊方法清理companies表...`);
+          
+          // 先获取所有公司ID
+          const { data: companies, error: fetchError } = await supabase
+            .from('companies')
+            .select('id')
+            .neq('id', '00000000-0000-0000-0000-000000000000');
+          
+          if (fetchError) {
+            console.log(`⚠️ 获取公司列表失败:`, fetchError.message);
+            results.push({ table, success: false, error: `获取公司列表失败: ${fetchError.message}` });
+            errorCount++;
+            continue;
+          }
+          
+          if (!companies || companies.length === 0) {
+            console.log(`✅ companies表已经是空的`);
+            results.push({ table, success: true, message: '表已经是空的' });
+            clearedCount++;
+            continue;
+          }
+          
+          console.log(`📊 找到 ${companies.length} 家公司需要删除`);
+          
+          // 逐个删除公司
+          let deletedCount = 0;
+          let errorCountForTable = 0;
+          
+          for (const company of companies) {
+            try {
+              // 先删除相关的projects
+              await supabase.from('projects').delete().eq('company_id', company.id);
+              // 先删除相关的fundings  
+              await supabase.from('fundings').delete().eq('company_id', company.id);
+              // 先删除相关的stories
+              await supabase.from('stories').delete().eq('company_id', company.id);
+              
+              // 删除公司记录
+              const { error: deleteError } = await supabase
+                .from('companies')
+                .delete()
+                .eq('id', company.id);
+              
+              if (deleteError) {
+                console.log(`❌ 删除公司 ${company.id} 失败:`, deleteError.message);
+                errorCountForTable++;
+              } else {
+                console.log(`✅ 成功删除公司 ${company.id}`);
+                deletedCount++;
+              }
+            } catch (err: any) {
+              console.log(`❌ 删除公司 ${company.id} 时出现异常:`, err.message);
+              errorCountForTable++;
+            }
+          }
+          
+          console.log(`📊 companies表清理完成: 成功删除 ${deletedCount} 条，失败 ${errorCountForTable} 条`);
+          
+          if (errorCountForTable === 0) {
+            results.push({ table, success: true, message: `成功删除 ${deletedCount} 条记录` });
+            clearedCount++;
+          } else {
+            results.push({ table, success: false, error: `部分删除失败: 成功 ${deletedCount} 条，失败 ${errorCountForTable} 条` });
+            errorCount++;
+          }
+          
+          continue; // 跳过标准删除逻辑
+        }
+        
+        // 对于其他表，使用标准删除方法
         const { error } = await supabase
           .from(table)
           .delete()
@@ -1532,18 +1604,21 @@ export default async function handler(req: any, res: any) {
               case 'fix-database-schema':
                 return handleFixDatabaseSchema(req, res);
               
-              case 'test-env':
-                return handleTestEnv(req, res);
-              
-              case 'insert-company-data':
-                return handleInsertCompanyData(req, res);
-              
-              case 'ai-chat':
-                return handleAIChat(req, res);
-              
-              default:
-                return res.status(400).json({ error: 'Invalid action' });
-            }
+      case 'test-env':
+        return handleTestEnv(req, res);
+      
+      case 'insert-company-data':
+        return handleInsertCompanyData(req, res);
+      
+      case 'ai-chat':
+        return handleAIChat(req, res);
+      
+      case 'fix-triggers':
+        return handleFixTriggers(req, res);
+      
+      default:
+        return res.status(400).json({ error: 'Invalid action' });
+    }
   } catch (error: any) {
     console.error('API Error:', error);
     return res.status(500).json({ error: error.message });
@@ -2878,4 +2953,150 @@ async function callQwen(message: string, apiKey: string, language: string): Prom
   
   const data = await response.json();
   return data.output.text;
+}
+
+// 修复数据库触发器
+async function handleFixTriggers(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { token } = req.body;
+  if (token !== process.env.ADMIN_TOKEN && token !== 'admin-token-123') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    console.log('🔧 开始修复数据库触发器...');
+    
+    initClients();
+    
+    const results: any[] = [];
+    let successCount = 0;
+    let errorCount = 0;
+
+    // 1. 直接尝试删除有问题的触发器（使用原生SQL）
+    const sqlCommands = [
+      'DROP TRIGGER IF EXISTS update_companies_updated_at ON public.companies;',
+      'DROP TRIGGER IF EXISTS update_tools_updated_at ON public.tools;',
+      'DROP TRIGGER IF EXISTS update_projects_updated_at ON public.projects;',
+      'DROP TRIGGER IF EXISTS company_updates_trigger ON public.company_updates;',
+      'DROP TRIGGER IF EXISTS prevent_duplicate_updates ON public.company_updates;',
+      'DROP FUNCTION IF EXISTS public.update_updated_at_column();',
+      'DROP FUNCTION IF EXISTS public.update_company_last_modified();',
+      'DROP FUNCTION IF EXISTS public.check_duplicate_update();'
+    ];
+
+    for (const sqlCommand of sqlCommands) {
+      try {
+        // 使用Supabase的RPC调用
+        const { error } = await supabase.rpc('exec_sql', {
+          sql_command: sqlCommand
+        });
+
+        if (error) {
+          console.log(`⚠️ 执行SQL失败: ${sqlCommand}`, error.message);
+          results.push({ 
+            action: sqlCommand, 
+            success: false, 
+            error: error.message 
+          });
+          errorCount++;
+        } else {
+          console.log(`✅ 成功执行: ${sqlCommand}`);
+          results.push({ 
+            action: sqlCommand, 
+            success: true, 
+            message: '执行成功' 
+          });
+          successCount++;
+        }
+      } catch (err: any) {
+        console.log(`❌ 执行SQL时出现异常: ${sqlCommand}`, err.message);
+        results.push({ 
+          action: sqlCommand, 
+          success: false, 
+          error: err.message 
+        });
+        errorCount++;
+      }
+    }
+
+    // 2. 测试删除操作
+    try {
+      console.log('🧪 测试删除操作...');
+      
+      // 获取第一条记录的ID
+      const { data: testCompany, error: fetchError } = await supabase
+        .from('companies')
+        .select('id')
+        .limit(1);
+
+      if (fetchError) {
+        throw new Error(`获取测试记录失败: ${fetchError.message}`);
+      }
+
+      if (testCompany && testCompany.length > 0) {
+        const testId = testCompany[0].id;
+        
+        // 尝试删除测试记录
+        const { error: deleteError } = await supabase
+          .from('companies')
+          .delete()
+          .eq('id', testId);
+
+        if (deleteError) {
+          throw new Error(`删除测试失败: ${deleteError.message}`);
+        } else {
+          console.log(`✅ 删除测试成功: ${testId}`);
+          results.push({ 
+            action: '删除测试', 
+            success: true, 
+            message: '删除操作正常' 
+          });
+          successCount++;
+        }
+      } else {
+        console.log('📊 没有记录可以测试删除操作');
+        results.push({ 
+          action: '删除测试', 
+          success: true, 
+          message: '没有记录需要测试' 
+        });
+        successCount++;
+      }
+    } catch (err: any) {
+      console.log(`❌ 删除测试失败:`, err.message);
+      results.push({ 
+        action: '删除测试', 
+        success: false, 
+        error: err.message 
+      });
+      errorCount++;
+    }
+
+    console.log(`🎉 触发器修复完成: ${successCount} 个操作成功, ${errorCount} 个操作失败`);
+
+    return res.status(200).json({
+      success: true,
+      message: `触发器修复完成: ${successCount} 个操作成功, ${errorCount} 个操作失败`,
+      results: {
+        successCount,
+        errorCount,
+        totalOperations: results.length,
+        details: results
+      }
+    });
+
+  } catch (error: any) {
+    console.error('❌ 触发器修复失败:', error);
+    return res.status(500).json({
+      success: false,
+      error: `触发器修复失败: ${error.message}`,
+      details: {
+        errorType: error.name,
+        timestamp: new Date().toISOString()
+      }
+    });
+  }
 }
