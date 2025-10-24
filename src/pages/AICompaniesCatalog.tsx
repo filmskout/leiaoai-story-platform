@@ -54,7 +54,7 @@ import {
   getCompanyStories,
   searchAICompanies,
   searchTools,
-  getToolsByCategory,
+  getProjectsByCategory,
   getTopRatedTools,
   getLatestTools,
   getUserFavorites
@@ -949,7 +949,7 @@ export default function AICompaniesCatalog() {
                 setSearchQuery('');
                 setSelectedCompanyType('all');
                 setSelectedCompanyTier('all');
-                setSelectedToolCategory('all');
+                setSelectedProjectCategory('all');
                 setSortBy('name');
                 setSortOrder('asc');
               }}
