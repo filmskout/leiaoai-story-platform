@@ -31,16 +31,16 @@ export async function getCompanyDetails(companyId: string) {
   return data;
 }
 
-// 获取单个工具的详细信息
+// 获取单个项目的详细信息
 export async function getToolDetails(toolId: string) {
   const { data, error } = await supabase
-    .from('tools')
+    .from('projects')
     .select(`
       *,
       company:companies(*),
-      tool_stats:tool_stats(*),
-      tool_ratings:tool_ratings(*, user_id),
-      tool_stories:tool_stories(story:stories(*))
+      project_stats:project_stats(*),
+      project_ratings:project_ratings(*, user_id),
+      project_stories:project_stories(story:stories(*))
     `)
     .eq('id', toolId)
     .single();
@@ -51,10 +51,10 @@ export async function getToolDetails(toolId: string) {
 // 用户评分相关功能
 export async function getUserRating(userId: string, toolId: string) {
   const { data, error } = await supabase
-    .from('tool_ratings')
+    .from('project_ratings')
     .select('*')
     .eq('user_id', userId)
-    .eq('tool_id', toolId)
+    .eq('project_id', toolId)
     .maybeSingle();
   if (error) throw error;
   return data;
@@ -62,10 +62,10 @@ export async function getUserRating(userId: string, toolId: string) {
 
 export async function submitRating(userId: string, toolId: string, rating: number, reviewText?: string) {
   const { data, error } = await supabase
-    .from('tool_ratings')
+    .from('project_ratings')
     .upsert({
       user_id: userId,
-      tool_id: toolId,
+      project_id: toolId,
       rating,
       review_text: reviewText
     })
@@ -81,7 +81,7 @@ export async function getUserFavorites(userId: string) {
     .from('user_favorites')
     .select(`
       *,
-      tool:tools(*, company:companies(*), tool_stats:tool_stats(*))
+      project:projects(*, company:companies(*), project_stats:project_stats(*))
     `)
     .eq('user_id', userId)
     .order('created_at', { ascending: false });
@@ -94,7 +94,7 @@ export async function addToFavorites(userId: string, toolId: string) {
     .from('user_favorites')
     .insert({
       user_id: userId,
-      tool_id: toolId
+      project_id: toolId
     })
     .select()
     .single();
@@ -107,7 +107,7 @@ export async function removeFromFavorites(userId: string, toolId: string) {
     .from('user_favorites')
     .delete()
     .eq('user_id', userId)
-    .eq('tool_id', toolId);
+    .eq('project_id', toolId);
   if (error) throw error;
 }
 
@@ -116,7 +116,7 @@ export async function isFavorite(userId: string, toolId: string) {
     .from('user_favorites')
     .select('id')
     .eq('user_id', userId)
-    .eq('tool_id', toolId)
+    .eq('project_id', toolId)
     .maybeSingle();
   if (error) throw error;
   return !!data;
@@ -125,10 +125,10 @@ export async function isFavorite(userId: string, toolId: string) {
 // 故事关联功能
 export async function linkStoryToTool(storyId: string, toolId: string) {
   const { data, error } = await supabase
-    .from('tool_stories')
+    .from('project_stories')
     .insert({
       story_id: storyId,
-      tool_id: toolId
+      project_id: toolId
     })
     .select()
     .single();
@@ -149,15 +149,15 @@ export async function linkStoryToCompany(storyId: string, companyId: string) {
   return data;
 }
 
-// 获取工具的故事
+// 获取项目的故事
 export async function getToolStories(toolId: string) {
   const { data, error } = await supabase
-    .from('tool_stories')
+    .from('project_stories')
     .select(`
       *,
       story:stories(*)
     `)
-    .eq('tool_id', toolId)
+    .eq('project_id', toolId)
     .order('created_at', { ascending: false });
   if (error) throw error;
   return data;
