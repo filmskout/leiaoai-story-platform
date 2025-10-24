@@ -8,8 +8,8 @@ AND trigger_name LIKE '%company%' OR trigger_name LIKE '%tool%' OR trigger_name 
 
 -- 删除旧的触发器
 DROP TRIGGER IF EXISTS update_company_stats_trigger ON companies;
-DROP TRIGGER IF EXISTS update_company_stats_trigger ON tools;
-DROP TRIGGER IF EXISTS update_company_stats_trigger ON projects;
+DROP TRIGGER IF EXISTS update_company_stats_from_projects_trigger ON projects;
+DROP TRIGGER IF EXISTS update_company_stats_from_stories_trigger ON company_stories;
 
 -- 删除旧的函数
 DROP FUNCTION IF EXISTS update_company_stats();
