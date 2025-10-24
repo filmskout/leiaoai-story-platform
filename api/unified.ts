@@ -3460,7 +3460,7 @@ async function handleGenerateRealData(req: any, res: any) {
     
     let successCount = 0;
     let errorCount = 0;
-    const results = [];
+    const results: any[] = [];
     
     for (let i = 0; i < companies.length; i++) {
       const companyName = companies[i];
