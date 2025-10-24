@@ -99,12 +99,12 @@ export default function CreateStory() {
   ];
 
   const categories = [
-    { value: 'ai_tools', label: t('story.category.ai_tools', 'AI Tools Experience') },
+    { value: 'ai_projects', label: t('story.category.ai_projects', 'AI Projects Experience') },
     { value: 'startup_interview', label: t('story.category.startup_interview', 'Startup Interview') },
     { value: 'investment_outlook', label: t('story.category.investment_outlook', 'Investment Outlook') },
     { value: 'finance_ai', label: t('story.category.finance_ai', 'Financial AI Applications') },
     { value: 'video_generation', label: t('story.category.video_generation', 'Video Generation Experience') },
-    { value: 'domestic_ai', label: t('story.category.domestic_ai', 'Domestic AI Tools') },
+    { value: 'domestic_ai', label: t('story.category.domestic_ai', 'Domestic AI Projects') },
     { value: 'overseas_ai', label: t('story.category.overseas_ai', 'Overseas AI Platforms') }
   ];
 

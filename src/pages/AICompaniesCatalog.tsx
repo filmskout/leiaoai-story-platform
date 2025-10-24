@@ -307,15 +307,15 @@ export default function AICompaniesCatalog() {
     setFilteredCompanies(filtered);
   };
 
-  const handleRating = async (toolId: string, rating: number) => {
+  const handleRating = async (projectId: string, rating: number) => {
     if (!isAuthenticated || !user) {
       navigate('/auth');
       return;
     }
 
     try {
-      await submitRating(toolId, rating, user.id);
-      setUserRatings(prev => ({ ...prev, [toolId]: rating }));
+      await submitRating(projectId, rating, user.id);
+      setUserRatings(prev => ({ ...prev, [projectId]: rating }));
       
       // Reload companies to get updated ratings
       loadCompanies();
@@ -324,40 +324,40 @@ export default function AICompaniesCatalog() {
     }
   };
 
-  const handleFavorite = async (toolId: string) => {
+  const handleFavorite = async (projectId: string) => {
     if (!isAuthenticated || !user) {
       navigate('/auth');
       return;
     }
 
     try {
-      const isFav = userFavorites.has(toolId);
+      const isFav = userFavorites.has(projectId);
       if (isFav) {
-        await removeFromFavorites(toolId, user.id);
+        await removeFromFavorites(projectId, user.id);
         setUserFavorites(prev => {
           const newSet = new Set(prev);
-          newSet.delete(toolId);
+          newSet.delete(projectId);
           return newSet;
         });
       } else {
-        await addToFavorites(toolId, user.id);
-        setUserFavorites(prev => new Set(prev).add(toolId));
+        await addToFavorites(projectId, user.id);
+        setUserFavorites(prev => new Set(prev).add(projectId));
       }
     } catch (error) {
       console.error('Error updating favorite:', error);
     }
   };
 
-  const openStoryDialog = (tool: Tool, company: Company) => {
+  const openStoryDialog = (project: Project, company: Company) => {
     if (!isAuthenticated) {
       navigate('/auth');
       return;
     }
-    setStoryDialog({ open: true, tool, company });
+    setStoryDialog({ open: true, project, company });
   };
 
   const submitStory = async () => {
-    if (!storyDialog.tool || !storyDialog.company || !storyTitle.trim() || !storyContent.trim()) {
+    if (!storyDialog.project || !storyDialog.company || !storyTitle.trim() || !storyContent.trim()) {
       return;
     }
 
@@ -365,9 +365,9 @@ export default function AICompaniesCatalog() {
       const storyData = {
         title: storyTitle,
         content: storyContent,
-        tags: [storyDialog.company.name, storyDialog.tool.name, ...storyDialog.tool.industry_tags]
+        tags: [storyDialog.company.name, storyDialog.project.name, ...storyDialog.project.industry_tags]
       };
-      await linkStoryToTool(storyDialog.tool.id, JSON.stringify(storyData));
+      await linkStoryToTool(storyDialog.project.id, JSON.stringify(storyData));
       
       setStoryDialog({ open: false });
       setStoryTitle('');
@@ -377,8 +377,8 @@ export default function AICompaniesCatalog() {
     }
   };
 
-  const renderStars = (rating: number, toolId: string, interactive: boolean = false) => {
-    const userRating = userRatings[toolId] || 0;
+  const renderStars = (rating: number, projectId: string, interactive: boolean = false) => {
+    const userRating = userRatings[projectId] || 0;
     const displayRating = userRating || rating;
     
     return (
@@ -391,7 +391,7 @@ export default function AICompaniesCatalog() {
                 ? 'text-yellow-500 fill-yellow-500' 
                 : 'text-muted-foreground/40'
             } ${interactive ? 'cursor-pointer hover:text-yellow-400 transition-colors' : ''}`}
-            onClick={interactive ? () => handleRating(toolId, star) : undefined}
+            onClick={interactive ? () => handleRating(projectId, star) : undefined}
           />
         ))}
         <span className="text-xs sm:text-sm text-muted-foreground ml-0.5 sm:ml-1">
@@ -962,7 +962,7 @@ export default function AICompaniesCatalog() {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>
-              Create Story for {storyDialog.tool?.name}
+              Create Story for {storyDialog.project?.name}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">

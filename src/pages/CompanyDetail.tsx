@@ -14,7 +14,7 @@ import {
   submitRating,
 } from '@/services/tools';
 
-type Tool = {
+type Project = {
   id: string;
   name: string;
   category: string;
@@ -22,7 +22,7 @@ type Tool = {
   website?: string;
   logo_url?: string;
   industry_tags?: string[];
-  tool_stats?: { average_rating?: number; total_ratings?: number };
+  project_stats?: { average_rating?: number; total_ratings?: number };
 };
 
 type Funding = {
@@ -44,7 +44,7 @@ type Company = {
   industry_tags: string[];
   headquarters?: string;
   social_links?: Record<string, string>;
-  tools: Tool[];
+  projects: Project[];
   fundings: Funding[];
   company_stats?: { total_tools?: number; average_tool_rating?: number };
 };
@@ -75,9 +75,9 @@ export default function CompanyDetail() {
   }, [id]);
 
   const avgRating = useMemo(() => {
-    if (!company || !company.tools?.length) return 0;
-    const sum = company.tools.reduce((acc, t) => acc + (t.tool_stats?.average_rating || 0), 0);
-    return +(sum / company.tools.length).toFixed(1);
+    if (!company || !company.projects?.length) return 0;
+    const sum = company.projects.reduce((acc, t) => acc + (t.project_stats?.average_rating || 0), 0);
+    return +(sum / company.projects.length).toFixed(1);
   }, [company]);
 
   return (
@@ -164,14 +164,14 @@ export default function CompanyDetail() {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {company.tools.map((tool) => (
-                      <Card key={tool.id} className="border border-border/30 hover:border-border dark:hover:border-border/50 transition-colors">
+                    {company.projects.map((project) => (
+                      <Card key={project.id} className="border border-border/30 hover:border-border dark:hover:border-border/50 transition-colors">
                         <CardHeader className="pb-2">
                           <CardTitle className="text-base flex items-center justify-between">
-                            <span className="truncate">{tool.name}</span>
-                            {tool.website && (
+                            <span className="truncate">{project.name}</span>
+                            {project.website && (
                               <Button variant="ghost" size="sm" asChild>
-                                <a href={tool.website} target="_blank" rel="noopener noreferrer">
+                                <a href={project.website} target="_blank" rel="noopener noreferrer">
                                   <ExternalLink className="w-4 h-4" />
                                 </a>
                               </Button>
@@ -179,16 +179,16 @@ export default function CompanyDetail() {
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="pt-0">
-                          <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{tool.description}</p>
+                          <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{project.description}</p>
                           <div className="flex flex-wrap gap-1 mb-3">
-                            <Badge variant="outline" className="text-xs">{tool.category}</Badge>
-                            {tool.industry_tags?.slice(0,3).map((t) => (
+                            <Badge variant="outline" className="text-xs">{project.category}</Badge>
+                            {project.industry_tags?.slice(0,3).map((t) => (
                               <Badge key={t} variant="secondary" className="text-xs">{t}</Badge>
                             ))}
                           </div>
                           <div className="flex items-center gap-2 text-xs text-muted-foreground">
                             <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-                            <span>{tool.tool_stats?.average_rating?.toFixed(1) ?? '0.0'} ({tool.tool_stats?.total_ratings ?? 0})</span>
+                            <span>{project.project_stats?.average_rating?.toFixed(1) ?? '0.0'} ({project.project_stats?.total_ratings ?? 0})</span>
                           </div>
                         </CardContent>
                       </Card>
