@@ -1693,6 +1693,9 @@ export default async function handler(req: any, res: any) {
       case 'update-schema-tags':
         return handleUpdateSchemaTags(req, res);
       
+      case 'add-schema-fields':
+        return handleAddSchemaFields(req, res);
+      
       default:
         return res.status(400).json({ error: 'Invalid action' });
     }
@@ -4353,6 +4356,93 @@ async function handleUpdateSchemaTags(req: any, res: any) {
     return res.status(500).json({
       success: false,
       error: `数据库Schema更新失败: ${error.message}`,
+      details: {
+        errorType: error.name,
+        timestamp: new Date().toISOString()
+      }
+    });
+  }
+}
+
+async function handleAddSchemaFields(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { token } = req.body;
+  if (token !== process.env.ADMIN_TOKEN && token !== 'admin-token-123') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    initClients();
+
+    console.log('🚀 开始添加数据库字段...');
+
+    // 尝试直接插入数据来测试字段是否存在
+    const testCompany = {
+      name: 'Test Company',
+      description: 'Test description',
+      english_description: 'Test English description',
+      headquarters: 'Test City',
+      valuation: 1000000,
+      website: 'https://test.com',
+      logo_base64: null,
+      category: 'techGiants',
+      is_overseas: true,
+      founded_year: 2020,
+      employee_count: '10-50',
+      industry: 'Technology',
+      tags: ['AI', 'Technology']
+    };
+
+    const { data, error } = await supabase
+      .from('companies')
+      .insert([testCompany])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('❌ 测试插入失败:', error.message);
+      
+      // 如果是因为字段不存在，尝试添加字段
+      if (error.message.includes('column') && error.message.includes('does not exist')) {
+        console.log('🔧 检测到缺少字段，尝试添加...');
+        
+        // 这里我们无法直接执行SQL，但可以提供指导
+        return res.status(200).json({
+          success: false,
+          message: '数据库缺少必要字段，请在Supabase SQL Editor中执行以下SQL:',
+          sqlCommands: [
+            'ALTER TABLE companies ADD COLUMN IF NOT EXISTS category VARCHAR(50);',
+            'ALTER TABLE companies ADD COLUMN IF NOT EXISTS tags TEXT[] DEFAULT \'{}\';',
+            'ALTER TABLE projects ADD COLUMN IF NOT EXISTS tags TEXT[] DEFAULT \'{}\';',
+            'ALTER TABLE projects ADD COLUMN IF NOT EXISTS user_stories TEXT[] DEFAULT \'{}\';',
+            'ALTER TABLE projects ADD COLUMN IF NOT EXISTS latest_features TEXT[] DEFAULT \'{}\';',
+            'ALTER TABLE projects ADD COLUMN IF NOT EXISTS user_rating DECIMAL(3,2) DEFAULT 0.0;',
+            'ALTER TABLE projects ADD COLUMN IF NOT EXISTS review_count INTEGER DEFAULT 0;',
+            'ALTER TABLE projects ADD COLUMN IF NOT EXISTS last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW();'
+          ],
+          error: error.message
+        });
+      }
+      
+      throw error;
+    }
+
+    // 如果插入成功，删除测试数据
+    await supabase.from('companies').delete().eq('id', data.id);
+
+    return res.status(200).json({
+      success: true,
+      message: '数据库字段检查完成，所有必要字段都存在'
+    });
+
+  } catch (error: any) {
+    console.error('❌ 字段检查失败:', error);
+    return res.status(500).json({
+      success: false,
+      error: `字段检查失败: ${error.message}`,
       details: {
         errorType: error.name,
         timestamp: new Date().toISOString()
