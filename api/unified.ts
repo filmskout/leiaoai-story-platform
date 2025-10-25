@@ -4066,7 +4066,10 @@ async function handleImportAiverseData(req: any, res: any) {
 
     for (let i = 0; i < migratedData.length; i++) {
       const item = migratedData[i];
-      const company = item.company;
+      const company = {
+        name: item.company.name,
+        description: item.company.description
+      };
 
       try {
         console.log(`\n🏢 正在导入公司: ${company.name} (${i + 1}/${migratedData.length})`);
