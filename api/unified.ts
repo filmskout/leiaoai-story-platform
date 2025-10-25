@@ -1690,6 +1690,9 @@ export default async function handler(req: any, res: any) {
       case 'import-aiverse-data':
         return handleImportAiverseData(req, res);
       
+      case 'update-schema-tags':
+        return handleUpdateSchemaTags(req, res);
+      
       default:
         return res.status(400).json({ error: 'Invalid action' });
     }
@@ -4181,6 +4184,175 @@ async function handleImportAiverseData(req: any, res: any) {
     return res.status(500).json({
       success: false,
       error: `AIverse数据导入失败: ${error.message}`,
+      details: {
+        errorType: error.name,
+        timestamp: new Date().toISOString()
+      }
+    });
+  }
+}
+
+async function handleUpdateSchemaTags(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { token } = req.body;
+  if (token !== process.env.ADMIN_TOKEN && token !== 'admin-token-123') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    initClients();
+
+    console.log('🚀 开始更新数据库Schema - 添加标签系统...');
+
+    const operations = [
+      // 1. 为companies表添加tags字段
+      {
+        name: '添加companies.tags字段',
+        sql: `ALTER TABLE companies ADD COLUMN IF NOT EXISTS tags TEXT[] DEFAULT '{}'`
+      },
+      // 2. 为projects表添加tags字段
+      {
+        name: '添加projects.tags字段',
+        sql: `ALTER TABLE projects ADD COLUMN IF NOT EXISTS tags TEXT[] DEFAULT '{}'`
+      },
+      // 3. 为projects表添加user_stories字段
+      {
+        name: '添加projects.user_stories字段',
+        sql: `ALTER TABLE projects ADD COLUMN IF NOT EXISTS user_stories TEXT[] DEFAULT '{}'`
+      },
+      // 4. 为projects表添加latest_features字段
+      {
+        name: '添加projects.latest_features字段',
+        sql: `ALTER TABLE projects ADD COLUMN IF NOT EXISTS latest_features TEXT[] DEFAULT '{}'`
+      },
+      // 5. 为projects表添加user_rating字段
+      {
+        name: '添加projects.user_rating字段',
+        sql: `ALTER TABLE projects ADD COLUMN IF NOT EXISTS user_rating DECIMAL(3,2) DEFAULT 0.0`
+      },
+      // 6. 为projects表添加review_count字段
+      {
+        name: '添加projects.review_count字段',
+        sql: `ALTER TABLE projects ADD COLUMN IF NOT EXISTS review_count INTEGER DEFAULT 0`
+      },
+      // 7. 为projects表添加last_updated字段
+      {
+        name: '添加projects.last_updated字段',
+        sql: `ALTER TABLE projects ADD COLUMN IF NOT EXISTS last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW()`
+      },
+      // 8. 创建标签索引
+      {
+        name: '创建companies标签索引',
+        sql: `CREATE INDEX IF NOT EXISTS idx_companies_tags ON companies USING GIN (tags)`
+      },
+      {
+        name: '创建projects标签索引',
+        sql: `CREATE INDEX IF NOT EXISTS idx_projects_tags ON projects USING GIN (tags)`
+      },
+      // 9. 创建常用标签表
+      {
+        name: '创建常用标签表',
+        sql: `CREATE TABLE IF NOT EXISTS common_tags (
+          id SERIAL PRIMARY KEY,
+          tag_name VARCHAR(50) UNIQUE NOT NULL,
+          tag_category VARCHAR(50) NOT NULL,
+          usage_count INTEGER DEFAULT 0,
+          created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+        )`
+      }
+    ];
+
+    let successCount = 0;
+    let errorCount = 0;
+    const results: any[] = [];
+
+    for (const operation of operations) {
+      try {
+        console.log(`   🔧 执行: ${operation.name}`);
+        
+        const { error } = await supabase.rpc('exec_sql', {
+          sql_command: operation.sql
+        });
+
+        if (error) {
+          throw error;
+        }
+
+        console.log(`   ✅ 成功: ${operation.name}`);
+        successCount++;
+        results.push({ operation: operation.name, success: true });
+      } catch (error: any) {
+        console.error(`   ❌ 失败: ${operation.name}`, error.message);
+        errorCount++;
+        results.push({ 
+          operation: operation.name, 
+          success: false, 
+          error: error.message 
+        });
+      }
+    }
+
+    // 插入常用标签
+    console.log('   📝 插入常用标签...');
+    const commonTags = [
+      ['AI', 'Technology'], ['Machine Learning', 'Technology'], ['Deep Learning', 'Technology'],
+      ['Natural Language Processing', 'Technology'], ['Computer Vision', 'Technology'], ['Generative AI', 'Technology'],
+      ['Productivity', 'Application'], ['Content Creation', 'Application'], ['Design', 'Application'],
+      ['Marketing', 'Application'], ['Education', 'Application'], ['Healthcare', 'Application'],
+      ['Finance', 'Application'], ['E-commerce', 'Application'], ['Startup', 'Company Type'],
+      ['Enterprise', 'Company Type'], ['Open Source', 'Company Type'], ['SaaS', 'Company Type'],
+      ['Platform', 'Company Type'], ['API', 'Technology'], ['Cloud', 'Technology'],
+      ['Mobile', 'Technology'], ['Web', 'Technology'], ['Desktop', 'Technology'],
+      ['Integration', 'Technology'], ['Video', 'Application'], ['Image', 'Application'],
+      ['Text', 'Application'], ['Code', 'Application'], ['Chat', 'Application'],
+      ['International', 'Company Type'], ['Domestic', 'Company Type'], ['Business', 'Application'],
+      ['Creative', 'Application'], ['Developer Tools', 'Application'], ['Writing', 'Application'],
+      ['Analytics', 'Application'], ['Customer Support', 'Application'], ['Sales', 'Application'],
+      ['Chatbots', 'Application'], ['Learning', 'Application'], ['Data', 'Application']
+    ];
+
+    for (const [tagName, tagCategory] of commonTags) {
+      try {
+        const { error } = await supabase
+          .from('common_tags')
+          .upsert({
+            tag_name: tagName,
+            tag_category: tagCategory,
+            usage_count: 0
+          }, {
+            onConflict: 'tag_name'
+          });
+
+        if (error) {
+          console.error(`   ❌ 插入标签失败: ${tagName}`, error.message);
+        }
+      } catch (error: any) {
+        console.error(`   ❌ 插入标签失败: ${tagName}`, error.message);
+      }
+    }
+
+    console.log('\n🎉 数据库Schema更新完成！');
+    console.log(`📊 最终统计: 成功 ${successCount}, 失败 ${errorCount}`);
+
+    return res.status(200).json({
+      success: true,
+      message: `数据库Schema更新完成: 成功 ${successCount}, 失败 ${errorCount}`,
+      results: {
+        successCount,
+        errorCount,
+        totalOperations: operations.length,
+        details: results
+      }
+    });
+
+  } catch (error: any) {
+    console.error('❌ 数据库Schema更新失败:', error);
+    return res.status(500).json({
+      success: false,
+      error: `数据库Schema更新失败: ${error.message}`,
       details: {
         errorType: error.name,
         timestamp: new Date().toISOString()
