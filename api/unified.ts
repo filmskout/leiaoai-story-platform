@@ -3478,7 +3478,7 @@ async function handleGenerateRealData(req: any, res: any) {
       try {
         console.log(`\n🏢 正在生成公司数据: ${companyName} (${i + 1}/${companies.length})`);
         
-        // 生成公司详细信息的DeepSeek提示词
+        // 生成公司详细信息的提示词 - 强调真实性和具体性
         const prompt = `请为${isOverseas ? '海外' : '国内'}AI公司"${companyName}"生成详细的真实信息。要求：
 
 1. **公司基本信息**：
@@ -3513,7 +3513,14 @@ async function handleGenerateRealData(req: any, res: any) {
    - 发布时间（2024年的日期）
    - 分类标签（如：融资新闻、产品发布、技术突破等）
 
-请确保所有信息都是真实、准确、最新的。使用JSON格式返回，包含所有字段。`;
+**重要要求**：
+- 所有信息必须是真实、准确、最新的
+- 不要使用模板化的描述
+- 每个公司的信息应该独特且具体
+- 基于真实的公开信息
+- 使用JSON格式返回，包含所有字段
+
+请为"${companyName}"生成真实、详细、准确的信息。`;
         
         // 优先使用Qwen，备用DeepSeek
         let response;
