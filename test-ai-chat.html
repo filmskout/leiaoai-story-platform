@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        #result { margin-top: 10px; padding: 10px; background-color: #f8f9fa; }
+    </style>
+</head>
+<body>
+    <h1>AI Chat 功能测试</h1>
+    
+    <div class="test-section">
+        <h3>测试1: API端点连接</h3>
+        <button onclick="testAPI()">测试API连接</button>
+        <div id="api-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>测试2: 发送消息</h3>
+        <input type="text" id="messageInput" placeholder="输入测试消息" value="Hello, test message">
+        <button onclick="sendMessage()">发送消息</button>
+        <div id="message-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>测试3: 不同模型</h3>
+        <button onclick="testModel('deepseek')">测试DeepSeek</button>
+        <button onclick="testModel('openai')">测试OpenAI</button>
+        <button onclick="testModel('qwen')">测试Qwen</button>
+        <div id="model-result"></div>
+    </div>
+
+    <script>
+        async function testAPI() {
+            const resultDiv = document.getElementById('api-result');
+            resultDiv.innerHTML = '测试中...';
+            
+            try {
+                const response = await fetch('/api/ai-chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: 'API连接测试',
+                        model: 'deepseek',
+                        language: 'zh'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            ✅ API连接成功<br>
+                            状态: ${response.status}<br>
+                            响应: ${data.response}<br>
+                            模型: ${data.model}
+                        </div>
+                    `;
+                } else {
+                    const errorText = await response.text();
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            ❌ API连接失败<br>
+                            状态: ${response.status}<br>
+                            错误: ${errorText}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        ❌ 网络错误: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        async function sendMessage() {
+            const message = document.getElementById('messageInput').value;
+            const resultDiv = document.getElementById('message-result');
+            resultDiv.innerHTML = '发送中...';
+            
+            try {
+                const response = await fetch('/api/ai-chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: message,
+                        model: 'deepseek',
+                        language: 'zh'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            ✅ 消息发送成功<br>
+                            用户消息: ${message}<br>
+                            AI回复: ${data.response}<br>
+                            使用模型: ${data.model}
+                        </div>
+                    `;
+                } else {
+                    const errorText = await response.text();
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            ❌ 消息发送失败<br>
+                            状态: ${response.status}<br>
+                            错误: ${errorText}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        ❌ 发送错误: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        async function testModel(model) {
+            const resultDiv = document.getElementById('model-result');
+            resultDiv.innerHTML = `测试${model}模型中...`;
+            
+            try {
+                const response = await fetch('/api/ai-chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: `测试${model}模型`,
+                        model: model,
+                        language: 'zh'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            ✅ ${model}模型测试成功<br>
+                            回复: ${data.response}<br>
+                            实际使用模型: ${data.model}
+                        </div>
+                    `;
+                } else {
+                    const errorText = await response.text();
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            ❌ ${model}模型测试失败<br>
+                            状态: ${response.status}<br>
+                            错误: ${errorText}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        ❌ ${model}模型测试错误: ${error.message}
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
