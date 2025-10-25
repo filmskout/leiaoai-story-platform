@@ -2328,7 +2328,7 @@ async function handleBatchCompleteCompanies(req: any, res: any) {
 
     const categories = companyCategories;
     const existingCompanies = await supabase
-      .from('companies')
+          .from('companies')
       .select('name')
       .then(result => result.data?.map(c => c.name) || []);
 
@@ -2859,11 +2859,11 @@ async function handleDataProgress(req: any, res: any) {
 async function handleAIChat(req: any, res: any) {
   try {
     const { message, model = 'deepseek', sessionId, language = 'zh' } = req.body;
-    
+
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
     }
-    
+
     console.log('🤖 AI Chat Request:', { model, messageLength: message.length, language });
     
     // 获取API密钥
@@ -2891,7 +2891,7 @@ async function handleAIChat(req: any, res: any) {
       usedModel = 'gpt-4';
       
     } else if (model === 'deepseek') {
-      if (!deepseekApiKey) {
+    if (!deepseekApiKey) {
         return res.status(400).json({ error: 'missing DEEPSEEK_API_KEY' });
       }
       
@@ -2969,8 +2969,8 @@ async function callOpenAI(message: string, apiKey: string, language: string): Pr
     : 'You are a professional AI assistant. Please answer user questions in English.';
     
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
+      method: 'POST',
+      headers: {
       'Authorization': `Bearer ${apiKey}`,
       'Content-Type': 'application/json'
     },
@@ -3061,10 +3061,10 @@ async function callQwen(message: string, apiKey: string, language: string): Prom
         temperature: 0.7,
         max_tokens: 2000
       }
-    })
-  });
-  
-  if (!response.ok) {
+      })
+    });
+
+    if (!response.ok) {
     throw new Error(`Qwen API error: ${response.status}`);
   }
   
@@ -3247,7 +3247,7 @@ async function handleFixTriggers(req: any, res: any) {
 
   } catch (error: any) {
     console.error('❌ 触发器修复失败:', error);
-    return res.status(500).json({
+    return res.status(500).json({ 
       success: false,
       error: `触发器修复失败: ${error.message}`,
       details: {
@@ -3588,10 +3588,10 @@ async function handleGenerateRealData(req: any, res: any) {
         if (process.env.QWEN_API_KEY) {
           try {
             response = await fetch('https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation', {
-              method: 'POST',
-              headers: {
+      method: 'POST',
+      headers: {
                 'Authorization': `Bearer ${process.env.QWEN_API_KEY}`,
-                'Content-Type': 'application/json',
+        'Content-Type': 'application/json',
               },
               body: JSON.stringify({
                 model: 'qwen-max',
@@ -3629,26 +3629,26 @@ async function handleGenerateRealData(req: any, res: any) {
             headers: {
               'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`,
               'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              model: 'deepseek-chat',
-              messages: [
-                {
-                  role: 'system',
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          {
+            role: 'system',
                   content: '你是一个专业的AI行业分析师，擅长收集和分析AI公司的真实信息。请提供准确、详细、最新的数据。'
-                },
-                {
-                  role: 'user',
+          },
+          {
+            role: 'user',
                   content: prompt
-                }
-              ],
+          }
+        ],
               temperature: 0.3,
               max_tokens: 4000
-            })
-          });
+      })
+    });
         }
 
-        if (!response.ok) {
+    if (!response.ok) {
           throw new Error(`${apiName} API error: ${response.status}`);
         }
 
@@ -3786,7 +3786,7 @@ async function handleGenerateRealData(req: any, res: any) {
     
     console.log('\n🎉 真实数据生成完成！');
     console.log(`📊 最终统计: 成功 ${successCount}, 失败 ${errorCount}`);
-    
+
     return res.status(200).json({
       success: true,
       message: `真实数据生成完成: 成功 ${successCount}, 失败 ${errorCount}`,
@@ -3805,7 +3805,7 @@ async function handleGenerateRealData(req: any, res: any) {
       error: `真实数据生成失败: ${error.message}`,
       details: {
         errorType: error.name,
-        timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString()
       }
     });
   }
@@ -3849,7 +3849,7 @@ async function handleCreateCompany(req: any, res: any) {
 
   } catch (error: any) {
     console.error('创建公司失败:', error);
-    return res.status(500).json({
+    return res.status(500).json({ 
       success: false,
       error: `创建公司失败: ${error.message}`
     });
