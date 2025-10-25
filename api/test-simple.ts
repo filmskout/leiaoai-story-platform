@@ -1,42 +1,32 @@
-import 'dotenv/config';
-
+// 简化的AI Chat测试API
 export default async function handler(req: any, res: any) {
-  // 设置CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
   try {
+    console.log('🧪 Test API called');
+    
     // 检查环境变量
     const envCheck = {
-      SUPABASE_URL: process.env.SUPABASE_URL ? '✅ Set' : '❌ Missing',
-      SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY ? '✅ Set' : '❌ Missing',
-      SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY ? '✅ Set' : '❌ Missing',
-      OPENAI_API_KEY: process.env.OPENAI_API_KEY ? '✅ Set' : '❌ Missing',
-      ADMIN_TOKEN: process.env.ADMIN_TOKEN ? '✅ Set' : '❌ Missing'
+      openai: !!process.env.OPENAI_API_KEY,
+      deepseek: !!process.env.DEEPSEEK_API_KEY,
+      qwen: !!process.env.QWEN_API_KEY,
+      supabase: !!process.env.SUPABASE_URL,
+      nodeEnv: process.env.NODE_ENV
     };
-
+    
+    console.log('🔑 Environment check:', envCheck);
+    
     return res.status(200).json({
       success: true,
-      message: '简单测试端点正常工作',
+      message: 'Test API working',
       environment: envCheck,
       timestamp: new Date().toISOString()
     });
-
+    
   } catch (error: any) {
-    console.error('❌ 简单测试失败:', error);
+    console.error('❌ Test API Error:', error);
     return res.status(500).json({
       success: false,
-      error: `测试失败: ${error.message}`,
-      details: {
-        errorType: error.name,
-        errorCode: error.code,
-        timestamp: new Date().toISOString()
-      }
+      error: error.message,
+      stack: error.stack
     });
   }
 }
