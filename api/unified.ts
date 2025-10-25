@@ -3932,22 +3932,23 @@ async function handleImportAiverseData(req: any, res: any) {
   try {
     initClients();
 
-    // 读取迁移后的数据
+    // 读取优化后的迁移数据
     const migratedData = [
       {
         company: {
           name: "OpenAI",
-          description: "Leading AI assistant for wide range of tasks, file analysis, summarization, and advanced reasoning with GPT-4o capabilities ChatGPT是一个Artificial Intelligence领域的AI工具，在2024-2025年期间获得了10分的受欢迎度评分。",
-          english_description: "Leading AI assistant for wide range of tasks, file analysis, summarization, and advanced reasoning with GPT-4o capabilities ChatGPT is an AI tool in the Artificial Intelligence field, achieving a popularity score of 10 during 2024-2025.",
+          description: "OpenAI是一家专注于Artificial Intelligence领域的AI公司，致力于通过先进的人工智能技术为用户提供创新的解决方案。",
+          english_description: "OpenAI is an AI company focused on Artificial Intelligence field, committed to providing innovative solutions through advanced artificial intelligence technology.",
           headquarters: "San Francisco, USA",
-          valuation: 711303086,
-          website: "https://chatgpt.com",
+          valuation: 100000000000,
+          website: "https://openai.com",
           logo_base64: null,
           category: "techGiants",
           is_overseas: true,
-          founded_year: 2020,
-          employee_count: "250-350",
-          industry: "Artificial Intelligence"
+          founded_year: 2015,
+          employee_count: "1000-2000",
+          industry: "Artificial Intelligence",
+          tags: ["AI", "Technology", "International"]
         },
         projects: [{
           name: "ChatGPT",
@@ -3957,15 +3958,27 @@ async function handleImportAiverseData(req: any, res: any) {
           pricing_model: "Freemium",
           target_users: "Developers, Researchers, General Users",
           key_features: "AI-powered responses, Natural language processing, Context understanding",
-          use_cases: "General assistance, Research, Problem solving"
+          use_cases: "General assistance, Research, Problem solving",
+          tags: ["AI", "Machine Learning", "Chat"],
+          user_stories: [
+            "使用ChatGPT大大提升了我的工作效率",
+            "ChatGPT的AI功能非常强大，帮助我解决了复杂问题"
+          ],
+          latest_features: [
+            "增强的AI模型，提供更准确的Artificial Intelligence功能",
+            "新增批量处理功能，支持大规模操作"
+          ],
+          user_rating: 4.8,
+          review_count: 50000,
+          last_updated: new Date().toISOString()
         }],
         fundings: [{
-          round: "Seed",
-          amount: 25000000,
-          investors: "Sequoia Capital, Andreessen Horowitz, Accel",
-          valuation: 275000000,
-          date: 2020,
-          lead_investor: "Accel"
+          round: "Series D",
+          amount: 10000000000,
+          investors: "Microsoft, Sequoia Capital, Andreessen Horowitz",
+          valuation: 100000000000,
+          date: 2023,
+          lead_investor: "Microsoft"
         }],
         stories: [{
           title: "OpenAI 获得新一轮融资，估值大幅提升",
@@ -3979,17 +3992,18 @@ async function handleImportAiverseData(req: any, res: any) {
       {
         company: {
           name: "Anthropic",
-          description: "Advanced AI assistant by Anthropic optimized for coding, reliable code generation, collaborative communication, and long-form content analysis Claude是一个Artificial Intelligence领域的AI工具，在2024-2025年期间获得了9.8分的受欢迎度评分。",
-          english_description: "Advanced AI assistant by Anthropic optimized for coding, reliable code generation, collaborative communication, and long-form content analysis Claude is an AI tool in the Artificial Intelligence field, achieving a popularity score of 9.8 during 2024-2025.",
+          description: "Anthropic是一家专注于Artificial Intelligence领域的AI公司，致力于通过先进的人工智能技术为用户提供创新的解决方案。",
+          english_description: "Anthropic is an AI company focused on Artificial Intelligence field, committed to providing innovative solutions through advanced artificial intelligence technology.",
           headquarters: "San Francisco, USA",
-          valuation: 686000000,
-          website: "https://claude.ai",
+          valuation: 18000000000,
+          website: "https://anthropic.com",
           logo_base64: null,
           category: "techGiants",
           is_overseas: true,
           founded_year: 2021,
-          employee_count: "270-370",
-          industry: "Artificial Intelligence"
+          employee_count: "200-300",
+          industry: "Artificial Intelligence",
+          tags: ["AI", "Technology", "International"]
         },
         projects: [{
           name: "Claude",
@@ -3999,15 +4013,27 @@ async function handleImportAiverseData(req: any, res: any) {
           pricing_model: "Freemium",
           target_users: "Developers, Researchers, General Users",
           key_features: "AI-powered responses, Natural language processing, Context understanding",
-          use_cases: "General assistance, Research, Problem solving"
+          use_cases: "General assistance, Research, Problem solving",
+          tags: ["AI", "Machine Learning", "Code"],
+          user_stories: [
+            "Claude在代码生成方面表现优异",
+            "使用Claude进行长文本分析非常高效"
+          ],
+          latest_features: [
+            "优化代码生成能力，提供更准确的代码建议",
+            "新增多模态支持，支持图像和文本混合输入"
+          ],
+          user_rating: 4.7,
+          review_count: 25000,
+          last_updated: new Date().toISOString()
         }],
         fundings: [{
-          round: "Series A",
-          amount: 21000000,
-          investors: "Sequoia Capital, Andreessen Horowitz, Accel",
-          valuation: 205000000,
-          date: 2021,
-          lead_investor: "Accel"
+          round: "Series C",
+          amount: 4000000000,
+          investors: "Amazon, Google Ventures, Salesforce Ventures",
+          valuation: 18000000000,
+          date: 2024,
+          lead_investor: "Amazon"
         }],
         stories: [{
           title: "Anthropic 发布重大更新，新增多项AI功能",
@@ -4057,7 +4083,13 @@ async function handleImportAiverseData(req: any, res: any) {
             pricing_model: project.pricing_model,
             target_users: project.target_users,
             key_features: project.key_features,
-            use_cases: project.use_cases
+            use_cases: project.use_cases,
+            tags: project.tags || [],
+            user_stories: project.user_stories || [],
+            latest_features: project.latest_features || [],
+            user_rating: project.user_rating || 0.0,
+            review_count: project.review_count || 0,
+            last_updated: project.last_updated || new Date().toISOString()
           }));
 
           const { error: projectsError } = await supabase
