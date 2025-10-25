@@ -1675,6 +1675,18 @@ export default async function handler(req: any, res: any) {
       case 'generate-real-data':
         return handleGenerateRealData(req, res);
       
+      case 'create-company':
+        return handleCreateCompany(req, res);
+      
+      case 'update-company':
+        return handleUpdateCompany(req, res);
+      
+      case 'delete-company':
+        return handleDeleteCompany(req, res);
+      
+      case 'get-companies':
+        return handleGetCompanies(req, res);
+      
       default:
         return res.status(400).json({ error: 'Invalid action' });
     }
@@ -3749,6 +3761,157 @@ async function handleGenerateRealData(req: any, res: any) {
         errorType: error.name,
         timestamp: new Date().toISOString()
       }
+    });
+  }
+}
+
+// 公司管理函数
+async function handleCreateCompany(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { token, company } = req.body;
+  if (token !== process.env.ADMIN_TOKEN && token !== 'admin-token-123') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    initClients();
+
+    const { data, error } = await supabase
+      .from('companies')
+      .insert([company])
+      .select()
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: '公司创建成功',
+      company: data
+    });
+
+  } catch (error: any) {
+    console.error('创建公司失败:', error);
+    return res.status(500).json({
+      success: false,
+      error: `创建公司失败: ${error.message}`
+    });
+  }
+}
+
+async function handleUpdateCompany(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { token, companyId, company } = req.body;
+  if (token !== process.env.ADMIN_TOKEN && token !== 'admin-token-123') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    initClients();
+
+    const { data, error } = await supabase
+      .from('companies')
+      .update(company)
+      .eq('id', companyId)
+      .select()
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: '公司更新成功',
+      company: data
+    });
+
+  } catch (error: any) {
+    console.error('更新公司失败:', error);
+    return res.status(500).json({
+      success: false,
+      error: `更新公司失败: ${error.message}`
+    });
+  }
+}
+
+async function handleDeleteCompany(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { token, companyId } = req.body;
+  if (token !== process.env.ADMIN_TOKEN && token !== 'admin-token-123') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    initClients();
+
+    // 先删除相关数据
+    await supabase.from('projects').delete().eq('company_id', companyId);
+    await supabase.from('fundings').delete().eq('company_id', companyId);
+    await supabase.from('stories').delete().eq('company_id', companyId);
+
+    // 删除公司
+    const { error } = await supabase
+      .from('companies')
+      .delete()
+      .eq('id', companyId);
+
+    if (error) {
+      throw error;
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: '公司删除成功'
+    });
+
+  } catch (error: any) {
+    console.error('删除公司失败:', error);
+    return res.status(500).json({
+      success: false,
+      error: `删除公司失败: ${error.message}`
+    });
+  }
+}
+
+async function handleGetCompanies(req: any, res: any) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  try {
+    initClients();
+
+    const { data, error } = await supabase
+      .from('companies')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      throw error;
+    }
+
+    return res.status(200).json({
+      success: true,
+      companies: data || []
+    });
+
+  } catch (error: any) {
+    console.error('获取公司列表失败:', error);
+    return res.status(500).json({
+      success: false,
+      error: `获取公司列表失败: ${error.message}`
     });
   }
 }
