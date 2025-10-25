@@ -1711,6 +1711,9 @@ export default async function handler(req: any, res: any) {
       case 'get-storage-logo':
         return handleGetStorageLogo(req, res);
       
+      case 'test-ai-chat':
+        return handleTestAIChat(req, res);
+      
       default:
         return res.status(400).json({ error: 'Invalid action' });
     }
@@ -2868,6 +2871,12 @@ async function handleAIChat(req: NextApiRequest, res: NextApiResponse) {
     const deepseekApiKey = process.env.DEEPSEEK_API_KEY;
     const qwenApiKey = process.env.QWEN_API_KEY;
     
+    console.log('🔑 API Keys Status:', {
+      openai: !!openaiApiKey,
+      deepseek: !!deepseekApiKey,
+      qwen: !!qwenApiKey
+    });
+    
     let response: string;
     let usedModel: string;
     
@@ -2990,29 +2999,42 @@ async function callDeepSeek(message: string, apiKey: string, language: string): 
     ? '你是一个专业的AI助手，请用中文回答用户的问题。'
     : 'You are a professional AI assistant. Please answer user questions in English.';
     
-  const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      model: 'deepseek-chat',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: message }
-      ],
-      temperature: 0.7,
-      max_tokens: 2000
-    })
-  });
+  console.log('🔵 Calling DeepSeek API...');
   
-  if (!response.ok) {
-    throw new Error(`DeepSeek API error: ${response.status}`);
+  try {
+    const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: message }
+        ],
+        temperature: 0.7,
+        max_tokens: 2000
+      })
+    });
+    
+    console.log('🔵 DeepSeek Response Status:', response.status);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ DeepSeek API Error:', errorText);
+      throw new Error(`DeepSeek API error: ${response.status} - ${errorText}`);
+    }
+    
+    const data = await response.json();
+    console.log('✅ DeepSeek API Success');
+    return data.choices[0].message.content;
+    
+  } catch (error) {
+    console.error('❌ DeepSeek API Call Failed:', error);
+    throw error;
   }
-  
-  const data = await response.json();
-  return data.choices[0].message.content;
 }
 
 // Qwen API调用
@@ -4775,6 +4797,33 @@ async function handleGetStorageLogo(req: any, res: any) {
     return res.status(500).json({ 
       success: false, 
       error: `获取Storage Logo失败: ${error.message}` 
+    });
+  }
+}
+
+// 测试AI Chat环境变量
+async function handleTestAIChat(req: NextApiRequest, res: NextApiResponse) {
+  try {
+    const openaiApiKey = process.env.OPENAI_API_KEY;
+    const deepseekApiKey = process.env.DEEPSEEK_API_KEY;
+    const qwenApiKey = process.env.QWEN_API_KEY;
+    
+    return res.status(200).json({
+      success: true,
+      environment: {
+        openai: !!openaiApiKey,
+        deepseek: !!deepseekApiKey,
+        qwen: !!qwenApiKey,
+        nodeEnv: process.env.NODE_ENV
+      },
+      message: 'AI Chat environment check completed'
+    });
+    
+  } catch (error: any) {
+    console.error('❌ Test AI Chat Error:', error);
+    return res.status(500).json({
+      success: false,
+      error: error.message
     });
   }
 }
