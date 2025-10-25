@@ -2110,7 +2110,7 @@ async function handleCheckDataCompleteness(req: any, res: any) {
       companies: [] as any[],
       summary: {
         totalCompanies: companies.length,
-        companiesWithTools: 0,
+        companiesWithProjects: 0,
         companiesWithFundings: 0,
         companiesWithStories: 0,
         companiesWithCompleteData: 0
@@ -2182,14 +2182,14 @@ async function handleCheckDataCompleteness(req: any, res: any) {
       let score = 0;
       if (companyReport.hasDescription) score += 20;
       if (companyReport.hasWebsite) score += 10;
-      if (companyReport.hasTools) score += 25;
+      if (companyReport.hasProjects) score += 25;
       if (companyReport.hasFundings) score += 25;
       if (companyReport.hasStories) score += 20;
       
       companyReport.completenessScore = score;
 
       // 更新汇总统计
-      if (companyReport.hasTools) completenessReport.summary.companiesWithTools++;
+      if (companyReport.hasProjects) completenessReport.summary.companiesWithProjects++;
       if (companyReport.hasFundings) completenessReport.summary.companiesWithFundings++;
       if (companyReport.hasStories) completenessReport.summary.companiesWithStories++;
       if (score >= 80) completenessReport.summary.companiesWithCompleteData++;
@@ -2664,32 +2664,32 @@ Generate 5-7 comprehensive projects/products based on thorough research. Ensure 
     const insertedProjects: any[] = [];
     for (const project of projects) {
       try {
-        const { data: insertedTool, error: insertError } = await supabase
+        const { data: insertedProject, error: insertError } = await supabase
           .from('projects')
           .insert({
             company_id: companyId,
-            name: tool.name || `${companyName} Tool`,
-            description: tool.description || `由${companyName}开发的工具`,
-            url: tool.url || `https://${companyName.toLowerCase()}.com`,
-            category: tool.category || 'AI工具',
+            name: project.name || `${companyName} Project`,
+            description: project.description || `由${companyName}开发的项目`,
+            url: project.url || `https://${companyName.toLowerCase()}.com`,
+            category: project.category || 'AI项目',
             created_at: new Date().toISOString()
           })
           .select()
           .single();
 
         if (insertError) {
-          console.error(`❌ 工具插入失败: ${tool.name}`, insertError);
+          console.error(`❌ 项目插入失败: ${project.name}`, insertError);
         } else {
-          insertedTools.push(insertedTool);
-          console.log(`✅ 工具插入成功: ${tool.name}`);
+          insertedProjects.push(insertedProject);
+          console.log(`✅ 项目插入成功: ${project.name}`);
         }
-      } catch (toolError) {
-        console.error(`❌ 工具处理失败: ${tool.name}`, toolError);
+      } catch (projectError) {
+        console.error(`❌ 项目处理失败: ${project.name}`, projectError);
       }
     }
 
-    console.log(`✅ 为 ${companyName} 成功生成 ${insertedTools.length} 个工具`);
-    return insertedTools;
+    console.log(`✅ 为 ${companyName} 成功生成 ${insertedProjects.length} 个项目`);
+    return insertedProjects;
     
   } catch (error: any) {
     console.error(`❌ 为 ${companyName} 生成工具失败:`, error);
@@ -2856,7 +2856,7 @@ async function handleDataProgress(req: any, res: any) {
 }
 
 // AI聊天处理函数
-async function handleAIChat(req: NextApiRequest, res: NextApiResponse) {
+async function handleAIChat(req: any, res: any) {
   try {
     const { message, model = 'deepseek', sessionId, language = 'zh' } = req.body;
     
@@ -4802,7 +4802,7 @@ async function handleGetStorageLogo(req: any, res: any) {
 }
 
 // 测试AI Chat环境变量
-async function handleTestAIChat(req: NextApiRequest, res: NextApiResponse) {
+async function handleTestAIChat(req: any, res: any) {
   try {
     const openaiApiKey = process.env.OPENAI_API_KEY;
     const deepseekApiKey = process.env.DEEPSEEK_API_KEY;
@@ -4828,4 +4828,4 @@ async function handleTestAIChat(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default handler;
+// export default handler; // Removed duplicate export
