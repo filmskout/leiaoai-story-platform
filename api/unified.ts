@@ -3788,9 +3788,19 @@ async function handleCreateCompany(req: any, res: any) {
   try {
     initClients();
 
+    // 创建简化的公司数据，只包含现有字段
+    const simplifiedCompany = {
+      name: company.name,
+      description: company.description,
+      headquarters: company.headquarters,
+      valuation: company.valuation,
+      website: company.website,
+      logo_base64: company.logo_base64 || null
+    };
+
     const { data, error } = await supabase
       .from('companies')
-      .insert([company])
+      .insert([simplifiedCompany])
       .select()
       .single();
 
