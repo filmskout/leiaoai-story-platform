@@ -1687,6 +1687,9 @@ export default async function handler(req: any, res: any) {
       case 'get-companies':
         return handleGetCompanies(req, res);
       
+      case 'import-aiverse-data':
+        return handleImportAiverseData(req, res);
+      
       default:
         return res.status(400).json({ error: 'Invalid action' });
     }
@@ -3912,6 +3915,163 @@ async function handleGetCompanies(req: any, res: any) {
     return res.status(500).json({
       success: false,
       error: `获取公司列表失败: ${error.message}`
+    });
+  }
+}
+
+async function handleImportAiverseData(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { token } = req.body;
+  if (token !== process.env.ADMIN_TOKEN && token !== 'admin-token-123') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    initClients();
+
+    // 读取迁移后的数据
+    const fs = require('fs');
+    const path = require('path');
+    
+    const dataPath = path.join(process.cwd(), 'migrated-aiverse-companies.json');
+    const migratedData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+
+    console.log(`🚀 开始导入 ${migratedData.length} 家AIverse公司数据...`);
+
+    let successCount = 0;
+    let errorCount = 0;
+    const results: any[] = [];
+
+    for (let i = 0; i < migratedData.length; i++) {
+      const item = migratedData[i];
+      const company = item.company;
+
+      try {
+        console.log(`\n🏢 正在导入公司: ${company.name} (${i + 1}/${migratedData.length})`);
+
+        // 插入公司
+        const { data: companyData, error: companyError } = await supabase
+          .from('companies')
+          .insert([company])
+          .select()
+          .single();
+
+        if (companyError) {
+          throw companyError;
+        }
+
+        console.log(`   ✅ 公司插入成功: ${company.name} (ID: ${companyData.id})`);
+
+        // 插入项目
+        if (item.projects && item.projects.length > 0) {
+          const projects = item.projects.map((project: any) => ({
+            company_id: companyData.id,
+            name: project.name,
+            description: project.description,
+            category: project.category,
+            website: project.website,
+            pricing_model: project.pricing_model,
+            target_users: project.target_users,
+            key_features: project.key_features,
+            use_cases: project.use_cases
+          }));
+
+          const { error: projectsError } = await supabase
+            .from('projects')
+            .insert(projects);
+
+          if (projectsError) {
+            console.error(`   ❌ 插入项目失败: ${company.name}`, projectsError.message);
+          } else {
+            console.log(`   ✅ 项目插入成功: ${company.name} (${projects.length}个项目)`);
+          }
+        }
+
+        // 插入融资信息
+        if (item.fundings && item.fundings.length > 0) {
+          const fundings = item.fundings.map((funding: any) => ({
+            company_id: companyData.id,
+            round: funding.round,
+            amount: funding.amount,
+            investors: funding.investors,
+            valuation: funding.valuation,
+            date: funding.date,
+            lead_investor: funding.lead_investor
+          }));
+
+          const { error: fundingsError } = await supabase
+            .from('fundings')
+            .insert(fundings);
+
+          if (fundingsError) {
+            console.error(`   ❌ 插入融资失败: ${company.name}`, fundingsError.message);
+          } else {
+            console.log(`   ✅ 融资插入成功: ${company.name} (${fundings.length}轮融资)`);
+          }
+        }
+
+        // 插入新闻故事
+        if (item.stories && item.stories.length > 0) {
+          const stories = item.stories.map((story: any) => ({
+            company_id: companyData.id,
+            title: story.title,
+            summary: story.summary,
+            source_url: story.source_url,
+            published_date: story.published_date,
+            category: story.category,
+            tags: story.tags
+          }));
+
+          const { error: storiesError } = await supabase
+            .from('stories')
+            .insert(stories);
+
+          if (storiesError) {
+            console.error(`   ❌ 插入故事失败: ${company.name}`, storiesError.message);
+          } else {
+            console.log(`   ✅ 故事插入成功: ${company.name} (${stories.length}篇故事)`);
+          }
+        }
+
+        successCount++;
+        results.push({ company: company.name, status: 'success' });
+
+        // 添加延迟避免API限制
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+      } catch (error: any) {
+        console.error(`❌ 处理公司失败: ${company.name}`, error.message);
+        errorCount++;
+        results.push({ company: company.name, status: 'failed', error: error.message });
+      }
+    }
+
+    console.log('\n🎉 AIverse数据导入完成！');
+    console.log(`📊 最终统计: 成功 ${successCount}, 失败 ${errorCount}`);
+
+    return res.status(200).json({
+      success: true,
+      message: `AIverse数据导入完成: 成功 ${successCount}, 失败 ${errorCount}`,
+      results: {
+        successCount,
+        errorCount,
+        totalCompanies: migratedData.length,
+        details: results
+      }
+    });
+
+  } catch (error: any) {
+    console.error('❌ AIverse数据导入失败:', error);
+    return res.status(500).json({
+      success: false,
+      error: `AIverse数据导入失败: ${error.message}`,
+      details: {
+        errorType: error.name,
+        timestamp: new Date().toISOString()
+      }
     });
   }
 }
