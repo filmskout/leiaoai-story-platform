@@ -29,14 +29,13 @@ export async function fetchAIResponse(
 
     console.log('🔵 Frontend: Calling AI Chat API', { model, messageLength: lastMessage.content.length });
 
-    // 调用 Vercel Serverless Function 以隐藏服务端密钥
-    const resp = await fetch('/api/unified?action=ai-chat', {
+    // 调用独立的AI Chat API
+    const resp = await fetch('/api/ai-chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         message: lastMessage.content,
         model,
-        sessionId: crypto.randomUUID(),
         language: language
       })
     });
