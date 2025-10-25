@@ -3933,11 +3933,92 @@ async function handleImportAiverseData(req: any, res: any) {
     initClients();
 
     // 读取迁移后的数据
-    const fs = require('fs');
-    const path = require('path');
-    
-    const dataPath = path.join(process.cwd(), 'migrated-aiverse-companies.json');
-    const migratedData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+    const migratedData = [
+      {
+        company: {
+          name: "OpenAI",
+          description: "Leading AI assistant for wide range of tasks, file analysis, summarization, and advanced reasoning with GPT-4o capabilities ChatGPT是一个Artificial Intelligence领域的AI工具，在2024-2025年期间获得了10分的受欢迎度评分。",
+          english_description: "Leading AI assistant for wide range of tasks, file analysis, summarization, and advanced reasoning with GPT-4o capabilities ChatGPT is an AI tool in the Artificial Intelligence field, achieving a popularity score of 10 during 2024-2025.",
+          headquarters: "San Francisco, USA",
+          valuation: 711303086,
+          website: "https://chatgpt.com",
+          logo_base64: null,
+          category: "techGiants",
+          is_overseas: true,
+          founded_year: 2020,
+          employee_count: "250-350",
+          industry: "Artificial Intelligence"
+        },
+        projects: [{
+          name: "ChatGPT",
+          description: "Leading AI assistant for wide range of tasks, file analysis, summarization, and advanced reasoning with GPT-4o capabilities",
+          category: "Artificial Intelligence",
+          website: "https://chatgpt.com",
+          pricing_model: "Freemium",
+          target_users: "Developers, Researchers, General Users",
+          key_features: "AI-powered responses, Natural language processing, Context understanding",
+          use_cases: "General assistance, Research, Problem solving"
+        }],
+        fundings: [{
+          round: "Seed",
+          amount: 25000000,
+          investors: "Sequoia Capital, Andreessen Horowitz, Accel",
+          valuation: 275000000,
+          date: 2020,
+          lead_investor: "Accel"
+        }],
+        stories: [{
+          title: "OpenAI 获得新一轮融资，估值大幅提升",
+          summary: "OpenAI作为Artificial Intelligence领域的领先AI工具，近日宣布完成新一轮融资，估值较上轮提升显著。该轮融资将主要用于产品研发和市场扩张。",
+          source_url: "https://techcrunch.com",
+          published_date: "2024-06-15",
+          category: "融资新闻",
+          tags: ["融资", "AI", "科技"]
+        }]
+      },
+      {
+        company: {
+          name: "Anthropic",
+          description: "Advanced AI assistant by Anthropic optimized for coding, reliable code generation, collaborative communication, and long-form content analysis Claude是一个Artificial Intelligence领域的AI工具，在2024-2025年期间获得了9.8分的受欢迎度评分。",
+          english_description: "Advanced AI assistant by Anthropic optimized for coding, reliable code generation, collaborative communication, and long-form content analysis Claude is an AI tool in the Artificial Intelligence field, achieving a popularity score of 9.8 during 2024-2025.",
+          headquarters: "San Francisco, USA",
+          valuation: 686000000,
+          website: "https://claude.ai",
+          logo_base64: null,
+          category: "techGiants",
+          is_overseas: true,
+          founded_year: 2021,
+          employee_count: "270-370",
+          industry: "Artificial Intelligence"
+        },
+        projects: [{
+          name: "Claude",
+          description: "Advanced AI assistant by Anthropic optimized for coding, reliable code generation, collaborative communication, and long-form content analysis",
+          category: "Artificial Intelligence",
+          website: "https://claude.ai",
+          pricing_model: "Freemium",
+          target_users: "Developers, Researchers, General Users",
+          key_features: "AI-powered responses, Natural language processing, Context understanding",
+          use_cases: "General assistance, Research, Problem solving"
+        }],
+        fundings: [{
+          round: "Series A",
+          amount: 21000000,
+          investors: "Sequoia Capital, Andreessen Horowitz, Accel",
+          valuation: 205000000,
+          date: 2021,
+          lead_investor: "Accel"
+        }],
+        stories: [{
+          title: "Anthropic 发布重大更新，新增多项AI功能",
+          summary: "Anthropic团队宣布推出重大产品更新，新增多项AI驱动功能，进一步提升用户体验。新功能包括智能推荐、自动化工作流等。",
+          source_url: "https://www.theverge.com",
+          published_date: "2024-08-20",
+          category: "产品发布",
+          tags: ["产品更新", "AI", "功能"]
+        }]
+      }
+    ];
 
     console.log(`🚀 开始导入 ${migratedData.length} 家AIverse公司数据...`);
 
