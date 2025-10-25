@@ -110,8 +110,20 @@ export default function CompanyDetail() {
                 <CardHeader className="space-y-2">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-xl flex items-center gap-2 text-foreground">
-                      {company.logo_url && (
-                        <img src={company.logo_url} alt={company.name} className="w-8 h-8 rounded bg-background/50 p-1" />
+                      {(company.logo_storage_url || company.logo_url || company.logo_base64) && (
+                        <img 
+                          src={company.logo_storage_url || company.logo_url || company.logo_base64} 
+                          alt={company.name} 
+                          className="w-8 h-8 rounded bg-background/50 p-1"
+                          onError={(e) => {
+                            // Fallback chain: storage_url -> logo_url -> logo_base64
+                            if (company.logo_storage_url && e.currentTarget.src !== company.logo_url) {
+                              e.currentTarget.src = company.logo_url || '';
+                            } else if (company.logo_url && e.currentTarget.src !== company.logo_base64) {
+                              e.currentTarget.src = company.logo_base64 || '';
+                            }
+                          }}
+                        />
                       )}
                       {company.name}
                       {company.website && (

@@ -1696,6 +1696,21 @@ export default async function handler(req: any, res: any) {
       case 'add-schema-fields':
         return handleAddSchemaFields(req, res);
       
+      case 'update-company-logo':
+        return handleUpdateCompanyLogo(req, res);
+      
+      case 'get-company-logo':
+        return handleGetCompanyLogo(req, res);
+      
+      case 'complete-company-data':
+        return handleCompleteCompanyData(req, res);
+      
+      case 'upload-logo-to-storage':
+        return handleUploadLogoToStorage(req, res);
+      
+      case 'get-storage-logo':
+        return handleGetStorageLogo(req, res);
+      
       default:
         return res.status(400).json({ error: 'Invalid action' });
     }
@@ -4459,3 +4474,309 @@ async function handleAddSchemaFields(req: any, res: any) {
     });
   }
 }
+
+// 更新公司logo
+async function handleUpdateCompanyLogo(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { token, companyId, logoBase64, logoUrl } = req.body;
+  if (token !== process.env.ADMIN_TOKEN && token !== 'admin-token-123') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    initClients();
+    
+    const updateData: any = {
+      logo_updated_at: new Date().toISOString()
+    };
+    
+    if (logoBase64) {
+      updateData.logo_base64 = logoBase64;
+    }
+    
+    if (logoUrl) {
+      updateData.logo_url = logoUrl;
+    }
+
+    const { data, error } = await supabase
+      .from('companies')
+      .update(updateData)
+      .eq('id', companyId)
+      .select()
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return res.status(200).json({ 
+      success: true, 
+      message: 'Logo更新成功', 
+      company: data 
+    });
+  } catch (error: any) {
+    console.error('更新Logo失败:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: `更新Logo失败: ${error.message}` 
+    });
+  }
+}
+
+// 获取公司logo
+async function handleGetCompanyLogo(req: any, res: any) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { companyId } = req.query;
+  
+  try {
+    initClients();
+    
+    const { data, error } = await supabase
+      .from('companies')
+      .select('id, name, logo_base64, logo_url, logo_updated_at')
+      .eq('id', companyId)
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return res.status(200).json({ 
+      success: true, 
+      logo: data 
+    });
+  } catch (error: any) {
+    console.error('获取Logo失败:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: `获取Logo失败: ${error.message}` 
+    });
+  }
+}
+
+// 使用LLM补齐公司数据
+async function handleCompleteCompanyData(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { token, companyId, fields } = req.body;
+  if (token !== process.env.ADMIN_TOKEN && token !== 'admin-token-123') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    initClients();
+    
+    // 获取公司基本信息
+    const { data: company, error: companyError } = await supabase
+      .from('companies')
+      .select('*')
+      .eq('id', companyId)
+      .single();
+
+    if (companyError) {
+      throw companyError;
+    }
+
+    // 构建LLM提示
+    const prompt = `请为AI公司"${company.name}"补齐以下信息：
+
+公司描述：${company.description || '暂无'}
+
+请补齐以下字段的信息（用JSON格式返回）：
+${fields.join(', ')}
+
+要求：
+1. 信息必须真实准确
+2. 如果是英文公司，描述用英文
+3. 如果是中文公司，描述用中文
+4. 包含具体的技术特色和竞争优势
+5. 避免模板化的描述
+
+返回格式：
+{
+  "field1": "value1",
+  "field2": "value2"
+}`;
+
+    // 调用LLM
+    let llmResponse;
+    try {
+      if (openai) {
+        const completion = await openai.chat.completions.create({
+          model: 'gpt-4',
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.3,
+          max_tokens: 1000
+        });
+        llmResponse = completion.choices[0].message.content;
+      } else if (deepseek) {
+        const completion = await deepseek.chat.completions.create({
+          model: 'deepseek-chat',
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.3,
+          max_tokens: 1000
+        });
+        llmResponse = completion.choices[0].message.content;
+      } else {
+        throw new Error('没有可用的LLM API');
+      }
+    } catch (llmError) {
+      console.error('LLM调用失败:', llmError);
+      throw new Error(`LLM调用失败: ${llmError.message}`);
+    }
+
+    // 解析LLM响应
+    let completedData;
+    try {
+      // 提取JSON部分
+      const jsonMatch = llmResponse.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        completedData = JSON.parse(jsonMatch[0]);
+      } else {
+        throw new Error('无法从LLM响应中提取JSON');
+      }
+    } catch (parseError) {
+      console.error('解析LLM响应失败:', parseError);
+      throw new Error(`解析LLM响应失败: ${parseError.message}`);
+    }
+
+    // 更新数据库
+    const { data: updatedCompany, error: updateError } = await supabase
+      .from('companies')
+      .update(completedData)
+      .eq('id', companyId)
+      .select()
+      .single();
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    return res.status(200).json({ 
+      success: true, 
+      message: '公司数据补齐成功', 
+      company: updatedCompany,
+      completedFields: Object.keys(completedData)
+    });
+  } catch (error: any) {
+    console.error('补齐公司数据失败:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: `补齐公司数据失败: ${error.message}` 
+    });
+  }
+}
+
+// 上传logo到Storage
+async function handleUploadLogoToStorage(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { token, companyId, logoBase64, fileName } = req.body;
+  if (token !== process.env.ADMIN_TOKEN && token !== 'admin-token-123') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    initClients();
+    
+    // 将base64转换为buffer
+    const base64Data = logoBase64.replace(/^data:image\/[a-z]+;base64,/, '');
+    const buffer = Buffer.from(base64Data, 'base64');
+    
+    // 生成文件名
+    const finalFileName = fileName || `logo-${companyId}-${Date.now()}.png`;
+    
+    // 上传到Supabase Storage
+    const { data, error } = await supabase.storage
+      .from('company-logos')
+      .upload(finalFileName, buffer, {
+        contentType: 'image/png',
+        upsert: true
+      });
+
+    if (error) {
+      throw error;
+    }
+
+    // 获取公共URL
+    const { data: publicUrlData } = supabase.storage
+      .from('company-logos')
+      .getPublicUrl(finalFileName);
+
+    const publicUrl = publicUrlData.publicUrl;
+
+    // 更新数据库
+    const { data: updatedCompany, error: updateError } = await supabase
+      .from('companies')
+      .update({
+        logo_storage_url: publicUrl,
+        logo_updated_at: new Date().toISOString()
+      })
+      .eq('id', companyId)
+      .select()
+      .single();
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    return res.status(200).json({ 
+      success: true, 
+      message: 'Logo上传到Storage成功', 
+      company: updatedCompany,
+      storageUrl: publicUrl
+    });
+  } catch (error: any) {
+    console.error('上传Logo到Storage失败:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: `上传Logo到Storage失败: ${error.message}` 
+    });
+  }
+}
+
+// 获取Storage logo
+async function handleGetStorageLogo(req: any, res: any) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { companyId } = req.query;
+  
+  try {
+    initClients();
+    
+    const { data, error } = await supabase
+      .from('companies')
+      .select('id, name, logo_storage_url, logo_base64, logo_url, logo_updated_at')
+      .eq('id', companyId)
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return res.status(200).json({ 
+      success: true, 
+      logo: data 
+    });
+  } catch (error: any) {
+    console.error('获取Storage Logo失败:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: `获取Storage Logo失败: ${error.message}` 
+    });
+  }
+}
+
+export default handler;

@@ -1,0 +1,32 @@
+[
+  {
+    "company": {
+      "name": "OpenAI"
+    },
+    "error": "Cannot read properties of undefined (reading '0')"
+  },
+  {
+    "company": {
+      "name": "Anthropic"
+    },
+    "error": "Cannot read properties of undefined (reading '0')"
+  },
+  {
+    "company": {
+      "name": "xAI"
+    },
+    "error": "Cannot read properties of undefined (reading '0')"
+  },
+  {
+    "company": {
+      "name": "Google"
+    },
+    "error": "Cannot read properties of undefined (reading '0')"
+  },
+  {
+    "company": {
+      "name": "DeepSeek"
+    },
+    "error": "Cannot read properties of undefined (reading '0')"
+  }
+]

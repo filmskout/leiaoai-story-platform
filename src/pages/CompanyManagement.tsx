@@ -10,9 +10,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AlertCircle, Plus, Edit, Trash2, Save, X, Building2, Globe, Users, Calendar, DollarSign } from 'lucide-react';
+import { AlertCircle, Plus, Edit, Trash2, Save, X, Building2, Globe, Users, Calendar, DollarSign, Image } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import CompanyLogoManager from '@/components/CompanyLogoManager';
 
 interface Company {
   id: string;
@@ -497,7 +498,19 @@ const CompanyManagement: React.FC = () => {
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    {company.logo_base64 ? (
+                    {company.logo_storage_url ? (
+                      <img
+                        src={company.logo_storage_url}
+                        alt={company.name}
+                        className="w-12 h-12 rounded-lg object-cover"
+                        onError={(e) => {
+                          // Fallback to base64 if storage fails
+                          if (company.logo_base64) {
+                            e.currentTarget.src = company.logo_base64;
+                          }
+                        }}
+                      />
+                    ) : company.logo_base64 ? (
                       <img
                         src={company.logo_base64}
                         alt={company.name}
@@ -581,7 +594,7 @@ const CompanyManagement: React.FC = () => {
 
       {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>编辑公司信息</DialogTitle>
             <DialogDescription>
@@ -589,138 +602,159 @@ const CompanyManagement: React.FC = () => {
             </DialogDescription>
           </DialogHeader>
           
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="edit-name">公司名称 *</Label>
-              <Input
-                id="edit-name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="例如：OpenAI"
-              />
-            </div>
+          <Tabs defaultValue="basic" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="basic">基本信息</TabsTrigger>
+              <TabsTrigger value="logo">Logo管理</TabsTrigger>
+            </TabsList>
             
-            <div className="space-y-2">
-              <Label htmlFor="edit-category">分类 *</Label>
-              <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="选择分类" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category.value} value={category.value}>
-                      {category.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <TabsContent value="basic" className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-name">公司名称 *</Label>
+                  <Input
+                    id="edit-name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="例如：OpenAI"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="edit-category">分类 *</Label>
+                  <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="选择分类" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((category) => (
+                        <SelectItem key={category.value} value={category.value}>
+                          {category.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="edit-headquarters">总部地址 *</Label>
+                  <Input
+                    id="edit-headquarters"
+                    value={formData.headquarters}
+                    onChange={(e) => setFormData({ ...formData, headquarters: e.target.value })}
+                    placeholder="例如：San Francisco, USA"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="edit-website">官网 *</Label>
+                  <Input
+                    id="edit-website"
+                    value={formData.website}
+                    onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                    placeholder="https://example.com"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="edit-valuation">估值 (美元) *</Label>
+                  <Input
+                    id="edit-valuation"
+                    type="number"
+                    value={formData.valuation}
+                    onChange={(e) => setFormData({ ...formData, valuation: e.target.value })}
+                    placeholder="1000000000"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="edit-founded_year">成立年份 *</Label>
+                  <Input
+                    id="edit-founded_year"
+                    type="number"
+                    value={formData.founded_year}
+                    onChange={(e) => setFormData({ ...formData, founded_year: e.target.value })}
+                    placeholder="2020"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="edit-employee_count">员工数量</Label>
+                  <Input
+                    id="edit-employee_count"
+                    value={formData.employee_count}
+                    onChange={(e) => setFormData({ ...formData, employee_count: e.target.value })}
+                    placeholder="例如：100-200"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="edit-industry">行业</Label>
+                  <Input
+                    id="edit-industry"
+                    value={formData.industry}
+                    onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
+                    placeholder="例如：Artificial Intelligence"
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="edit-description">中文描述 *</Label>
+                <Textarea
+                  id="edit-description"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="详细描述公司的业务、技术特点等..."
+                  rows={3}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="edit-english_description">英文描述 *</Label>
+                <Textarea
+                  id="edit-english_description"
+                  value={formData.english_description}
+                  onChange={(e) => setFormData({ ...formData, english_description: e.target.value })}
+                  placeholder="English description of the company..."
+                  rows={3}
+                />
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="edit-is_overseas"
+                  checked={formData.is_overseas}
+                  onChange={(e) => setFormData({ ...formData, is_overseas: e.target.checked })}
+                  className="rounded"
+                />
+                <Label htmlFor="edit-is_overseas">海外公司</Label>
+              </div>
+              
+              <div className="flex justify-end space-x-2">
+                <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                  取消
+                </Button>
+                <Button onClick={handleEditCompany}>
+                  <Save className="h-4 w-4 mr-2" />
+                  保存更改
+                </Button>
+              </div>
+            </TabsContent>
             
-            <div className="space-y-2">
-              <Label htmlFor="edit-headquarters">总部地址 *</Label>
-              <Input
-                id="edit-headquarters"
-                value={formData.headquarters}
-                onChange={(e) => setFormData({ ...formData, headquarters: e.target.value })}
-                placeholder="例如：San Francisco, USA"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="edit-website">官网 *</Label>
-              <Input
-                id="edit-website"
-                value={formData.website}
-                onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                placeholder="https://example.com"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="edit-valuation">估值 (美元) *</Label>
-              <Input
-                id="edit-valuation"
-                type="number"
-                value={formData.valuation}
-                onChange={(e) => setFormData({ ...formData, valuation: e.target.value })}
-                placeholder="1000000000"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="edit-founded_year">成立年份 *</Label>
-              <Input
-                id="edit-founded_year"
-                type="number"
-                value={formData.founded_year}
-                onChange={(e) => setFormData({ ...formData, founded_year: e.target.value })}
-                placeholder="2020"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="edit-employee_count">员工数量</Label>
-              <Input
-                id="edit-employee_count"
-                value={formData.employee_count}
-                onChange={(e) => setFormData({ ...formData, employee_count: e.target.value })}
-                placeholder="例如：100-200"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="edit-industry">行业</Label>
-              <Input
-                id="edit-industry"
-                value={formData.industry}
-                onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
-                placeholder="例如：Artificial Intelligence"
-              />
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="edit-description">中文描述 *</Label>
-            <Textarea
-              id="edit-description"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="详细描述公司的业务、技术特点等..."
-              rows={3}
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="edit-english_description">英文描述 *</Label>
-            <Textarea
-              id="edit-english_description"
-              value={formData.english_description}
-              onChange={(e) => setFormData({ ...formData, english_description: e.target.value })}
-              placeholder="English description of the company..."
-              rows={3}
-            />
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              id="edit-is_overseas"
-              checked={formData.is_overseas}
-              onChange={(e) => setFormData({ ...formData, is_overseas: e.target.checked })}
-              className="rounded"
-            />
-            <Label htmlFor="edit-is_overseas">海外公司</Label>
-          </div>
-          
-          <div className="flex justify-end space-x-2">
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-              取消
-            </Button>
-            <Button onClick={handleEditCompany}>
-              <Save className="h-4 w-4 mr-2" />
-              保存更改
-            </Button>
-          </div>
+            <TabsContent value="logo" className="space-y-4">
+              {editingCompany && (
+                <CompanyLogoManager 
+                  company={editingCompany} 
+                  onUpdate={(updatedCompany) => {
+                    setEditingCompany(updatedCompany);
+                    setCompanies(companies.map(c => c.id === updatedCompany.id ? updatedCompany : c));
+                  }} 
+                />
+              )}
+            </TabsContent>
+          </Tabs>
         </DialogContent>
       </Dialog>
     </div>

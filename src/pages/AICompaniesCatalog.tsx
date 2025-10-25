@@ -670,9 +670,33 @@ export default function AICompaniesCatalog() {
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center overflow-hidden">
-                          {company.logo_url ? (
+                          {company.logo_storage_url ? (
+                            <img
+                              src={company.logo_storage_url}
+                              alt={company.name}
+                              className="w-full h-full object-contain"
+                              onError={(e) => {
+                                // Fallback to logo_url if storage fails
+                                if (company.logo_url) {
+                                  e.currentTarget.src = company.logo_url;
+                                }
+                              }}
+                            />
+                          ) : company.logo_url ? (
                             <img
                               src={company.logo_url}
+                              alt={company.name}
+                              className="w-full h-full object-contain"
+                              onError={(e) => {
+                                // Fallback to base64 if URL fails
+                                if (company.logo_base64) {
+                                  e.currentTarget.src = company.logo_base64;
+                                }
+                              }}
+                            />
+                          ) : company.logo_base64 ? (
+                            <img
+                              src={company.logo_base64}
                               alt={company.name}
                               className="w-full h-full object-contain"
                             />
