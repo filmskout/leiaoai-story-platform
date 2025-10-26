@@ -3064,9 +3064,7 @@ async function callDeepSeek(message: string, apiKey: string, language: string): 
           { role: 'user', content: message }
         ],
         temperature: 0.7,
-        max_tokens: 2000,
-        // 禁用思考模式，加快响应速度
-        thinking: false
+        max_tokens: 2000
       })
     });
     
