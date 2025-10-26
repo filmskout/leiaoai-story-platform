@@ -141,6 +141,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // 根据选择的模型和可用密钥决定调用顺序
     const attempts: Array<() => Promise<{ response: string; model: string }>> = [];
     
+    console.log('🔍 Available API keys:', { 
+      openai: !!openaiApiKey, 
+      deepseek: !!deepseekApiKey, 
+      qwen: !!qwenApiKey,
+      requestedModel: model
+    });
+    
     // 设置优先级
     if (model === 'openai') {
       if (openaiApiKey) attempts.push(tryOpenAI);
@@ -157,15 +164,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (openaiApiKey) attempts.push(tryOpenAI);
     }
     
+    console.log(`📋 Attempting ${attempts.length} API(s):`, attempts.map(a => a.name || 'anonymous'));
+    
+    // 如果没有任何可用的API
+    if (attempts.length === 0) {
+      console.error('❌ No API keys available for any model');
+      throw new Error('No API keys configured for any model');
+    }
+    
     // 尝试所有可用的API
     for (const attempt of attempts) {
       try {
+        console.log(`🔄 Attempting API: ${attempt.name || 'anonymous'}`);
         const result = await attempt();
         response = result.response;
         usedModel = result.model;
+        console.log(`✅ API succeeded: ${usedModel}`);
         break;
-      } catch (error) {
-        console.error(`❌ API尝试失败:`, error);
+      } catch (error: any) {
+        console.error(`❌ API尝试失败:`, error.message);
         lastError = error;
         // 继续尝试下一个
       }
@@ -173,7 +190,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     
     // 如果所有API都失败
     if (!response) {
-      throw lastError || new Error('No valid API key available for the selected model');
+      console.error('❌ All API attempts failed');
+      throw lastError || new Error('All API attempts failed');
     }
     
     console.log('✅ AI Chat Response:', { model: usedModel, responseLength: response.length });
