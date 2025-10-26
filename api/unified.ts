@@ -2993,7 +2993,7 @@ async function handleAIChat(req: any, res: any) {
           return res.status(200).json({
             success: true,
             response: deepseekResponse,
-            model: 'deepseek-chat',
+            model: 'deepseek-v3.2-exp',
             sessionId: sessionId,
             timestamp: new Date().toISOString()
           });
