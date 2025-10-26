@@ -89,7 +89,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             { role: 'user', content: message }
           ],
           temperature: 0.7,
-          max_tokens: 1500
+          max_tokens: 800,  // 减少token数量以提高速度
+          stream: false
         })
       });
       
