@@ -2901,7 +2901,7 @@ async function handleAIChat(req: any, res: any) {
         if (deepseekApiKey) {
           const deepseekResponse = await callDeepSeek(message, deepseekApiKey, language);
           response = deepseekResponse;
-          usedModel = 'deepseek-chat';
+          usedModel = 'deepseek-v3.2-exp';
         } else {
           throw error; // 如果DeepSeek也不可用，抛出原始错误
         }
@@ -2914,7 +2914,7 @@ async function handleAIChat(req: any, res: any) {
       
       const deepseekResponse = await callDeepSeek(message, deepseekApiKey, language);
       response = deepseekResponse;
-      usedModel = 'deepseek-chat';
+      usedModel = 'deepseek-v3.2-exp';
       
     } else if (model === 'qwen') {
       if (!qwenApiKey) {
@@ -2931,7 +2931,7 @@ async function handleAIChat(req: any, res: any) {
         if (deepseekApiKey) {
           const deepseekResponse = await callDeepSeek(message, deepseekApiKey, language);
           response = deepseekResponse;
-          usedModel = 'deepseek-chat';
+          usedModel = 'deepseek-v3.2-exp';
         } else {
           throw error; // 如果DeepSeek也不可用，抛出原始错误
         }
@@ -2943,7 +2943,7 @@ async function handleAIChat(req: any, res: any) {
         try {
           const deepseekResponse = await callDeepSeek(message, deepseekApiKey, language);
           response = deepseekResponse;
-          usedModel = 'deepseek-chat';
+          usedModel = 'deepseek-v3.2-exp';
         } catch (error) {
           console.log('DeepSeek failed, trying OpenAI...');
           if (openaiApiKey) {
@@ -3058,13 +3058,15 @@ async function callDeepSeek(message: string, apiKey: string, language: string): 
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'deepseek-chat',
+        model: 'deepseek-v3.2-exp',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: message }
         ],
         temperature: 0.7,
-        max_tokens: 2000
+        max_tokens: 2000,
+        // 禁用思考模式，加快响应速度
+        thinking: false
       })
     });
     
