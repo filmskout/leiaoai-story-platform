@@ -5,10 +5,7 @@
 UPDATE companies 
 SET logo_url = 'https://logo.clearbit.com/adobe.com',
     logo_storage_url = 'https://logo.clearbit.com/adobe.com',
-    logo_updated_at = NOW(),
-    description = 'Adobe是全球领先的数字媒体和营销解决方案提供商，提供创作软件、数字体验软件和企业解决方案。',
-    english_description = 'Adobe is a leading global provider of digital media and marketing solutions.',
-    valuation = 200000000000
+    logo_updated_at = NOW()
 WHERE name = 'Adobe';
 
 -- 为Adobe创建Express和Firefly项目（如果还没有）
@@ -38,10 +35,7 @@ ON CONFLICT DO NOTHING;
 UPDATE companies 
 SET logo_url = 'https://logo.clearbit.com/vercel.com',
     logo_storage_url = 'https://logo.clearbit.com/vercel.com',
-    logo_updated_at = NOW(),
-    description = 'Vercel是前端云平台提供商，提供构建和部署现代Web应用的工具和服务。',
-    english_description = 'Vercel is a frontend cloud platform for building and deploying modern web applications.',
-    valuation = 3000000000
+    logo_updated_at = NOW()
 WHERE name = 'Vercel';
 
 -- 为Vercel创建v0项目（如果还没有）
