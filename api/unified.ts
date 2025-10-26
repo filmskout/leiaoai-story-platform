@@ -2871,6 +2871,11 @@ async function handleAIChat(req: any, res: any) {
     const deepseekApiKey = process.env.DEEPSEEK_API_KEY;
     const qwenApiKey = process.env.QWEN_API_KEY;
     
+    // 地域检测：从请求头判断用户所在地区
+    const userRegion = req.headers['x-vercel-ip-country'] || 'CN'; // Vercel自动提供国家代码
+    const qwenRegion = userRegion === 'CN' ? 'beijing' : 'singapore'; // 中国用北京，海外用新加坡
+    console.log(`🌍 User region: ${userRegion}, Using Qwen region: ${qwenRegion}`);
+    
     console.log('🔑 API Keys Status:', {
       openai: !!openaiApiKey,
       deepseek: !!deepseekApiKey,
@@ -2917,7 +2922,7 @@ async function handleAIChat(req: any, res: any) {
       }
       
       try {
-        const qwenResponse = await callQwen(message, qwenApiKey, language);
+        const qwenResponse = await callQwen(message, qwenApiKey, language, qwenRegion);
         response = qwenResponse;
         usedModel = 'qwen-turbo';
       } catch (error: any) {
@@ -2946,7 +2951,7 @@ async function handleAIChat(req: any, res: any) {
             response = openaiResponse;
             usedModel = 'gpt-4';
           } else if (qwenApiKey) {
-            const qwenResponse = await callQwen(message, qwenApiKey, language);
+            const qwenResponse = await callQwen(message, qwenApiKey, language, qwenRegion);
             response = qwenResponse;
             usedModel = 'qwen-turbo';
           } else {
@@ -2958,7 +2963,7 @@ async function handleAIChat(req: any, res: any) {
         response = openaiResponse;
         usedModel = 'gpt-4';
       } else if (qwenApiKey) {
-        const qwenResponse = await callQwen(message, qwenApiKey, language);
+        const qwenResponse = await callQwen(message, qwenApiKey, language, qwenRegion);
         response = qwenResponse;
         usedModel = 'qwen-turbo';
       } else {
@@ -3082,38 +3087,54 @@ async function callDeepSeek(message: string, apiKey: string, language: string): 
 }
 
 // Qwen API调用
-async function callQwen(message: string, apiKey: string, language: string): Promise<string> {
+async function callQwen(message: string, apiKey: string, language: string, region: string = 'beijing'): Promise<string> {
   const systemPrompt = language.startsWith('zh') 
     ? '你是一个专业的AI助手，请用中文回答用户的问题。'
     : 'You are a professional AI assistant. Please answer user questions in English.';
-    
-  const response = await fetch('https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation', {
+  
+  // 根据地域选择端点
+  let endpoint: string;
+  switch (region) {
+    case 'singapore':
+      endpoint = 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions';
+      break;
+    case 'finance':
+      endpoint = 'https://dashscope-finance.aliyuncs.com/compatible-mode/v1/chat/completions';
+      break;
+    case 'beijing':
+    default:
+      endpoint = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
+      break;
+  }
+  
+  console.log(`🔵 Calling Qwen API (${region}): ${endpoint}`);
+  
+  const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${apiKey}`,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      model: 'qwen-turbo',
-      input: {
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: message }
-        ]
-      },
-      parameters: {
-        temperature: 0.7,
-        max_tokens: 2000
-      }
-      })
-    });
+      model: 'qwen-turbo',  // 可以改为 qwen-turbo-latest 以测试最新版本
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: message }
+      ],
+      temperature: 0.7,
+      max_tokens: 2000
+    })
+  });
 
-    if (!response.ok) {
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('❌ Qwen API Error:', response.status, errorText);
     throw new Error(`Qwen API error: ${response.status}`);
   }
   
   const data = await response.json();
-  return data.output.text;
+  console.log('✅ Qwen API Success');
+  return data.choices[0].message.content;
 }
 
 // 修复数据库触发器
