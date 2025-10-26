@@ -106,6 +106,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const tryQwen = async (): Promise<{ response: string; model: string }> => {
       if (!qwenApiKey) throw new Error('QWEN_API_KEY not configured');
       
+      // 使用正确的Qwen API格式
       const apiResponse = await fetch('https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation', {
         method: 'POST',
         headers: {
@@ -121,20 +122,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             ]
           },
           parameters: {
-            temperature: 0.7,
-            max_tokens: 1500
+            max_tokens: 800
           }
         })
       });
       
       if (!apiResponse.ok) {
         const errorText = await apiResponse.text();
-        throw new Error(`Qwen API error: ${apiResponse.status} - ${errorText}`);
+        console.error('Qwen API error:', errorText);
+        throw new Error(`Qwen API error: ${apiResponse.status}`);
       }
       
       const data = await apiResponse.json();
-      if (!data.output || !data.output.choices || !data.output.choices[0]) {
-        throw new Error('Invalid Qwen API response structure');
+      console.log('Qwen API response:', JSON.stringify(data).slice(0, 200));
+      
+      if (!data.output || !data.output.choices || !data.output.choices[0] || !data.output.choices[0].message) {
+        throw new Error(`Invalid Qwen API response structure: ${JSON.stringify(data).slice(0, 200)}`);
       }
       return { response: data.output.choices[0].message.content, model: 'qwen-turbo' };
     };
