@@ -5,11 +5,11 @@ BEGIN;
 -- 步骤1: 获取正确的公司ID
 DO $$
 DECLARE
-  adobe_company_id INTEGER;
-  vercel_company_id INTEGER;
-  express_company_id INTEGER;
-  firefly_company_id INTEGER;
-  v0_company_id INTEGER;
+  adobe_company_id UUID;
+  vercel_company_id UUID;
+  express_company_id UUID;
+  firefly_company_id UUID;
+  v0_company_id UUID;
 BEGIN
   -- 获取Adobe公司ID
   SELECT id INTO adobe_company_id FROM companies WHERE name = 'Adobe' LIMIT 1;
