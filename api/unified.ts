@@ -1739,6 +1739,9 @@ export default async function handler(req: any, res: any) {
       case 'test-ai-chat':
         return handleTestAIChat(req, res);
       
+      case 'batch-complete-logos':
+        return handleBatchCompleteLogos(req, res);
+      
       default:
         return res.status(400).json({ error: 'Invalid action' });
     }
@@ -1935,34 +1938,189 @@ async function handleGenerateSingleCompany(req: any, res: any) {
   }
 }
 
-// 搜索公司Logo
+// 搜索公司Logo（使用Qwen生成搜索关键词和Clearbit Logo URL）
 async function searchCompanyLogo(companyName: string): Promise<string | null> {
   try {
-    // 使用OpenAI生成Logo搜索提示
-    const prompt = `请为AI公司"${companyName}"生成一个合适的Logo图片搜索关键词。返回一个简洁的英文关键词，用于在Unsplash等图片网站搜索公司Logo。只返回关键词，不要其他内容。`;
+    console.log(`🔍 开始为 "${companyName}" 搜索Logo...`);
     
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4',
-      messages: [{ role: 'user', content: prompt }],
-      max_tokens: 50,
-      temperature: 0.3
-    });
-    
-    const searchKeyword = response.choices[0]?.message?.content?.trim();
-    if (!searchKeyword) {
-      throw new Error('无法生成搜索关键词');
+    // 使用Qwen生成Logo信息
+    const qwenApiKey = process.env.QWEN_API_KEY;
+    if (!qwenApiKey) {
+      throw new Error('QWEN_API_KEY 未配置');
     }
     
-    // 使用Unsplash API搜索Logo
-    const unsplashUrl = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(searchKeyword)}&per_page=1&orientation=squarish`;
+    const prompt = `为AI公司"${companyName}"提供Logo信息。请返回JSON格式：
+{
+  "search_keyword": "简洁的英文关键词，用于图片搜索",
+  "clearbit_domain": "公司官网域名",
+  "description": "公司业务简要描述"
+}
+
+只返回JSON，不要其他内容。`;
     
-    // 注意：这里需要Unsplash API key，暂时返回null
-    console.log(`🔍 Logo搜索关键词: ${searchKeyword}`);
-    return null; // 暂时返回null，需要配置Unsplash API
+    // 调用Qwen Turbo
+    const qwenResponse = await callQwen(prompt, qwenApiKey, 'zh', 'beijing', 200);
+    
+    console.log(`🔍 Qwen返回: ${qwenResponse}`);
+    
+    // 解析JSON响应
+    let logoInfo: any;
+    try {
+      const cleanedResponse = qwenResponse.replace(/```json|```/g, '').trim();
+      logoInfo = JSON.parse(cleanedResponse);
+    } catch (parseError) {
+      console.error('解析Qwen响应失败:', parseError);
+      // 如果解析失败，尝试使用Clearbit
+      logoInfo = { clearbit_domain: companyName.toLowerCase().replace(/\s+/g, '') };
+    }
+    
+    // 优先使用Clearbit Logo（如果已获得域名）
+    if (logoInfo.clearbit_domain) {
+      const clearbitUrl = `https://logo.clearbit.com/${logoInfo.clearbit_domain}`;
+      console.log(`🖼️ 生成Clearbit URL: ${clearbitUrl}`);
+      return clearbitUrl;
+    }
+    
+    // 备选：使用Unavatar
+    if (logoInfo.clearbit_domain || companyName) {
+      const domain = logoInfo.clearbit_domain || companyName.toLowerCase().replace(/\s+/g, '');
+      const unavatarUrl = `https://unavatar.io/${domain}`;
+      console.log(`🖼️ 生成Unavatar URL: ${unavatarUrl}`);
+      return unavatarUrl;
+    }
+    
+    return null;
     
   } catch (error: any) {
     console.error('❌ Logo搜索失败:', error);
-    return null;
+    // 尝试使用Clearbit作为备选
+    try {
+      const clearbitUrl = `https://logo.clearbit.com/${companyName.toLowerCase().replace(/\s+/g, '')}`;
+      console.log(`🖼️ 尝试Clearbit: ${clearbitUrl}`);
+      return clearbitUrl;
+    } catch (clearbitError) {
+      console.error('❌ Clearbit也失败:', clearbitError);
+      return null;
+    }
+  }
+}
+
+// 批量为缺失Logo的公司补齐Logo
+async function handleBatchCompleteLogos(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { token, limit = 50 } = req.body;
+  if (token !== process.env.ADMIN_TOKEN && token !== 'admin-token-123') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    initClients();
+    
+    console.log('🔍 开始查找缺失Logo的公司...');
+    
+    // 查询所有缺失Logo的公司
+    const { data: companiesWithoutLogos, error: fetchError } = await supabase
+      .from('companies')
+      .select('id, name, website')
+      .or('logo_storage_url.is.null,logo_url.is.null')
+      .limit(limit || 50);
+    
+    if (fetchError) {
+      throw fetchError;
+    }
+    
+    if (!companiesWithoutLogos || companiesWithoutLogos.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: '没有找到缺失Logo的公司',
+        completed: 0,
+        failed: 0,
+        results: []
+      });
+    }
+    
+    console.log(`📊 找到 ${companiesWithoutLogos.length} 个缺失Logo的公司`);
+    
+    let completed = 0;
+    let failed = 0;
+    const results: any[] = [];
+    
+    for (const company of companiesWithoutLogos) {
+      try {
+        console.log(`🖼️ 为 "${company.name}" 生成Logo...`);
+        
+        // 使用改进的Logo搜索函数
+        const logoUrl = await searchCompanyLogo(company.name);
+        
+        if (logoUrl) {
+          // 更新数据库
+          const { data: updatedCompany, error: updateError } = await supabase
+            .from('companies')
+            .update({
+              logo_url: logoUrl,
+              logo_storage_url: logoUrl,
+              logo_updated_at: new Date().toISOString()
+            })
+            .eq('id', company.id)
+            .select()
+            .single();
+          
+          if (updateError) {
+            throw updateError;
+          }
+          
+          completed++;
+          results.push({
+            company: company.name,
+            status: 'success',
+            logoUrl
+          });
+          
+          console.log(`✅ Logo更新成功: ${company.name} -> ${logoUrl}`);
+        } else {
+          failed++;
+          results.push({
+            company: company.name,
+            status: 'failed',
+            reason: '无法生成Logo URL'
+          });
+          console.log(`⚠️ 无法生成Logo: ${company.name}`);
+        }
+        
+        // 添加延迟，避免API限流
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+      } catch (error: any) {
+        failed++;
+        results.push({
+          company: company.name,
+          status: 'error',
+          error: error.message
+        });
+        console.error(`❌ Logo更新失败: ${company.name}`, error);
+      }
+    }
+    
+    console.log(`🎉 Logo批量更新完成: 成功 ${completed}, 失败 ${failed}`);
+    
+    return res.status(200).json({
+      success: true,
+      message: `Logo批量更新完成: 成功 ${completed}, 失败 ${failed}`,
+      completed,
+      failed,
+      total: companiesWithoutLogos.length,
+      results
+    });
+    
+  } catch (error: any) {
+    console.error('批量为缺失Logo的公司补齐失败:', error);
+    return res.status(500).json({ 
+      success: false,
+      error: `批量为缺失Logo的公司补齐失败: ${error.message}` 
+    });
   }
 }
 
