@@ -1,158 +1,157 @@
 #!/usr/bin/env node
+/**
+ * 使用 LLM 生成完整的 SQL 脚本
+ * 生成后可直接复制到 SQL Editor 执行
+ */
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { createClient } from '@supabase/supabase-js';
+import fetch from 'node-fetch';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const QWEN_API_KEY = process.env.QWEN_API_KEY;
+const QWEN_API_URL = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
 
-// 读取迁移数据
-const data = JSON.parse(fs.readFileSync('migrated-aiverse-companies-optimized.json', 'utf8'));
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-console.log(`📊 发现 ${data.length} 家公司数据`);
+// 调用Qwen API
+async function callQwen(message: string, maxTokens: number = 2000): Promise<string> {
+  const response = await fetch(QWEN_API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${QWEN_API_KEY}`
+    },
+    body: JSON.stringify({
+      model: 'qwen-turbo',
+      messages: [
+        { role: 'user', content: message }
+      ],
+      temperature: 0.3,
+      max_tokens: maxTokens
+    })
+  });
 
-// 生成SQL插入脚本
-let sql = `-- 完整AIverse数据插入脚本 - ${data.length}家公司
--- 在Supabase SQL Editor中执行
-
--- 1. 插入所有公司数据
-INSERT INTO companies (name, description) VALUES\n`;
-
-// 生成公司插入语句
-const companyInserts = data.map((item, index) => {
-  const name = item.company.name.replace(/'/g, "''"); // 转义单引号
-  const description = item.company.description.replace(/'/g, "''"); // 转义单引号
-  return `('${name}', '${description}')`;
-});
-
-sql += companyInserts.join(',\n') + ';\n\n';
-
-// 生成项目插入语句
-sql += `-- 2. 插入所有项目数据
-WITH company_ids AS (
-  SELECT name, id FROM companies WHERE name IN (${data.map(item => `'${item.company.name.replace(/'/g, "''")}'`).join(', ')})
-)
-INSERT INTO projects (company_id, name, description, category, website, pricing_model, target_users, key_features, use_cases)
-SELECT 
-  ci.id,
-  p.name,
-  p.description,
-  p.category,
-  p.website,
-  p.pricing_model,
-  p.target_users,
-  p.key_features,
-  p.use_cases
-FROM company_ids ci
-CROSS JOIN LATERAL (
-  VALUES\n`;
-
-// 为每个公司生成项目数据
-const projectValues = [];
-data.forEach((item, index) => {
-  if (item.projects && item.projects.length > 0) {
-    item.projects.forEach((project, pIndex) => {
-      const name = project.name.replace(/'/g, "''");
-      const description = project.description.replace(/'/g, "''");
-      const category = project.category.replace(/'/g, "''");
-      const website = project.website.replace(/'/g, "''");
-      const pricingModel = project.pricing_model.replace(/'/g, "''");
-      const targetUsers = project.target_users.replace(/'/g, "''");
-      const keyFeatures = project.key_features.replace(/'/g, "''");
-      const useCases = project.use_cases.replace(/'/g, "''");
-      
-      projectValues.push(`    ('${item.company.name.replace(/'/g, "''")}', '${name}', '${description}', '${category}', '${website}', '${pricingModel}', '${targetUsers}', '${keyFeatures}', '${useCases}')`);
-    });
+  if (!response.ok) {
+    throw new Error(`Qwen API失败: ${response.statusText}`);
   }
-});
 
-sql += projectValues.join(',\n') + '\n';
-sql += `) AS p(company_name, name, description, category, website, pricing_model, target_users, key_features, use_cases)
-WHERE ci.name = p.company_name;\n\n`;
+  const data = await response.json();
+  return data.choices[0].message.content;
+}
 
-// 生成融资插入语句
-sql += `-- 3. 插入所有融资数据
-WITH company_ids AS (
-  SELECT name, id FROM companies WHERE name IN (${data.map(item => `'${item.company.name.replace(/'/g, "''")}'`).join(', ')})
-)
-INSERT INTO fundings (company_id, round, amount, investors, valuation, date, lead_investor)
-SELECT 
-  ci.id,
-  f.round,
-  f.amount,
-  f.investors,
-  f.valuation,
-  f.date,
-  f.lead_investor
-FROM company_ids ci
-CROSS JOIN LATERAL (
-  VALUES\n`;
+// 生成单个公司的SQL
+async function generateCompanySQL(company: any): Promise<string> {
+  console.log(`🔄 为 ${company.name} 生成SQL...`);
+  
+  const prompt = `你是AI行业研究专家。请为AI公司"${company.name}"生成准确的SQL更新语句。
 
-// 为每个公司生成融资数据
-const fundingValues = [];
-data.forEach((item, index) => {
-  if (item.fundings && item.fundings.length > 0) {
-    item.fundings.forEach((funding, fIndex) => {
-      const round = funding.round.replace(/'/g, "''");
-      const investors = funding.investors.replace(/'/g, "''");
-      const leadInvestor = funding.lead_investor.replace(/'/g, "''");
-      
-      fundingValues.push(`    ('${item.company.name.replace(/'/g, "''")}', '${round}', ${funding.amount}, '${investors}', ${funding.valuation}, ${funding.date}, '${leadInvestor}')`);
-    });
+要求：
+1. 生成完整的UPDATE SQL语句
+2. 所有数据必须真实准确
+3. website必须是官方真实网站
+4. description（100字内，中文）
+5. headquarters（城市, 国家）
+6. founded_year（数字）
+7. employee_count（格式：500-1000人）
+8. logo_url（使用clearbit格式）
+
+返回格式（只返回SQL语句，不要其他文字）：
+UPDATE companies 
+SET 
+  website = 'https://www.example.com',
+  description = '公司简介...',
+  headquarters = 'City, Country',
+  founded_year = 2020,
+  employee_count = '500-1000人',
+  logo_url = 'https://logo.clearbit.com/example.com'
+WHERE name = '${company.name}';`;
+  
+  const response = await callQwen(prompt, 2000);
+  
+  // 提取SQL语句
+  const sqlMatch = response.match(/UPDATE[\s\S]*?;/);
+  if (sqlMatch) {
+    return sqlMatch[0];
   }
-});
+  
+  return `-- 无法为 ${company.name} 生成SQL: ${response}`;
+}
 
-sql += fundingValues.join(',\n') + '\n';
-sql += `) AS f(company_name, round, amount, investors, valuation, date, lead_investor)
-WHERE ci.name = f.company_name;\n\n`;
-
-// 生成新闻插入语句
-sql += `-- 4. 插入所有新闻数据
-WITH company_ids AS (
-  SELECT name, id FROM companies WHERE name IN (${data.map(item => `'${item.company.name.replace(/'/g, "''")}'`).join(', ')})
-)
-INSERT INTO stories (company_id, title, summary, source_url, published_date, category, tags)
-SELECT 
-  ci.id,
-  s.title,
-  s.summary,
-  s.source_url,
-  s.published_date,
-  s.category,
-  s.tags
-FROM company_ids ci
-CROSS JOIN LATERAL (
-  VALUES\n`;
-
-// 为每个公司生成新闻数据
-const storyValues = [];
-data.forEach((item, index) => {
-  if (item.stories && item.stories.length > 0) {
-    item.stories.forEach((story, sIndex) => {
-      const title = story.title.replace(/'/g, "''");
-      const summary = story.summary.replace(/'/g, "''");
-      const sourceUrl = story.source_url.replace(/'/g, "''");
-      const category = story.category.replace(/'/g, "''");
-      const tags = JSON.stringify(story.tags).replace(/'/g, "''");
+// 主函数
+async function main() {
+  console.log('🚀 开始生成补齐公司数据的SQL脚本...\n');
+  
+  try {
+    // 获取所有缺失数据的公司
+    const { data: companies, error } = await supabase
+      .from('companies')
+      .select('id, name, website, description, headquarters, founded_year, employee_count')
+      .or('website.is.null,website.eq.,description.is.null,description.eq.')
+      .limit(50)
+      .order('name');
+    
+    if (error) throw error;
+    
+    console.log(`📊 找到 ${companies.length} 个需要补齐的公司\n`);
+    
+    if (companies.length === 0) {
+      console.log('✅ 所有公司数据完整！');
+      return;
+    }
+    
+    // 生成SQL脚本头
+    console.log('// =========================================');
+    console.log('// 补齐公司数据的 SQL 脚本');
+    console.log('// 生成时间:', new Date().toISOString());
+    console.log('// =========================================\n');
+    
+    console.log('BEGIN;\n');
+    
+    // 为每个公司生成SQL
+    const sqlStatements: string[] = [];
+    
+    for (let i = 0; i < companies.length; i++) {
+      const company = companies[i];
+      console.log(`[${i + 1}/${companies.length}] ${company.name}`);
       
-      storyValues.push(`    ('${item.company.name.replace(/'/g, "''")}', '${title}', '${summary}', '${sourceUrl}', '${story.published_date}', '${category}', '${tags}')`);
-    });
+      try {
+        const sql = await generateCompanySQL(company);
+        console.log(sql + '\n');
+        sqlStatements.push(sql);
+        
+        // 添加延迟避免API限流
+        if (i < companies.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 1500));
+        }
+      } catch (error: any) {
+        console.error(`  ❌ 生成失败: ${error.message}`);
+        sqlStatements.push(`-- 无法为 ${company.name} 生成SQL`);
+      }
+    }
+    
+    console.log('COMMIT;\n');
+    
+    // 生成检查语句
+    console.log('-- ========================================');
+    console.log('-- 执行结果检查');
+    console.log('-- ========================================\n');
+    
+    const companyNames = companies.map(c => `'${c.name}'`).join(', ');
+    console.log(`SELECT name, website, description, headquarters, founded_year, employee_count`);
+    console.log(`FROM companies`);
+    console.log(`WHERE name IN (${companyNames})`);
+    console.log(`ORDER BY name;\n`);
+    
+    console.log('// =========================================');
+    console.log(`// 已生成 ${sqlStatements.length} 条 SQL 语句`);
+    console.log('// 请复制上方SQL到 Supabase SQL Editor 执行');
+    console.log('// =========================================');
+    
+  } catch (error: any) {
+    console.error('❌ 脚本执行失败:', error);
+    process.exit(1);
   }
-});
+}
 
-sql += storyValues.join(',\n') + '\n';
-sql += `) AS s(company_name, title, summary, source_url, published_date, category, tags)
-WHERE ci.name = s.company_name;\n\n`;
-
-sql += `-- 完成
-SELECT 'AIverse完整数据插入完成！共${data.length}家公司' as status;`;
-
-// 写入文件
-fs.writeFileSync('insert-all-aiverse-data.sql', sql);
-
-console.log(`✅ 完整SQL脚本已生成: insert-all-aiverse-data.sql`);
-console.log(`📊 包含 ${data.length} 家公司数据`);
-console.log(`📊 包含 ${projectValues.length} 个项目`);
-console.log(`📊 包含 ${fundingValues.length} 轮融资`);
-console.log(`📊 包含 ${storyValues.length} 篇新闻`);
+main();
