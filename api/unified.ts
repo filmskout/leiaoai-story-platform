@@ -2880,15 +2880,27 @@ async function handleAIChat(req: any, res: any) {
     let response: string;
     let usedModel: string;
     
-    // 根据模型选择API
+    // 根据模型选择API（带错误回退）
     if (model === 'openai' || model === 'gpt-4') {
       if (!openaiApiKey) {
         return res.status(400).json({ error: 'missing OPENAI_API_KEY' });
       }
       
-      const openaiResponse = await callOpenAI(message, openaiApiKey, language);
-      response = openaiResponse;
-      usedModel = 'gpt-4';
+      try {
+        const openaiResponse = await callOpenAI(message, openaiApiKey, language);
+        response = openaiResponse;
+        usedModel = 'gpt-4';
+      } catch (error: any) {
+        console.error('OpenAI failed, trying DeepSeek...', error.message);
+        // 如果OpenAI失败，回退到DeepSeek
+        if (deepseekApiKey) {
+          const deepseekResponse = await callDeepSeek(message, deepseekApiKey, language);
+          response = deepseekResponse;
+          usedModel = 'deepseek-chat';
+        } else {
+          throw error; // 如果DeepSeek也不可用，抛出原始错误
+        }
+      }
       
     } else if (model === 'deepseek') {
     if (!deepseekApiKey) {
@@ -2904,9 +2916,21 @@ async function handleAIChat(req: any, res: any) {
         return res.status(400).json({ error: 'missing QWEN_API_KEY' });
       }
       
-      const qwenResponse = await callQwen(message, qwenApiKey, language);
-      response = qwenResponse;
-      usedModel = 'qwen-turbo';
+      try {
+        const qwenResponse = await callQwen(message, qwenApiKey, language);
+        response = qwenResponse;
+        usedModel = 'qwen-turbo';
+      } catch (error: any) {
+        console.error('Qwen failed, trying DeepSeek...', error.message);
+        // 如果Qwen失败，回退到DeepSeek
+        if (deepseekApiKey) {
+          const deepseekResponse = await callDeepSeek(message, deepseekApiKey, language);
+          response = deepseekResponse;
+          usedModel = 'deepseek-chat';
+        } else {
+          throw error; // 如果DeepSeek也不可用，抛出原始错误
+        }
+      }
       
     } else {
       // 默认尝试DeepSeek，然后OpenAI，最后Qwen
