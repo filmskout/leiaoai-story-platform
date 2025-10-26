@@ -70,6 +70,28 @@ WHERE c.name = '腾讯 AI'
 INSERT INTO projects (company_id, name, description, website, category)
 SELECT 
   c.id,
+  '腾讯元宝',
+  '腾讯元宝是腾讯的AI助手，提供对话、创作、问答等功能，集成到腾讯产品生态中。',
+  'https://ybb.tencent.com',
+  'AI Assistant'
+FROM companies c
+WHERE c.name = '腾讯 AI'
+  AND NOT EXISTS (SELECT 1 FROM projects WHERE company_id = c.id AND name = '腾讯元宝');
+
+INSERT INTO projects (company_id, name, description, website, category)
+SELECT 
+  c.id,
+  'Code Buddy',
+  'Code Buddy是腾讯的AI编程助手，支持代码生成、调试、重构和文档生成，适用于多编程语言。',
+  'https://dev.tencent.com',
+  'AI Tool'
+FROM companies c
+WHERE c.name = '腾讯 AI'
+  AND NOT EXISTS (SELECT 1 FROM projects WHERE company_id = c.id AND name = 'Code Buddy');
+
+INSERT INTO projects (company_id, name, description, website, category)
+SELECT 
+  c.id,
   '腾讯云AI',
   '腾讯云AI提供企业级AI服务，包括机器学习、计算机视觉、语音识别和自然语言处理能力。',
   'https://cloud.tencent.com/product/ai',
@@ -91,6 +113,28 @@ SELECT
 FROM companies c
 WHERE c.name = '字节跳动 AI'
   AND NOT EXISTS (SELECT 1 FROM projects WHERE company_id = c.id AND name = '豆包');
+
+INSERT INTO projects (company_id, name, description, website, category)
+SELECT 
+  c.id,
+  'Trae',
+  'Trae是字节跳动的AI创作工具，提供代码生成、文档编辑和创意内容创作能力。',
+  'https://trae.byteplus.com',
+  'AI Tool'
+FROM companies c
+WHERE c.name = '字节跳动 AI'
+  AND NOT EXISTS (SELECT 1 FROM projects WHERE company_id = c.id AND name = 'Trae');
+
+INSERT INTO projects (company_id, name, description, website, category)
+SELECT 
+  c.id,
+  'Trae Solo',
+  'Trae Solo是Trae的单机版本，提供离线AI创作能力，适用于个人用户和小型团队。',
+  'https://trae.byteplus.com/solo',
+  'AI Tool'
+FROM companies c
+WHERE c.name = '字节跳动 AI'
+  AND NOT EXISTS (SELECT 1 FROM projects WHERE company_id = c.id AND name = 'Trae Solo');
 
 INSERT INTO projects (company_id, name, description, website, category)
 SELECT 
