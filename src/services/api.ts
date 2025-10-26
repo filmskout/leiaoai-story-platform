@@ -29,11 +29,12 @@ export async function fetchAIResponse(
 
     console.log('🔵 Frontend: Calling AI Chat API', { model, messageLength: lastMessage.content.length });
 
-    // 调用独立的AI Chat API
-    const resp = await fetch('/api/ai-chat', {
+    // 调用unified API (回到原来的工作方式)
+    const resp = await fetch('/api/unified', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        action: 'ai-chat',
         message: lastMessage.content,
         model,
         language: language
