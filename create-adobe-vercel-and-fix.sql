@@ -1,27 +1,25 @@
 -- 创建Adobe和Vercel公司，并修复项目关系
 
 -- 步骤1: 创建Adobe公司（如果不存在）
-INSERT INTO companies (name, description, website, category, is_overseas, founded_year, valuation)
+INSERT INTO companies (name, description, website, category, is_overseas, founded_year)
 SELECT 
   'Adobe',
   'Adobe是全球领先的数字媒体和营销解决方案提供商，提供创作软件、数字体验软件和企业解决方案。',
   'https://www.adobe.com',
   'Tech Giants',
   true,
-  1982,
-  200000000000
+  1982
 WHERE NOT EXISTS (SELECT 1 FROM companies WHERE name = 'Adobe');
 
 -- 步骤2: 创建Vercel公司（如果不存在）
-INSERT INTO companies (name, description, website, category, is_overseas, founded_year, valuation)
+INSERT INTO companies (name, description, website, category, is_overseas, founded_year)
 SELECT 
   'Vercel',
   'Vercel是前端云平台提供商，提供构建和部署现代Web应用的工具和服务。',
   'https://vercel.com',
   'AI Tools',
   true,
-  2015,
-  3000000000
+  2015
 WHERE NOT EXISTS (SELECT 1 FROM companies WHERE name = 'Vercel');
 
 -- 步骤3: 检查Adobe Express和Firefly是否已经作为错误公司存在
