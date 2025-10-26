@@ -61,13 +61,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            model: 'gpt-4o-mini',
+            model: 'gpt-3.5-turbo',  // 使用更快的模型
             messages: [
               { role: 'system', content: systemPrompt },
               { role: 'user', content: message }
             ],
             temperature: 0.7,
-            max_tokens: 800
+            max_tokens: 400  // 降低以提升响应速度
           }),
           signal: controller.signal
         });
@@ -82,7 +82,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         
         const data = await apiResponse.json();
         console.log('✅ OpenAI succeeded');
-        return { response: data.choices[0].message.content, model: 'gpt-4o-mini' };
+        return { response: data.choices[0].message.content, model: 'gpt-3.5-turbo' };
       } catch (error: any) {
         clearTimeout(timeoutId);
         if (error.name === 'AbortError') {
