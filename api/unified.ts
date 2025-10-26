@@ -2901,7 +2901,7 @@ async function handleAIChat(req: any, res: any) {
         if (deepseekApiKey) {
           const deepseekResponse = await callDeepSeek(message, deepseekApiKey, language);
           response = deepseekResponse;
-          usedModel = 'deepseek-v3.2-exp';
+          usedModel = 'deepseek-chat';
         } else {
           throw error; // 如果DeepSeek也不可用，抛出原始错误
         }
@@ -2931,7 +2931,7 @@ async function handleAIChat(req: any, res: any) {
         if (deepseekApiKey) {
           const deepseekResponse = await callDeepSeek(message, deepseekApiKey, language);
           response = deepseekResponse;
-          usedModel = 'deepseek-v3.2-exp';
+          usedModel = 'deepseek-chat';
         } else {
           throw error; // 如果DeepSeek也不可用，抛出原始错误
         }
@@ -2943,7 +2943,7 @@ async function handleAIChat(req: any, res: any) {
         try {
           const deepseekResponse = await callDeepSeek(message, deepseekApiKey, language);
           response = deepseekResponse;
-          usedModel = 'deepseek-v3.2-exp';
+          usedModel = 'deepseek-chat';
         } catch (error) {
           console.log('DeepSeek failed, trying OpenAI...');
           if (openaiApiKey) {
@@ -2993,7 +2993,7 @@ async function handleAIChat(req: any, res: any) {
           return res.status(200).json({
             success: true,
             response: deepseekResponse,
-            model: 'deepseek-v3.2-exp',
+            model: 'deepseek-chat',
             sessionId: sessionId,
             timestamp: new Date().toISOString()
           });
@@ -3058,7 +3058,7 @@ async function callDeepSeek(message: string, apiKey: string, language: string): 
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'deepseek-v3.2-exp',
+        model: 'deepseek-chat',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: message }
