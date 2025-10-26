@@ -1,5 +1,6 @@
-// 独立的AI Chat API
-export default async function handler(req: any, res: any) {
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   // 设置CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -14,7 +15,7 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    const { message, model = 'deepseek', language = 'zh' } = req.body;
+    const { message, model = 'deepseek', language = 'zh' } = req.body || {};
     
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
