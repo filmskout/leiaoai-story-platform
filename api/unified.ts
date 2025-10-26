@@ -313,7 +313,7 @@ Ensure all information is factual, current, and based on available public data. 
   }
 }
 
-// 生成新闻故事
+// 生成新闻故事（使用Qwen Turbo）
 async function generateNewsStory(companyName: string, isOverseas: boolean, useDeepSeek = false) {
   try {
     const newsSources = isOverseas ? [
@@ -395,16 +395,16 @@ Conduct thorough investigation and provide detailed analysis covering:
 19. Strategic partnerships and collaborations
 20. Industry predictions and forecasts
 
-Write a comprehensive 500-700 word news article in professional journalistic style. Include:
-- Compelling headline and lead paragraph
-- Detailed analysis with specific facts and figures
-- Expert insights and industry context
-- Multiple perspectives and balanced reporting
-- Clear structure with subheadings
-- Professional tone suitable for investors and industry professionals
+Write a professional news article summary (350-500 words) in journalistic style. Focus on:
+- Compelling headline
+- Concise lead paragraph
+- Key facts and analysis
+- Recent company developments
+- Market context and implications
+- Professional tone for business professionals
 
-Include a reference to the source: ${randomSource}
-Make it sound like a real investigative report from ${randomSource} with proper journalistic depth and analysis.`
+Reference source: ${randomSource}
+Keep it authentic like a real news report from ${randomSource} with factual depth.`
 
       : `你是一位资深科技记者和AI行业分析师，正在为${randomSource}撰写一份深度调查报告。你已经对"${companyName}"进行了广泛的研究，正在准备一篇全面的新闻报道。
 
@@ -439,38 +439,36 @@ Make it sound like a real investigative report from ${randomSource} with proper 
 19. 战略合作伙伴和协作关系
 20. 行业预测和展望
 
-撰写一篇500-700字的全面新闻报道，采用专业新闻风格。包括：
-- 引人注目的标题和导语段落
-- 包含具体事实和数据的详细分析
-- 专家见解和行业背景
-- 多角度和平衡的报道
-- 清晰的结构和副标题
-- 适合投资人和行业专业人士的专业语调
+撰写一篇新闻报道摘要（350-500字），采用专业新闻风格。重点包括：
+- 引人注目的标题
+- 简洁的导语段落
+- 核心事实和分析
+- 公司最新动态
+- 市场背景和影响
+- 适合商业人士的专业语调
 
 包含新闻来源引用：${randomSource}
-让文章听起来像${randomSource}的真实调查报告，具有适当的新闻深度和分析。`;
+保持像${randomSource}真实报道的风格，具有事实深度。`;
 
-    console.log(`🤖 发送新闻生成请求: ${companyName} (${isOverseas ? '海外' : '国内'}) ${useDeepSeek ? '[DeepSeek]' : '[OpenAI]'}`);
+    console.log(`🤖 发送新闻生成请求: ${companyName} (${isOverseas ? '海外' : '国内'}) [使用Qwen Turbo]`);
     console.log(`📰 新闻来源: ${randomSource}`);
     console.log(`🔗 新闻链接: ${newsUrl}`);
 
-    // 选择API客户端
-    const client = useDeepSeek ? deepseek : openai;
-    const model = useDeepSeek ? 'deepseek-chat' : 'gpt-4';
-    
-    if (!client) {
-      throw new Error(`API客户端未初始化: ${useDeepSeek ? 'DeepSeek' : 'OpenAI'}`);
+    // 使用Qwen Turbo
+    const qwenApiKey = process.env.QWEN_API_KEY;
+    if (!qwenApiKey) {
+      throw new Error('QWEN_API_KEY 未配置');
     }
-
-    const response = await client.chat.completions.create({
-      model: model,
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.3, // 降低温度以获得更准确的研究结果
-      max_tokens: 2500, // 增加token限制以获得更详细的内容
-    });
-
-    const content = response.choices[0]?.message?.content || '';
-    console.log(`📰 深度研究新闻响应长度: ${content.length} 字符`);
+    
+    // 用户地域检测
+    const userRegion = 'CN'; // 可以从请求中获取
+    const qwenRegion = userRegion === 'CN' ? 'beijing' : 'singapore';
+    
+    // 调用Qwen API（专门用于故事生成，确保350-500字）
+    const qwenResponse = await callQwen(prompt, qwenApiKey, isOverseas ? 'en' : 'zh', qwenRegion, 800); // 800 tokens = ~400字
+    
+    const content = qwenResponse || '';
+    console.log(`📰 新闻响应长度: ${content.length} 字符`);
     console.log(`📰 响应内容预览: ${content.substring(0, 200)}...`);
     
     const contentWithLink = content + `\n\n原文链接：[${randomSource} - ${companyName} AI创新动态](${newsUrl})`;
@@ -3043,7 +3041,7 @@ async function callOpenAI(message: string, apiKey: string, language: string): Pr
 }
 
 // DeepSeek API调用
-async function callDeepSeek(message: string, apiKey: string, language: string): Promise<string> {
+async function callDeepSeek(message: string, apiKey: string, language: string, maxTokens: number = 2000): Promise<string> {
   const systemPrompt = language.startsWith('zh') 
     ? '你是一个专业的AI助手，请用中文回答用户的问题。'
     : 'You are a professional AI assistant. Please answer user questions in English.';
@@ -3064,7 +3062,7 @@ async function callDeepSeek(message: string, apiKey: string, language: string): 
           { role: 'user', content: message }
         ],
         temperature: 0.7,
-        max_tokens: 2000
+        max_tokens: maxTokens
       })
     });
     
@@ -3087,7 +3085,7 @@ async function callDeepSeek(message: string, apiKey: string, language: string): 
 }
 
 // Qwen API调用
-async function callQwen(message: string, apiKey: string, language: string, region: string = 'beijing'): Promise<string> {
+async function callQwen(message: string, apiKey: string, language: string, region: string = 'beijing', maxTokens: number = 2000): Promise<string> {
   const systemPrompt = language.startsWith('zh') 
     ? '你是一个专业的AI助手，请用中文回答用户的问题。'
     : 'You are a professional AI assistant. Please answer user questions in English.';
@@ -3122,7 +3120,7 @@ async function callQwen(message: string, apiKey: string, language: string, regio
         { role: 'user', content: message }
       ],
       temperature: 0.7,
-      max_tokens: 2000
+      max_tokens: maxTokens
     })
   });
 
