@@ -189,19 +189,24 @@ export default function AICompaniesCatalog() {
   const loadCompanies = async () => {
     try {
       setLoading(true);
+      console.log('🔄 开始加载公司数据...');
       const data = await listAICompaniesWithTools();
       console.log('📊 加载的公司数据:', data?.length || 0, '家公司');
+      console.log('📝 数据示例:', data?.[0]);
       setCompanies(data || []);
       
       // 如果没有数据，显示提示
       if (!data || data.length === 0) {
         console.log('⚠️ 数据库中没有公司数据，可能需要先运行数据生成');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ 加载公司数据失败:', error);
+      console.error('错误详情:', error.message, error.stack);
       setCompanies([]);
+      alert(`加载失败: ${error.message}`);
     } finally {
       setLoading(false);
+      console.log('✅ 公司数据加载完成，loading状态已关闭');
     }
   };
 
