@@ -21,9 +21,9 @@ export async function getCompanyDetails(companyId: string) {
     .from('companies')
     .select(`
       *,
-      tools:tools(*, tool_stats:tool_stats(*)),
+      projects:projects(*),
       fundings:fundings(*),
-      company_stats:company_stats(*)
+      stories:stories(*)
     `)
     .eq('id', companyId)
     .single();

@@ -136,7 +136,7 @@ export default function CompanyDetail() {
                       <Star className="w-4 h-4 text-yellow-500" />
                       <span>{avgRating}</span>
                       <BarChart3 className="w-4 h-4 ml-3" />
-                      <span>{company.company_stats?.total_tools || company.tools.length} 工具</span>
+                      <span>{company.projects?.length || 0} 项目</span>
                     </div>
                   </div>
                   {company.industry_tags?.length > 0 && (
