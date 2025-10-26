@@ -43,54 +43,38 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       ? '你是一个专业的AI助手，请用中文回答用户的问题。'
       : 'You are a professional AI assistant. Please answer user questions in English.';
     
-    // 尝试请求的函数 - 添加超时控制
+    // 尝试请求的函数
     const tryOpenAI = async (): Promise<{ response: string; model: string }> => {
       if (!openaiApiKey) throw new Error('OPENAI_API_KEY not configured');
       
       console.log('🔄 Attempting OpenAI...');
       
-      // 添加8秒超时，留出2秒缓冲给Vercel
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      const apiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openaiApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'gpt-3.5-turbo',  // 使用更快的模型
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: message }
+          ],
+          temperature: 0.7,
+          max_tokens: 400  // 降低以提升响应速度
+        })
+      });
       
-      try {
-        const apiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${openaiApiKey}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            model: 'gpt-3.5-turbo',  // 使用更快的模型
-            messages: [
-              { role: 'system', content: systemPrompt },
-              { role: 'user', content: message }
-            ],
-            temperature: 0.7,
-            max_tokens: 400  // 降低以提升响应速度
-          }),
-          signal: controller.signal
-        });
-        
-        clearTimeout(timeoutId);
-        
-        if (!apiResponse.ok) {
-          const errorText = await apiResponse.text();
-          console.error('OpenAI API error:', apiResponse.status, errorText);
-          throw new Error(`OpenAI returned ${apiResponse.status}`);
-        }
-        
-        const data = await apiResponse.json();
-        console.log('✅ OpenAI succeeded');
-        return { response: data.choices[0].message.content, model: 'gpt-3.5-turbo' };
-      } catch (error: any) {
-        clearTimeout(timeoutId);
-        if (error.name === 'AbortError') {
-          console.error('OpenAI timeout after 8 seconds');
-          throw new Error('OpenAI timeout');
-        }
-        throw error;
+      if (!apiResponse.ok) {
+        const errorText = await apiResponse.text();
+        console.error('OpenAI API error:', apiResponse.status, errorText);
+        throw new Error(`OpenAI returned ${apiResponse.status}`);
       }
+      
+      const data = await apiResponse.json();
+      console.log('✅ OpenAI succeeded');
+      return { response: data.choices[0].message.content, model: 'gpt-3.5-turbo' };
     };
     
     const tryDeepSeek = async (): Promise<{ response: string; model: string }> => {
@@ -98,49 +82,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       
       console.log('🔄 Attempting DeepSeek...');
       
-      // 添加8秒超时
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      const apiResponse = await fetch('https://api.deepseek.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${deepseekApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'deepseek-chat',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: message }
+          ],
+          temperature: 0.7,
+          max_tokens: 800,  // 减少token数量以提高速度
+          stream: false
+        })
+      });
       
-      try {
-        const apiResponse = await fetch('https://api.deepseek.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${deepseekApiKey}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            model: 'deepseek-chat',
-            messages: [
-              { role: 'system', content: systemPrompt },
-              { role: 'user', content: message }
-            ],
-            temperature: 0.7,
-            max_tokens: 800,  // 减少token数量以提高速度
-            stream: false
-          }),
-          signal: controller.signal
-        });
-        
-        clearTimeout(timeoutId);
-        
-        if (!apiResponse.ok) {
-          const errorText = await apiResponse.text();
-          console.error('DeepSeek API error:', apiResponse.status, errorText);
-          throw new Error(`DeepSeek returned ${apiResponse.status}`);
-        }
-        
-        const data = await apiResponse.json();
-        console.log('✅ DeepSeek succeeded');
-        return { response: data.choices[0].message.content, model: 'deepseek-chat' };
-      } catch (error: any) {
-        clearTimeout(timeoutId);
-        if (error.name === 'AbortError') {
-          console.error('DeepSeek timeout after 8 seconds');
-          throw new Error('DeepSeek timeout');
-        }
-        throw error;
+      if (!apiResponse.ok) {
+        const errorText = await apiResponse.text();
+        console.error('DeepSeek API error:', apiResponse.status, errorText);
+        throw new Error(`DeepSeek returned ${apiResponse.status}`);
       }
+      
+      const data = await apiResponse.json();
+      console.log('✅ DeepSeek succeeded');
+      return { response: data.choices[0].message.content, model: 'deepseek-chat' };
     };
     
     const tryQwen = async (): Promise<{ response: string; model: string }> => {
@@ -148,57 +116,41 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       
       console.log('🔄 Attempting Qwen...');
       
-      // 添加8秒超时
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000);
-      
-      try {
-        const apiResponse = await fetch('https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${qwenApiKey}`,
-            'Content-Type': 'application/json'
+      const apiResponse = await fetch('https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${qwenApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'qwen-turbo',
+          input: {
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: message }
+            ]
           },
-          body: JSON.stringify({
-            model: 'qwen-turbo',
-            input: {
-              messages: [
-                { role: 'system', content: systemPrompt },
-                { role: 'user', content: message }
-              ]
-            },
-            parameters: {
-              max_tokens: 800
-            }
-          }),
-          signal: controller.signal
-        });
-        
-        clearTimeout(timeoutId);
-        
-        if (!apiResponse.ok) {
-          const errorText = await apiResponse.text();
-          console.error('Qwen API error:', apiResponse.status, errorText);
-          throw new Error(`Qwen returned ${apiResponse.status}`);
-        }
-        
-        const data = await apiResponse.json();
-        console.log('✅ Qwen succeeded');
-        
-        if (!data.output || !data.output.choices || !data.output.choices[0] || !data.output.choices[0].message) {
-          console.error('Invalid Qwen response structure:', JSON.stringify(data).slice(0, 200));
-          throw new Error('Invalid Qwen response structure');
-        }
-        
-        return { response: data.output.choices[0].message.content, model: 'qwen-turbo' };
-      } catch (error: any) {
-        clearTimeout(timeoutId);
-        if (error.name === 'AbortError') {
-          console.error('Qwen timeout after 8 seconds');
-          throw new Error('Qwen timeout');
-        }
-        throw error;
+          parameters: {
+            max_tokens: 800
+          }
+        })
+      });
+      
+      if (!apiResponse.ok) {
+        const errorText = await apiResponse.text();
+        console.error('Qwen API error:', apiResponse.status, errorText);
+        throw new Error(`Qwen returned ${apiResponse.status}`);
       }
+      
+      const data = await apiResponse.json();
+      console.log('✅ Qwen succeeded');
+      
+      if (!data.output || !data.output.choices || !data.output.choices[0] || !data.output.choices[0].message) {
+        console.error('Invalid Qwen response structure:', JSON.stringify(data).slice(0, 200));
+        throw new Error('Invalid Qwen response structure');
+      }
+      
+      return { response: data.output.choices[0].message.content, model: 'qwen-turbo' };
     };
     
     // 根据选择的模型和可用密钥决定调用顺序
