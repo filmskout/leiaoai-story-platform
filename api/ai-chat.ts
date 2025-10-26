@@ -163,15 +163,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       requestedModel: model
     });
     
-    // 设置优先级
+    // 设置优先级 - 用户指定模型时，优先只使用该模型，失败后才回退
     if (model === 'openai') {
       if (openaiApiKey) attempts.push(tryOpenAI);
-      if (qwenApiKey) attempts.push(tryQwen);
+      // 只添加回退选项，不在主列表中
       if (deepseekApiKey) attempts.push(tryDeepSeek);
+      if (qwenApiKey) attempts.push(tryQwen);
     } else if (model === 'qwen') {
       if (qwenApiKey) attempts.push(tryQwen);
-      if (openaiApiKey) attempts.push(tryOpenAI);
       if (deepseekApiKey) attempts.push(tryDeepSeek);
+      if (openaiApiKey) attempts.push(tryOpenAI);
     } else {
       // deepseek或默认
       if (deepseekApiKey) attempts.push(tryDeepSeek);
@@ -180,6 +181,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
     
     console.log(`📋 Attempting ${attempts.length} API(s):`, attempts.map(a => a.name || 'anonymous'));
+    console.log(`⏳ Allowing up to 25 seconds for API calls...`);
     
     // 如果没有任何可用的API
     if (attempts.length === 0) {
@@ -187,19 +189,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       throw new Error('No API keys configured for any model');
     }
     
-    // 尝试所有可用的API
-    for (const attempt of attempts) {
+    // 尝试所有可用的API，给用户指定的模型最大努力
+    for (let i = 0; i < attempts.length; i++) {
+      const attempt = attempts[i];
       try {
-        console.log(`🔄 Attempting API: ${attempt.name || 'anonymous'}`);
+        console.log(`🔄 Attempting API (${i+1}/${attempts.length}): ${attempt.name || 'anonymous'}`);
+        const startTime = Date.now();
         const result = await attempt();
+        const duration = Date.now() - startTime;
         response = result.response;
         usedModel = result.model;
-        console.log(`✅ API succeeded: ${usedModel}`);
+        console.log(`✅ API succeeded: ${usedModel} (took ${duration}ms)`);
         break;
       } catch (error: any) {
-        console.error(`❌ API尝试失败:`, error.message);
+        console.error(`❌ API尝试失败 (${i+1}/${attempts.length}):`, error.message);
         lastError = error;
+        
+        // 如果是最后一个尝试
+        if (i === attempts.length - 1) {
+          console.error('❌ All API attempts failed');
+          throw lastError || new Error('All API attempts failed');
+        }
+        
         // 继续尝试下一个
+        console.log(`⏭️ Trying next API...`);
       }
     }
     
