@@ -2978,6 +2978,26 @@ async function handleAIChat(req: any, res: any) {
     
   } catch (error: any) {
     console.error('❌ AI Chat Error:', error);
+    
+    // 如果OpenAI/Qwen失败且有DeepSeek可用，尝试回退
+    if (model !== 'deepseek') {
+      console.log('⚠️ Primary model failed, trying DeepSeek fallback...');
+      try {
+        if (deepseekApiKey) {
+          const deepseekResponse = await callDeepSeek(message, deepseekApiKey, language);
+          return res.status(200).json({
+            success: true,
+            response: deepseekResponse,
+            model: 'deepseek-chat',
+            sessionId: sessionId,
+            timestamp: new Date().toISOString()
+          });
+        }
+      } catch (fallbackError: any) {
+        console.error('❌ Fallback to DeepSeek also failed:', fallbackError);
+      }
+    }
+    
     return res.status(500).json({
       success: false,
       error: error.message,
