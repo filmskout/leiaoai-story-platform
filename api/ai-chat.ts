@@ -60,13 +60,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             { role: 'user', content: message }
           ],
           temperature: 0.7,
-          max_tokens: 2000
+          max_tokens: 800
         })
       });
       
       if (!apiResponse.ok) {
         const errorText = await apiResponse.text();
-        throw new Error(`OpenAI API error: ${apiResponse.status} - ${errorText}`);
+        console.error('OpenAI API error:', apiResponse.status, errorText);
+        throw new Error(`OpenAI API error: ${apiResponse.status}`);
       }
       
       const data = await apiResponse.json();
