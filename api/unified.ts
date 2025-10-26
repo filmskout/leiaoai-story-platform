@@ -471,7 +471,12 @@ Keep it authentic like a real news report from ${randomSource} with factual dept
     console.log(`📰 新闻响应长度: ${content.length} 字符`);
     console.log(`📰 响应内容预览: ${content.substring(0, 200)}...`);
     
-    const contentWithLink = content + `\n\n原文链接：[${randomSource} - ${companyName} AI创新动态](${newsUrl})`;
+    // 添加明确的原文出处和链接
+    const sourceCredit = isOverseas
+      ? `\n\n---\n**原文来源**：${randomSource}\n**阅读原文**：[点击查看](${newsUrl})`
+      : `\n\n---\n**原文来源**：${randomSource}\n**阅读原文**：[点击查看](${newsUrl})`;
+    
+    const contentWithLink = content + sourceCredit;
     
     const result = {
       content: contentWithLink,
@@ -577,42 +582,64 @@ async function generateCompanyData(companyName: string, isOverseas: boolean, use
       }
     }
 
-    // 生成新闻故事
+    // 生成新闻故事（根据公司级别生成不同数量）
+    const getStoryCount = (tier: string) => {
+      switch(tier) {
+        case 'tier1': return 4; // 顶级公司4篇
+        case 'tier2': return 3; // 重要公司3篇
+        case 'tier3': return 2; // 普通公司2篇
+        default: return 2;
+      }
+    };
+    
+    const storyCount = getStoryCount(company.tier || 'default');
+    console.log(`📰 开始生成 ${storyCount} 篇新闻故事: ${companyName}`);
+    
     try {
-      console.log(`📰 开始生成新闻故事: ${companyName}`);
-      const newsStory = await generateNewsStory(companyName, isOverseas, useDeepSeek);
-      console.log(`📰 新闻故事生成结果:`, {
-        hasContent: !!newsStory.content,
-        contentLength: newsStory.content?.length || 0,
-        source: newsStory.source,
-        url: newsStory.url
-      });
-      
-      if (newsStory.content && newsStory.content.length > 50) {
-        const { data: insertedStory, error: storyInsertError } = await supabase.from('stories').insert({
-          company_id: company.id,
-          title: `${companyName} AI创新动态`,
-          content: newsStory.content,
-          source: newsStory.source,
-          url: newsStory.url,
-          published_date: newsStory.published_date,
-          created_at: new Date().toISOString()
-        }).select().single();
+      for (let i = 0; i < storyCount; i++) {
+        console.log(`📰 生成第 ${i + 1}/${storyCount} 篇故事...`);
         
-        if (storyInsertError) {
-          console.error(`❌ 新闻故事插入失败: ${companyName}`, storyInsertError);
-        } else {
-          console.log(`✅ 新闻故事插入成功: ${companyName}`, {
-            storyId: insertedStory?.id,
-            contentLength: insertedStory?.content?.length || 0
-          });
-        }
-      } else {
-        console.warn(`⚠️ 新闻故事内容为空或太短: ${companyName}`, {
+        const newsStory = await generateNewsStory(companyName, isOverseas, useDeepSeek);
+        
+        console.log(`📰 新闻故事生成结果:`, {
+          storyNumber: i + 1,
           hasContent: !!newsStory.content,
           contentLength: newsStory.content?.length || 0,
-          source: newsStory.source
+          source: newsStory.source,
+          url: newsStory.url
         });
+        
+        if (newsStory.content && newsStory.content.length > 50) {
+          const { data: insertedStory, error: storyInsertError } = await supabase.from('stories').insert({
+            company_id: company.id,
+            title: `${companyName} AI创新动态 ${i + 1}`,
+            content: newsStory.content,
+            source: newsStory.source,
+            url: newsStory.url,
+            published_date: newsStory.published_date,
+            created_at: new Date().toISOString()
+          }).select().single();
+          
+          if (storyInsertError) {
+            console.error(`❌ 新闻故事插入失败: ${companyName} (${i + 1}/${storyCount})`, storyInsertError);
+          } else {
+            console.log(`✅ 新闻故事插入成功: ${companyName} (${i + 1}/${storyCount})`, {
+              storyId: insertedStory?.id,
+              contentLength: insertedStory?.content?.length || 0
+            });
+          }
+        } else {
+          console.warn(`⚠️ 新闻故事内容为空或太短: ${companyName} (${i + 1}/${storyCount})`, {
+            hasContent: !!newsStory.content,
+            contentLength: newsStory.content?.length || 0,
+            source: newsStory.source
+          });
+        }
+        
+        // 添加延迟，避免API限流
+        if (i < storyCount - 1) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
       }
     } catch (storyError) {
       console.error(`❌ 新闻故事生成失败: ${companyName}`, storyError);
