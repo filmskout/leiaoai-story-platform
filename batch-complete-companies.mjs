@@ -59,21 +59,34 @@ async function completeCompany(company: any): Promise<any> {
     }
     
     // 调用Qwen补齐数据
-    const prompt = `为AI公司"${company.name}"补齐以下信息，返回JSON格式：
+    const prompt = `你是一名AI行业研究专家。请为AI公司"${company.name}"补齐真实准确的信息。
+
+返回JSON格式：
 {
-  "website": "公司官网URL",
-  "description": "公司业务和产品简介（中文）",
-  "headquarters": "总部所在城市和国家",
-  "founded_year": 成立年份（数字）,
-  "employee_count": "员工规模描述（如：500-1000人）"
+  "website": "公司官网URL，必须是真实可访问的网站",
+  "description": "公司简介（100字内，中文，包含核心业务、主要产品、技术特色）",
+  "headquarters": "总部地址（格式：城市, 国家，海外公司用英文，国内公司用中文）",
+  "founded_year": 成立年份（数字，如2015）,
+  "employee_count": "员工规模（格式：1000-5000人或10万+人）"
 }
 
 要求：
-1. 信息必须真实准确
-2. 如果是海外公司，headquarters用英文
-3. 如果是国内公司，headquarters用中文
-4. description要具体，包含核心技术或产品
-5. 只返回JSON，不要其他文字`;
+1. 所有信息必须基于真实公开资料
+2. website必须是官方真实网站，如https://www.example.com
+3. description要简洁专业，突出核心竞争力（100字内）
+4. headquarters准确到城市和国家
+5. founded_year必须是真实成立年份
+6. employee_count要符合公司规模
+7. 只返回JSON，不要任何其他文字或解释
+
+示例输出：
+{
+  "website": "https://www.anthropic.com",
+  "description": "Anthropic是专注于AI安全的公司，开发了Claude AI助手，致力于构建可控、可解释的AI系统。",
+  "headquarters": "San Francisco, USA",
+  "founded_year": 2021,
+  "employee_count": "200-500人"
+}`;
     
     const response = await callQwen(prompt, 1500);
     
