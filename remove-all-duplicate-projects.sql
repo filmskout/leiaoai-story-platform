@@ -5,14 +5,14 @@ BEGIN;
 
 -- 1. 显示所有重复的项目
 SELECT '=== 重复的项目（所有公司） ===' as info,
-  company_id,
+  p.company_id,
   c.name as company_name,
   p.name as project_name,
   COUNT(*) as count,
-  array_agg(id::text ORDER BY created_at) as project_ids
+  array_agg(p.id::text ORDER BY p.created_at) as project_ids
 FROM projects p
 JOIN companies c ON p.company_id = c.id
-GROUP BY company_id, c.name, p.name
+GROUP BY p.company_id, c.name, p.name
 HAVING COUNT(*) > 1
 ORDER BY c.name, p.name;
 
