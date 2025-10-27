@@ -1,0 +1,11 @@
+-- Essential SQL files to keep:
+-- 1. remove-all-duplicate-projects.sql - Remove duplicate projects
+-- 2. complete-companies-real-data.sql - Complete company basic data  
+-- 3. fix-openai-naming.sql - Fix OpenAI project naming
+-- 4. fix-google-projects.sql - Fix Google duplicate projects
+-- 5. fix-microsoft-projects.sql - Fix Microsoft duplicate projects
+-- 6. add-domestic-projects.sql - Add domestic company projects
+-- 7. add-key-projects.sql - Add key projects for major companies
+-- 8. separate-descriptions.sql - Separate brief and detailed descriptions
+
+-- All other SQL files can be archived
