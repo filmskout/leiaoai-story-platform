@@ -1739,6 +1739,15 @@ export default async function handler(req: any, res: any) {
       case 'batch-complete-logos':
         return handleBatchCompleteLogos(req, res);
       
+      case 'batch-enrich-companies':
+        return handleBatchEnrichCompanies(req, res);
+      
+      case 'batch-enrich-projects':
+        return handleBatchEnrichProjects(req, res);
+      
+      case 'batch-enrich-fundings':
+        return handleBatchEnrichFundings(req, res);
+      
       default:
         return res.status(400).json({ error: 'Invalid action' });
     }
@@ -5227,6 +5236,188 @@ async function handleTestAIChat(req: any, res: any) {
       success: false,
       error: error.message
     });
+  }
+}
+
+// 批量补齐公司数据（URL/估值/融资轮次）- 使用深研模式
+async function handleBatchEnrichCompanies(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { token, limit = 10 } = req.body;
+  if (token !== process.env.ADMIN_TOKEN && token !== 'admin-token-123') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    initClients();
+    
+    // 获取所有公司
+    const { data: companies, error: companiesError } = await supabase
+      .from('companies')
+      .select('id, name')
+      .order('created_at', { ascending: false })
+      .limit(limit);
+    
+    if (companiesError) throw companiesError;
+    
+    const results = { enriched: [], errors: [] };
+    
+    for (const company of companies) {
+      try {
+        // 调用深研生成公司数据
+        const enriched = await getCompanyDetails(company.name, true, true);
+        
+        // 更新数据库
+        const { error: updateError } = await supabase
+          .from('companies')
+          .update({
+            website: enriched.website,
+            description: enriched.description,
+            detailed_description: enriched.detailed_description,
+            valuation: enriched.valuation,
+            founded_year: enriched.founded_year,
+            employee_count: enriched.employee_count,
+            headquarters: enriched.headquarters
+          })
+          .eq('id', company.id);
+        
+        if (updateError) {
+          results.errors.push({ company: company.name, error: updateError.message });
+        } else {
+          results.enriched.push({ company: company.name, id: company.id });
+        }
+      } catch (err: any) {
+        results.errors.push({ company: company.name, error: err.message });
+      }
+    }
+    
+    return res.status(200).json({
+      success: true,
+      enriched: results.enriched.length,
+      errors: results.errors.length,
+      details: results
+    });
+  } catch (error: any) {
+    console.error('❌ Batch Enrich Companies Error:', error);
+    return res.status(500).json({ error: error.message });
+  }
+}
+
+// 批量补齐项目数据（URL/明细）
+async function handleBatchEnrichProjects(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { token, limit = 10 } = req.body;
+  if (token !== process.env.ADMIN_TOKEN && token !== 'admin-token-123') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    initClients();
+    
+    // 获取所有项目
+    const { data: projects, error: projectsError } = await supabase
+      .from('projects')
+      .select('id, name, company:companies(name)')
+      .order('created_at', { ascending: false })
+      .limit(limit);
+    
+    if (projectsError) throw projectsError;
+    
+    const qwenApiKey = process.env.QWEN_API_KEY;
+    const results = { enriched: [], errors: [] };
+    
+    for (const project of projects) {
+      try {
+        // 使用Qwen查找项目URL
+        const prompt = `查找项目"${project.name}"（所属公司：${project.company?.name}）的官方网站URL。只返回JSON: {"website": "项目URL"}。如果找不到，返回null。`;
+        
+        const response = await callQwen(prompt, qwenApiKey || '', 'zh', 'singapore', 6000, 'qwen-turbo-latest', 90000, true);
+        const match = response.match(/\{[^}]+\}/);
+        const parsed = match ? JSON.parse(match) : null;
+        
+        if (parsed && parsed.website) {
+          await supabase
+            .from('projects')
+            .update({ website: parsed.website })
+            .eq('id', project.id);
+          
+          results.enriched.push({ project: project.name, id: project.id, website: parsed.website });
+        }
+      } catch (err: any) {
+        results.errors.push({ project: project.name, error: err.message });
+      }
+    }
+    
+    return res.status(200).json({
+      success: true,
+      enriched: results.enriched.length,
+      errors: results.errors.length,
+      details: results
+    });
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
+}
+
+// 批量补齐融资轮次
+async function handleBatchEnrichFundings(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { token, limit = 10 } = req.body;
+  if (token !== process.env.ADMIN_TOKEN && token !== 'admin-token-123') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    initClients();
+    
+    const { data: companies, error } = await supabase
+      .from('companies')
+      .select('id, name')
+      .order('created_at', { ascending: false })
+      .limit(limit);
+    
+    if (error) throw error;
+    
+    const results = { added: [], errors: [] };
+    
+    for (const company of companies) {
+      try {
+        const enriched = await getCompanyDetails(company.name, true, true);
+        
+        if (enriched.fundingInfo) {
+          for (const funding of enriched.fundingInfo) {
+            await supabase.from('fundings').insert({
+              company_id: company.id,
+              amount: funding.amount,
+              round: funding.round,
+              date: funding.date,
+              investors: funding.investors
+            });
+          }
+          
+          results.added.push({ company: company.name, count: enriched.fundingInfo.length });
+        }
+      } catch (err: any) {
+        results.errors.push({ company: company.name, error: err.message });
+      }
+    }
+    
+    return res.status(200).json({
+      success: true,
+      added: results.added.reduce((sum, r) => sum + r.count, 0),
+      errors: results.errors.length,
+      details: results
+    });
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
   }
 }
 
