@@ -1,6 +1,5 @@
 import 'dotenv/config';
 import { createClient } from '@supabase/supabase-js';
-import OpenAI from 'openai';
 
 // 安全的环境变量检查
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -10,35 +9,16 @@ const deepseekApiKey = process.env.DEEPSEEK_API_KEY || process.env.DEEPSEEK_KEY;
 
 // 延迟初始化客户端，避免环境变量缺失时崩溃
 let supabase: any = null;
-let openai: any = null;
-let deepseek: any = null;
 
 function initClients() {
   try {
     if (!supabaseUrl || !supabaseKey) {
       throw new Error('Supabase配置缺失: SUPABASE_URL或SUPABASE_KEY未设置');
     }
-    if (!openaiApiKey && !deepseekApiKey) {
-      throw new Error('API Key缺失: 需要OpenAI或DeepSeek API Key');
-    }
+    // OpenAI/DeepSeek 可选，不强制在初始化阶段校验
 
     if (!supabase) {
       supabase = createClient(supabaseUrl, supabaseKey);
-    }
-
-    if (!openai && openaiApiKey) {
-      openai = new OpenAI({
-        apiKey: openaiApiKey,
-      });
-      console.log('✅ OpenAI客户端初始化成功');
-    }
-
-    if (!deepseek && deepseekApiKey) {
-      deepseek = new OpenAI({
-        apiKey: deepseekApiKey,
-        baseURL: 'https://api.deepseek.com',
-      });
-      console.log('✅ DeepSeek客户端初始化成功');
     }
 
     console.log(`🔑 API Key状态: OpenAI=${!!openaiApiKey}, DeepSeek=${!!deepseekApiKey}`);

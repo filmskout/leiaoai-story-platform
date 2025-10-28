@@ -470,7 +470,8 @@
       "video_generation": "视频生成体验",
       "domestic_ai": "国内AI工具",
       "overseas_ai": "海外AI平台"
-    }
+    },
+    "view_all_stories": "查看所有故事"
   },
   
   "quick_ai_consultation_title": "快速AI投资咨询",
@@ -762,5 +763,8 @@
     "message_placeholder": "请详细告诉我们您的查询...",
     "send": "发送消息",
     "response_time": "我们通常会在24小时内回复"
-  }
+  },
+  "language_selector": "选择语言",
+  "auto_detect_language": "自动识别语言",
+  "detecting": "检测中..."
 }

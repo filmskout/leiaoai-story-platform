@@ -1,7 +1,7 @@
 // 优化的批量数据生成API端点
 // 支持多模型协作和进度监控
 
-import { NextApiRequest, NextApiResponse } from 'next';
+// 注意：在 Vercel Node/Edge 环境中不依赖 next 类型，避免 TS2307
 import { createClient } from '@supabase/supabase-js';
 
 // 初始化Supabase客户端
@@ -651,7 +651,7 @@ function getGenerationProgress(): any {
 }
 
 // API处理器
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: any, res: any) {
   // 设置CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
