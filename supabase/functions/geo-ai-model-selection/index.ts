@@ -2,8 +2,15 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 Deno.serve(async (req) => {
+  // 动态 CORS - 允许生产域与 Vercel 预览域
+  const origin = req.headers.get('origin') || '';
+  let allowed = false;
+  try {
+    const host = new URL(origin).hostname;
+    allowed = origin === 'https://leiao.ai' || host.endsWith('.vercel.app') || origin === 'http://localhost:5173';
+  } catch {}
   const corsHeaders = {
-    'Access-Control-Allow-Origin': 'https://leiao.ai',
+    'Access-Control-Allow-Origin': allowed ? origin : 'https://leiao.ai',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
     'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE, PATCH',
     'Access-Control-Max-Age': '86400',
@@ -114,7 +121,7 @@ Deno.serve(async (req) => {
     
     // 错误时返回默认设置
     return new Response(JSON.stringify({
-      error: error.message,
+      error: (error as Error).message,
       data: {
         region: 'overseas',
         country: 'US',

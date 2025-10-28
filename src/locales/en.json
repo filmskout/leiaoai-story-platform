@@ -298,6 +298,7 @@
     "mobile_page_subtitle": "Investment advice at your fingertips",
     "placeholder": "Ask me about investment opportunities, market trends, or financial advice...",
     "answer_placeholder": "Hello! I'm your AI investment consultant. Ask me anything about investments, markets, or financial planning.",
+    "placeholder_response": "Ask investment-related questions to get professional AI advice",
     "direct_input_hint": "Type your question below or click on suggested questions to get started.",
     "click_to_consult": "Click to get professional consultation about {{area}}",
     "send": "Send",
