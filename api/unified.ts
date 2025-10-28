@@ -3036,6 +3036,15 @@ async function handleDataProgress(req: any, res: any) {
 
 // AI聊天处理函数
 async function handleAIChat(req: any, res: any) {
+  // 确保使用 POST 方法
+  if (req.method !== 'POST') {
+    console.error('❌ AI Chat: Invalid method', req.method);
+    return res.status(405).json({ 
+      success: false, 
+      error: 'Method not allowed. Use POST.' 
+    });
+  }
+
   // 将关键变量提升到函数作用域，避免 catch 中不可见
   let reqMessage: string = '';
   let reqModel: string = 'deepseek';
@@ -3049,6 +3058,11 @@ async function handleAIChat(req: any, res: any) {
   let qwenRegion: string = 'beijing';
 
   try {
+    console.log('✅ AI Chat: Handler entered', {
+      method: req.method,
+      hasBody: !!req.body,
+      bodyKeys: req.body ? Object.keys(req.body) : 'no body'
+    });
     const body = req.body || {};
     reqMessage = body.message || '';
     reqModel = body.model || 'deepseek';
@@ -3148,9 +3162,21 @@ async function handleAIChat(req: any, res: any) {
     });
   } catch (error: any) {
     console.error('❌ AI Chat Error:', error);
+    console.error('❌ Error stack:', error.stack);
+    
+    // 构建详细的错误信息
+    const errorDetails = {
+      message: error.message,
+      name: error.name,
+      ...(error.response && { responseStatus: error.response.status, responseBody: error.response.body })
+    };
+    
+    console.error('❌ Error details:', JSON.stringify(errorDetails, null, 2));
+    
     // 失败时尝试可用的模型进行一次兜底
     try {
       if (deepseekApiKey) {
+        console.log('🔄 Fallback: Trying DeepSeek...');
         const fallback = await callDeepSeek(reqMessage, deepseekApiKey, reqLanguage);
         return res.status(200).json({
           success: true,
@@ -3161,6 +3187,7 @@ async function handleAIChat(req: any, res: any) {
         });
       }
       if (qwenApiKey) {
+        console.log('🔄 Fallback: Trying Qwen...');
         const fallback = await callQwen(reqMessage, qwenApiKey, reqLanguage, qwenRegion);
         return res.status(200).json({
           success: true,
@@ -3171,6 +3198,7 @@ async function handleAIChat(req: any, res: any) {
         });
       }
       if (openaiApiKey) {
+        console.log('🔄 Fallback: Trying OpenAI...');
         const fallback = await callOpenAI(reqMessage, openaiApiKey, reqLanguage);
         return res.status(200).json({
           success: true,
@@ -3181,15 +3209,21 @@ async function handleAIChat(req: any, res: any) {
         });
       }
     } catch (fallbackErr: any) {
-      console.error('❌ Final fallback failed:', fallbackErr);
+      console.error('❌ Final fallback failed:', fallbackErr.message);
     }
 
     // 没有任何可用模型或全部失败
     const noKeys = !openaiApiKey && !deepseekApiKey && !qwenApiKey;
-    const msg = noKeys ? 'No AI keys configured (OpenAI/DeepSeek/Qwen)' : error.message;
+    const msg = noKeys 
+      ? 'No AI keys configured (OpenAI/DeepSeek/Qwen)' 
+      : (error.message || 'Unknown error occurred');
+    
+    console.error('❌ Returning error response:', msg);
+    
     return res.status(500).json({
       success: false,
       error: msg,
+      details: errorDetails,
       timestamp: new Date().toISOString()
     });
   }
