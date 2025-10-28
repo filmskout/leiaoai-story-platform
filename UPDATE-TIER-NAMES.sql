@@ -22,8 +22,10 @@ ORDER BY company_tier;
 SELECT 
     name,
     company_tier,
-    valuation,
-    headquarters
+    company_category,
+    headquarters,
+    valuation_usd,
+    website
 FROM companies
 ORDER BY company_tier, name;
 
