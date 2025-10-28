@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar, Ticket } from 'lucide-react';
 import { listUpcomingEvents, registerEvent, createEvent, createTicket, listTickets, listRegistrations } from '@/services/events';
-import * as XLSX from 'xlsx';
 import { useAuth } from '@/contexts/AuthContext';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
@@ -60,26 +59,6 @@ export default function Events() {
     a.download = `event-registrations-${activeEventId || 'list'}.csv`;
     a.click();
     URL.revokeObjectURL(url);
-  };
-
-  const exportRegsXLSX = () => {
-    if (regs.length === 0) {
-      alert('暂无报名记录');
-      return;
-    }
-    const rows = regs.map((r:any)=>({
-      id: r.id,
-      event_id: r.event_id,
-      user_id: r.user_id,
-      user_email: r.user?.email || '',
-      ticket_id: r.ticket_id || '',
-      status: r.status,
-      created_at: r.created_at
-    }));
-    const ws = XLSX.utils.json_to_sheet(rows);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'registrations');
-    XLSX.writeFile(wb, `event-registrations-${activeEventId || 'list'}.xlsx`);
   };
 
   useEffect(() => {
@@ -300,7 +279,6 @@ export default function Events() {
                               </div>
                               <div className="mt-2 flex gap-2">
                                 <Button size="sm" variant="outline" onClick={exportRegsCSV}>导出 CSV</Button>
-                                <Button size="sm" variant="outline" onClick={exportRegsXLSX}>导出 XLSX</Button>
                               </div>
                             </div>
                           </div>
