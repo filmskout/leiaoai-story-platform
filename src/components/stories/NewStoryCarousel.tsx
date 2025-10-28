@@ -201,9 +201,12 @@ export function NewStoryCarousel({ className }: NewStoryCarouselProps) {
   if (stories.length === 0) {
     return (
       <div className={cn("space-y-6", className)}>
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-2">
+          <p className="text-foreground font-semibold">
+            {t('stories.no_stories.title', 'No Stories Yet')}
+          </p>
           <p className="text-foreground-secondary">
-            {t('stories.no_stories', 'No stories available at the moment.')}
+            {t('stories.no_stories.desc', 'There are no user stories shared in this category yet')}
           </p>
         </div>
       </div>
