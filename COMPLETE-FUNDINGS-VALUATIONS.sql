@@ -8,8 +8,8 @@ BEGIN;
 -- 01.AI
 UPDATE companies SET valuation_usd = 1000000000 WHERE name = '01.AI';
 
-INSERT INTO fundings (company_id, round, amount_usd, investors, valuation, date, lead_investor)
-SELECT id, 'Series A', 40, ARRAY['Alibaba'], 1000000000, '2024-01-01', 'Alibaba'
+INSERT INTO fundings (company_id, round, amount_usd, investors, announced_on)
+SELECT id, 'Series A', 40, ARRAY['Alibaba'], '2024-01-01'
 FROM companies WHERE name = '01.AI' 
 AND NOT EXISTS (SELECT 1 FROM fundings WHERE company_id = companies.id AND round = 'Series A');
 
