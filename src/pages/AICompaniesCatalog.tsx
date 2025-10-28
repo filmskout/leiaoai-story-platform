@@ -1004,13 +1004,13 @@ export default function AICompaniesCatalog() {
 
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4">
-                            {company.tools.slice(0, 3).map((tool) => (
-                              <div key={tool.id} className="flex items-center gap-2">
+                            {company.projects.slice(0, 3).map((project) => (
+                              <div key={project.id} className="flex items-center gap-2">
                                 <div className="w-6 h-6 rounded bg-muted flex items-center justify-center">
-                                  {tool.logo_url ? (
+                                  {project.logo_url ? (
                                     <img
-                                      src={tool.logo_url}
-                                      alt={tool.name}
+                                      src={project.logo_url}
+                                      alt={project.name}
                                       className="w-full h-full object-contain"
                                     />
                                   ) : (
@@ -1018,17 +1018,17 @@ export default function AICompaniesCatalog() {
                                   )}
                                 </div>
                                 <div>
-                                  <span className="text-sm font-medium">{tool.name}</span>
-                                  {tool.tool_category && (
-                                    <div className="text-xs text-muted-foreground">{tool.tool_category}</div>
+                                  <span className="text-sm font-medium">{project.name}</span>
+                                  {project.project_category && (
+                                    <div className="text-xs text-muted-foreground">{project.project_category}</div>
                                   )}
                                 </div>
-                                {renderStars(tool.tool_stats?.average_rating || 0, tool.id, true)}
+                                {renderStars(project.project_stats?.average_rating || 0, project.id, true)}
                               </div>
                             ))}
-                            {company.tools.length > 3 && (
+                            {company.projects.length > 3 && (
                               <span className="text-sm text-muted-foreground">
-                                +{company.tools.length - 3} more
+                                +{company.projects.length - 3} more
                               </span>
                             )}
                           </div>
