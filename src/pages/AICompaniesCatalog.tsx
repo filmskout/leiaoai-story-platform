@@ -793,12 +793,18 @@ export default function AICompaniesCatalog() {
                               <Globe className="w-3 h-3" />
                               <span>{company.headquarters || 'Unknown'}</span>
                             </div>
+                            {company.founded_year && (
+                              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                <Calendar className="w-3 h-3" />
+                                <span>{company.founded_year}</span>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
                       {company.website && (
-                        <Button variant="ghost" size="sm" asChild>
-                          <a href={company.website} target="_blank" rel="noopener noreferrer">
+                        <Button variant="ghost" size="sm" asChild className="h-8 w-8 p-0">
+                          <a href={company.website} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
                             <ExternalLink className="w-4 h-4" />
                           </a>
                         </Button>
