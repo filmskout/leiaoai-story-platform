@@ -176,6 +176,20 @@ export default function AICompaniesCatalog() {
     { value: 'founded_year', label: 'Founded Year' }
   ];
 
+  // 检测页面可见性 - 从详情页返回时重新加载数据
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && companies.length === 0) {
+        console.log('📄 页面恢复可见且数据为空，重新加载...');
+        loadCompanies();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [companies.length]);
+
+  // 初始加载
   useEffect(() => {
     loadCompanies();
   }, []);
