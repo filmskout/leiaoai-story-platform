@@ -3323,47 +3323,64 @@ async function callDeepSeek(
   const systemPrompt = language.startsWith('zh') 
     ? '你是一个专业的AI助手，请用中文回答用户的问题。'
     : 'You are a professional AI assistant. Please answer user questions in English.';
-    
+  
   console.log('🔵 Calling DeepSeek API...');
   
   try {
+    // 对实验模型设置更短超时，稳定模型用完整超时
+    const experimentalTimeout = 30000; // 30秒
+    const actualTimeout = model.includes('v3.2-exp') ? experimentalTimeout : timeoutMS;
+    
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMS);
-    const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: deepResearch ? `${message}\n\n请进行深度研究：\n- 结构化分析（提纲/要点）\n- 引用可靠来源并注明\n- 详细推理过程（可简洁）\n- 800-1200字` : message }
-        ],
-        temperature: 0.7,
-        max_tokens: maxTokens
-      }),
-      signal: controller.signal
-    });
-    clearTimeout(timer);
+    const timer = setTimeout(() => controller.abort(), actualTimeout);
     
-    console.log('🔵 DeepSeek Response Status:', response.status);
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('❌ DeepSeek API Error:', response.status, errorText);
-      // 若实验模型不可用，自动回退到 deepseek-chat 再试一次
-      if (model !== 'deepseek-chat') {
-        console.log('🔁 Retrying with deepseek-chat...');
-        return await callDeepSeek(message, apiKey, language, maxTokens, 'deepseek-chat', timeoutMS, deepResearch);
+    try {
+      const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: deepResearch ? `${message}\n\n请进行深度研究：\n- 结构化分析（提纲/要点）\n- 引用可靠来源并注明\n- 详细推理过程（可简洁）\n- 800-1200字` : message }
+          ],
+          temperature: 0.7,
+          max_tokens: maxTokens
+        }),
+        signal: controller.signal
+      });
+      clearTimeout(timer);
+      
+      console.log('🔵 DeepSeek Response Status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ DeepSeek API Error:', response.status, errorText);
+        // 若实验模型不可用，自动回退到 deepseek-chat 再试一次
+        if (model !== 'deepseek-chat') {
+          console.log('🔁 Retrying with deepseek-chat...');
+          return await callDeepSeek(message, apiKey, language, maxTokens, 'deepseek-chat', timeoutMS, deepResearch);
+        }
+        throw new Error(`DeepSeek API error: ${response.status} - ${errorText}`);
       }
-      throw new Error(`DeepSeek API error: ${response.status} - ${errorText}`);
+      
+      const data = await response.json();
+      console.log('✅ DeepSeek API Success');
+      return data.choices[0].message.content;
+    } catch (fetchError: any) {
+      // 超时或中断
+      if (fetchError.name === 'AbortError') {
+        console.log(`⏱️ ${model} timeout after ${actualTimeout}ms, falling back to stable model...`);
+        if (model !== 'deepseek-chat') {
+          return await callDeepSeek(message, apiKey, language, maxTokens, 'deepseek-chat', timeoutMS, deepResearch);
+        }
+        throw new Error('DeepSeek request timeout');
+      }
+      throw fetchError;
     }
-    
-    const data = await response.json();
-    console.log('✅ DeepSeek API Success');
-    return data.choices[0].message.content;
     
   } catch (error) {
     console.error('❌ DeepSeek API Call Failed:', error);
@@ -3403,36 +3420,58 @@ async function callQwen(
   
   console.log(`🔵 Calling Qwen API (${region}): ${endpoint}`);
   
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMS);
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      model,  // 默认 qwen-turbo-latest，可通过环境变量覆盖
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: deepResearch ? `${message}\n\n深度研究要求：\n- 结构化分点回答\n- 数据/事实注明来源\n- 给出结论与建议\n- 800-1200字` : message }
-      ],
-      temperature: 0.7,
-      max_tokens: maxTokens
-      }),
-    signal: controller.signal
-  });
-  clearTimeout(timer);
+  try {
+    // 对 latest 模型设置更短超时，稳定模型用完整超时
+    const experimentalTimeout = 30000; // 30秒
+    const actualTimeout = model.includes('latest') ? experimentalTimeout : timeoutMS;
+    
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), actualTimeout);
+    
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model,  // 默认 qwen-turbo-latest，可通过环境变量覆盖
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: deepResearch ? `${message}\n\n深度研究要求：\n- 结构化分点回答\n- 数据/事实注明来源\n- 给出结论与建议\n- 800-1200字` : message }
+          ],
+          temperature: 0.7,
+          max_tokens: maxTokens
+          }),
+        signal: controller.signal
+      });
+      clearTimeout(timer);
 
-    if (!response.ok) {
-    const errorText = await response.text();
-    console.error('❌ Qwen API Error:', response.status, errorText);
-    throw new Error(`Qwen API error: ${response.status} ${errorText.slice(0,200)}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ Qwen API Error:', response.status, errorText);
+        throw new Error(`Qwen API error: ${response.status} ${errorText.slice(0,200)}`);
+      }
+      
+      const data = await response.json();
+      console.log('✅ Qwen API Success');
+      return data.choices[0].message.content;
+    } catch (fetchError: any) {
+      // 超时或中断
+      if (fetchError.name === 'AbortError') {
+        console.log(`⏱️ ${model} timeout after ${actualTimeout}ms, falling back to stable model...`);
+        if (model !== 'qwen-turbo') {
+          return await callQwen(message, apiKey, language, region, maxTokens, 'qwen-turbo', timeoutMS, deepResearch);
+        }
+        throw new Error('Qwen request timeout');
+      }
+      throw fetchError;
+    }
+  } catch (error) {
+    console.error('❌ Qwen API Call Failed:', error);
+    throw error;
   }
-  
-  const data = await response.json();
-  console.log('✅ Qwen API Success');
-  return data.choices[0].message.content;
 }
 
 // 修复数据库触发器
