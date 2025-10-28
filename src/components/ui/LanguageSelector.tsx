@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
-import { authService } from '@/lib/supabase';
+import { authService, supabase } from '@/lib/supabase';
 
 // 支持的语言列表
 const supportedLanguages = [
@@ -181,10 +181,10 @@ export function LanguageSelector({ className, variant = 'default' }: LanguageSel
     
     setIsDetecting(true);
     try {
-      const response = await fetch('https://ipapi.co/json/');
-      if (response.ok) {
-        const data = await response.json();
-        const countryCode = data.country_code;
+      // 使用自有 Edge Function，避免第三方 CORS
+      const { data, error } = await supabase.functions.invoke('ip-to-language', { method: 'GET' });
+      if (!error && data?.data) {
+        const countryCode = data.data.country || 'US';
         
         // 国家代码到语言的映射
         const countryToLanguage: { [key: string]: string } = {
