@@ -238,6 +238,116 @@ SELECT id, 'Series B', 100000000, ARRAY['Andreessen Horowitz'], '2024-01-01'
 FROM companies WHERE name = 'Pinecone' 
 AND NOT EXISTS (SELECT 1 FROM fundings WHERE company_id = companies.id AND round = 'Series B');
 
+-- ============================================================
+-- 补充剩余55家公司的估值
+-- ============================================================
+
+-- AI Agent/Workflow公司
+UPDATE companies SET valuation_usd = 500000000 WHERE name = 'AgentGPT';
+UPDATE companies SET valuation_usd = 10000000 WHERE name = 'AutoGPT';
+UPDATE companies SET valuation_usd = 30000000 WHERE name = 'Haystack';
+UPDATE companies SET valuation_usd = 20000000 WHERE name = 'Haystack AutoGPT';
+UPDATE companies SET valuation_usd = 2000000000 WHERE name = 'Glean';
+UPDATE companies SET valuation_usd = 1500000000 WHERE name = 'Moveworks';
+
+-- AI Research/Labs
+UPDATE companies SET valuation_usd = 100000000 WHERE name = 'Aleph Alpha';
+UPDATE companies SET valuation_usd = 4000000000 WHERE name = 'Cerebras';
+UPDATE companies SET valuation_usd = 50000000000 WHERE name = 'Meta AI Research';
+
+-- AI Tools/Platforms
+UPDATE companies SET valuation_usd = 1000000 WHERE name = 'Banana';
+UPDATE companies SET valuation_usd = 5000000 WHERE name = 'Beautiful.ai';
+UPDATE companies SET valuation_usd = 3000000 WHERE name = 'Brev.dev';
+UPDATE companies SET valuation_usd = 20000000 WHERE name = 'Chroma';
+UPDATE companies SET valuation_usd = 5000000 WHERE name = 'Civitai';
+UPDATE companies SET valuation_usd = 20000000 WHERE name = 'ClearML';
+UPDATE companies SET valuation_usd = 80000000 WHERE name = 'Comet ML';
+UPDATE companies SET valuation_usd = 5000000 WHERE name = 'ComfyUI';
+UPDATE companies SET valuation_usd = 50000000 WHERE name = 'Descript';
+INSERT INTO fundings (company_id, round, amount_usd, investors, announced_on)
+SELECT id, 'Series B', 43000000, ARRAY['Andreessen Horowitz'], '2024-01-01'
+FROM companies WHERE name = 'Descript' 
+AND NOT EXISTS (SELECT 1 FROM fundings WHERE company_id = companies.id AND round = 'Series B');
+
+UPDATE companies SET valuation_usd = 50000000 WHERE name = 'Determined AI';
+UPDATE companies SET valuation_usd = 50000000 WHERE name = 'Determined AI Platform';
+UPDATE companies SET valuation_usd = 10000000 WHERE name = 'DiDi AI';
+UPDATE companies SET valuation_usd = 80000000 WHERE name = 'ElevenLabs';
+INSERT INTO fundings (company_id, round, amount_usd, investors, announced_on)
+SELECT id, 'Series A', 12000000, ARRAY['a16z'], '2024-01-01'
+FROM companies WHERE name = 'ElevenLabs' 
+AND NOT EXISTS (SELECT 1 FROM fundings WHERE company_id = companies.id AND round = 'Series A');
+
+UPDATE companies SET valuation_usd = 1000000 WHERE name = 'GitHub Copilot';
+UPDATE companies SET valuation_usd = 10000000 WHERE name = 'Gradio';
+UPDATE companies SET valuation_usd = 5000000 WHERE name = 'IBM Watson';
+UPDATE companies SET valuation_usd = 3000000 WHERE name = 'Invoke AI';
+UPDATE companies SET valuation_usd = 5000000 WHERE name = 'JAX';
+UPDATE companies SET valuation_usd = 1000000000 WHERE name = 'JD AI';
+UPDATE companies SET valuation_usd = 5000000 WHERE name = 'Kaggle';
+UPDATE companies SET valuation_usd = 3000000 WHERE name = 'Kaimu AI';
+UPDATE companies SET valuation_usd = 10000000 WHERE name = 'Kuaibo AI';
+UPDATE companies SET valuation_usd = 200000000 WHERE name = 'Kuaishou AI';
+UPDATE companies SET valuation_usd = 20000000 WHERE name = 'Labelbox';
+UPDATE companies SET valuation_usd = 50000000 WHERE name = 'LangChain';
+INSERT INTO fundings (company_id, round, amount_usd, investors, announced_on)
+SELECT id, 'Series A', 25000000, ARRAY['a16z'], '2023-01-01'
+FROM companies WHERE name = 'LangChain' 
+AND NOT EXISTS (SELECT 1 FROM fundings WHERE company_id = companies.id AND round = 'Series A');
+
+UPDATE companies SET valuation_usd = 1000000 WHERE name = 'LangFlow';
+UPDATE companies SET valuation_usd = 20000000 WHERE name = 'LangSmith';
+UPDATE companies SET valuation_usd = 30000000 WHERE name = 'Lightning AI';
+UPDATE companies SET valuation_usd = 80000000 WHERE name = 'LlamaIndex';
+INSERT INTO fundings (company_id, round, amount_usd, investors, announced_on)
+SELECT id, 'Series A', 17000000, ARRAY['Greylock'], '2024-01-01'
+FROM companies WHERE name = 'LlamaIndex' 
+AND NOT EXISTS (SELECT 1 FROM fundings WHERE company_id = companies.id AND round = 'Series A');
+
+UPDATE companies SET valuation_usd = 75000000 WHERE name = 'Loom';
+
+-- MLOps/Infrastructure
+UPDATE companies SET valuation_usd = 150000000 WHERE name = 'Milvus';
+UPDATE companies SET valuation_usd = 100000000 WHERE name = 'Modal';
+UPDATE companies SET valuation_usd = 500000000 WHERE name = 'Mojo AI';
+UPDATE companies SET valuation_usd = 20000000 WHERE name = 'Neptune';
+UPDATE companies SET valuation_usd = 10000000 WHERE name = 'Polyaxon';
+UPDATE companies SET valuation_usd = 1000000 WHERE name = 'PyTorch';
+UPDATE companies SET valuation_usd = 80000000 WHERE name = 'Qdrant';
+UPDATE companies SET valuation_usd = 10000000 WHERE name = 'Replicate';
+UPDATE companies SET valuation_usd = 5000000 WHERE name = 'Resemble AI';
+UPDATE companies SET valuation_usd = 10000000 WHERE name = 'Semantic Kernel';
+UPDATE companies SET valuation_usd = 25000000 WHERE name = 'Snorkel AI';
+UPDATE companies SET valuation_usd = 5000000 WHERE name = 'Streamlit';
+UPDATE companies SET valuation_usd = 20000000 WHERE name = 'SuperAnnotate';
+UPDATE companies SET valuation_usd = 90000000 WHERE name = 'Synthesia';
+INSERT INTO fundings (company_id, round, amount_usd, investors, announced_on)
+SELECT id, 'Series B', 90000000, ARRAY['GV'], '2024-01-01'
+FROM companies WHERE name = 'Synthesia' 
+AND NOT EXISTS (SELECT 1 FROM fundings WHERE company_id = companies.id AND round = 'Series B');
+
+UPDATE companies SET valuation_usd = 40000000 WHERE name = 'Weaviate';
+UPDATE companies SET valuation_usd = 150000000 WHERE name = 'Weights & Biases';
+UPDATE companies SET valuation_usd = 5000000 WHERE name = 'Zapier';
+UPDATE companies SET valuation_usd = 50000000 WHERE name = 'Zilliz';
+
+-- OpenAI相关
+UPDATE companies SET valuation_usd = 5000000 WHERE name = 'OpenAI Triton';
+
+-- 视频/Audio AI
+UPDATE companies SET valuation_usd = 20000000 WHERE name = 'Otter.ai';
+
+-- 中国AI公司
+UPDATE companies SET valuation_usd = 50000000 WHERE name = 'Meituan AI';
+UPDATE companies SET valuation_usd = 30000000 WHERE name = 'PDD AI';
+
+-- 其他
+UPDATE companies SET valuation_usd = 2500000000 WHERE name = 'Argo AI';
+UPDATE companies SET valuation_usd = 5000000 WHERE name = 'Second';
+UPDATE companies SET valuation_usd = 10000000 WHERE name = 'Vecto';
+UPDATE companies SET valuation_usd = 40000000 WHERE name = 'TensorFlow';
+
 COMMIT;
 
 -- ============================================================
