@@ -3072,13 +3072,26 @@ async function handleAIChat(req: any, res: any) {
       qwen: !!qwenApiKey
     });
 
+    // 如果请求的模型不可用，自动选择可用模型
+    if (reqModel === 'openai' && !openaiApiKey) {
+      reqModel = deepseekApiKey ? 'deepseek' : (qwenApiKey ? 'qwen' : reqModel);
+      console.log(`⚠️ Requested OpenAI not available, switching to: ${reqModel}`);
+    } else if (reqModel === 'deepseek' && !deepseekApiKey) {
+      reqModel = qwenApiKey ? 'qwen' : (openaiApiKey ? 'openai' : reqModel);
+      console.log(`⚠️ Requested DeepSeek not available, switching to: ${reqModel}`);
+    } else if (reqModel === 'qwen' && !qwenApiKey) {
+      reqModel = deepseekApiKey ? 'deepseek' : (openaiApiKey ? 'openai' : reqModel);
+      console.log(`⚠️ Requested Qwen not available, switching to: ${reqModel}`);
+    }
+
     let response: string = '';
     let usedModel: string = reqModel;
 
     // 根据模型选择API（带错误回退）
     if (reqModel === 'openai' || reqModel === 'gpt-4') {
       if (!openaiApiKey) {
-        return res.status(400).json({ error: 'missing OPENAI_API_KEY' });
+        console.warn('missing OPENAI_API_KEY, attempting fallback');
+        throw new Error('missing OPENAI_API_KEY');
       }
       try {
         response = await callOpenAI(reqMessage, openaiApiKey, reqLanguage);
@@ -3094,13 +3107,15 @@ async function handleAIChat(req: any, res: any) {
       }
     } else if (reqModel === 'deepseek') {
     if (!deepseekApiKey) {
-        return res.status(400).json({ error: 'missing DEEPSEEK_API_KEY' });
+        console.warn('missing DEEPSEEK_API_KEY, attempting fallback');
+        throw new Error('missing DEEPSEEK_API_KEY');
       }
       response = await callDeepSeek(reqMessage, deepseekApiKey, reqLanguage);
       usedModel = 'deepseek-chat';
     } else if (reqModel === 'qwen') {
       if (!qwenApiKey) {
-        return res.status(400).json({ error: 'missing QWEN_API_KEY' });
+        console.warn('missing QWEN_API_KEY, attempting fallback');
+        throw new Error('missing QWEN_API_KEY');
       }
       try {
         response = await callQwen(reqMessage, qwenApiKey, reqLanguage, qwenRegion);
