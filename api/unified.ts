@@ -1606,10 +1606,12 @@ async function handleFixDatabaseSchema(req: any, res: any) {
 }
 
 export default async function handler(req: any, res: any) {
-  // 设置CORS
+  // 设置CORS - 使用更宽松的配置
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Content-Type', 'application/json');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -1742,8 +1744,27 @@ export default async function handler(req: any, res: any) {
         return res.status(400).json({ error: 'Invalid action' });
     }
   } catch (error: any) {
-    console.error('API Error:', error);
-    return res.status(500).json({ error: error.message });
+    console.error('❌ API Top-level Error:', error);
+    console.error('❌ Error stack:', error.stack);
+    console.error('❌ Error message:', error.message);
+    console.error('❌ Error name:', error.name);
+    
+    // 确保始终返回 JSON 响应
+    try {
+      return res.status(500).json({ 
+        success: false,
+        error: error.message || 'Unknown error',
+        details: error.stack || error.toString()
+      });
+    } catch (responseError: any) {
+      console.error('❌ Failed to send error response:', responseError);
+      // 如果连响应都发送不了，至少记录日志
+      return res.status(500).json({ 
+        success: false,
+        error: 'Internal server error',
+        timestamp: new Date().toISOString()
+      });
+    }
   }
 }
 
