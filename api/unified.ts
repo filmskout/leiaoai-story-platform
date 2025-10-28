@@ -3146,9 +3146,10 @@ async function handleAIChat(req: any, res: any) {
     const openaiModel = (process.env.OPENAI_MODEL || 'gpt-4o').trim(); // 支持 gpt-4o / gpt-5（若账号开通）
     const deepseekModel = (process.env.DEEPSEEK_MODEL || 'deepseek-v3.2-exp').trim();
     const qwenModel = (process.env.QWEN_MODEL || 'qwen-turbo-latest').trim();
-    const maxTokens = Number(process.env.AI_MAX_TOKENS || 3500);
-    const timeoutMS = Number(process.env.AI_TIMEOUT_MS || 25000);
-    const deepResearch: boolean = !!(req.body && req.body.deepResearch);
+    const maxTokens = Number(process.env.AI_MAX_TOKENS || 6000);
+    const timeoutMS = Number(process.env.AI_TIMEOUT_MS || 90000);
+    const deepResearch: boolean = body.deepResearch !== undefined ? !!body.deepResearch : true; // 默认开启深度研究
+    const allowFallback: boolean = body.allowFallback !== undefined ? !!body.allowFallback : (reqModel ? false : true); // 指定模型时默认不回退
 
     for (const candidate of tryOrder) {
       try {
@@ -3174,6 +3175,9 @@ async function handleAIChat(req: any, res: any) {
         const msg = (e?.message || String(e)).slice(0, 200);
         console.error(`❌ Model ${candidate} failed:`, msg);
         errors.push(`${candidate}: ${msg}`);
+        if (!allowFallback) {
+          throw new Error(`Requested model ${candidate} failed: ${msg}`);
+        }
       }
     }
 
