@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { 
+  import { 
   Star, 
   Building, 
   ExternalLink, 
@@ -33,7 +33,8 @@ import {
   ChevronLeft,
   Crown,
   Zap,
-  Target,
+    Target,
+    Sparkles,
   Layers
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -143,14 +144,23 @@ export default function AICompaniesCatalog() {
     { value: 'AI Company', label: 'AI Companies', icon: Building, color: 'text-green-500' }
   ];
 
-  // Company tier filters
+  // Company tier filters（重命名：Tier1->Giants，Tier2->Unicorns）
   const companyTiers = [
     { value: 'all', label: 'All Tiers' },
-    { value: 'Tier 1', label: 'Tier 1 Giants', icon: Crown, color: 'text-yellow-600' },
-    { value: 'Tier 2', label: 'Tier 2 Giants', icon: Crown, color: 'text-yellow-500' },
+    { value: 'Giants', label: 'Giants', icon: Crown, color: 'text-yellow-600' },
+    { value: 'Unicorns', label: 'Unicorns (≥ $1B)', icon: Sparkles, color: 'text-pink-500' },
     { value: 'Independent', label: 'Independent', icon: Zap, color: 'text-blue-500' },
     { value: 'Emerging', label: 'Emerging', icon: Target, color: 'text-green-500' }
   ];
+
+  // Giants 名单与特例
+  const GIANTS_SET = new Set([
+    'OpenAI', 'Google', 'Microsoft', 'Meta', 'xAI', 'Baidu', 'Tencent', 'ByteDance', 'Alibaba'
+  ]);
+
+  const FORCE_UNICORNS_SET = new Set([
+    'Adobe'
+  ]);
 
   // Project category filters
   const projectCategories = [
@@ -262,7 +272,7 @@ export default function AICompaniesCatalog() {
     // Company tier filter
     if (selectedCompanyTier !== 'all') {
       filtered = filtered.filter(company => 
-        company.company_tier === selectedCompanyTier
+        computeDisplayTier(company) === selectedCompanyTier
       );
     }
 
@@ -283,9 +293,9 @@ export default function AICompaniesCatalog() {
           bValue = b.name.toLowerCase();
           break;
         case 'company_tier':
-          const tierOrder = { 'Tier 1': 1, 'Tier 2': 2, 'Independent': 3, 'Emerging': 4 };
-          aValue = tierOrder[a.company_tier as keyof typeof tierOrder] || 5;
-          bValue = tierOrder[b.company_tier as keyof typeof tierOrder] || 5;
+          const tierOrder: Record<string, number> = { Giants: 1, Unicorns: 2, Independent: 3, Emerging: 4 };
+          aValue = tierOrder[computeDisplayTier(a) || 'zzz'] || 5;
+          bValue = tierOrder[computeDisplayTier(b) || 'zzz'] || 5;
           break;
         case 'projects_count':
           aValue = a.projects.length;
@@ -459,21 +469,41 @@ export default function AICompaniesCatalog() {
     }
   };
 
+  // 计算显示用Tier（基于名称与估值规则）
+  const computeDisplayTier = (company: Company): string | undefined => {
+    const name = company.name?.trim() || '';
+    const valuation = (company as any).valuation as number | undefined;
+    if (GIANTS_SET.has(name)) return 'Giants';
+    if (FORCE_UNICORNS_SET.has(name)) return 'Unicorns';
+    if (typeof valuation === 'number' && valuation >= 1_000_000_000) return 'Unicorns';
+    // 兼容旧数据：Tier 1/2 映射
+    const raw = (company as any).company_tier || (company as any).tier;
+    if (raw === 'Tier 1') return 'Giants';
+    if (raw === 'Tier 2') return 'Unicorns';
+    return raw;
+  };
+
   const getCompanyTierBadge = (tier?: string) => {
     if (!tier) return null;
-    
-    const tierColors = {
-      'Tier 1': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
-      'Tier 2': 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/10 dark:text-yellow-500',
-      'Independent': 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
-      'Emerging': 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+    const textMap: Record<string,string> = { Giants: 'Giant', Unicorns: 'Unicorn' };
+    const colorMap: Record<string,string> = {
+      Giants: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
+      Unicorns: 'bg-pink-100 text-pink-800 dark:bg-pink-900/20 dark:text-pink-400',
+      Independent: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
+      Emerging: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
     };
-
+    const Icon = tier === 'Giants' ? Crown : tier === 'Unicorns' ? Sparkles : undefined;
     return (
-      <Badge className={`text-xs ${tierColors[tier as keyof typeof tierColors] || 'bg-gray-100 text-gray-800'}`}>
-        {tier}
+      <Badge className={`text-xs inline-flex items-center gap-1 ${colorMap[tier] || 'bg-gray-100 text-gray-800'}`}>
+        {Icon && <Icon className="w-3.5 h-3.5" />} {textMap[tier] || tier}
       </Badge>
     );
+  };
+
+  // map selected filter to computed tier
+  const tierMatches = (company: Company) => {
+    if (selectedCompanyTier === 'all') return true;
+    return computeDisplayTier(company) === selectedCompanyTier;
   };
 
   if (loading) {
@@ -743,7 +773,7 @@ export default function AICompaniesCatalog() {
                             {getCompanyTypeIcon(company.company_type)}
                           </div>
                           <div className="flex items-center gap-2 mb-1">
-                            {getCompanyTierBadge(company.company_tier)}
+                            {getCompanyTierBadge(computeDisplayTier(company))}
                             <div className="flex items-center gap-1 text-sm text-muted-foreground">
                               <Globe className="w-3 h-3" />
                               <span>{company.headquarters || 'Unknown'}</span>
@@ -906,7 +936,7 @@ export default function AICompaniesCatalog() {
                             <div className="flex items-center gap-2 mb-1">
                               <h3 className="text-xl font-semibold">{company.name}</h3>
                               {getCompanyTypeIcon(company.company_type)}
-                              {getCompanyTierBadge(company.company_tier)}
+                              {getCompanyTierBadge(computeDisplayTier(company))}
                             </div>
                             <div className="flex items-center gap-4 text-sm text-muted-foreground">
                               <div className="flex items-center gap-1">
