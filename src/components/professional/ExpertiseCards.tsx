@@ -313,18 +313,17 @@ export function ExpertiseCards({ className, onQuestionSelect }: ExpertiseCardsPr
   // 处理问题点击
   const handleQuestionClick = (question: string, e: React.MouseEvent, category?: string) => {
     e.stopPropagation();
+    e.preventDefault();
     if (isDragging) return;
     
     if (onQuestionSelect) {
-      // 如果有问题选择回调，使用回调
       onQuestionSelect(question);
     } else {
-      // 跳转到 AI 问答页面，并自动发送问题
       navigate(`/ai-chat`, { 
         state: { 
           autoAsk: true, 
-          question: question,
-          category: category
+          question,
+          category
         } 
       });
     }
