@@ -3084,77 +3084,51 @@ async function handleAIChat(req: any, res: any) {
       console.log(`⚠️ Requested Qwen not available, switching to: ${reqModel}`);
     }
 
-    let response: string = '';
-    let usedModel: string = reqModel;
+    // 构建按地域优先级的模型尝试顺序
+    const regionPriority = (userRegion === 'CN')
+      ? ['qwen', 'deepseek', 'openai']
+      : ['openai', 'deepseek', 'qwen'];
 
-    // 根据模型选择API（带错误回退）
-    if (reqModel === 'openai' || reqModel === 'gpt-4') {
-      if (!openaiApiKey) {
-        console.warn('missing OPENAI_API_KEY, attempting fallback');
-        throw new Error('missing OPENAI_API_KEY');
-      }
+    // 若请求了特定模型且有密钥，则将其置顶
+    const requested = (reqModel === 'gpt-4') ? 'openai' : reqModel;
+    const tryOrder = Array.from(new Set([
+      requested,
+      ...regionPriority
+    ])).filter(Boolean) as string[];
+
+    const errors: string[] = [];
+    let usedModel = '';
+    let response = '';
+
+    for (const candidate of tryOrder) {
       try {
-        response = await callOpenAI(reqMessage, openaiApiKey, reqLanguage);
-        usedModel = 'gpt-4';
-      } catch (error: any) {
-        console.error('OpenAI failed, trying DeepSeek...', error.message);
-        if (deepseekApiKey) {
+        if (candidate === 'openai') {
+          if (!openaiApiKey) throw new Error('missing OPENAI_API_KEY');
+          response = await callOpenAI(reqMessage, openaiApiKey, reqLanguage);
+          usedModel = 'gpt-4';
+          break;
+        }
+        if (candidate === 'deepseek') {
+          if (!deepseekApiKey) throw new Error('missing DEEPSEEK_API_KEY');
           response = await callDeepSeek(reqMessage, deepseekApiKey, reqLanguage);
           usedModel = 'deepseek-chat';
-        } else {
-          throw error;
+          break;
         }
-      }
-    } else if (reqModel === 'deepseek') {
-    if (!deepseekApiKey) {
-        console.warn('missing DEEPSEEK_API_KEY, attempting fallback');
-        throw new Error('missing DEEPSEEK_API_KEY');
-      }
-      response = await callDeepSeek(reqMessage, deepseekApiKey, reqLanguage);
-      usedModel = 'deepseek-chat';
-    } else if (reqModel === 'qwen') {
-      if (!qwenApiKey) {
-        console.warn('missing QWEN_API_KEY, attempting fallback');
-        throw new Error('missing QWEN_API_KEY');
-      }
-      try {
-        response = await callQwen(reqMessage, qwenApiKey, reqLanguage, qwenRegion);
-        usedModel = 'qwen-turbo';
-      } catch (error: any) {
-        console.error('Qwen failed, trying DeepSeek...', error.message);
-        if (deepseekApiKey) {
-          response = await callDeepSeek(reqMessage, deepseekApiKey, reqLanguage);
-          usedModel = 'deepseek-chat';
-        } else {
-          throw error;
+        if (candidate === 'qwen') {
+          if (!qwenApiKey) throw new Error('missing QWEN_API_KEY');
+          response = await callQwen(reqMessage, qwenApiKey, reqLanguage, qwenRegion);
+          usedModel = 'qwen-turbo';
+          break;
         }
+      } catch (e: any) {
+        const msg = (e?.message || String(e)).slice(0, 200);
+        console.error(`❌ Model ${candidate} failed:`, msg);
+        errors.push(`${candidate}: ${msg}`);
       }
-    } else {
-      // 默认优先 DeepSeek -> OpenAI -> Qwen
-      if (deepseekApiKey) {
-        try {
-          response = await callDeepSeek(reqMessage, deepseekApiKey, reqLanguage);
-          usedModel = 'deepseek-chat';
-        } catch {
-          if (openaiApiKey) {
-            response = await callOpenAI(reqMessage, openaiApiKey, reqLanguage);
-            usedModel = 'gpt-4';
-          } else if (qwenApiKey) {
-            response = await callQwen(reqMessage, qwenApiKey, reqLanguage, qwenRegion);
-            usedModel = 'qwen-turbo';
-          } else {
-            throw new Error('No API keys available');
-          }
-        }
-      } else if (openaiApiKey) {
-        response = await callOpenAI(reqMessage, openaiApiKey, reqLanguage);
-        usedModel = 'gpt-4';
-      } else if (qwenApiKey) {
-        response = await callQwen(reqMessage, qwenApiKey, reqLanguage, qwenRegion);
-        usedModel = 'qwen-turbo';
-      } else {
-        throw new Error('No API keys available');
-      }
+    }
+
+    if (!usedModel) {
+      throw new Error(`All models failed. ${errors.join(' | ')}`);
     }
 
     console.log('✅ AI Chat Response:', { model: usedModel, responseLength: response.length });
