@@ -3142,28 +3142,31 @@ async function handleAIChat(req: any, res: any) {
     let usedModel = '';
     let response = '';
 
-    // 为各模型读取可配置的具体型号
+    // 为各模型读取可配置的具体型号与资源限制
     const openaiModel = (process.env.OPENAI_MODEL || 'gpt-4o').trim(); // 支持 gpt-4o / gpt-5（若账号开通）
     const deepseekModel = (process.env.DEEPSEEK_MODEL || 'deepseek-v3.2-exp').trim();
     const qwenModel = (process.env.QWEN_MODEL || 'qwen-turbo-latest').trim();
+    const maxTokens = Number(process.env.AI_MAX_TOKENS || 3500);
+    const timeoutMS = Number(process.env.AI_TIMEOUT_MS || 25000);
+    const deepResearch: boolean = !!(req.body && req.body.deepResearch);
 
     for (const candidate of tryOrder) {
       try {
         if (candidate === 'openai') {
           if (!openaiApiKey) throw new Error('missing OPENAI_API_KEY');
-          response = await callOpenAI(reqMessage, openaiApiKey, reqLanguage, openaiModel);
+          response = await callOpenAI(reqMessage, openaiApiKey, reqLanguage, openaiModel, maxTokens, timeoutMS, deepResearch);
           usedModel = openaiModel;
           break;
         }
         if (candidate === 'deepseek') {
           if (!deepseekApiKey) throw new Error('missing DEEPSEEK_API_KEY');
-          response = await callDeepSeek(reqMessage, deepseekApiKey, reqLanguage, 2000, deepseekModel);
+          response = await callDeepSeek(reqMessage, deepseekApiKey, reqLanguage, maxTokens, deepseekModel, timeoutMS, deepResearch);
           usedModel = deepseekModel;
           break;
         }
         if (candidate === 'qwen') {
           if (!qwenApiKey) throw new Error('missing QWEN_API_KEY');
-          response = await callQwen(reqMessage, qwenApiKey, reqLanguage, qwenRegion, 2000, qwenModel);
+          response = await callQwen(reqMessage, qwenApiKey, reqLanguage, qwenRegion, maxTokens, qwenModel, timeoutMS, deepResearch);
           usedModel = qwenModel;
           break;
         }
@@ -3205,7 +3208,7 @@ async function handleAIChat(req: any, res: any) {
       if (deepseekApiKey) {
         console.log('🔄 Fallback: Trying DeepSeek...');
         const dsModel = (process.env.DEEPSEEK_MODEL || 'deepseek-v3.2-exp').trim();
-        const fallback = await callDeepSeek(reqMessage, deepseekApiKey, reqLanguage, 2000, dsModel);
+        const fallback = await callDeepSeek(reqMessage, deepseekApiKey, reqLanguage, maxTokens, dsModel, timeoutMS, deepResearch);
         return res.status(200).json({
           success: true,
           response: fallback,
@@ -3217,7 +3220,7 @@ async function handleAIChat(req: any, res: any) {
       if (qwenApiKey) {
         console.log('🔄 Fallback: Trying Qwen...');
         const qwModel = (process.env.QWEN_MODEL || 'qwen-turbo-latest').trim();
-        const fallback = await callQwen(reqMessage, qwenApiKey, reqLanguage, qwenRegion, 2000, qwModel);
+        const fallback = await callQwen(reqMessage, qwenApiKey, reqLanguage, qwenRegion, maxTokens, qwModel, timeoutMS, deepResearch);
         return res.status(200).json({
           success: true,
           response: fallback,
@@ -3229,7 +3232,7 @@ async function handleAIChat(req: any, res: any) {
       if (openaiApiKey) {
         console.log('🔄 Fallback: Trying OpenAI...');
         const oaModel = (process.env.OPENAI_MODEL || 'gpt-4o').trim();
-        const fallback = await callOpenAI(reqMessage, openaiApiKey, reqLanguage, oaModel);
+        const fallback = await callOpenAI(reqMessage, openaiApiKey, reqLanguage, oaModel, maxTokens, timeoutMS, deepResearch);
         return res.status(200).json({
           success: true,
           response: fallback,
@@ -3260,11 +3263,21 @@ async function handleAIChat(req: any, res: any) {
 }
 
 // OpenAI API调用
-async function callOpenAI(message: string, apiKey: string, language: string, model: string = 'gpt-4o'): Promise<string> {
+async function callOpenAI(
+  message: string,
+  apiKey: string,
+  language: string,
+  model: string = 'gpt-4o',
+  maxTokens: number = 3500,
+  timeoutMS: number = 60000,
+  deepResearch: boolean = false
+): Promise<string> {
   const systemPrompt = language.startsWith('zh') 
     ? '你是一个专业的AI助手，请用中文回答用户的问题。'
     : 'You are a professional AI assistant. Please answer user questions in English.';
     
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMS);
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -3275,12 +3288,14 @@ async function callOpenAI(message: string, apiKey: string, language: string, mod
       model,
         messages: [
         { role: 'system', content: systemPrompt },
-        { role: 'user', content: message }
+        { role: 'user', content: deepResearch ? `${message}\n\n要求：\n- 使用分步推理，先列提纲再逐点展开\n- 引用权威公开资料（注明来源）\n- 结尾给出要点总结\n- 字数800-1200` : message }
       ],
       temperature: 0.7,
-      max_tokens: 2000
-    })
+      max_tokens: maxTokens
+    }),
+    signal: controller.signal
   });
+  clearTimeout(timer);
   
   if (!response.ok) {
     const txt = await response.text();
@@ -3292,7 +3307,15 @@ async function callOpenAI(message: string, apiKey: string, language: string, mod
 }
 
 // DeepSeek API调用
-async function callDeepSeek(message: string, apiKey: string, language: string, maxTokens: number = 2000, model: string = 'deepseek-v3.2-exp'): Promise<string> {
+async function callDeepSeek(
+  message: string,
+  apiKey: string,
+  language: string,
+  maxTokens: number = 3500,
+  model: string = 'deepseek-v3.2-exp',
+  timeoutMS: number = 60000,
+  deepResearch: boolean = false
+): Promise<string> {
   const systemPrompt = language.startsWith('zh') 
     ? '你是一个专业的AI助手，请用中文回答用户的问题。'
     : 'You are a professional AI assistant. Please answer user questions in English.';
@@ -3301,7 +3324,7 @@ async function callDeepSeek(message: string, apiKey: string, language: string, m
   
   try {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 8000);
+    const timer = setTimeout(() => controller.abort(), timeoutMS);
     const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -3312,7 +3335,7 @@ async function callDeepSeek(message: string, apiKey: string, language: string, m
         model,
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: message }
+          { role: 'user', content: deepResearch ? `${message}\n\n请进行深度研究：\n- 结构化分析（提纲/要点）\n- 引用可靠来源并注明\n- 详细推理过程（可简洁）\n- 800-1200字` : message }
         ],
         temperature: 0.7,
         max_tokens: maxTokens
@@ -3329,7 +3352,7 @@ async function callDeepSeek(message: string, apiKey: string, language: string, m
       // 若实验模型不可用，自动回退到 deepseek-chat 再试一次
       if (model !== 'deepseek-chat') {
         console.log('🔁 Retrying with deepseek-chat...');
-        return await callDeepSeek(message, apiKey, language, maxTokens, 'deepseek-chat');
+        return await callDeepSeek(message, apiKey, language, maxTokens, 'deepseek-chat', timeoutMS, deepResearch);
       }
       throw new Error(`DeepSeek API error: ${response.status} - ${errorText}`);
     }
@@ -3345,7 +3368,16 @@ async function callDeepSeek(message: string, apiKey: string, language: string, m
 }
 
 // Qwen API调用
-async function callQwen(message: string, apiKey: string, language: string, region: string = 'singapore', maxTokens: number = 2000, model: string = 'qwen-turbo-latest'): Promise<string> {
+async function callQwen(
+  message: string,
+  apiKey: string,
+  language: string,
+  region: string = 'singapore',
+  maxTokens: number = 3500,
+  model: string = 'qwen-turbo-latest',
+  timeoutMS: number = 60000,
+  deepResearch: boolean = false
+): Promise<string> {
   const systemPrompt = language.startsWith('zh') 
     ? '你是一个专业的AI助手，请用中文回答用户的问题。'
     : 'You are a professional AI assistant. Please answer user questions in English.';
@@ -3368,7 +3400,7 @@ async function callQwen(message: string, apiKey: string, language: string, regio
   console.log(`🔵 Calling Qwen API (${region}): ${endpoint}`);
   
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 8000);
+  const timer = setTimeout(() => controller.abort(), timeoutMS);
   const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
@@ -3379,7 +3411,7 @@ async function callQwen(message: string, apiKey: string, language: string, regio
       model,  // 默认 qwen-turbo-latest，可通过环境变量覆盖
       messages: [
         { role: 'system', content: systemPrompt },
-        { role: 'user', content: message }
+        { role: 'user', content: deepResearch ? `${message}\n\n深度研究要求：\n- 结构化分点回答\n- 数据/事实注明来源\n- 给出结论与建议\n- 800-1200字` : message }
       ],
       temperature: 0.7,
       max_tokens: maxTokens
