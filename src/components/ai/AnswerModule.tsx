@@ -404,16 +404,17 @@ export function AnswerModule({
                         {new Date().toLocaleTimeString()}
                       </span>
                     </div>
-                    
-                    {/* 使用标准spinner加载动画 */}
-                    <div className="flex justify-center items-center py-6">
-                      <UnifiedLoader 
-                        variant="inline" 
-                        show={true} 
-                        size="md"
-                        loaderStyle="spinner"
-                        text={i18n.language.startsWith('zh') ? '响应中...' : 'Processing...'}
-                      />
+                    {/* 线性进度条 */}
+                    <div className="w-full py-4">
+                      <div className="w-full h-2 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-primary-500 animate-[progress_1.5s_ease-in-out_infinite]"
+                          style={{ width: '35%' }}
+                        />
+                      </div>
+                      <div className="mt-2 text-xs text-foreground-muted">
+                        {i18n.language.startsWith('zh') ? '正在生成详细回答…' : 'Generating a detailed response…'}
+                      </div>
                     </div>
                   </div>
                 </motion.div>

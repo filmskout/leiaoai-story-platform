@@ -927,11 +927,12 @@ export default function Profile() {
       </div>
 
       {/* Main Content Tabs */}
-      <Tabs defaultValue="stories" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="stories">{t('profile.tabs.stories', 'Stories')}</TabsTrigger>
+      <Tabs defaultValue="submissions" className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="submissions">{t('profile.tabs.submissions', 'Submissions')}</TabsTrigger>
-          <TabsTrigger value="interaction">{t('profile.tabs.interaction', 'Interaction')}</TabsTrigger>
+          <TabsTrigger value="chat">{t('profile.chat_sessions', 'AI Chat Sessions')}</TabsTrigger>
+          <TabsTrigger value="bp">{t('bp_analysis.title', 'BP Analysis')}</TabsTrigger>
+          <TabsTrigger value="bmc">{t('bp_analysis.tabs.canvas', 'BMC')}</TabsTrigger>
         </TabsList>
 
         {/* Stories Tab */}
@@ -1028,7 +1029,7 @@ export default function Profile() {
           </Card>
         </TabsContent>
 
-        {/* Submissions Tab */}
+        {/* Submissions Tab - 默认第一个 */}
         <TabsContent value="submissions">
           <div className="space-y-6">
             {/* BP Submissions */}
@@ -1251,8 +1252,8 @@ export default function Profile() {
               </CardContent>
             </Card>
 
-            {/* Chat Sessions */}
-            <Card>
+            {/* Chat Sessions - 第二个 Tab 对应内容 */}
+            <Card id="chat">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>{t('profile.chat_sessions', 'AI Chat Sessions')}</CardTitle>
@@ -1377,8 +1378,23 @@ export default function Profile() {
           </div>
         </TabsContent>
 
-        {/* Interaction Tab */}
-        <TabsContent value="interaction">
+        {/* BP Tab */}
+        <TabsContent value="bp">
+          <div className="space-y-6">
+            <Button onClick={() => navigate('/bp-analysis')}>
+              {t('bp_analysis.upload_bp', 'Upload BP')}
+            </Button>
+          </div>
+        </TabsContent>
+
+        {/* BMC Tab */}
+        <TabsContent value="bmc">
+          <div className="space-y-6">
+            <Button onClick={() => navigate('/bp-analysis?tab=canvas')}>
+              {t('bp_analysis.tabs.canvas', 'Business Model Canvas')}
+            </Button>
+          </div>
+        </TabsContent>
           <div className="space-y-6">
             {/* Liked Stories */}
             <Card>

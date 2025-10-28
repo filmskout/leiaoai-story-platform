@@ -172,14 +172,14 @@ export function AIInvestmentChat({ className, initialQuestion }: AIInvestmentCha
                 className="text-foreground"
               />
             ) : (
-              // 空内容时显示加载指示器
-              <div className="flex items-center gap-2 text-foreground-muted">
-                <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-primary-500 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-primary-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                  <div className="w-2 h-2 bg-primary-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+              // 空内容时显示线性进度条
+              <div className="w-full">
+                <div className="w-full h-2 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
+                  <div className="h-full bg-primary-500 animate-[progress_1.5s_ease-in-out_infinite]" style={{ width: '35%' }} />
                 </div>
-                <span className="text-sm">{t('ai_chat.analyzing_question')}</span>
+                <div className="mt-2 text-xs text-foreground-muted">
+                  {t('ai_chat.analyzing_question')}
+                </div>
               </div>
             )}
           </div>
