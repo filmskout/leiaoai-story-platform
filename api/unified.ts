@@ -3036,152 +3036,124 @@ async function handleDataProgress(req: any, res: any) {
 
 // AI聊天处理函数
 async function handleAIChat(req: any, res: any) {
-  try {
-    const { message, model = 'deepseek', sessionId, language = 'zh' } = req.body;
+  // 将关键变量提升到函数作用域，避免 catch 中不可见
+  let reqMessage: string = '';
+  let reqModel: string = 'deepseek';
+  let reqSessionId: string | undefined;
+  let reqLanguage: string = 'zh';
+  const openaiApiKey = process.env.OPENAI_API_KEY as string | undefined;
+  const deepseekApiKey = process.env.DEEPSEEK_API_KEY as string | undefined;
+  const qwenApiKey = process.env.QWEN_API_KEY as string | undefined;
 
-    if (!message) {
+  // 地域与路由（在 try 中计算，以便使用请求头）
+  let qwenRegion: string = 'beijing';
+
+  try {
+    const body = req.body || {};
+    reqMessage = body.message || '';
+    reqModel = body.model || 'deepseek';
+    reqSessionId = body.sessionId;
+    reqLanguage = body.language || 'zh';
+
+    if (!reqMessage) {
       return res.status(400).json({ error: 'Message is required' });
     }
 
-    console.log('🤖 AI Chat Request:', { model, messageLength: message.length, language });
-    
-    // 获取API密钥
-    const openaiApiKey = process.env.OPENAI_API_KEY;
-    const deepseekApiKey = process.env.DEEPSEEK_API_KEY;
-    const qwenApiKey = process.env.QWEN_API_KEY;
-    
+    console.log('🤖 AI Chat Request:', { model: reqModel, messageLength: reqMessage.length, language: reqLanguage });
+
     // 地域检测：从请求头判断用户所在地区
-    const userRegion = req.headers['x-vercel-ip-country'] || 'CN'; // Vercel自动提供国家代码
-    const qwenRegion = userRegion === 'CN' ? 'beijing' : 'singapore'; // 中国用北京，海外用新加坡
+    const userRegion = (req.headers && (req.headers['x-vercel-ip-country'] as string)) || 'CN';
+    qwenRegion = userRegion === 'CN' ? 'beijing' : 'singapore';
     console.log(`🌍 User region: ${userRegion}, Using Qwen region: ${qwenRegion}`);
-    
+
     console.log('🔑 API Keys Status:', {
       openai: !!openaiApiKey,
       deepseek: !!deepseekApiKey,
       qwen: !!qwenApiKey
     });
-    
-    let response: string;
-    let usedModel: string;
-    
+
+    let response: string = '';
+    let usedModel: string = reqModel;
+
     // 根据模型选择API（带错误回退）
-    if (model === 'openai' || model === 'gpt-4') {
+    if (reqModel === 'openai' || reqModel === 'gpt-4') {
       if (!openaiApiKey) {
         return res.status(400).json({ error: 'missing OPENAI_API_KEY' });
       }
-      
       try {
-        const openaiResponse = await callOpenAI(message, openaiApiKey, language);
-        response = openaiResponse;
+        response = await callOpenAI(reqMessage, openaiApiKey, reqLanguage);
         usedModel = 'gpt-4';
       } catch (error: any) {
         console.error('OpenAI failed, trying DeepSeek...', error.message);
-        // 如果OpenAI失败，回退到DeepSeek
         if (deepseekApiKey) {
-          const deepseekResponse = await callDeepSeek(message, deepseekApiKey, language);
-          response = deepseekResponse;
+          response = await callDeepSeek(reqMessage, deepseekApiKey, reqLanguage);
           usedModel = 'deepseek-chat';
         } else {
-          throw error; // 如果DeepSeek也不可用，抛出原始错误
+          throw error;
         }
       }
-      
-    } else if (model === 'deepseek') {
-    if (!deepseekApiKey) {
+    } else if (reqModel === 'deepseek') {
+      if (!deepseekApiKey) {
         return res.status(400).json({ error: 'missing DEEPSEEK_API_KEY' });
       }
-      
-      const deepseekResponse = await callDeepSeek(message, deepseekApiKey, language);
-      response = deepseekResponse;
-      usedModel = 'deepseek-v3.2-exp';
-      
-    } else if (model === 'qwen') {
+      response = await callDeepSeek(reqMessage, deepseekApiKey, reqLanguage);
+      usedModel = 'deepseek-chat';
+    } else if (reqModel === 'qwen') {
       if (!qwenApiKey) {
         return res.status(400).json({ error: 'missing QWEN_API_KEY' });
       }
-      
       try {
-        const qwenResponse = await callQwen(message, qwenApiKey, language, qwenRegion);
-        response = qwenResponse;
+        response = await callQwen(reqMessage, qwenApiKey, reqLanguage, qwenRegion);
         usedModel = 'qwen-turbo';
       } catch (error: any) {
         console.error('Qwen failed, trying DeepSeek...', error.message);
-        // 如果Qwen失败，回退到DeepSeek
         if (deepseekApiKey) {
-          const deepseekResponse = await callDeepSeek(message, deepseekApiKey, language);
-          response = deepseekResponse;
+          response = await callDeepSeek(reqMessage, deepseekApiKey, reqLanguage);
           usedModel = 'deepseek-chat';
         } else {
-          throw error; // 如果DeepSeek也不可用，抛出原始错误
+          throw error;
         }
       }
-      
     } else {
-      // 默认尝试DeepSeek，然后OpenAI，最后Qwen
+      // 默认优先 DeepSeek -> OpenAI -> Qwen
       if (deepseekApiKey) {
         try {
-          const deepseekResponse = await callDeepSeek(message, deepseekApiKey, language);
-          response = deepseekResponse;
+          response = await callDeepSeek(reqMessage, deepseekApiKey, reqLanguage);
           usedModel = 'deepseek-chat';
-        } catch (error) {
-          console.log('DeepSeek failed, trying OpenAI...');
+        } catch {
           if (openaiApiKey) {
-            const openaiResponse = await callOpenAI(message, openaiApiKey, language);
-            response = openaiResponse;
+            response = await callOpenAI(reqMessage, openaiApiKey, reqLanguage);
             usedModel = 'gpt-4';
           } else if (qwenApiKey) {
-            const qwenResponse = await callQwen(message, qwenApiKey, language, qwenRegion);
-            response = qwenResponse;
+            response = await callQwen(reqMessage, qwenApiKey, reqLanguage, qwenRegion);
             usedModel = 'qwen-turbo';
           } else {
             throw new Error('No API keys available');
           }
         }
       } else if (openaiApiKey) {
-        const openaiResponse = await callOpenAI(message, openaiApiKey, language);
-        response = openaiResponse;
+        response = await callOpenAI(reqMessage, openaiApiKey, reqLanguage);
         usedModel = 'gpt-4';
       } else if (qwenApiKey) {
-        const qwenResponse = await callQwen(message, qwenApiKey, language, qwenRegion);
-        response = qwenResponse;
+        response = await callQwen(reqMessage, qwenApiKey, reqLanguage, qwenRegion);
         usedModel = 'qwen-turbo';
       } else {
         throw new Error('No API keys available');
       }
     }
-    
+
     console.log('✅ AI Chat Response:', { model: usedModel, responseLength: response.length });
-    
+
     return res.status(200).json({
       success: true,
-      response: response,
+      response,
       model: usedModel,
-      sessionId: sessionId,
+      sessionId: reqSessionId,
       timestamp: new Date().toISOString()
     });
-    
   } catch (error: any) {
     console.error('❌ AI Chat Error:', error);
-    
-    // 如果OpenAI/Qwen失败且有DeepSeek可用，尝试回退
-    if (model !== 'deepseek') {
-      console.log('⚠️ Primary model failed, trying DeepSeek fallback...');
-      try {
-        if (deepseekApiKey) {
-          const deepseekResponse = await callDeepSeek(message, deepseekApiKey, language);
-          return res.status(200).json({
-            success: true,
-            response: deepseekResponse,
-            model: 'deepseek-chat',
-            sessionId: sessionId,
-            timestamp: new Date().toISOString()
-          });
-        }
-      } catch (fallbackError: any) {
-        console.error('❌ Fallback to DeepSeek also failed:', fallbackError);
-      }
-    }
-    
+    // 失败时的保守处理：不再使用未定义变量，直接返回错误
     return res.status(500).json({
       success: false,
       error: error.message,
