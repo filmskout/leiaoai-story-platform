@@ -2110,10 +2110,10 @@ async function handleBatchCompleteLogos(req: any, res: any) {
       total: companiesWithoutLogos.length,
       results
     });
-    
+
   } catch (error: any) {
     console.error('批量为缺失Logo的公司补齐失败:', error);
-    return res.status(500).json({ 
+    return res.status(500).json({
       success: false,
       error: `批量为缺失Logo的公司补齐失败: ${error.message}` 
     });
@@ -3093,7 +3093,7 @@ async function handleAIChat(req: any, res: any) {
         }
       }
     } else if (reqModel === 'deepseek') {
-      if (!deepseekApiKey) {
+    if (!deepseekApiKey) {
         return res.status(400).json({ error: 'missing DEEPSEEK_API_KEY' });
       }
       response = await callDeepSeek(reqMessage, deepseekApiKey, reqLanguage);
@@ -3153,10 +3153,48 @@ async function handleAIChat(req: any, res: any) {
     });
   } catch (error: any) {
     console.error('❌ AI Chat Error:', error);
-    // 失败时的保守处理：不再使用未定义变量，直接返回错误
+    // 失败时尝试可用的模型进行一次兜底
+    try {
+      if (deepseekApiKey) {
+        const fallback = await callDeepSeek(reqMessage, deepseekApiKey, reqLanguage);
+        return res.status(200).json({
+          success: true,
+          response: fallback,
+          model: 'deepseek-chat',
+          sessionId: reqSessionId,
+          timestamp: new Date().toISOString()
+        });
+      }
+      if (qwenApiKey) {
+        const fallback = await callQwen(reqMessage, qwenApiKey, reqLanguage, qwenRegion);
+        return res.status(200).json({
+          success: true,
+          response: fallback,
+          model: 'qwen-turbo',
+          sessionId: reqSessionId,
+          timestamp: new Date().toISOString()
+        });
+      }
+      if (openaiApiKey) {
+        const fallback = await callOpenAI(reqMessage, openaiApiKey, reqLanguage);
+        return res.status(200).json({
+          success: true,
+          response: fallback,
+          model: 'gpt-4',
+          sessionId: reqSessionId,
+          timestamp: new Date().toISOString()
+        });
+      }
+    } catch (fallbackErr: any) {
+      console.error('❌ Final fallback failed:', fallbackErr);
+    }
+
+    // 没有任何可用模型或全部失败
+    const noKeys = !openaiApiKey && !deepseekApiKey && !qwenApiKey;
+    const msg = noKeys ? 'No AI keys configured (OpenAI/DeepSeek/Qwen)' : error.message;
     return res.status(500).json({
       success: false,
-      error: error.message,
+      error: msg,
       timestamp: new Date().toISOString()
     });
   }
@@ -3173,10 +3211,10 @@ async function callOpenAI(message: string, apiKey: string, language: string): Pr
       headers: {
       'Authorization': `Bearer ${apiKey}`,
       'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
+      },
+      body: JSON.stringify({
       model: 'gpt-4',
-      messages: [
+        messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: message }
       ],
@@ -3274,10 +3312,10 @@ async function callQwen(message: string, apiKey: string, language: string, regio
       ],
       temperature: 0.7,
       max_tokens: maxTokens
-    })
-  });
+      })
+    });
 
-  if (!response.ok) {
+    if (!response.ok) {
     const errorText = await response.text();
     console.error('❌ Qwen API Error:', response.status, errorText);
     throw new Error(`Qwen API error: ${response.status}`);
