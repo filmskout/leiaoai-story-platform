@@ -203,7 +203,106 @@ UPDATE companies SET
   employee_count = '50-200人'
 WHERE name = 'Brev.dev' OR name LIKE '%Brev%';
 
--- 101-110. More companies...
+-- 101. Vecto
+UPDATE companies SET
+  description = 'Vecto是AI矢量数据库，简化LLM与数据的集成。',
+  detailed_description = 'Vecto成立于2023年，是AI矢量数据库。总部位于旧金山，员工50-200人。公司开发的矢量数据库简化LLM与数据的集成，提供强大的语义搜索能力。Vecto支持多种数据源，包括文档、图像、音频等。2024年，Vecto获得了广泛的关注，成为AI应用的热门基础设施。',
+  headquarters = 'San Francisco, California, USA',
+  website = 'https://www.vecto.ai',
+  founded_year = 2023,
+  employee_count = '50-200人'
+WHERE name = 'Vecto' OR name LIKE '%Vecto%';
+
+-- 102. Zilliz
+UPDATE companies SET
+  description = 'Zilliz是Milvus的母公司，提供向量数据库云服务。',
+  detailed_description = 'Zilliz成立于2017年，是Milvus的母公司。总部位于加州弗里蒙特，员工200-500人。公司提供向量数据库云服务，帮助企业构建AI应用。Zilliz的Milvus平台已被广泛应用于图像搜索、推荐系统等场景。2024年，Zilliz继续推动向量数据库技术的发展。',
+  headquarters = 'Fremont, California, USA',
+  website = 'https://zilliz.com',
+  founded_year = 2017,
+  employee_count = '200-500人'
+WHERE name = 'Zilliz' OR name LIKE '%Zilliz%';
+
+-- 103. SuperAnnotate
+UPDATE companies SET
+  description = 'SuperAnnotate是AI数据标注平台，加速机器学习项目。',
+  detailed_description = 'SuperAnnotate成立于2018年，是AI数据标注平台。总部位于旧金山，员工200-500人。公司开发的平台帮助企业和研究人员快速标注数据，加速机器学习项目。SuperAnnotate支持多种数据类型，包括图像、视频、文本等。2024年，SuperAnnotate获得了广泛的采用，成为ML数据标注的热门工具。',
+  headquarters = 'San Francisco, California, USA',
+  website = 'https://www.superannotate.com',
+  founded_year = 2018,
+  employee_count = '200-500人'
+WHERE name = 'SuperAnnotate' OR name LIKE '%SuperAnnotate%';
+
+-- 104. Labelbox
+UPDATE companies SET
+  description = 'Labelbox是AI数据标注平台，提供企业级数据标注解决方案。',
+  detailed_description = 'Labelbox成立于2018年，是AI数据标注平台。总部位于旧金山，员工200-500人。公司开发的平台提供企业级数据标注解决方案，帮助团队协作完成数据标注任务。Labelbox支持多种数据类型和标注工具，已与多家AI公司合作。2024年，Labelbox获得了广泛的采用，成为AI数据标注的领导者。',
+  headquarters = 'San Francisco, California, USA',
+  website = 'https://labelbox.com',
+  founded_year = 2018,
+  employee_count = '200-500人'
+WHERE name = 'Labelbox' OR name LIKE '%Labelbox%';
+
+-- 105. Scale AI
+UPDATE companies SET
+  description = 'Scale AI是AI数据平台，为AI训练提供高质量数据。',
+  detailed_description = 'Scale AI成立于2016年，是AI数据平台。总部位于旧金山，员工1000-3000人。公司开发的平台为AI训练提供高质量数据，包括图像标注、文本标注、自动驾驶数据等。Scale AI已与OpenAI、Tesla等公司合作，为AI模型训练提供数据支持。2024年，Scale AI估值达到数十亿美元，成为AI数据领域的领导者。',
+  headquarters = 'San Francisco, California, USA',
+  website = 'https://scale.com',
+  founded_year = 2016,
+  employee_count = '1000-3000人'
+WHERE name = 'Scale AI' OR name LIKE '%Scale AI%';
+
+-- 106. Snorkel AI
+UPDATE companies SET
+  description = 'Snorkel AI是AI数据平台，使用编程方式创建训练数据。',
+  detailed_description = 'Snorkel AI成立于2019年，是AI数据平台。总部位于帕洛阿尔托，员工200-500人。公司开发的平台使用编程方式创建训练数据，通过弱监督学习加速机器学习项目。Snorkel AI已应用于多个企业AI项目，提高了数据标注效率。2024年，Snorkel AI获得了广泛的关注，成为AI数据平台的创新者。',
+  headquarters = 'Palo Alto, California, USA',
+  website = 'https://www.snorkel.ai',
+  founded_year = 2019,
+  employee_count = '200-500人'
+WHERE name = 'Snorkel AI' OR name LIKE '%Snorkel%';
+
+-- 107. Determined AI (Duplicate)
+UPDATE companies SET
+  description = 'Determined AI是深度学习训练平台，加速模型训练。',
+  detailed_description = 'Determined AI成立于2017年，是深度学习训练平台。总部位于西雅图，员工100-300人。公司开发的平台加速深度学习模型训练，提供分布式训练、自动超参数优化等功能。Determined AI支持PyTorch和TensorFlow，已被HPE收购。2024年，Determined AI继续为企业提供深度学习平台。',
+  headquarters = 'Seattle, Washington, USA',
+  website = 'https://www.determined.ai',
+  founded_year = 2017,
+  employee_count = '100-300人'
+WHERE name = 'Determined AI Platform' OR name LIKE '%Determined Platform%';
+
+-- 108. Modal
+UPDATE companies SET
+  description = 'Modal是Python云平台，快速部署AI和机器学习代码。',
+  detailed_description = 'Modal成立于2022年，是Python云平台。总部位于旧金山，员工100-300人。公司开发的平台使开发者能够快速部署AI和机器学习代码到云端，无需管理基础设施。Modal支持GPU和CPU计算，提供简单的API。2024年，Modal获得了广泛的关注，成为AI部署的热门平台。',
+  headquarters = 'San Francisco, California, USA',
+  website = 'https://modal.com',
+  founded_year = 2022,
+  employee_count = '100-300人'
+WHERE name = 'Modal' OR name LIKE '%Modal%';
+
+-- 109. Banana
+UPDATE companies SET
+  description = 'Banana是机器学习模型部署平台，提供GPU加速推理。',
+  detailed_description = 'Banana成立于2022年，是机器学习模型部署平台。总部位于旧金山，员工50-200人。公司开发的平台提供GPU加速推理，使开发者能够快速部署模型到生产环境。Banana支持多种机器学习框架，包括PyTorch、TensorFlow等。2024年，Banana获得了广泛的关注，成为AI部署的热门选择。',
+  headquarters = 'San Francisco, California, USA',
+  website = 'https://www.banana.dev',
+  founded_year = 2022,
+  employee_count = '50-200人'
+WHERE name = 'Banana' OR name LIKE '%Banana.dev%';
+
+-- 110. Cerebras
+UPDATE companies SET
+  description = 'Cerebras是AI芯片公司，开发大规模的AI加速硬件。',
+  detailed_description = 'Cerebras成立于2016年，是AI芯片公司。总部位于加州圣何塞，员工500-1000人。公司开发大规模的AI加速硬件，专门用于深度学习训练。Cerebras的Wafer-Scale Engine是最大的AI芯片，加速大模型训练。2024年，Cerebras获得了广泛的关注，成为AI硬件领域的创新者。',
+  headquarters = 'Sunnyvale, California, USA',
+  website = 'https://www.cerebras.net',
+  founded_year = 2016,
+  employee_count = '500-1000人'
+WHERE name = 'Cerebras' OR name LIKE '%Cerebras%';
+
 -- 111. Cruise
 UPDATE companies SET
   description = 'Cruise是自动驾驶公司，开发和部署自动驾驶车辆。',

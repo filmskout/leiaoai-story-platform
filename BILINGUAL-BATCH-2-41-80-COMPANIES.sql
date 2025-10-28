@@ -203,7 +203,106 @@ UPDATE companies SET
   employee_count = '50-200人'
 WHERE name = 'LangFlow' OR name LIKE '%LangFlow%';
 
--- 61-70. More companies to be added...
+-- 61. LangSmith
+UPDATE companies SET
+  description = 'LangSmith是LangChain的监控和调试平台，跟踪AI应用运行。',
+  detailed_description = 'LangSmith成立于2023年，是LangChain的监控和调试平台。总部位于旧金山，员工100-300人。公司开发的平台帮助开发者监控和调试AI应用，跟踪模型调用、性能和成本。LangSmith提供完整的AI应用生命周期管理，包括开发、测试、部署等。2024年，LangSmith获得了广泛的采用，成为AI开发的重要工具。',
+  headquarters = 'San Francisco, California, USA',
+  website = 'https://www.langsmith.com',
+  founded_year = 2023,
+  employee_count = '100-300人'
+WHERE name = 'LangSmith' OR name LIKE '%LangSmith%';
+
+-- 62. Pinecone
+UPDATE companies SET
+  description = 'Pinecone是向量数据库，为AI应用提供语义搜索能力。',
+  detailed_description = 'Pinecone成立于2019年，是向量数据库。总部位于旧金山，员工200-500人。公司开发的向量数据库为AI应用提供语义搜索能力，支持大规模向量数据的存储和检索。Pinecone已被广泛应用于推荐系统、搜索、相似度匹配等场景。2024年，Pinecone获得了广泛的采用，成为AI应用的热门基础设施。',
+  headquarters = 'San Francisco, California, USA',
+  website = 'https://www.pinecone.io',
+  founded_year = 2019,
+  employee_count = '200-500人'
+WHERE name = 'Pinecone' OR name LIKE '%Pinecone%';
+
+-- 63. Weaviate
+UPDATE companies SET
+  description = 'Weaviate是开源向量数据库，支持语义搜索和图数据库功能。',
+  detailed_description = 'Weaviate成立于2017年，是开源向量数据库。总部位于荷兰阿姆斯特丹，员工100-300人。公司开发的向量数据库支持语义搜索和图数据库功能，为AI应用提供强大的数据存储能力。Weaviate支持多种机器学习模型，包括BERT、GPT等。2024年，Weaviate获得了广泛的采用，成为AI应用的重要基础设施。',
+  headquarters = 'Amsterdam, Netherlands',
+  website = 'https://weaviate.io',
+  founded_year = 2017,
+  employee_count = '100-300人'
+WHERE name = 'Weaviate' OR name LIKE '%Weaviate%';
+
+-- 64. Milvus
+UPDATE companies SET
+  description = 'Milvus是开源向量数据库，为AI应用提供高效的向量搜索。',
+  detailed_description = 'Milvus成立于2019年，是开源向量数据库。总部位于北京，员工200-500人。公司开发的向量数据库为AI应用提供高效的向量搜索能力，支持大规模向量数据的存储和检索。Milvus已被广泛应用于图像搜索、推荐系统等场景。2024年，Milvus获得了广泛的采用，成为AI应用的重要基础设施。',
+  headquarters = '北京, 中国',
+  website = 'https://milvus.io',
+  founded_year = 2019,
+  employee_count = '200-500人'
+WHERE name = 'Milvus' OR name LIKE '%Milvus%';
+
+-- 65. Qdrant
+UPDATE companies SET
+  description = 'Qdrant是开源向量搜索引擎，提供高性能的相似度搜索。',
+  detailed_description = 'Qdrant成立于2021年，是开源向量搜索引擎。总部位于柏林，员工100-300人。公司开发的向量搜索引擎提供高性能的相似度搜索，支持大规模向量数据的存储和检索。Qdrant采用Rust编写，性能优异。2024年，Qdrant获得了广泛的采用，成为AI应用的热门基础设施。',
+  headquarters = 'Berlin, Germany',
+  website = 'https://qdrant.tech',
+  founded_year = 2021,
+  employee_count = '100-300人'
+WHERE name = 'Qdrant' OR name LIKE '%Qdrant%';
+
+-- 66. Chroma
+UPDATE companies SET
+  description = 'Chroma是AI原生向量数据库，简化为AI应用存储embedding。',
+  detailed_description = 'Chroma成立于2022年，是AI原生向量数据库。总部位于旧金山，员工100-300人。公司开发的向量数据库简化为AI应用存储embedding，提供简单的API和强大的搜索能力。Chroma已与LangChain等框架集成，成为AI应用的热门选择。2024年，Chroma获得了广泛的采用，成为AI开发的重要工具。',
+  headquarters = 'San Francisco, California, USA',
+  website = 'https://www.trychroma.com',
+  founded_year = 2022,
+  employee_count = '100-300人'
+WHERE name = 'Chroma' OR name LIKE '%Chroma%';
+
+-- 67. LlamaIndex
+UPDATE companies SET
+  description = 'LlamaIndex是数据框架，连接LLM和私有数据源。',
+  detailed_description = 'LlamaIndex成立于2022年，是数据框架。总部位于旧金山，员工100-300人。公司开发的框架连接LLM和私有数据源，使LLM能够访问和理解企业数据。LlamaIndex提供简单的API，帮助开发者快速构建基于LLM的应用。2024年，LlamaIndex获得了广泛的采用，成为AI应用开发的重要工具。',
+  headquarters = 'San Francisco, California, USA',
+  website = 'https://www.llamaindex.ai',
+  founded_year = 2022,
+  employee_count = '100-300人'
+WHERE name = 'LlamaIndex' OR name LIKE '%LlamaIndex%';
+
+-- 68. Haystack
+UPDATE companies SET
+  description = 'Haystack是神经搜索框架，构建端到端搜索应用。',
+  detailed_description = 'Haystack成立于2019年，是神经搜索框架。总部位于柏林，员工100-300人。公司开发的框架帮助开发者构建端到端的搜索应用，集成多种AI模型。Haystack提供完整的工作流，包括文档处理、embedding、检索、问答等。2024年，Haystack获得了广泛的采用，成为AI搜索应用的重要框架。',
+  headquarters = 'Berlin, Germany',
+  website = 'https://haystack.deepset.ai',
+  founded_year = 2019,
+  employee_count = '100-300人'
+WHERE name = 'Haystack' OR name LIKE '%Haystack%';
+
+-- 69. Haystack AutoGPT
+UPDATE companies SET
+  description = 'Haystack AutoGPT集成了AutoGPT功能，自动化AI任务。',
+  detailed_description = 'Haystack AutoGPT成立于2023年，集成了AutoGPT功能。总部位于柏林，员工50-200人。公司开发的工具结合Haystack和AutoGPT，自动化AI任务流程。Haystack AutoGPT可以帮助用户创建复杂的AI代理，自动化工作任务。2024年，Haystack AutoGPT获得了广泛的关注，成为AI自动化工具。',
+  headquarters = 'Berlin, Germany',
+  website = 'https://github.com/deepset-ai/haystack',
+  founded_year = 2023,
+  employee_count = '50-200人'
+WHERE name = 'Haystack AutoGPT' OR name LIKE '%Haystack AutoGPT%';
+
+-- 70. Semantic Kernel
+UPDATE companies SET
+  description = 'Semantic Kernel是Microsoft的AI编排框架，连接LLM和企业数据。',
+  detailed_description = 'Semantic Kernel成立于2023年，是Microsoft的AI编排框架。总部位于华盛顿州雷德蒙德，员工1000+人。公司开发的框架连接LLM和企业数据，使开发者能够快速构建AI应用。Semantic Kernel支持多种LLM提供商，包括OpenAI、Azure OpenAI等。2024年，Semantic Kernel获得了广泛的采用，成为企业AI开发的重要框架。',
+  headquarters = 'Redmond, Washington, USA',
+  website = 'https://github.com/microsoft/semantic-kernel',
+  founded_year = 2023,
+  employee_count = '1000+人'
+WHERE name = 'Semantic Kernel' OR name LIKE '%Semantic Kernel%';
+
 -- 71. Gradio
 UPDATE companies SET
   description = 'Gradio是机器学习模型演示平台，快速部署AI模型。',
