@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-  import { 
+import { 
   Star, 
   Building, 
   ExternalLink, 
@@ -33,8 +33,8 @@ import { Label } from '@/components/ui/label';
   ChevronLeft,
   Crown,
   Zap,
-    Target,
-    Sparkles,
+  Target,
+  Sparkles,
   Layers
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -121,7 +121,6 @@ export default function AICompaniesCatalog() {
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCompanyType, setSelectedCompanyType] = useState('all');
   const [selectedCompanyTier, setSelectedCompanyTier] = useState('all');
   const [selectedProjectCategory, setSelectedProjectCategory] = useState('all');
   const [sortBy, setSortBy] = useState('name');
@@ -135,14 +134,6 @@ export default function AICompaniesCatalog() {
   const [storyTitle, setStoryTitle] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
-
-  // Company type filters
-  const companyTypes = [
-    { value: 'all', label: 'All Company Types' },
-    { value: 'AI Giant', label: 'AI Giants', icon: Crown, color: 'text-yellow-500' },
-    { value: 'Independent AI', label: 'Independent AI', icon: Zap, color: 'text-blue-500' },
-    { value: 'AI Company', label: 'AI Companies', icon: Building, color: 'text-green-500' }
-  ];
 
   // Company tier filters（重命名：Tier1->Giants，Tier2->Unicorns）
   const companyTiers = [
@@ -196,8 +187,38 @@ export default function AICompaniesCatalog() {
   }, [isAuthenticated, companies]);
 
   useEffect(() => {
-    applyFilters();
-  }, [companies, searchQuery, selectedCompanyType, selectedCompanyTier, selectedProjectCategory, sortBy, sortOrder]);
+    // 过滤（移除 company type 相关逻辑）
+    let temp = [...companies];
+
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      temp = temp.filter(c => c.name?.toLowerCase().includes(q));
+    }
+
+    if (selectedCompanyTier !== 'all') {
+      temp = temp.filter(company => computeDisplayTier(company) === selectedCompanyTier);
+    }
+
+    if (selectedProjectCategory !== 'all') {
+      temp = temp.filter(company => company.projects?.some((p: any) => p.project_category === selectedProjectCategory));
+    }
+
+    // 排序（映射到计算后的展示层级）
+    const sorters: Record<string, (a: Company, b: Company) => number> = {
+      name: (a, b) => (a.name || '').localeCompare(b.name || ''),
+      company_tier: (a, b) => {
+        const tierOrder: Record<string, number> = { Giants: 1, Unicorns: 2, Independent: 3, Emerging: 4 };
+        const aVal = tierOrder[computeDisplayTier(a) || 'zzz'] || 5;
+        const bVal = tierOrder[computeDisplayTier(b) || 'zzz'] || 5;
+        return aVal - bVal;
+      }
+    };
+
+    const sorter = sorters[sortBy] || sorters.name;
+    temp.sort((a, b) => sortOrder === 'asc' ? sorter(a, b) : -sorter(a, b));
+
+    setFilteredCompanies(temp);
+  }, [companies, searchQuery, selectedCompanyTier, selectedProjectCategory, sortBy, sortOrder]);
 
   const loadCompanies = async () => {
     try {
@@ -340,7 +361,7 @@ export default function AICompaniesCatalog() {
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, selectedCompanyType, selectedCompanyTier, selectedProjectCategory]);
+  }, [searchQuery, selectedCompanyTier, selectedProjectCategory]);
 
   // Tag navigation handler
   const navigateToTag = (tag: string) => {
@@ -609,25 +630,6 @@ export default function AICompaniesCatalog() {
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 p-4 bg-muted/30 rounded-lg mb-6"
             >
               <div>
-                <Label className="text-sm font-medium mb-2 block">Company Type</Label>
-                <Select value={selectedCompanyType} onValueChange={setSelectedCompanyType}>
-                  <SelectTrigger className="h-11">
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {companyTypes.map(type => (
-                      <SelectItem key={type.value} value={type.value}>
-                        <div className="flex items-center gap-2">
-                          {type.icon && <type.icon className={`w-4 h-4 ${type.color}`} />}
-                          {type.label}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
                 <Label className="text-sm font-medium mb-2 block">Company Tier</Label>
                 <Select value={selectedCompanyTier} onValueChange={setSelectedCompanyTier}>
                   <SelectTrigger className="h-11">
@@ -712,7 +714,6 @@ export default function AICompaniesCatalog() {
           <p className="text-muted-foreground">
             Showing {filteredCompanies.length} of {companies.length} companies
             {searchQuery && ` matching "${searchQuery}"`}
-            {selectedCompanyType !== 'all' && ` of type ${selectedCompanyType}`}
             {selectedCompanyTier !== 'all' && ` at ${selectedCompanyTier} tier`}
             {selectedProjectCategory !== 'all' && ` with ${selectedProjectCategory} projects`}
           </p>
@@ -1119,7 +1120,6 @@ export default function AICompaniesCatalog() {
               variant="outline"
               onClick={() => {
                 setSearchQuery('');
-                setSelectedCompanyType('all');
                 setSelectedCompanyTier('all');
                 setSelectedProjectCategory('all');
                 setSortBy('name');
