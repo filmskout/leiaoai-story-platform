@@ -1,4 +1,5 @@
 // IP geolocation detection and platform selection utilities
+import { supabase } from '@/lib/supabase';
 
 interface GeolocationInfo {
   country: string;
@@ -23,17 +24,20 @@ export async function getUserLocation(): Promise<GeolocationInfo> {
   }
 
   try {
-    // For demo purposes, we'll use a simple approach
-    // In production, you'd use a proper IP geolocation service
-    const response = await fetch('https://ipapi.co/json/');
-    const data = await response.json();
-    
+    // 改为调用自有 Supabase Edge Function，避免浏览器直连第三方 CORS 问题
+    const { data, error } = await supabase.functions.invoke('ip-to-language', { method: 'GET' });
+    if (error) throw error;
+
+    const payload = data?.data || {};
+    const countryCode = payload.country || 'US';
+    const isChina = countryCode === 'CN' || payload.region === 'china';
+
     const location: GeolocationInfo = {
-      country: data.country_name || 'Unknown',
-      countryCode: data.country_code || 'XX',
-      isChina: data.country_code === 'CN'
+      country: countryCode,
+      countryCode,
+      isChina
     };
-    
+
     cachedLocation = location;
     return location;
   } catch (error) {
