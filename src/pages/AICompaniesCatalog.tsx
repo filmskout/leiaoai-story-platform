@@ -131,6 +131,8 @@ export default function AICompaniesCatalog() {
   const [storyDialog, setStoryDialog] = useState<{ open: boolean; project?: Project; company?: Company }>({ open: false });
   const [storyContent, setStoryContent] = useState('');
   const [storyTitle, setStoryTitle] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
 
   // Company type filters
   const companyTypes = [
@@ -313,6 +315,31 @@ export default function AICompaniesCatalog() {
     });
 
     setFilteredCompanies(filtered);
+  };
+
+  // Pagination logic
+  const getPaginatedCompanies = () => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredCompanies.slice(startIndex, endIndex);
+  };
+
+  const totalPages = Math.ceil(filteredCompanies.length / itemsPerPage);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCompanyType, selectedCompanyTier, selectedProjectCategory]);
+
+  // Tag navigation handler
+  const navigateToTag = (tag: string) => {
+    const filteredByTag = companies.filter(company =>
+      company.industry_tags?.includes(tag) || 
+      company.projects.some(p => p.industry_tags?.includes(tag))
+    );
+    setFilteredCompanies(filteredByTag);
+    setSearchQuery(tag);
+    setCurrentPage(1);
   };
 
   const handleRating = async (projectId: string, rating: number) => {
@@ -663,7 +690,7 @@ export default function AICompaniesCatalog() {
         {/* Companies Grid/List */}
         {viewMode === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredCompanies.map((company) => (
+            {getPaginatedCompanies().map((company) => (
               <motion.div
                 key={company.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -756,7 +783,12 @@ export default function AICompaniesCatalog() {
                         <h4 className="text-sm font-medium">Focus Areas</h4>
                         <div className="flex flex-wrap gap-1">
                           {company.focus_areas.slice(0, 3).map((area) => (
-                            <Badge key={area} variant="outline" className="text-xs">
+                            <Badge 
+                              key={area} 
+                              variant="outline" 
+                              className="text-xs cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                              onClick={() => navigateToTag(area)}
+                            >
                               {area}
                             </Badge>
                           ))}
@@ -845,7 +877,7 @@ export default function AICompaniesCatalog() {
           </div>
         ) : (
           <div className="space-y-4">
-            {filteredCompanies.map((company) => (
+            {getPaginatedCompanies().map((company) => (
               <motion.div
                 key={company.id}
                 initial={{ opacity: 0, x: -20 }}
@@ -907,7 +939,12 @@ export default function AICompaniesCatalog() {
                         {company.focus_areas && company.focus_areas.length > 0 && (
                           <div className="flex flex-wrap gap-1 mb-4">
                             {company.focus_areas.slice(0, 5).map((area) => (
-                              <Badge key={area} variant="outline" className="text-xs">
+                              <Badge 
+                                key={area} 
+                                variant="outline" 
+                                className="text-xs cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                                onClick={() => navigateToTag(area)}
+                              >
                                 {area}
                               </Badge>
                             ))}
@@ -962,6 +999,31 @@ export default function AICompaniesCatalog() {
                 </Card>
               </motion.div>
             ))}
+          </div>
+        )}
+
+        {/* Pagination Controls */}
+        {filteredCompanies.length > itemsPerPage && (
+          <div className="flex items-center justify-center gap-2 mt-8 mb-8">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </Button>
+            <span className="px-4 text-sm text-muted-foreground">
+              Page {currentPage} of {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </Button>
           </div>
         )}
 
