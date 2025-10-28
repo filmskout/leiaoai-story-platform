@@ -45,13 +45,15 @@ export async function fetchAIResponse(
 
     if (!resp.ok) {
       const txt = await resp.text();
-      console.error('🔴 Frontend: API Error Response', txt.slice(0, 200));
+      console.error('🔴 Frontend: API Error Response', txt);
+      console.error('🔴 Frontend: Full Error Text:', txt.slice(0, 500));
       
       // 解析错误消息
       let errorObj;
       try {
         errorObj = JSON.parse(txt);
-      } catch {
+      } catch (e) {
+        console.error('🔴 Failed to parse error as JSON:', e);
         errorObj = { error: txt };
       }
       
