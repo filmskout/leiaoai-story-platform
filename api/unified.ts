@@ -3062,7 +3062,13 @@ async function handleAIChat(req: any, res: any) {
     console.log('🤖 AI Chat Request:', { model: reqModel, messageLength: reqMessage.length, language: reqLanguage });
 
     // 地域检测：从请求头判断用户所在地区
-    const userRegion = (req.headers && (req.headers['x-vercel-ip-country'] as string)) || 'CN';
+    // 兼容不同运行时的 header 读取
+    let userRegion: string = 'CN';
+    try {
+      const h: any = req.headers || {};
+      userRegion = (h['x-vercel-ip-country'] || h['X-Vercel-IP-Country'] || h['x-vercel-ip-country-region']) || 'CN';
+      if (typeof userRegion !== 'string' || userRegion.length === 0) userRegion = 'CN';
+    } catch { userRegion = 'CN'; }
     qwenRegion = userRegion === 'CN' ? 'beijing' : 'singapore';
     console.log(`🌍 User region: ${userRegion}, Using Qwen region: ${qwenRegion}`);
 
@@ -3213,7 +3219,8 @@ async function callOpenAI(message: string, apiKey: string, language: string): Pr
   });
   
   if (!response.ok) {
-    throw new Error(`OpenAI API error: ${response.status}`);
+    const txt = await response.text();
+    throw new Error(`OpenAI API error: ${response.status} ${txt.slice(0,200)}`);
   }
   
   const data = await response.json();
@@ -3307,7 +3314,7 @@ async function callQwen(message: string, apiKey: string, language: string, regio
     if (!response.ok) {
     const errorText = await response.text();
     console.error('❌ Qwen API Error:', response.status, errorText);
-    throw new Error(`Qwen API error: ${response.status}`);
+    throw new Error(`Qwen API error: ${response.status} ${errorText.slice(0,200)}`);
   }
   
   const data = await response.json();
