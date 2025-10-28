@@ -392,6 +392,14 @@
     "years_ago": "{{years}} years ago"
   },
   
+  "language_selector": "Select Language",
+  "auto_detect_language": "Auto Detect Language",
+  "detecting": "Detecting...",
+  
+  "stories": {
+    "view_all_stories": "View All Stories"
+  },
+  
   "ai_companies": {
     "title": "AI Companies Catalog",
     "subtitle": "Discover AI Giants, Independent AI companies, and their specialized tools",

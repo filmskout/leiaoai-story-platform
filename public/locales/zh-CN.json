@@ -392,6 +392,14 @@
     "years_ago": "{{years}}年前"
   },
   
+  "language_selector": "选择语言",
+  "auto_detect_language": "自动识别语言",
+  "detecting": "检测中...",
+  
+  "stories": {
+    "view_all_stories": "查看所有故事"
+  },
+  
   "ai_companies": {
     "title": "AI公司目录",
     "subtitle": "发现AI巨头、独立AI公司和他们的专业工具",
