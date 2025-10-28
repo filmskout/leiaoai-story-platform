@@ -954,6 +954,12 @@ export default function AICompaniesCatalog() {
                               {getCompanyTierBadge(computeDisplayTier(company))}
                             </div>
                             <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                              {company.founded_year && (
+                                <div className="flex items-center gap-1">
+                                  <Calendar className="w-4 h-4" />
+                                  <span>{company.founded_year}</span>
+                                </div>
+                              )}
                               <div className="flex items-center gap-1">
                                 <Globe className="w-4 h-4" />
                                 <span>{company.headquarters || 'Unknown'}</span>
@@ -968,13 +974,15 @@ export default function AICompaniesCatalog() {
                               </div>
                             </div>
                           </div>
-                          {company.website && (
-                            <Button variant="ghost" size="sm" asChild>
-                              <a href={company.website} target="_blank" rel="noopener noreferrer">
-                                <ExternalLink className="w-4 h-4" />
-                              </a>
-                            </Button>
-                          )}
+                          <div className="flex items-center gap-1">
+                            {company.website && (
+                              <Button variant="ghost" size="sm" asChild className="h-8 w-8 p-0">
+                                <a href={company.website} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
+                                  <ExternalLink className="w-4 h-4" />
+                                </a>
+                              </Button>
+                            )}
+                          </div>
                         </div>
 
                         <p className="text-muted-foreground mb-3 line-clamp-2 leading-relaxed">
