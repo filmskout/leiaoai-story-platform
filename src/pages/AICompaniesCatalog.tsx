@@ -842,7 +842,7 @@ export default function AICompaniesCatalog() {
                       <div className="space-y-2">
                         {company.projects.slice(0, 2).map((project) => (
                           <div key={project.id} className="flex items-center justify-between p-2 bg-muted/50 rounded-lg">
-                            <div className="flex items-center gap-2 min-w-0 flex-1">
+                            <Link to={`/project/${project.id}`} className="flex items-center gap-2 min-w-0 flex-1 group">
                               <div className="w-6 h-6 rounded bg-background flex items-center justify-center">
                                 {project.logo_url ? (
                                   <img
@@ -855,12 +855,12 @@ export default function AICompaniesCatalog() {
                                 )}
                               </div>
                               <div className="min-w-0 flex-1">
-                                <span className="text-sm font-medium truncate block">{project.name}</span>
+                                <span className="text-sm font-medium truncate block group-hover:text-primary transition-colors">{project.name}</span>
                                 {project.project_category && (
                                   <span className="text-xs text-muted-foreground truncate block">{project.project_category}</span>
                                 )}
                               </div>
-                            </div>
+                            </Link>
                             <div className="flex items-center gap-1">
                               {renderStars(project.project_stats?.average_rating || 0, project.id, true)}
                               <Button

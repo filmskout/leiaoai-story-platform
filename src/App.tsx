@@ -58,6 +58,7 @@ const Events = lazyWithRetry(() => import('@/pages/Events'));
 const ToolsReviews = lazyWithRetry(() => import('@/pages/ToolsReviews'));
 const AICompaniesCatalog = lazyWithRetry(() => import('@/pages/AICompaniesCatalog'));
 const CompanyDetail = lazyWithRetry(() => import('@/pages/CompanyDetail'));
+const ProjectDetail = lazyWithRetry(() => import('@/pages/ProjectDetail'));
 const MonitoringDashboard = lazyWithRetry(() => import('@/pages/MonitoringDashboard'));
 const ReconfigureData = lazyWithRetry(() => import('@/pages/ReconfigureDataSimplified'));
 const CompanyManagement = lazyWithRetry(() => import('@/pages/CompanyManagement'));
@@ -282,6 +283,7 @@ function AppRoutes() {
           <Route path="tools" element={<ToolsReviews />} />
           <Route path="ai-companies" element={<AICompaniesCatalog />} />
           <Route path="ai-companies/:id" element={<CompanyDetail />} />
+          <Route path="project/:id" element={<ProjectDetail />} />
           <Route path="monitoring" element={<MonitoringDashboard />} />
           <Route path="reconfigure-data" element={<ReconfigureData />} />
           <Route path="company-management" element={<CompanyManagement />} />
