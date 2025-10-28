@@ -204,7 +204,105 @@ UPDATE companies SET
   employee_count = '100-300人'
 WHERE name = 'Character.AI' OR name LIKE '%Character%';
 
--- 21-30 more companies will be added here...
+-- 21. Glean
+UPDATE companies SET
+  description = 'Glean是企业AI搜索平台，帮助企业员工快速找到内部信息。',
+  detailed_description = 'Glean成立于2019年，是企业AI搜索平台。总部位于帕洛阿尔托，员工200-500人。公司开发的AI搜索平台帮助企业员工快速找到内部文档、对话、代码等信息。Glean理解员工的工作上下文，提供个性化的搜索结果。2023年，Glean获得了多次融资，成为企业AI工具的热门选择。',
+  headquarters = 'Palo Alto, California, USA',
+  website = 'https://www.glean.com',
+  founded_year = 2019,
+  employee_count = '200-500人'
+WHERE name = 'Glean' OR name LIKE '%Glean%';
+
+-- 22. Moveworks
+UPDATE companies SET
+  description = 'Moveworks是企业AI客服助手，自动化IT支持和员工服务。',
+  detailed_description = 'Moveworks成立于2016年，是企业AI客服助手。总部位于山景城，员工500-1000人。公司开发的AI助手自动化IT支持和员工服务，通过自然语言理解帮助员工解决技术问题。Moveworks集成到Slack、Microsoft Teams等工具中，提供24/7的AI支持。2023年，Moveworks获得了多次融资，估值达到数十亿美元。',
+  headquarters = 'Mountain View, California, USA',
+  website = 'https://moveworks.com',
+  founded_year = 2016,
+  employee_count = '500-1000人'
+WHERE name = 'Moveworks' OR name LIKE '%Moveworks%';
+
+-- 23. Second
+UPDATE companies SET
+  description = 'Second是AI法律助理，自动化合同审查和法律文档分析。',
+  detailed_description = 'Second成立于2019年，是AI法律助理。总部位于旧金山，员工100-300人。公司开发的AI工具自动化合同审查、法律文档分析和法律研究。Second帮助企业法律团队提高效率，减少人工审查时间。2023年，Second获得了多次融资，成为法律AI领域的热门工具。',
+  headquarters = 'San Francisco, California, USA',
+  website = 'https://second.com',
+  founded_year = 2019,
+  employee_count = '100-300人'
+WHERE name = 'Second' OR name LIKE '%Second%';
+
+-- 24. Grammarly
+UPDATE companies SET
+  description = 'Grammarly是AI写作助手，提供语法检查和写作建议。',
+  detailed_description = 'Grammarly成立于2009年，是AI写作助手。总部位于旧金山，员工1000+人。公司开发的AI工具提供实时语法检查、拼写检查和写作建议。Grammarly集成到浏览器、Word、Google Docs等应用中，帮助用户提高写作质量。2023年，Grammarly获得了多次融资，估值达到数十亿美元。',
+  headquarters = 'San Francisco, California, USA',
+  website = 'https://www.grammarly.com',
+  founded_year = 2009,
+  employee_count = '1000+人'
+WHERE name = 'Grammarly' OR name LIKE '%Grammarly%';
+
+-- 25. Otter.ai
+UPDATE companies SET
+  description = 'Otter.ai是AI会议转录工具，自动记录和总结会议内容。',
+  detailed_description = 'Otter.ai成立于2016年，是AI会议转录工具。总部位于洛杉矶，员工200-500人。公司开发的AI工具自动记录和总结会议内容，提供实时的会议转录和关键词提取。Otter.ai支持多种会议平台，包括Zoom、Google Meet、Microsoft Teams。2023年，Otter.ai获得了广泛的采用，成为企业会议的必备工具。',
+  headquarters = 'Los Angeles, California, USA',
+  website = 'https://otter.ai',
+  founded_year = 2016,
+  employee_count = '200-500人'
+WHERE name = 'Otter.ai' OR name LIKE '%Otter%';
+
+-- 26. Loom
+UPDATE companies SET
+  description = 'Loom是AI视频录制工具，帮助团队高效沟通。',
+  detailed_description = 'Loom成立于2016年，是AI视频录制工具。总部位于旧金山，员工200-500人。公司开发的工具帮助团队录制和分享视频，提高沟通效率。Loom的AI功能包括自动转录、智能剪辑等。2023年，Loom获得了广泛的采用，成为企业协作的热门工具。',
+  headquarters = 'San Francisco, California, USA',
+  website = 'https://www.loom.com',
+  founded_year = 2016,
+  employee_count = '200-500人'
+WHERE name = 'Loom' OR name LIKE '%Loom%';
+
+-- 27. Notion
+UPDATE companies SET
+  description = 'Notion是AI增强的工作空间，集成笔记、数据库和协作工具。',
+  detailed_description = 'Notion成立于2016年，是AI增强的工作空间。总部位于旧金山，员工500-1000人。公司开发的平台集成笔记、数据库、任务管理和协作工具。Notion的AI功能包括智能写作、自动摘要、内容生成等。2023年，Notion集成了AI助手，为用户提供智能化的协作体验。',
+  headquarters = 'San Francisco, California, USA',
+  website = 'https://www.notion.so',
+  founded_year = 2016,
+  employee_count = '500-1000人'
+WHERE name = 'Notion' OR name LIKE '%Notion%';
+
+-- 28. Zapier
+UPDATE companies SET
+  description = 'Zapier是自动化工作流平台，连接不同应用和服务。',
+  detailed_description = 'Zapier成立于2011年，是自动化工作流平台。总部位于佛罗里达州，员工500-1000人。公司开发的平台帮助用户连接不同的应用和服务，自动化重复性的工作流程。Zapier支持数千种集成，是企业自动化的热门选择。2023年，Zapier获得了广泛的采用，成为企业效率工具。',
+  headquarters = 'Sunnyvale, Florida, USA',
+  website = 'https://zapier.com',
+  founded_year = 2011,
+  employee_count = '500-1000人'
+WHERE name = 'Zapier' OR name LIKE '%Zapier%';
+
+-- 29. Beautiful.ai
+UPDATE companies SET
+  description = 'Beautiful.ai是AI演示文稿生成工具，自动创建专业演示文稿。',
+  detailed_description = 'Beautiful.ai成立于2017年，是AI演示文稿生成工具。总部位于旧金山，员工100-300人。公司开发的AI工具帮助用户自动创建专业的演示文稿。Beautiful.ai的设计AI确保每张幻灯片都符合最佳设计实践。2023年，Beautiful.ai获得了广泛的采用，成为演示文稿制作的热门工具。',
+  headquarters = 'San Francisco, California, USA',
+  website = 'https://www.beautiful.ai',
+  founded_year = 2017,
+  employee_count = '100-300人'
+WHERE name = 'Beautiful.ai' OR name LIKE '%Beautiful.ai%';
+
+-- 30. Synthesia
+UPDATE companies SET
+  description = 'Synthesia是AI视频生成平台，使用AI化身创建视频内容。',
+  detailed_description = 'Synthesia成立于2017年，是AI视频生成平台。总部位于伦敦，员工200-500人。公司开发的AI平台使用AI化身创建视频内容，支持多种语言和方言。Synthesia帮助企业创建培训视频、营销视频等内容，无需演员或摄像设备。2023年，Synthesia获得了广泛的采用，成为企业视频制作的热门工具。',
+  headquarters = 'London, UK',
+  website = 'https://www.synthesia.io',
+  founded_year = 2017,
+  employee_count = '200-500人'
+WHERE name = 'Synthesia' OR name LIKE '%Synthesia%';
 
 -- 31. Cursor
 UPDATE companies SET

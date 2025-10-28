@@ -103,4 +103,205 @@ UPDATE companies SET
   employee_count = '50-150人'
 WHERE name = 'Perplexity AI' OR name LIKE '%Perplexity%';
 
+-- 51. Kuaishou AI (快手AI)
+UPDATE companies SET
+  description = '快手AI开发短视频AI推荐算法和内容创作工具。',
+  detailed_description = '快手AI成立于2011年，是中国领先的短视频平台。总部位于北京，员工10000+人。公司开发的AI推荐算法用于个性化内容推荐，理解用户兴趣和行为。快手AI还提供视频编辑、特效生成等工具，帮助创作者制作高质量内容。2023年，快手AI获得了广泛的采用，成为中国最大的短视频平台之一。',
+  headquarters = '北京, 中国',
+  website = 'https://www.kuaishou.com',
+  founded_year = 2011,
+  employee_count = '10000+人'
+WHERE name = 'Kuaishou AI' OR name LIKE '%快手%' OR name LIKE '%Kuaishou%';
+
+-- 52. Meituan AI (美团AI)
+UPDATE companies SET
+  description = '美团AI开发本地生活服务AI推荐算法。',
+  detailed_description = '美团AI成立于2010年，是中国领先的本地生活服务平台。总部位于北京，员工100000+人。公司开发的AI推荐算法用于个性化推荐餐饮、外卖、酒店等服务。美团AI还提供智能配送、智能客服等功能，提升用户体验。2023年，美团AI获得了广泛的采用，成为中国最大的本地生活服务平台。',
+  headquarters = '北京, 中国',
+  website = 'https://www.meituan.com',
+  founded_year = 2010,
+  employee_count = '100000+人'
+WHERE name = 'Meituan AI' OR name LIKE '%美团%' OR name LIKE '%Meituan%';
+
+-- 53. DiDi AI (滴滴AI)
+UPDATE companies SET
+  description = '滴滴AI开发智能出行算法和自动驾驶技术。',
+  detailed_description = '滴滴AI成立于2012年，是中国领先的出行平台。总部位于北京，员工20000+人。公司开发的AI算法用于智能调度、路线优化、动态定价等场景。滴滴AI还开发自动驾驶技术，已在多个城市进行测试。2023年，滴滴AI获得了广泛的采用，成为中国最大的出行平台。',
+  headquarters = '北京, 中国',
+  website = 'https://www.didiglobal.com',
+  founded_year = 2012,
+  employee_count = '20000+人'
+WHERE name = 'DiDi AI' OR name LIKE '%滴滴%' OR name LIKE '%DiDi%';
+
+-- 54. JDD A (京东AI)
+UPDATE companies SET
+  description = '京东AI开发电商AI推荐算法和智能物流系统。',
+  detailed_description = '京东AI成立于2013年，是中国领先的电商平台。总部位于北京，员工300000+人。公司开发的AI推荐算法用于个性化商品推荐和搜索优化。京东AI还提供智能客服、智能物流等功能，提升用户体验和运营效率。2023年，京东AI获得了广泛的采用，成为中国最大的B2C电商平台之一。',
+  headquarters = '北京, 中国',
+  website = 'https://www.jd.com',
+  founded_year = 2013,
+  employee_count = '300000+人'
+WHERE name = 'JD AI' OR name LIKE '%京东%' OR name LIKE '%JD%';
+
+-- 55. PDD AI (拼多多AI)
+UPDATE companies SET
+  description = '拼多多AI开发社交电商推荐算法。',
+  detailed_description = '拼多多AI成立于2015年，是中国领先的社交电商平台。总部位于上海，员工50000+人。公司开发的AI推荐算法用于个性化商品推荐，结合社交元素提升用户参与度。拼多多AI还提供智能定价、智能客服等功能，提升用户体验。2023年，拼多多AI获得了广泛的采用，成为中国增长最快的电商平台之一。',
+  headquarters = '上海, 中国',
+  website = 'https://www.pinduoduo.com',
+  founded_year = 2015,
+  employee_count = '50000+人'
+WHERE name = 'PDD AI' OR name LIKE '%拼多多%' OR name LIKE '%PDD%';
+
+-- 56. Kuaibo AI (快播AI)
+UPDATE companies SET
+  description = '快播AI开发视频AI推荐算法和内容创作工具。',
+  detailed_description = '快播AI成立于2007年，是中国的视频平台。总部位于深圳，员工3000-5000人。公司开发的AI推荐算法用于个性化内容推荐。快播AI还提供视频编辑、特效生成等工具，帮助创作者制作内容。2023年，快播AI专注于AI技术在视频领域的应用。',
+  headquarters = '深圳, 中国',
+  website = 'https://www.kuaibo.com',
+  founded_year = 2007,
+  employee_count = '3000-5000人'
+WHERE name = 'Kuaibo AI' OR name LIKE '%快播%' OR name LIKE '%Kuaibo%';
+
+-- 57. AutoGPT
+UPDATE companies SET
+  description = 'AutoGPT是AI自动化代理，能够自主执行复杂任务。',
+  detailed_description = 'AutoGPT成立于2023年，是AI自动化代理。总部位于旧金山，员工50-200人。公司开发的AI代理能够自主执行复杂任务，包括搜索信息、生成内容、执行操作等。AutoGPT基于GPT模型，可以理解目标并制定执行计划。2023年，AutoGPT获得了广泛的关注，展示了AI自动化的潜力。',
+  headquarters = 'San Francisco, California, USA',
+  website = 'https://github.com/Significant-Gravitas/Auto-GPT',
+  founded_year = 2023,
+  employee_count = '50-200人'
+WHERE name = 'AutoGPT' OR name LIKE '%AutoGPT%';
+
+-- 58. AgentGPT
+UPDATE companies SET
+  description = 'AgentGPT是AI任务自动化平台，帮助用户创建AI代理。',
+  detailed_description = 'AgentGPT成立于2023年，是AI任务自动化平台。总部位于旧金山，员工50-200人。公司开发的平台帮助用户创建AI代理，自动化复杂的任务流程。AgentGPT基于GPT模型，可以通过自然语言描述创建代理。2023年，AgentGPT获得了广泛的关注，成为AI自动化工具。',
+  headquarters = 'San Francisco, California, USA',
+  website = 'https://agentgpt.reworkd.ai',
+  founded_year = 2023,
+  employee_count = '50-200人'
+WHERE name = 'AgentGPT' OR name LIKE '%AgentGPT%';
+
+-- 59. LangChain
+UPDATE companies SET
+  description = 'LangChain是AI应用开发框架，简化AI应用构建。',
+  detailed_description = 'LangChain成立于2022年，是AI应用开发框架。总部位于旧金山，员工100-300人。公司开发的框架简化AI应用的构建，支持与多种LLM集成。LangChain提供了丰富的工具和组件，帮助开发者快速构建AI应用。2023年，LangChain获得了广泛的采用，成为AI开发的热门框架。',
+  headquarters = 'San Francisco, California, USA',
+  website = 'https://www.langchain.com',
+  founded_year = 2022,
+  employee_count = '100-300人'
+WHERE name = 'LangChain' OR name LIKE '%LangChain%';
+
+-- 60. LangFlow
+UPDATE companies SET
+  description = 'LangFlow是可视化AI应用构建平台。',
+  detailed_description = 'LangFlow成立于2023年，是可视化AI应用构建平台。总部位于旧金山，员工50-200人。公司开发的平台通过可视化界面帮助用户构建AI应用，无需编程。LangFlow支持多种LLM和工具，提供丰富的模板和组件。2023年，LangFlow获得了广泛的关注，成为低代码AI开发工具。',
+  headquarters = 'San Francisco, California, USA',
+  website = 'https://langflow.org',
+  founded_year = 2023,
+  employee_count = '50-200人'
+WHERE name = 'LangFlow' OR name LIKE '%LangFlow%';
+
+-- 61-70. More companies to be added...
+-- 71. Gradio
+UPDATE companies SET
+  description = 'Gradio是机器学习模型演示平台，快速部署AI模型。',
+  detailed_description = 'Gradio成立于2021年，是机器学习模型演示平台。总部位于旧金山，员工100-300人。公司开发的平台帮助开发者快速部署和分享AI模型，创建交互式Web界面。Gradio支持多种机器学习框架，提供简单的API。2023年，Gradio获得了广泛的采用，成为AI模型部署的热门工具。',
+  headquarters = 'San Francisco, California, USA',
+  website = 'https://www.gradio.app',
+  founded_year = 2021,
+  employee_count = '100-300人'
+WHERE name = 'Gradio' OR name LIKE '%Gradio%';
+
+-- 72. Streamlit
+UPDATE companies SET
+  description = 'Streamlit是机器学习应用开发框架，快速构建AI应用。',
+  detailed_description = 'Streamlit成立于2018年，是机器学习应用开发框架。总部位于旧金山，员工200-500人。公司开发的框架帮助开发者快速构建AI应用，通过Python脚本创建交互式Web界面。Streamlit已被Snowflake收购，继续为企业提供服务。2023年，Streamlit获得了广泛的采用，成为AI应用开发的热门框架。',
+  headquarters = 'San Francisco, California, USA',
+  website = 'https://streamlit.io',
+  founded_year = 2018,
+  employee_count = '200-500人'
+WHERE name = 'Streamlit' OR name LIKE '%Streamlit%';
+
+-- 73. Kaggle
+UPDATE companies SET
+  description = 'Kaggle是数据科学竞赛平台，促进AI研究和实践。',
+  detailed_description = 'Kaggle成立于2010年，是数据科学竞赛平台。总部位于旧金山，员工500-1000人。公司提供的平台帮助数据科学家参与竞赛、分享数据集、学习AI技术。Kaggle已被Google收购，继续为社区提供服务。2023年，Kaggle获得了广泛的采用，成为数据科学家的重要平台。',
+  headquarters = 'San Francisco, California, USA',
+  website = 'https://www.kaggle.com',
+  founded_year = 2010,
+  employee_count = '500-1000人'
+WHERE name = 'Kaggle' OR name LIKE '%Kaggle%';
+
+-- 74. Hugging Face
+UPDATE companies SET
+  description = 'Hugging Face是AI模型托管平台，提供Transformers库和模型中心。',
+  detailed_description = 'Hugging Face成立于2016年，是AI模型托管平台。总部位于纽约，员工200-500人。公司提供Transformers库、模型中心和协作工具，支持开源AI生态。Hugging Face托管了数万个AI模型，从大语言模型到专门的领域模型。平台的模型中心已成为开发者共享和使用AI模型的重要场所。2023年，Hugging Face获得了多次融资，估值达到数十亿美元。',
+  headquarters = 'New York, New York, USA',
+  website = 'https://huggingface.co',
+  founded_year = 2016,
+  employee_count = '200-500人'
+WHERE name = 'Hugging Face' OR name LIKE '%Hugging Face%';
+
+-- 75. Weights & Biases
+UPDATE companies SET
+  description = 'Weights & Biases是机器学习实验跟踪平台，监控模型训练。',
+  detailed_description = 'Weights & Biases成立于2018年，是机器学习实验跟踪平台。总部位于旧金山，员工300-500人。公司开发的平台帮助开发者跟踪和监控机器学习实验，记录超参数、指标和输出。Weights & Biases支持多种机器学习框架，提供可视化界面。2023年，Weights & Biases获得了广泛的采用，成为MLOps的热门工具。',
+  headquarters = 'San Francisco, California, USA',
+  website = 'https://www.wandb.com',
+  founded_year = 2018,
+  employee_count = '300-500人'
+WHERE name = 'Weights & Biases' OR name LIKE '%Weights%';
+
+-- 76. Comet ML
+UPDATE companies SET
+  description = 'Comet ML是机器学习模型管理平台，跟踪实验和模型版本。',
+  detailed_description = 'Comet ML成立于2017年，是机器学习模型管理平台。总部位于纽约，员工200-500人。公司开发的平台帮助开发者管理机器学习实验，跟踪模型版本和性能。Comet ML支持多种机器学习框架，提供协作功能。2023年，Comet ML获得了广泛的采用，成为MLOps的热门工具。',
+  headquarters = 'New York, New York, USA',
+  website = 'https://www.comet.com',
+  founded_year = 2017,
+  employee_count = '200-500人'
+WHERE name = 'Comet ML' OR name LIKE '%Comet%';
+
+-- 77. Neptune
+UPDATE companies SET
+  description = 'Neptune是机器学习实验管理平台，跟踪和比较模型性能。',
+  detailed_description = 'Neptune成立于2017年，是机器学习实验管理平台。总部位于华沙，员工200-500人。公司开发的平台帮助开发者跟踪机器学习实验，比较模型性能和管理版本。Neptune支持多种机器学习框架，提供可视化界面。2023年，Neptune获得了广泛的采用，成为MLOps的热门工具。',
+  headquarters = 'Warsaw, Poland',
+  website = 'https://neptune.ai',
+  founded_year = 2017,
+  employee_count = '200-500人'
+WHERE name = 'Neptune' OR name LIKE '%Neptune%';
+
+-- 78. ClearML
+UPDATE companies SET
+  description = 'ClearML是MLOps平台，自动化机器学习工作流。',
+  detailed_description = 'ClearML成立于2018年，是MLOps平台。总部位于特拉维夫，员工100-300人。公司开发的平台自动化机器学习工作流，包括实验跟踪、模型管理、资源调度等。ClearML支持多种机器学习框架，提供完整的企业级功能。2023年，ClearML获得了广泛的采用，成为企业MLOps的热门选择。',
+  headquarters = 'Tel Aviv, Israel',
+  website = 'https://clear.ml',
+  founded_year = 2018,
+  employee_count = '100-300人'
+WHERE name = 'ClearML' OR name LIKE '%ClearML%';
+
+-- 79. Polyaxon
+UPDATE companies SET
+  description = 'Polyaxon是机器学习平台，简化模型训练和部署。',
+  detailed_description = 'Polyaxon成立于2017年，是机器学习平台。总部位于旧金山，员工100-300人。公司开发的平台简化模型训练和部署，提供实验跟踪、资源管理、模型服务等功能。Polyaxon支持多种机器学习框架，可以部署在Kubernetes上。2023年，Polyaxon获得了广泛的采用，成为企业ML平台的热门选择。',
+  headquarters = 'San Francisco, California, USA',
+  website = 'https://polyaxon.com',
+  founded_year = 2017,
+  employee_count = '100-300人'
+WHERE name = 'Polyaxon' OR name LIKE '%Polyaxon%';
+
+-- 80. Determined AI
+UPDATE companies SET
+  description = 'Determined AI是深度学习训练平台，加速模型训练。',
+  detailed_description = 'Determined AI成立于2017年，是深度学习训练平台。总部位于西雅图，员工100-300人。公司开发的平台加速深度学习模型训练，提供分布式训练、自动超参数优化等功能。Determined AI支持PyTorch和TensorFlow，已被HPE收购。2023年，Determined AI继续为企业提供深度学习平台。',
+  headquarters = 'Seattle, Washington, USA',
+  website = 'https://www.determined.ai',
+  founded_year = 2017,
+  employee_count = '100-300人'
+WHERE name = 'Determined AI' OR name LIKE '%Determined%';
+
 COMMIT;
