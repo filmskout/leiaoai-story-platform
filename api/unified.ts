@@ -3140,24 +3140,29 @@ async function handleAIChat(req: any, res: any) {
     let usedModel = '';
     let response = '';
 
+    // 为各模型读取可配置的具体型号
+    const openaiModel = (process.env.OPENAI_MODEL || 'gpt-4o').trim(); // 支持 gpt-4o / gpt-5（若账号开通）
+    const deepseekModel = (process.env.DEEPSEEK_MODEL || 'deepseek-v3.2-exp').trim();
+    const qwenModel = (process.env.QWEN_MODEL || 'qwen-turbo-latest').trim();
+
     for (const candidate of tryOrder) {
       try {
         if (candidate === 'openai') {
           if (!openaiApiKey) throw new Error('missing OPENAI_API_KEY');
-          response = await callOpenAI(reqMessage, openaiApiKey, reqLanguage);
-          usedModel = 'gpt-4';
+          response = await callOpenAI(reqMessage, openaiApiKey, reqLanguage, openaiModel);
+          usedModel = openaiModel;
           break;
         }
         if (candidate === 'deepseek') {
           if (!deepseekApiKey) throw new Error('missing DEEPSEEK_API_KEY');
-          response = await callDeepSeek(reqMessage, deepseekApiKey, reqLanguage);
-          usedModel = 'deepseek-chat';
+          response = await callDeepSeek(reqMessage, deepseekApiKey, reqLanguage, 2000, deepseekModel);
+          usedModel = deepseekModel;
           break;
         }
         if (candidate === 'qwen') {
           if (!qwenApiKey) throw new Error('missing QWEN_API_KEY');
-          response = await callQwen(reqMessage, qwenApiKey, reqLanguage, qwenRegion);
-          usedModel = 'qwen-turbo';
+          response = await callQwen(reqMessage, qwenApiKey, reqLanguage, qwenRegion, 2000, qwenModel);
+          usedModel = qwenModel;
           break;
         }
       } catch (e: any) {
@@ -3197,33 +3202,36 @@ async function handleAIChat(req: any, res: any) {
     try {
       if (deepseekApiKey) {
         console.log('🔄 Fallback: Trying DeepSeek...');
-        const fallback = await callDeepSeek(reqMessage, deepseekApiKey, reqLanguage);
+        const dsModel = (process.env.DEEPSEEK_MODEL || 'deepseek-v3.2-exp').trim();
+        const fallback = await callDeepSeek(reqMessage, deepseekApiKey, reqLanguage, 2000, dsModel);
         return res.status(200).json({
           success: true,
           response: fallback,
-          model: 'deepseek-chat',
+          model: dsModel,
           sessionId: reqSessionId,
           timestamp: new Date().toISOString()
         });
       }
       if (qwenApiKey) {
         console.log('🔄 Fallback: Trying Qwen...');
-        const fallback = await callQwen(reqMessage, qwenApiKey, reqLanguage, qwenRegion);
+        const qwModel = (process.env.QWEN_MODEL || 'qwen-turbo-latest').trim();
+        const fallback = await callQwen(reqMessage, qwenApiKey, reqLanguage, qwenRegion, 2000, qwModel);
         return res.status(200).json({
           success: true,
           response: fallback,
-          model: 'qwen-turbo',
+          model: qwModel,
           sessionId: reqSessionId,
           timestamp: new Date().toISOString()
         });
       }
       if (openaiApiKey) {
         console.log('🔄 Fallback: Trying OpenAI...');
-        const fallback = await callOpenAI(reqMessage, openaiApiKey, reqLanguage);
+        const oaModel = (process.env.OPENAI_MODEL || 'gpt-4o').trim();
+        const fallback = await callOpenAI(reqMessage, openaiApiKey, reqLanguage, oaModel);
         return res.status(200).json({
           success: true,
           response: fallback,
-          model: 'gpt-4',
+          model: oaModel,
           sessionId: reqSessionId,
           timestamp: new Date().toISOString()
         });
@@ -3250,7 +3258,7 @@ async function handleAIChat(req: any, res: any) {
 }
 
 // OpenAI API调用
-async function callOpenAI(message: string, apiKey: string, language: string): Promise<string> {
+async function callOpenAI(message: string, apiKey: string, language: string, model: string = 'gpt-4o'): Promise<string> {
   const systemPrompt = language.startsWith('zh') 
     ? '你是一个专业的AI助手，请用中文回答用户的问题。'
     : 'You are a professional AI assistant. Please answer user questions in English.';
@@ -3262,7 +3270,7 @@ async function callOpenAI(message: string, apiKey: string, language: string): Pr
       'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-      model: 'gpt-4',
+      model,
         messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: message }
@@ -3282,7 +3290,7 @@ async function callOpenAI(message: string, apiKey: string, language: string): Pr
 }
 
 // DeepSeek API调用
-async function callDeepSeek(message: string, apiKey: string, language: string, maxTokens: number = 2000): Promise<string> {
+async function callDeepSeek(message: string, apiKey: string, language: string, maxTokens: number = 2000, model: string = 'deepseek-v3.2-exp'): Promise<string> {
   const systemPrompt = language.startsWith('zh') 
     ? '你是一个专业的AI助手，请用中文回答用户的问题。'
     : 'You are a professional AI assistant. Please answer user questions in English.';
@@ -3297,7 +3305,7 @@ async function callDeepSeek(message: string, apiKey: string, language: string, m
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'deepseek-chat',
+        model,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: message }
@@ -3326,7 +3334,7 @@ async function callDeepSeek(message: string, apiKey: string, language: string, m
 }
 
 // Qwen API调用
-async function callQwen(message: string, apiKey: string, language: string, region: string = 'beijing', maxTokens: number = 2000): Promise<string> {
+async function callQwen(message: string, apiKey: string, language: string, region: string = 'beijing', maxTokens: number = 2000, model: string = 'qwen-turbo-latest'): Promise<string> {
   const systemPrompt = language.startsWith('zh') 
     ? '你是一个专业的AI助手，请用中文回答用户的问题。'
     : 'You are a professional AI assistant. Please answer user questions in English.';
@@ -3355,7 +3363,7 @@ async function callQwen(message: string, apiKey: string, language: string, regio
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      model: 'qwen-turbo',  // 可以改为 qwen-turbo-latest 以测试最新版本
+      model,  // 默认 qwen-turbo-latest，可通过环境变量覆盖
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: message }
