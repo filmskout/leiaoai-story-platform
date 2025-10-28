@@ -927,16 +927,15 @@ export default function Profile() {
       </div>
 
       {/* Main Content Tabs */}
-      <Tabs defaultValue="submissions" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="submissions">{t('profile.tabs.submissions', 'Submissions')}</TabsTrigger>
+      <Tabs defaultValue="chat" className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="chat">{t('profile.chat_sessions', 'AI Chat Sessions')}</TabsTrigger>
-          <TabsTrigger value="bp">{t('bp_analysis.title', 'BP Analysis')}</TabsTrigger>
-          <TabsTrigger value="bmc">{t('bp_analysis.tabs.canvas', 'BMC')}</TabsTrigger>
+          <TabsTrigger value="submissions">{t('profile.tabs.submissions', 'Submissions')}</TabsTrigger>
+          <TabsTrigger value="stories">{t('profile.tabs.stories', 'Stories')}</TabsTrigger>
           <TabsTrigger value="interaction">{t('profile.tabs.interaction', 'Interaction')}</TabsTrigger>
         </TabsList>
 
-        {/* Submissions Tab - 默认第一个 */}
+        {/* Submissions Tab */}
         <TabsContent value="submissions">
           <div className="space-y-6">
             {/* BP Submissions */}
@@ -1162,7 +1161,7 @@ export default function Profile() {
           </div>
         </TabsContent>
 
-        {/* Chat Sessions Tab */}
+        {/* Chat Sessions Tab - 默认 */}
         <TabsContent value="chat">
           <div className="space-y-6">
             <Card>
@@ -1288,22 +1287,96 @@ export default function Profile() {
           </div>
         </TabsContent>
 
-        {/* BP Tab */}
-        <TabsContent value="bp">
-          <div className="space-y-6">
-            <Button onClick={() => navigate('/bp-analysis')}>
-              {t('bp_analysis.upload_bp', 'Upload BP')}
-            </Button>
-          </div>
-        </TabsContent>
-
-        {/* BMC Tab */}
-        <TabsContent value="bmc">
-          <div className="space-y-6">
-            <Button onClick={() => navigate('/bp-analysis?tab=canvas')}>
-              {t('bp_analysis.tabs.canvas', 'Business Model Canvas')}
-            </Button>
-          </div>
+        {/* Stories Tab（包含 Drafts） */}
+        <TabsContent value="stories">
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('profile.my_stories', 'My Stories')}</CardTitle>
+              <CardDescription>
+                {t('profile.stories_desc', 'All your stories and drafts')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {allStories.length === 0 ? (
+                <div className="text-center py-12">
+                  <FileText className="w-16 h-16 mx-auto text-gray-300 mb-4" />
+                  <p className="text-gray-500 mb-4">
+                    {t('profile.no_stories', 'No stories yet')}
+                  </p>
+                  <Button onClick={() => navigate('/create-story')} variant="outline">
+                    <PlusCircle className="w-4 h-4 mr-2" />
+                    {t('story.create_first', 'Create Your First Story')}
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <div className="space-y-4">
+                    {paginatedStories.map((story: any) => (
+                      <div key={story.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-semibold text-gray-900 dark:text-gray-100">{story.title}</h3>
+                              {story.isDraft && (
+                                <Badge variant="secondary" className="text-xs">
+                                  {t('common.draft', 'Draft')}
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => navigate(`/edit-story/${story.id}`)}
+                          >
+                            <Edit3 className="w-4 h-4 mr-1" />
+                            {t('common.edit', 'Edit')}
+                          </Button>
+                        </div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm mb-3 line-clamp-2">{story.content}</p>
+                        <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+                          <span>{formatDate(story.updated_at || story.created_at)}</span>
+                          <div className="flex items-center space-x-4">
+                            <span className="flex items-center">
+                              <Heart className="w-4 h-4 mr-1" />
+                              {story.like_count || 0}
+                            </span>
+                            <span className="flex items-center">
+                              <MessageSquare className="w-4 h-4 mr-1" />
+                              {story.comment_count || 0}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {totalPages > 1 && (
+                    <div className="flex items-center justify-center space-x-2 mt-6">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                      >
+                        {t('common.previous', 'Previous')}
+                      </Button>
+                      <span className="text-sm text-gray-500">
+                        {t('common.page', 'Page')} {currentPage} {t('common.of', 'of')} {totalPages}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                      >
+                        {t('common.next', 'Next')}
+                      </Button>
+                    </div>
+                  )}
+                </>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* Interaction Tab - 移动到最后一个 */}
