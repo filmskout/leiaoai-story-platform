@@ -2,8 +2,6 @@ import React, { memo, useMemo, useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
-import remarkMath from 'remark-math';
-import rehypeKatex from 'rehype-katex';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeRaw from 'rehype-raw';
 import { Copy, Check, Eye, EyeOff, ChevronDown, ChevronRight } from 'lucide-react';
@@ -14,15 +12,11 @@ import type { Components } from 'react-markdown';
 // 使用全局 Prism 初始化
 import Prism, { highlightAll } from '@/lib/prism';
 
-// KaTeX 数学公式样式
-import 'katex/dist/katex.min.css';
-
 interface MarkdownRendererProps {
   content: string;
   className?: string;
   isTyping?: boolean;
   enableCopy?: boolean;
-  enableMath?: boolean;
   maxHeight?: string;
   compact?: boolean;
   theme?: 'light' | 'dark' | 'auto';
@@ -89,7 +83,6 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
   className, 
   isTyping,
   enableCopy = true,
-  enableMath = true,
   maxHeight,
   compact = false,
   theme = 'auto'
@@ -100,16 +93,11 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
   
   // 渲染插件配置
   const remarkPlugins = useMemo(() => {
-    const plugins = [remarkGfm, remarkBreaks];
-    if (enableMath) {
-      plugins.push(remarkMath);
-    }
-    return plugins;
-  }, [enableMath]);
+    return [remarkGfm, remarkBreaks];
+  }, []);
   
   const rehypePlugins = useMemo(() => {
-    // 使用 rehypeRaw 来处理原始 HTML
-    // 由于我们手动调用 Prism.highlightAll()，可以不使用 rehypeHighlight
+    // 使用 rehypeRaw 来处理原始 HTML；可按需启用代码高亮 rehypeHighlight
     return [rehypeRaw];
   }, []);
   
