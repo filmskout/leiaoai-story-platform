@@ -73,6 +73,7 @@ i18n
     interpolation: {
       escapeValue: false,
     },
+    returnObjects: true,
     detection: {
       order: ['localStorage', 'cookie', 'navigator', 'htmlTag'],
       lookupLocalStorage: 'leoai-language',

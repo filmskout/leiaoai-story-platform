@@ -57,10 +57,15 @@ export function useAIChat() {
   const loadChatSessions = async () => {
     setIsLoadingSessions(true);
     try {
+      // 未登录时不请求数据库，直接返回空列表，避免 400/RLS 拒绝
+      if (!user) {
+        setSessions([]);
+        return;
+      }
       const { data: sessionsData, error: sessionsError } = await supabase
         .from('chat_sessions')
         .select('*')
-        .eq('user_id', user?.id || null)
+        .eq('user_id', user.id)
         .order('updated_at', { ascending: false });
         
       if (sessionsError) {
@@ -183,12 +188,26 @@ export function useAIChat() {
     });
     
     try {
+      // 未登录则仅在本地创建会话，不触发数据库写入
+      if (!user) {
+        const localSession: ChatSession = {
+          id: sessionId,
+          title: sessionTitle,
+          messages: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          category
+        };
+        setSessions(prev => [localSession, ...prev]);
+        setCurrentSession(localSession);
+        return localSession;
+      }
       // 在数据库中创建新会话
       const { data: newSessionData, error: sessionError } = await supabase
         .from('chat_sessions')
         .insert({
           session_id: sessionId,
-          user_id: user?.id || null,
+          user_id: user.id,
           title: sessionTitle,
           category: category || null, // 保存category字段
           message_count: 0
