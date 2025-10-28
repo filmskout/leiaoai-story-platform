@@ -140,18 +140,18 @@ export function LanguageSelector({ className, variant = 'default' }: LanguageSel
       
       // 保存用户选择
       localStorage.setItem('leoai-language', languageCode);
-      // 通知服务端保存用户偏好（若已登录会以Cookie记住）
-      fetch('/api/unified?action=save-language-preference', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ language: languageCode })
-      }).catch(() => {});
-      // 记录语言访问统计
-      fetch('/api/unified?action=track-language', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ language: languageCode })
-      }).catch(() => {});
+      // 通知服务端保存用户偏好（若已登录会以Cookie记住） - 暂时禁用，避免后端500
+      // fetch('/api/unified?action=save-language-preference', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ language: languageCode })
+      // }).catch(() => {});
+      // 记录语言访问统计 - 暂时禁用，避免后端500
+      // fetch('/api/unified?action=track-language', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ language: languageCode })
+      // }).catch(() => {});
 
       // 若用户已登录，将偏好保存到数据库profiles.preferences.preferred_language
       try {
@@ -213,14 +213,14 @@ export function LanguageSelector({ className, variant = 'default' }: LanguageSel
   useEffect(() => {
     // 初始化语言检测
     detectLanguageByIP();
-    // 首次加载记录一次当前语言访问
-    try {
-      fetch('/api/unified?action=track-language', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ language: i18n.language })
-      }).catch(() => {});
-    } catch {}
+    // 首次加载记录一次当前语言访问 - 暂时禁用，避免后端500
+    // try {
+    //   fetch('/api/unified?action=track-language', {
+    //     method: 'POST',
+    //     headers: { 'Content-Type': 'application/json' },
+    //     body: JSON.stringify({ language: i18n.language })
+    //   }).catch(() => {});
+    // } catch {}
     
     // 监听语言变化
     const handleLanguageChange = () => {
