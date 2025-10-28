@@ -9,6 +9,9 @@ const deepseekApiKey = process.env.DEEPSEEK_API_KEY || process.env.DEEPSEEK_KEY;
 
 // 延迟初始化客户端，避免环境变量缺失时崩溃
 let supabase: any = null;
+// 定义占位的 OpenAI/DeepSeek 客户端以满足类型引用；实际调用优先使用 fetch 封装
+let openai: any = null;
+let deepseek: any = null;
 
 function initClients() {
   try {
@@ -127,7 +130,8 @@ Ensure all information is factual, current, and based on available public data. 
     console.log(`🤖 发送深度研究请求: ${companyName} (${isOverseas ? '海外' : '国内'}) ${useDeepSeek ? '[DeepSeek]' : '[OpenAI]'}`);
     
     // 选择API客户端
-    const client = useDeepSeek ? deepseek : openai;
+    // 统一改用 HTTP fetch，避免构建期 SDK 依赖
+    const client = useDeepSeek ? 'deepseek' : 'openai';
     const model = useDeepSeek ? 'deepseek-chat' : 'gpt-4';
     
     if (!client) {
@@ -143,12 +147,23 @@ Ensure all information is factual, current, and based on available public data. 
           console.log(`🔧 调用${useDeepSeek ? 'DeepSeek' : 'OpenAI'} API: ${companyName}`);
           console.log(`🔧 API Key状态: ${useDeepSeek ? 'DeepSeek' : 'OpenAI'}=${!!(useDeepSeek ? deepseekApiKey : openaiApiKey)}`);
           
-          response = await client.chat.completions.create({
-            model: model,
-            messages: [{ role: 'user', content: prompt }],
-            temperature: 0.2, // 降低温度以获得更准确的研究结果
-            max_tokens: 3000, // 增加token限制以获得更详细的内容
-          });
+          if (client === 'openai') {
+            const r = await fetch('https://api.openai.com/v1/chat/completions', {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${openaiApiKey}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }], temperature: 0.2, max_tokens: 3000 })
+            });
+            if (!r.ok) throw new Error(`OpenAI HTTP ${r.status}`);
+            response = await r.json();
+          } else {
+            const r = await fetch('https://api.deepseek.com/v1/chat/completions', {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${deepseekApiKey}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }], temperature: 0.2, max_tokens: 3000 })
+            });
+            if (!r.ok) throw new Error(`DeepSeek HTTP ${r.status}`);
+            response = await r.json();
+          }
           
           console.log(`✅ ${useDeepSeek ? 'DeepSeek' : 'OpenAI'} API调用成功: ${companyName}`);
           console.log(`📝 响应内容长度: ${response.choices[0]?.message?.content?.length || 0}`);
@@ -156,15 +171,16 @@ Ensure all information is factual, current, and based on available public data. 
           console.error(`❌ ${useDeepSeek ? 'DeepSeek' : 'OpenAI'} API调用失败:`, apiError);
 
           // 如果DeepSeek失败，尝试使用OpenAI
-          if (useDeepSeek && openai) {
+          if (useDeepSeek && openaiApiKey) {
             console.log(`🔄 DeepSeek失败，切换到OpenAI: ${companyName}`);
             try {
-              response = await openai.chat.completions.create({
-      model: 'gpt-4',
-      messages: [{ role: 'user', content: prompt }],
-                temperature: 0.2,
-                max_tokens: 3000,
+              const r2 = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${openaiApiKey}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ model: 'gpt-4', messages: [{ role: 'user', content: prompt }], temperature: 0.2, max_tokens: 3000 })
               });
+              if (!r2.ok) throw new Error(`OpenAI HTTP ${r2.status}`);
+              response = await r2.json();
               console.log(`✅ OpenAI备用调用成功: ${companyName}`);
             } catch (fallbackError) {
               console.error(`❌ OpenAI备用调用也失败:`, fallbackError);
@@ -175,7 +191,7 @@ Ensure all information is factual, current, and based on available public data. 
           }
         }
 
-    const content = response.choices[0]?.message?.content || '';
+    const content = response.choices?.[0]?.message?.content || response.choices?.[0]?.delta?.content || '';
     console.log(`🔬 深度研究响应长度: ${content.length} 字符`);
     console.log(`🔬 响应内容预览: ${content.substring(0, 200)}...`);
     console.log(`🔬 完整响应内容:`, content);
