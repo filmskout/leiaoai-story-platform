@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import { createClient } from '@supabase/supabase-js';
 
 // 安全的环境变量检查
