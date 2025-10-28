@@ -3095,16 +3095,18 @@ async function handleAIChat(req: any, res: any) {
 
     console.log('🤖 AI Chat Request:', { model: reqModel, messageLength: reqMessage.length, language: reqLanguage });
 
-    // 地域检测：从请求头判断用户所在地区
-    // 兼容不同运行时的 header 读取
+    // Qwen 区域优先使用环境变量（Vercel 出口到国内端点可能不可达）
+    const envQwenRegion = (process.env.QWEN_REGION || '').toLowerCase();
+    // 地域检测：仅在未显式配置时作为参考
     let userRegion: string = 'CN';
     try {
       const h: any = req.headers || {};
       userRegion = (h['x-vercel-ip-country'] || h['X-Vercel-IP-Country'] || h['x-vercel-ip-country-region']) || 'CN';
       if (typeof userRegion !== 'string' || userRegion.length === 0) userRegion = 'CN';
     } catch { userRegion = 'CN'; }
-    qwenRegion = userRegion === 'CN' ? 'beijing' : 'singapore';
-    console.log(`🌍 User region: ${userRegion}, Using Qwen region: ${qwenRegion}`);
+    // 默认改为新加坡端点，除非明确要求北京/金融云
+    qwenRegion = envQwenRegion === 'beijing' || envQwenRegion === 'finance' ? envQwenRegion : 'singapore';
+    console.log(`🌍 User region: ${userRegion}, Qwen region (env-first): ${qwenRegion}`);
 
     console.log('🔑 API Keys Status:', {
       openai: !!openaiApiKey,
@@ -3298,6 +3300,8 @@ async function callDeepSeek(message: string, apiKey: string, language: string, m
   console.log('🔵 Calling DeepSeek API...');
   
   try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
     const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -3312,14 +3316,21 @@ async function callDeepSeek(message: string, apiKey: string, language: string, m
         ],
         temperature: 0.7,
         max_tokens: maxTokens
-      })
+      }),
+      signal: controller.signal
     });
+    clearTimeout(timer);
     
     console.log('🔵 DeepSeek Response Status:', response.status);
     
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('❌ DeepSeek API Error:', errorText);
+      console.error('❌ DeepSeek API Error:', response.status, errorText);
+      // 若实验模型不可用，自动回退到 deepseek-chat 再试一次
+      if (model !== 'deepseek-chat') {
+        console.log('🔁 Retrying with deepseek-chat...');
+        return await callDeepSeek(message, apiKey, language, maxTokens, 'deepseek-chat');
+      }
       throw new Error(`DeepSeek API error: ${response.status} - ${errorText}`);
     }
     
@@ -3334,7 +3345,7 @@ async function callDeepSeek(message: string, apiKey: string, language: string, m
 }
 
 // Qwen API调用
-async function callQwen(message: string, apiKey: string, language: string, region: string = 'beijing', maxTokens: number = 2000, model: string = 'qwen-turbo-latest'): Promise<string> {
+async function callQwen(message: string, apiKey: string, language: string, region: string = 'singapore', maxTokens: number = 2000, model: string = 'qwen-turbo-latest'): Promise<string> {
   const systemPrompt = language.startsWith('zh') 
     ? '你是一个专业的AI助手，请用中文回答用户的问题。'
     : 'You are a professional AI assistant. Please answer user questions in English.';
@@ -3356,6 +3367,8 @@ async function callQwen(message: string, apiKey: string, language: string, regio
   
   console.log(`🔵 Calling Qwen API (${region}): ${endpoint}`);
   
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 8000);
   const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
@@ -3370,8 +3383,10 @@ async function callQwen(message: string, apiKey: string, language: string, regio
       ],
       temperature: 0.7,
       max_tokens: maxTokens
-      })
-    });
+      }),
+    signal: controller.signal
+  });
+  clearTimeout(timer);
 
     if (!response.ok) {
     const errorText = await response.text();
