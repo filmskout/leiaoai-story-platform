@@ -127,6 +127,7 @@ export default function AICompaniesCatalog() {
   const [sortBy, setSortBy] = useState('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [groupByCategory, setGroupByCategory] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [userRatings, setUserRatings] = useState<Record<string, number>>({});
   const [userFavorites, setUserFavorites] = useState<Set<string>>(new Set());
@@ -357,6 +358,30 @@ export default function AICompaniesCatalog() {
     setFilteredCompanies(filtered);
   };
 
+  // Group companies by project categories
+  const groupCompaniesByCategory = () => {
+    const grouped: Record<string, Company[]> = {};
+    
+    // Initialize all categories
+    projectCategories.forEach(cat => {
+      if (cat.value !== 'all') {
+        grouped[cat.value] = [];
+      }
+    });
+
+    // Group companies
+    filteredCompanies.forEach(company => {
+      company.projects?.forEach(project => {
+        const category = project.project_category;
+        if (category && grouped[category] && !grouped[category].some(c => c.id === company.id)) {
+          grouped[category].push(company);
+        }
+      });
+    });
+
+    return grouped;
+  };
+
   // Pagination logic
   const getPaginatedCompanies = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -529,6 +554,196 @@ export default function AICompaniesCatalog() {
     return computeDisplayTier(company) === selectedCompanyTier;
   };
 
+  // Render company card component
+  const renderCompanyCard = (company: Company) => (
+    <motion.div
+      key={company.id}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <Card 
+        className="h-full flex flex-col hover:shadow-lg transition-all duration-300 border border-border/50 dark:border-border/30 hover:border-border dark:hover:border-border/50 cursor-pointer"
+        onClick={() => navigate(`/ai-companies/${company.id}`)}
+      >
+        <CardHeader className="pb-3 sm:pb-4">
+          {/* Top Row: Icon, Name, Tier Badge, External Link - All Level */}
+          <div className="flex items-center gap-3 sm:gap-4">
+            {/* Logo - Fill rounded square */}
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-muted flex items-center justify-center overflow-hidden flex-shrink-0">
+              {company.logo_storage_url ? (
+                <img
+                  src={company.logo_storage_url}
+                  alt={company.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    if (company.logo_url) {
+                      e.currentTarget.src = company.logo_url;
+                    }
+                  }}
+                />
+              ) : company.logo_url ? (
+                <img
+                  src={company.logo_url}
+                  alt={company.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    if (company.logo_base64) {
+                      e.currentTarget.src = company.logo_base64;
+                    }
+                  }}
+                />
+              ) : company.logo_base64 ? (
+                <img
+                  src={company.logo_base64}
+                  alt={company.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <Building className="w-6 h-6 sm:w-7 sm:h-7 text-muted-foreground" />
+              )}
+            </div>
+            
+            {/* Name and Tier - Flex grow */}
+            <div className="flex-1 min-w-0 flex items-center gap-2 sm:gap-3">
+              <CardTitle className="text-base sm:text-lg font-semibold leading-tight line-clamp-1 flex-1">
+                {company.name}
+              </CardTitle>
+              {getCompanyTierBadge(computeDisplayTier(company))}
+            </div>
+            
+            {/* External Link Icon - Level with top row */}
+            {company.website && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                asChild 
+                className="h-8 w-8 sm:h-9 sm:w-9 p-0 flex-shrink-0"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <a 
+                  href={company.website} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="flex items-center justify-center"
+                >
+                  <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
+                </a>
+              </Button>
+            )}
+          </div>
+        </CardHeader>
+
+        <CardContent className="flex-1 flex flex-col space-y-3 sm:space-y-4 pt-0">
+          {/* Brief Description - Clickable */}
+          <p 
+            className="text-xs sm:text-sm text-muted-foreground line-clamp-3 sm:line-clamp-4 leading-relaxed flex-shrink-0 cursor-pointer"
+            onClick={() => navigate(`/ai-companies/${company.id}`)}
+          >
+            {company.description}
+          </p>
+
+          {/* Company Stats - Two Lines */}
+          {/* Line 1: Headquarters and Foundation Year */}
+          <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground flex-wrap">
+            <div className="flex items-center gap-1.5">
+              <Globe className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
+              <span className="truncate">{company.headquarters || 'Unknown'}</span>
+            </div>
+            {company.founded_year && (
+              <div className="flex items-center gap-1.5">
+                <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
+                <span>{company.founded_year}</span>
+              </div>
+            )}
+          </div>
+          
+          {/* Line 2: Valuation and Project Count */}
+          <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
+            {company.valuation_usd && (
+              <div className="flex items-center gap-1.5">
+                <DollarSign className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
+                <span className="truncate">{formatValuation(company.valuation_usd)}</span>
+              </div>
+            )}
+            <div className="flex items-center gap-1.5">
+              <Wrench className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
+              <span>{company.projects.length} projects</span>
+            </div>
+          </div>
+
+          {/* Projects with Ratings - No Title */}
+          {company.projects.length > 0 && (
+            <div className="space-y-1.5 sm:space-y-2 flex-1 flex flex-col">
+              {company.projects.slice(0, 2).map((project) => (
+                <div 
+                  key={project.id} 
+                  className="flex items-center justify-between p-1.5 sm:p-2 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Link 
+                    to={`/project/${project.id}`} 
+                    className="flex items-center gap-2 min-w-0 flex-1 group"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="w-5 h-5 sm:w-6 sm:h-6 rounded bg-background flex items-center justify-center flex-shrink-0">
+                      {project.logo_url ? (
+                        <img
+                          src={project.logo_url}
+                          alt={project.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <Wrench className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-muted-foreground" />
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <span className="text-xs sm:text-sm font-medium truncate block group-hover:text-primary transition-colors">
+                        {project.name}
+                      </span>
+                      {project.project_category && (
+                        <span className="text-xs text-muted-foreground truncate block">
+                          {project.project_category}
+                        </span>
+                      )}
+                    </div>
+                  </Link>
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <div className="flex items-center">
+                      {renderStars(project.project_stats?.average_rating || 0, project.id, true)}
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleFavorite(project.id);
+                      }}
+                      className="h-6 w-6 sm:h-7 sm:w-7 p-0 hover:bg-muted"
+                    >
+                      <Heart 
+                        className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${
+                          userFavorites.has(project.id) 
+                            ? 'text-red-500 fill-red-500' 
+                            : 'text-muted-foreground hover:text-red-500'
+                        }`}
+                      />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+              {company.projects.length > 2 && (
+                <p className="text-xs text-muted-foreground text-center pt-1">
+                  +{company.projects.length - 2} more
+                </p>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -610,6 +825,18 @@ export default function AICompaniesCatalog() {
                 onClick={() => setViewMode('list')}
               >
                 <List className="w-4 h-4" />
+              </Button>
+              <Button
+                variant={groupByCategory ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => {
+                  setGroupByCategory(!groupByCategory);
+                  setCurrentPage(1);
+                }}
+                title="Group by Project Category"
+              >
+                <Layers className="w-4 h-4 mr-2" />
+                Group by Category
               </Button>
               <Button
                 variant="outline"
@@ -714,204 +941,56 @@ export default function AICompaniesCatalog() {
         {/* Results Summary */}
         <div className="mb-6">
           <p className="text-muted-foreground">
-            Showing {filteredCompanies.length} of {companies.length} companies
-            {searchQuery && ` matching "${searchQuery}"`}
-            {selectedCompanyTier !== 'all' && ` at ${selectedCompanyTier} tier`}
-            {selectedProjectCategory !== 'all' && ` with ${selectedProjectCategory} projects`}
+            {groupByCategory ? (
+              <>
+                {Object.values(groupCompaniesByCategory()).reduce((sum, companies) => sum + companies.length, 0)} companies across {Object.values(groupCompaniesByCategory()).filter(c => c.length > 0).length} categories
+                {searchQuery && ` matching "${searchQuery}"`}
+                {selectedCompanyTier !== 'all' && ` at ${selectedCompanyTier} tier`}
+              </>
+            ) : (
+              <>
+                Showing {filteredCompanies.length} of {companies.length} companies
+                {searchQuery && ` matching "${searchQuery}"`}
+                {selectedCompanyTier !== 'all' && ` at ${selectedCompanyTier} tier`}
+                {selectedProjectCategory !== 'all' && ` with ${selectedProjectCategory} projects`}
+              </>
+            )}
           </p>
         </div>
 
         {/* Companies Grid/List */}
-        {viewMode === 'grid' ? (
+        {groupByCategory ? (
+          /* Grouped by Category */
+          <div className="space-y-8">
+            {projectCategories.filter(cat => cat.value !== 'all').map((category) => {
+              const groupedCompanies = groupCompaniesByCategory();
+              const categoryCompanies = groupedCompanies[category.value] || [];
+              
+              if (categoryCompanies.length === 0) return null;
+
+              return (
+                <div key={category.value} className="space-y-4">
+                  {/* Category Header */}
+                  <div className="flex items-center gap-3 pb-2 border-b border-border">
+                    {category.icon && <category.icon className={`w-5 h-5 ${category.color}`} />}
+                    <h2 className="text-xl sm:text-2xl font-bold">{category.label}</h2>
+                    <Badge variant="outline" className="ml-auto">
+                      {categoryCompanies.length} {categoryCompanies.length === 1 ? 'company' : 'companies'}
+                    </Badge>
+                  </div>
+
+                  {/* Companies Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                    {categoryCompanies.map((company) => renderCompanyCard(company))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : viewMode === 'grid' ? (
+          /* Normal Grid View */
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {getPaginatedCompanies().map((company) => (
-              <motion.div
-                key={company.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <Card 
-                  className="h-full flex flex-col hover:shadow-lg transition-all duration-300 border border-border/50 dark:border-border/30 hover:border-border dark:hover:border-border/50 cursor-pointer"
-                  onClick={() => navigate(`/ai-companies/${company.id}`)}
-                >
-                  <CardHeader className="pb-3 sm:pb-4">
-                    {/* Top Row: Icon, Name, Tier Badge, External Link - All Level */}
-                    <div className="flex items-center gap-3 sm:gap-4">
-                      {/* Logo - Fill rounded square */}
-                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-muted flex items-center justify-center overflow-hidden flex-shrink-0">
-                        {company.logo_storage_url ? (
-                          <img
-                            src={company.logo_storage_url}
-                            alt={company.name}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              if (company.logo_url) {
-                                e.currentTarget.src = company.logo_url;
-                              }
-                            }}
-                          />
-                        ) : company.logo_url ? (
-                          <img
-                            src={company.logo_url}
-                            alt={company.name}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              if (company.logo_base64) {
-                                e.currentTarget.src = company.logo_base64;
-                              }
-                            }}
-                          />
-                        ) : company.logo_base64 ? (
-                          <img
-                            src={company.logo_base64}
-                            alt={company.name}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <Building className="w-6 h-6 sm:w-7 sm:h-7 text-muted-foreground" />
-                        )}
-                      </div>
-                      
-                      {/* Name and Tier - Flex grow */}
-                      <div className="flex-1 min-w-0 flex items-center gap-2 sm:gap-3">
-                        <CardTitle className="text-base sm:text-lg font-semibold leading-tight line-clamp-1 flex-1">
-                          {company.name}
-                        </CardTitle>
-                        {getCompanyTierBadge(computeDisplayTier(company))}
-                      </div>
-                      
-                      {/* External Link Icon - Level with top row */}
-                      {company.website && (
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          asChild 
-                          className="h-8 w-8 sm:h-9 sm:w-9 p-0 flex-shrink-0"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <a 
-                            href={company.website} 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
-                            className="flex items-center justify-center"
-                          >
-                            <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
-                          </a>
-                        </Button>
-                      )}
-                    </div>
-                  </CardHeader>
-
-                  <CardContent className="flex-1 flex flex-col space-y-3 sm:space-y-4 pt-0">
-                    {/* Brief Description - Clickable */}
-                    <p 
-                      className="text-xs sm:text-sm text-muted-foreground line-clamp-3 sm:line-clamp-4 leading-relaxed flex-shrink-0 cursor-pointer"
-                      onClick={() => navigate(`/ai-companies/${company.id}`)}
-                    >
-                      {company.description}
-                    </p>
-
-                    {/* Company Stats - Two Lines */}
-                    {/* Line 1: Headquarters and Foundation Year */}
-                    <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground flex-wrap">
-                      <div className="flex items-center gap-1.5">
-                        <Globe className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
-                        <span className="truncate">{company.headquarters || 'Unknown'}</span>
-                      </div>
-                      {company.founded_year && (
-                        <div className="flex items-center gap-1.5">
-                          <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
-                          <span>{company.founded_year}</span>
-                        </div>
-                      )}
-                    </div>
-                    
-                    {/* Line 2: Valuation and Project Count */}
-                    <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
-                      {company.valuation_usd && (
-                        <div className="flex items-center gap-1.5">
-                          <DollarSign className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
-                          <span className="truncate">{formatValuation(company.valuation_usd)}</span>
-                        </div>
-                      )}
-                      <div className="flex items-center gap-1.5">
-                        <Wrench className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
-                        <span>{company.projects.length} projects</span>
-                      </div>
-                    </div>
-
-                    {/* Projects with Ratings - No Title */}
-                    {company.projects.length > 0 && (
-                      <div className="space-y-1.5 sm:space-y-2 flex-1 flex flex-col">
-                        {company.projects.slice(0, 2).map((project) => (
-                          <div 
-                            key={project.id} 
-                            className="flex items-center justify-between p-1.5 sm:p-2 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <Link 
-                              to={`/project/${project.id}`} 
-                              className="flex items-center gap-2 min-w-0 flex-1 group"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <div className="w-5 h-5 sm:w-6 sm:h-6 rounded bg-background flex items-center justify-center flex-shrink-0">
-                                {project.logo_url ? (
-                                  <img
-                                    src={project.logo_url}
-                                    alt={project.name}
-                                    className="w-full h-full object-cover"
-                                  />
-                                ) : (
-                                  <Wrench className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-muted-foreground" />
-                                )}
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <span className="text-xs sm:text-sm font-medium truncate block group-hover:text-primary transition-colors">
-                                  {project.name}
-                                </span>
-                                {project.project_category && (
-                                  <span className="text-xs text-muted-foreground truncate block">
-                                    {project.project_category}
-                                  </span>
-                                )}
-                              </div>
-                            </Link>
-                            <div className="flex items-center gap-1 flex-shrink-0">
-                              <div className="flex items-center">
-                                {renderStars(project.project_stats?.average_rating || 0, project.id, true)}
-                              </div>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleFavorite(project.id);
-                                }}
-                                className="h-6 w-6 sm:h-7 sm:w-7 p-0 hover:bg-muted"
-                              >
-                                <Heart 
-                                  className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${
-                                    userFavorites.has(project.id) 
-                                      ? 'text-red-500 fill-red-500' 
-                                      : 'text-muted-foreground hover:text-red-500'
-                                  }`}
-                                />
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
-                        {company.projects.length > 2 && (
-                          <p className="text-xs text-muted-foreground text-center pt-1">
-                            +{company.projects.length - 2} more
-                          </p>
-                        )}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+            {getPaginatedCompanies().map((company) => renderCompanyCard(company))}
           </div>
         ) : (
           <div className="space-y-4">
@@ -1047,8 +1126,8 @@ export default function AICompaniesCatalog() {
           </div>
         )}
 
-        {/* Pagination Controls */}
-        {filteredCompanies.length > itemsPerPage && (
+        {/* Pagination Controls - Hidden when grouped by category */}
+        {!groupByCategory && filteredCompanies.length > itemsPerPage && (
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 mb-8 px-4">
             <div className="flex items-center gap-2">
               <Button
