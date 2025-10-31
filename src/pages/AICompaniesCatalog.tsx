@@ -33,9 +33,8 @@ import {
   ChevronLeft,
   Crown,
   Zap,
-  Target,
-  Sparkles,
-  Layers
+  Layers,
+  Swirl
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -139,9 +138,9 @@ export default function AICompaniesCatalog() {
   const companyTiers = [
     { value: 'all', label: 'All Tiers' },
     { value: 'Giants', label: 'Giants', icon: Crown, color: 'text-yellow-600' },
-    { value: 'Unicorns', label: 'Unicorns (≥ $1B)', icon: Sparkles, color: 'text-pink-500' },
+    { value: 'Unicorns', label: 'Unicorns (≥ $1B)', icon: Star, color: 'text-pink-500' },
     { value: 'Independent', label: 'Independent', icon: Zap, color: 'text-blue-500' },
-    { value: 'Emerging', label: 'Emerging', icon: Target, color: 'text-green-500' }
+    { value: 'Emerging', label: 'Emerging', icon: Swirl, color: 'text-green-500' }
   ];
 
   // Giants 名单与特例
@@ -493,21 +492,12 @@ export default function AICompaniesCatalog() {
     return `$${valuation.toLocaleString()}`;
   };
 
-  const getCompanyTypeIcon = (companyType?: string) => {
-    switch (companyType) {
-      case 'AI Giant':
-        return <Crown className="w-4 h-4 text-yellow-500" />;
-      case 'Independent AI':
-        return <Zap className="w-4 h-4 text-blue-500" />;
-      default:
-        return <Building className="w-4 h-4 text-green-500" />;
-    }
-  };
+  // 已移除 company type 图标展示
 
   // 计算显示用Tier（基于名称与估值规则）
   const computeDisplayTier = (company: Company): string | undefined => {
     const name = company.name?.trim() || '';
-    const valuation = (company as any).valuation as number | undefined;
+    const valuation = company.valuation_usd as number | undefined;
     if (GIANTS_SET.has(name)) return 'Giants';
     if (FORCE_UNICORNS_SET.has(name)) return 'Unicorns';
     if (typeof valuation === 'number' && valuation >= 1_000_000_000) return 'Unicorns';
@@ -515,7 +505,10 @@ export default function AICompaniesCatalog() {
     const raw = (company as any).company_tier || (company as any).tier;
     if (raw === 'Tier 1') return 'Giants';
     if (raw === 'Tier 2') return 'Unicorns';
-    return raw;
+    if (raw === 'Giants' || raw === 'Unicorns' || raw === 'Independent' || raw === 'Emerging') return raw;
+    // 启发式兜底：近年成立标记 Emerging，否则 Independent
+    if (company.founded_year && company.founded_year >= 2019) return 'Emerging';
+    return 'Independent';
   };
 
   const getCompanyTierBadge = (tier?: string) => {
@@ -527,7 +520,7 @@ export default function AICompaniesCatalog() {
       Independent: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
       Emerging: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
     };
-    const Icon = tier === 'Giants' ? Crown : tier === 'Unicorns' ? Sparkles : undefined;
+    const Icon = tier === 'Giants' ? Crown : tier === 'Unicorns' ? Star : tier === 'Independent' ? Zap : tier === 'Emerging' ? Swirl : undefined;
     return (
       <Badge className={`text-xs inline-flex items-center gap-1 ${colorMap[tier] || 'bg-gray-100 text-gray-800'}`}>
         {Icon && <Icon className="w-3.5 h-3.5" />} {textMap[tier] || tier}
@@ -785,7 +778,6 @@ export default function AICompaniesCatalog() {
                         <div>
                           <div className="flex items-center gap-2 mb-1">
                             <CardTitle className="text-lg">{company.name}</CardTitle>
-                            {getCompanyTypeIcon(company.company_type)}
                           </div>
                           <div className="flex items-center gap-2 mb-1">
                             {getCompanyTierBadge(computeDisplayTier(company))}
@@ -956,7 +948,6 @@ export default function AICompaniesCatalog() {
                           <div>
                             <div className="flex items-center gap-2 mb-1">
                               <h3 className="text-xl font-semibold">{company.name}</h3>
-                              {getCompanyTypeIcon(company.company_type)}
                               {getCompanyTierBadge(computeDisplayTier(company))}
                             </div>
                             <div className="flex items-center gap-4 text-sm text-muted-foreground">
