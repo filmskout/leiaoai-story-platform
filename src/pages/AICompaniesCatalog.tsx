@@ -34,7 +34,8 @@ import {
   Crown,
   Zap,
   Layers,
-  Asterisk
+  Asterisk,
+  Target
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -101,6 +102,7 @@ type Company = {
   industry_tags: string[];
   logo_url?: string;
   logo_base64?: string;
+  logo_storage_url?: string;
   valuation_usd?: number;
   projects: Project[];
   fundings: any[];
@@ -293,13 +295,6 @@ export default function AICompaniesCatalog() {
           project.name.toLowerCase().includes(query) ||
           project.description.toLowerCase().includes(query)
         )
-      );
-    }
-
-    // Company type filter
-    if (selectedCompanyType !== 'all') {
-      filtered = filtered.filter(company => 
-        company.company_type === selectedCompanyType
       );
     }
 
