@@ -134,7 +134,7 @@ export default function AICompaniesCatalog() {
   const [storyContent, setStoryContent] = useState('');
   const [storyTitle, setStoryTitle] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(20);
+  const [itemsPerPage] = useState(18); // Multiples of 3 for optimal grid layout
 
   // Company tier filters（重命名：Tier1->Giants，Tier2->Unicorns）
   const companyTiers = [
@@ -723,7 +723,7 @@ export default function AICompaniesCatalog() {
 
         {/* Companies Grid/List */}
         {viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {getPaginatedCompanies().map((company) => (
               <motion.div
                 key={company.id}
@@ -731,180 +731,180 @@ export default function AICompaniesCatalog() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <Card className="h-full hover:shadow-lg transition-all duration-300 border border-border/50 dark:border-border/30 hover:border-border dark:hover:border-border/50">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center overflow-hidden">
-                          {company.logo_storage_url ? (
-                            <img
-                              src={company.logo_storage_url}
-                              alt={company.name}
-                              className="w-full h-full object-contain"
-                              onError={(e) => {
-                                // Fallback to logo_url if storage fails
-                                if (company.logo_url) {
-                                  e.currentTarget.src = company.logo_url;
-                                }
-                              }}
-                            />
-                          ) : company.logo_url ? (
-                            <img
-                              src={company.logo_url}
-                              alt={company.name}
-                              className="w-full h-full object-contain"
-                              onError={(e) => {
-                                // Fallback to base64 if URL fails
-                                if (company.logo_base64) {
-                                  e.currentTarget.src = company.logo_base64;
-                                }
-                              }}
-                            />
-                          ) : company.logo_base64 ? (
-                            <img
-                              src={company.logo_base64}
-                              alt={company.name}
-                              className="w-full h-full object-contain"
-                            />
-                          ) : (
-                            <Building className="w-6 h-6 text-muted-foreground" />
+                <Card className="h-full flex flex-col hover:shadow-lg transition-all duration-300 border border-border/50 dark:border-border/30 hover:border-border dark:hover:border-border/50">
+                  <CardHeader className="pb-3 sm:pb-4">
+                    {/* Header: Logo, Name, External Link */}
+                    <div className="flex items-start gap-2 sm:gap-3">
+                      {/* Logo */}
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-muted flex items-center justify-center overflow-hidden flex-shrink-0">
+                        {company.logo_storage_url ? (
+                          <img
+                            src={company.logo_storage_url}
+                            alt={company.name}
+                            className="w-full h-full object-contain p-1"
+                            onError={(e) => {
+                              if (company.logo_url) {
+                                e.currentTarget.src = company.logo_url;
+                              }
+                            }}
+                          />
+                        ) : company.logo_url ? (
+                          <img
+                            src={company.logo_url}
+                            alt={company.name}
+                            className="w-full h-full object-contain p-1"
+                            onError={(e) => {
+                              if (company.logo_base64) {
+                                e.currentTarget.src = company.logo_base64;
+                              }
+                            }}
+                          />
+                        ) : company.logo_base64 ? (
+                          <img
+                            src={company.logo_base64}
+                            alt={company.name}
+                            className="w-full h-full object-contain p-1"
+                          />
+                        ) : (
+                          <Building className="w-5 h-5 sm:w-6 sm:h-6 text-muted-foreground" />
+                        )}
+                      </div>
+                      
+                      {/* Name and Link */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <CardTitle className="text-base sm:text-lg font-semibold leading-tight line-clamp-2">
+                            {company.name}
+                          </CardTitle>
+                          {company.website && (
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              asChild 
+                              className="h-7 w-7 sm:h-8 sm:w-8 p-0 flex-shrink-0"
+                            >
+                              <a 
+                                href={company.website} 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className="flex items-center justify-center"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                              </a>
+                            </Button>
                           )}
                         </div>
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <CardTitle className="text-lg">{company.name}</CardTitle>
-                          </div>
-                          <div className="flex items-center gap-2 mb-1">
-                            {getCompanyTierBadge(computeDisplayTier(company))}
-                            <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                              <Globe className="w-3 h-3" />
-                              <span>{company.headquarters || 'Unknown'}</span>
-                            </div>
-                            {company.founded_year && (
-                              <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                                <Calendar className="w-3 h-3" />
-                                <span>{company.founded_year}</span>
-                              </div>
-                            )}
-                          </div>
+                        
+                        {/* Tier Badge */}
+                        <div className="mt-1.5 sm:mt-2">
+                          {getCompanyTierBadge(computeDisplayTier(company))}
                         </div>
                       </div>
-                      {company.website && (
-                        <Button variant="ghost" size="sm" asChild className="h-8 w-8 p-0">
-                          <a href={company.website} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
-                            <ExternalLink className="w-4 h-4" />
-                          </a>
-                        </Button>
-                      )}
                     </div>
                   </CardHeader>
 
-                  <CardContent className="space-y-4">
-                    <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
+                  <CardContent className="flex-1 flex flex-col space-y-3 sm:space-y-4 pt-0">
+                    {/* Brief Description */}
+                    <p className="text-xs sm:text-sm text-muted-foreground line-clamp-3 sm:line-clamp-4 leading-relaxed flex-shrink-0">
                       {company.description}
                     </p>
 
-                    {/* Company Stats */}
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div className="flex items-center gap-2">
-                        <Wrench className="w-4 h-4 text-muted-foreground" />
-                        <span>{company.projects.length} projects</span>
+                    {/* Company Stats - Compact */}
+                    <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground flex-wrap">
+                      <div className="flex items-center gap-1.5">
+                        <Globe className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
+                        <span className="truncate">{company.headquarters || 'Unknown'}</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <DollarSign className="w-4 h-4 text-muted-foreground" />
-                        <span>{formatValuation(company.valuation_usd)}</span>
+                      {company.founded_year && (
+                        <div className="flex items-center gap-1.5">
+                          <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
+                          <span>{company.founded_year}</span>
+                        </div>
+                      )}
+                      <div className="flex items-center gap-1.5">
+                        <Wrench className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
+                        <span>{company.projects.length}</span>
                       </div>
+                      {company.valuation_usd && (
+                        <div className="flex items-center gap-1.5">
+                          <DollarSign className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
+                          <span className="truncate">{formatValuation(company.valuation_usd)}</span>
+                        </div>
+                      )}
                     </div>
 
-                    {/* Focus Areas */}
-                    {company.focus_areas && company.focus_areas.length > 0 && (
-                      <div className="space-y-2">
-                        <h4 className="text-sm font-medium">Focus Areas</h4>
-                        <div className="flex flex-wrap gap-1">
-                          {company.focus_areas.slice(0, 3).map((area) => (
-                            <Badge 
-                              key={area} 
-                              variant="outline" 
-                              className="text-xs cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
-                              onClick={() => navigateToTag(area)}
+                    {/* Key Projects with Ratings */}
+                    {company.projects.length > 0 && (
+                      <div className="space-y-2 flex-1 flex flex-col">
+                        <h4 className="text-xs sm:text-sm font-medium flex items-center gap-1.5">
+                          <Wrench className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                          <span>Key Projects</span>
+                        </h4>
+                        <div className="space-y-1.5 sm:space-y-2">
+                          {company.projects.slice(0, 2).map((project) => (
+                            <div 
+                              key={project.id} 
+                              className="flex items-center justify-between p-1.5 sm:p-2 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors"
                             >
-                              {area}
-                            </Badge>
+                              <Link 
+                                to={`/project/${project.id}`} 
+                                className="flex items-center gap-2 min-w-0 flex-1 group"
+                              >
+                                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded bg-background flex items-center justify-center flex-shrink-0">
+                                  {project.logo_url ? (
+                                    <img
+                                      src={project.logo_url}
+                                      alt={project.name}
+                                      className="w-full h-full object-contain p-0.5"
+                                    />
+                                  ) : (
+                                    <Wrench className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-muted-foreground" />
+                                  )}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <span className="text-xs sm:text-sm font-medium truncate block group-hover:text-primary transition-colors">
+                                    {project.name}
+                                  </span>
+                                  {project.project_category && (
+                                    <span className="text-xs text-muted-foreground truncate block">
+                                      {project.project_category}
+                                    </span>
+                                  )}
+                                </div>
+                              </Link>
+                              <div className="flex items-center gap-1 flex-shrink-0">
+                                <div className="flex items-center">
+                                  {renderStars(project.project_stats?.average_rating || 0, project.id, true)}
+                                </div>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => handleFavorite(project.id)}
+                                  className="h-6 w-6 sm:h-7 sm:w-7 p-0 hover:bg-muted"
+                                >
+                                  <Heart 
+                                    className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${
+                                      userFavorites.has(project.id) 
+                                        ? 'text-red-500 fill-red-500' 
+                                        : 'text-muted-foreground hover:text-red-500'
+                                    }`}
+                                  />
+                                </Button>
+                              </div>
+                            </div>
                           ))}
-                          {company.focus_areas.length > 3 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{company.focus_areas.length - 3}
-                            </Badge>
+                          {company.projects.length > 2 && (
+                            <p className="text-xs text-muted-foreground text-center pt-1">
+                              +{company.projects.length - 2} more
+                            </p>
                           )}
                         </div>
                       </div>
                     )}
 
-                    {/* Tools Preview */}
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-medium flex items-center gap-2">
-                        <Wrench className="w-4 h-4" />
-                        Key Projects
-                      </h4>
-                      <div className="space-y-2">
-                        {company.projects.slice(0, 2).map((project) => (
-                          <div key={project.id} className="flex items-center justify-between p-2 bg-muted/50 rounded-lg">
-                            <Link to={`/project/${project.id}`} className="flex items-center gap-2 min-w-0 flex-1 group">
-                              <div className="w-6 h-6 rounded bg-background flex items-center justify-center">
-                                {project.logo_url ? (
-                                  <img
-                                    src={project.logo_url}
-                                    alt={project.name}
-                                    className="w-full h-full object-contain"
-                                  />
-                                ) : (
-                                  <Wrench className="w-3 h-3 text-muted-foreground" />
-                                )}
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <span className="text-sm font-medium truncate block group-hover:text-primary transition-colors">{project.name}</span>
-                                {project.project_category && (
-                                  <span className="text-xs text-muted-foreground truncate block">{project.project_category}</span>
-                                )}
-                              </div>
-                            </Link>
-                            <div className="flex items-center gap-1">
-                              {renderStars(project.project_stats?.average_rating || 0, project.id, true)}
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handleFavorite(project.id)}
-                                className="hover:bg-muted/50 p-1 sm:p-2"
-                              >
-                                <Heart 
-                                  className={`w-3 h-3 sm:w-4 sm:h-4 ${
-                                    userFavorites.has(project.id) 
-                                      ? 'text-red-500 fill-red-500' 
-                                      : 'text-muted-foreground hover:text-red-500'
-                                  }`}
-                                />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => openStoryDialog(project, company)}
-                                className="hover:bg-muted/50 p-1 sm:p-2"
-                              >
-                                <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
-                        {company.projects.length > 2 && (
-                          <p className="text-xs text-muted-foreground text-center">
-                            +{company.projects.length - 2} more projects
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
                     {/* Action Button */}
-                    <Button asChild className="w-full">
+                    <Button asChild className="w-full mt-auto">
                       <Link to={`/ai-companies/${company.id}`}>
                         View Details
                       </Link>
