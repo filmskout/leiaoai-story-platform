@@ -34,7 +34,7 @@ import {
   Crown,
   Zap,
   Layers,
-  Swirl
+  Asterisk
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -140,7 +140,7 @@ export default function AICompaniesCatalog() {
     { value: 'Giants', label: 'Giants', icon: Crown, color: 'text-yellow-600' },
     { value: 'Unicorns', label: 'Unicorns (≥ $1B)', icon: Star, color: 'text-pink-500' },
     { value: 'Independent', label: 'Independent', icon: Zap, color: 'text-blue-500' },
-    { value: 'Emerging', label: 'Emerging', icon: Swirl, color: 'text-green-500' }
+    { value: 'Emerging', label: 'Emerging', icon: Asterisk, color: 'text-green-500' }
   ];
 
   // Giants 名单与特例
@@ -520,7 +520,7 @@ export default function AICompaniesCatalog() {
       Independent: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
       Emerging: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
     };
-    const Icon = tier === 'Giants' ? Crown : tier === 'Unicorns' ? Star : tier === 'Independent' ? Zap : tier === 'Emerging' ? Swirl : undefined;
+    const Icon = tier === 'Giants' ? Crown : tier === 'Unicorns' ? Star : tier === 'Independent' ? Zap : tier === 'Emerging' ? Asterisk : undefined;
     return (
       <Badge className={`text-xs inline-flex items-center gap-1 ${colorMap[tier] || 'bg-gray-100 text-gray-800'}`}>
         {Icon && <Icon className="w-3.5 h-3.5" />} {textMap[tier] || tier}
