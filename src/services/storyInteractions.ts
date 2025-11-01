@@ -31,10 +31,26 @@ export async function toggleLike(storyId: string, userId?: string, sessionId?: s
         .eq(userId ? 'user_id' : 'session_id', userId || sessionId);
 
       // Decrement count
-      await supabase.rpc('decrement_story_count', {
-        story_id: storyId,
-        column_name: 'likes_count'
-      });
+      try {
+        await supabase.rpc('decrement_story_count', {
+          story_id: storyId,
+          column_name: 'likes_count'
+        });
+      } catch (err) {
+        // Fallback
+        const { data: current } = await supabase
+          .from('stories')
+          .select('likes_count')
+          .eq('id', storyId)
+          .single();
+        
+        if (current) {
+          await supabase
+            .from('stories')
+            .update({ likes_count: Math.max(0, (current.likes_count || 0) - 1) })
+            .eq('id', storyId);
+        }
+      }
 
       return false;
     } else {
@@ -48,10 +64,26 @@ export async function toggleLike(storyId: string, userId?: string, sessionId?: s
         });
 
       // Increment count
-      await supabase.rpc('increment_story_count', {
-        story_id: storyId,
-        column_name: 'likes_count'
-      });
+      try {
+        await supabase.rpc('increment_story_count', {
+          story_id: storyId,
+          column_name: 'likes_count'
+        });
+      } catch (err) {
+        // Fallback: manually increment (if function doesn't exist)
+        const { data: current } = await supabase
+          .from('stories')
+          .select('likes_count')
+          .eq('id', storyId)
+          .single();
+        
+        if (current) {
+          await supabase
+            .from('stories')
+            .update({ likes_count: (current.likes_count || 0) + 1 })
+            .eq('id', storyId);
+        }
+      }
 
       return true;
     }

@@ -141,20 +141,18 @@ export default function CategoryStories() {
           .eq('story_id', storyId)
           .eq('user_id', user.id);
 
-        await supabase.rpc('decrement', {
-          table_name: 'stories',
-          column_name: 'likes_count',
-          id: storyId
+        await supabase.rpc('decrement_story_count', {
+          story_id: storyId,
+          column_name: 'likes_count'
         });
       } else {
         await supabase
           .from('story_likes')
           .insert({ story_id: storyId, user_id: user.id });
 
-        await supabase.rpc('increment', {
-          table_name: 'stories',
-          column_name: 'likes_count',
-          id: storyId
+        await supabase.rpc('increment_story_count', {
+          story_id: storyId,
+          column_name: 'likes_count'
         });
       }
 
@@ -182,20 +180,18 @@ export default function CategoryStories() {
           .eq('story_id', storyId)
           .eq('user_id', user.id);
 
-        await supabase.rpc('decrement', {
-          table_name: 'stories',
-          column_name: 'saves_count',
-          id: storyId
+        await supabase.rpc('decrement_story_count', {
+          story_id: storyId,
+          column_name: 'saves_count'
         });
       } else {
         await supabase
           .from('story_saves')
           .insert({ story_id: storyId, user_id: user.id });
 
-        await supabase.rpc('increment', {
-          table_name: 'stories',
-          column_name: 'saves_count',
-          id: storyId
+        await supabase.rpc('increment_story_count', {
+          story_id: storyId,
+          column_name: 'saves_count'
         });
       }
 
@@ -219,17 +215,21 @@ export default function CategoryStories() {
         });
 
         // Increment share count
-        await supabase.rpc('increment', {
-          table_name: 'stories',
-          column_name: 'share_count',
-          id: story.id
+        await supabase.rpc('increment_story_count', {
+          story_id: story.id,
+          column_name: 'share_count'
         });
       } catch (error) {
         // User cancelled or error
       }
     } else {
       // Fallback: copy to clipboard
-      navigator.clipboard.writeText(`${window.location.origin}/story/${story.id}`);
+      try {
+        await navigator.clipboard.writeText(`${window.location.origin}/story/${story.id}`);
+        // Show toast notification
+      } catch (error) {
+        console.error('Failed to copy URL:', error);
+      }
     }
   };
 

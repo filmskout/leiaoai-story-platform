@@ -74,24 +74,23 @@ export function SimpleStoriesWall() {
           title,
           excerpt,
           content,
-          featured_image_url,
-          view_count,
-          like_count,
-          comment_count,
+          cover_image_url,
+          views_count,
+          likes_count,
+          comments_count,
           created_at,
-          author,
-          category
+          category,
+          tags
         `)
-        .eq('status', 'published')
-        .eq('is_public', true);
+        .eq('status', 'published');
 
       // Apply sorting
       switch (sortBy) {
         case 'popular':
-          query = query.order('like_count', { ascending: false });
+          query = query.order('likes_count', { ascending: false });
           break;
         case 'views':
-          query = query.order('view_count', { ascending: false });
+          query = query.order('views_count', { ascending: false });
           break;
         default:
           query = query.order('created_at', { ascending: false });
@@ -129,17 +128,33 @@ export function SimpleStoriesWall() {
             selectedTags
           });
           
-          // Load tags for filtered stories
-          await loadStoriesTags(filteredStories);
-          setStories(filteredStories);
+          // Transform and load tags for filtered stories
+          const transformedStories = filteredStories.map((story: any) => ({
+            ...story,
+            featured_image_url: story.cover_image_url,
+            view_count: story.views_count || 0,
+            like_count: story.likes_count || 0,
+            comment_count: story.comments_count || 0,
+            author: 'Community'
+          }));
+          await loadStoriesTags(transformedStories);
+          setStories(transformedStories);
         } else {
           console.log('🟡 SimpleStoriesWall: No stories found with selected tags');
           setStories([]);
         }
       } else {
-        // Load tags for all stories
-        await loadStoriesTags(storiesData);
-        setStories(storiesData);
+        // Transform and load tags for all stories
+        const transformedStories = storiesData.map((story: any) => ({
+          ...story,
+          featured_image_url: story.cover_image_url,
+          view_count: story.views_count || 0,
+          like_count: story.likes_count || 0,
+          comment_count: story.comments_count || 0,
+          author: 'Community'
+        }));
+        await loadStoriesTags(transformedStories);
+        setStories(transformedStories);
       }
     } catch (error) {
       console.error('🔴 SimpleStoriesWall: Error loading stories:', error);

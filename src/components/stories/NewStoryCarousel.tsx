@@ -82,11 +82,10 @@ export function NewStoryCarousel({ className }: NewStoryCarouselProps) {
       const { data: storiesData, error } = await supabase
         .from('stories')
         .select(`
-          id, title, content, excerpt, view_count, like_count, comment_count, 
-          created_at, featured_image_url, author, category
+          id, title, content, excerpt, views_count, likes_count, comments_count, 
+          created_at, cover_image_url, category, tags
         `)
         .eq('status', 'published')
-        .eq('is_public', true)
         .order('created_at', { ascending: false })
         .limit(12);
 
@@ -129,14 +128,14 @@ export function NewStoryCarousel({ className }: NewStoryCarouselProps) {
           title: story.title,
           content: story.content,
           excerpt: story.excerpt || story.content?.substring(0, 120) + '...' || 'Story excerpt...',
-          author: story.author,
+          author: 'Community', // Default author since author_id is not in query
           category: story.category || 'general',
-          view_count: story.view_count || 0,
-          like_count: story.like_count || 0,
-          comment_count: story.comment_count || 0,
+          view_count: story.views_count || 0,
+          like_count: story.likes_count || 0,
+          comment_count: story.comments_count || 0,
           created_at: story.created_at,
-          image: story.featured_image_url || `/story-images/story-${Math.floor(Math.random() * 8) + 1}.jpg`,
-          tags: storyTagsMap.get(story.id) || []
+          image: story.cover_image_url || `/story-images/story-${Math.floor(Math.random() * 8) + 1}.jpg`,
+          tags: storyTagsMap.get(story.id) || (story.tags || []).map((t: string) => ({ id: t, name: t, display_name: t, color: '#3B82F6' }))
         }));
 
         setStories(transformedStories);
