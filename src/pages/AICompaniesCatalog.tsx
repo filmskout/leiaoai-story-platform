@@ -280,7 +280,8 @@ export default function AICompaniesCatalog() {
       console.error('❌ 加载公司数据失败:', error);
       console.error('错误详情:', error.message, error.stack);
       setCompanies([]);
-      alert(`加载失败: ${error.message}`);
+      // 使用console.warn而不是alert，避免阻塞
+      console.warn(`加载失败: ${error.message}`);
     } finally {
       setLoading(false);
       console.log('✅ 公司数据加载完成，loading状态已关闭');

@@ -94,35 +94,7 @@ export function NewStoryCarousel({ className }: NewStoryCarouselProps) {
       }
 
       if (storiesData && storiesData.length > 0) {
-        // Get story IDs for tag fetching
-        const storyIds = storiesData.map(story => story.id);
-        
-        // Fetch tags for these stories
-        const { data: storyTagsData } = await supabase
-          .from('story_tags')
-          .select(`
-            story_id,
-            tags!inner(id, name)
-          `)
-          .in('story_id', storyIds);
-
-        // Create story tags mapping
-        const storyTagsMap = new Map();
-        storyTagsData?.forEach(assignment => {
-          const storyId = assignment.story_id;
-          const tag = assignment.tags;
-          if (!storyTagsMap.has(storyId)) {
-            storyTagsMap.set(storyId, []);
-          }
-          storyTagsMap.get(storyId).push({
-            id: tag.id,
-            name: tag.name,
-            display_name: tag.name,
-            color: '#3B82F6'
-          });
-        });
-
-        // Transform data to match Story interface
+        // Transform data to match Story interface - use tags from story.tags array directly
         const transformedStories = storiesData.map(story => ({
           id: story.id,
           title: story.title,
@@ -135,13 +107,24 @@ export function NewStoryCarousel({ className }: NewStoryCarouselProps) {
           comment_count: story.comments_count || 0,
           created_at: story.created_at,
           image: story.cover_image_url || `/story-images/story-${Math.floor(Math.random() * 8) + 1}.jpg`,
-          tags: storyTagsMap.get(story.id) || (story.tags || []).map((t: string) => ({ id: t, name: t, display_name: t, color: '#3B82F6' }))
+          tags: (story.tags || []).map((t: string) => ({ 
+            id: t, 
+            name: t, 
+            display_name: t, 
+            color: '#3B82F6' 
+          }))
         }));
 
         setStories(transformedStories);
+        setTotalPages(Math.ceil(transformedStories.length / itemsPerPage));
+      } else {
+        setStories([]);
+        setTotalPages(1);
       }
     } catch (error) {
       console.error('Failed to fetch stories:', error);
+      setStories([]);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }

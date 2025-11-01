@@ -100,7 +100,12 @@ export function SimpleStoriesWall() {
 
       const { data: storiesData, error } = await query;
 
-      if (error) throw error;
+      if (error) {
+        console.error('🔴 SimpleStoriesWall: Database error:', error);
+        toast.error('Failed to load stories. Please try again.');
+        setStories([]);
+        return;
+      }
 
       if (!storiesData || storiesData.length === 0) {
         console.log('🟡 SimpleStoriesWall: No stories found');
@@ -110,24 +115,20 @@ export function SimpleStoriesWall() {
       
       console.log('🟢 SimpleStoriesWall: Loaded stories', { count: storiesData.length });
 
-      // Filter by tags if selected
+      // Filter by tags if selected - use tags array from story directly
       if (selectedTags.length > 0) {
-        // Get story IDs with selected tags
-        const { data: taggedStories } = await supabase
-          .from('story_tag_assignments')
-          .select('story_id, story_tags!inner(name)')
-          .in('story_tags.name', selectedTags);
-
-        if (taggedStories && taggedStories.length > 0) {
-          const storyIds = new Set(taggedStories.map((t: any) => t.story_id));
-          const filteredStories = storiesData.filter(s => storyIds.has(s.id));
-          
-          console.log('🟢 SimpleStoriesWall: Filtered by tags', { 
-            originalCount: storiesData.length,
-            filteredCount: filteredStories.length,
-            selectedTags
-          });
-          
+        const filteredStories = storiesData.filter((s: any) => {
+          const storyTags = (s.tags || []).map((t: string) => t.toLowerCase());
+          return selectedTags.some(selectedTag => storyTags.includes(selectedTag.toLowerCase()));
+        });
+        
+        console.log('🟢 SimpleStoriesWall: Filtered by tags', { 
+          originalCount: storiesData.length,
+          filteredCount: filteredStories.length,
+          selectedTags
+        });
+        
+        if (filteredStories.length > 0) {
           // Transform and load tags for filtered stories
           const transformedStories = filteredStories.map((story: any) => ({
             ...story,
@@ -155,6 +156,32 @@ export function SimpleStoriesWall() {
         }));
         await loadStoriesTags(transformedStories);
         setStories(transformedStories);
+        
+        // Extract unique tags from stories for filter
+        const uniqueTags = new Set<string>();
+        transformedStories.forEach((story: any) => {
+          (story.tags || []).forEach((tag: any) => {
+            if (typeof tag === 'string') {
+              uniqueTags.add(tag);
+            } else if (tag.name) {
+              uniqueTags.add(tag.name);
+            }
+          });
+        });
+        
+        // Update tags state with extracted tags
+        const tagArray = Array.from(uniqueTags).map(name => ({
+          id: name,
+          name,
+          display_name: name,
+          color: '#3B82F6',
+          usage_count: transformedStories.filter((s: any) => 
+            (s.tags || []).some((t: any) => 
+              (typeof t === 'string' ? t : t.name) === name
+            )
+          ).length
+        }));
+        setTags(tagArray);
       }
     } catch (error) {
       console.error('🔴 SimpleStoriesWall: Error loading stories:', error);
