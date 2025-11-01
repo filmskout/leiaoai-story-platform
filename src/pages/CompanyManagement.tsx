@@ -69,7 +69,7 @@ interface Story {
 }
 
 const CompanyManagement: React.FC = () => {
-  const { isAdmin } = useAdmin();
+  const { isAdmin, startEditing, stopEditing } = useAdmin();
   const { isAuthenticated } = useAuth();
   
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -187,6 +187,9 @@ const CompanyManagement: React.FC = () => {
     if (!editingCompany) return;
 
     try {
+      // Ensure we're still in editing mode
+      startEditing();
+      
       const response = await fetch('/api/unified', {
         method: 'POST',
         headers: {
@@ -209,16 +212,20 @@ const CompanyManagement: React.FC = () => {
       
       if (result.success) {
         toast.success('公司更新成功');
+        // Stop editing mode after successful save
+        stopEditing();
         setIsEditDialogOpen(false);
         setEditingCompany(null);
         resetForm();
         loadCompanies();
       } else {
         toast.error(result.error || '更新失败');
+        // Keep editing mode active if save failed
       }
     } catch (error) {
       console.error('Failed to update company:', error);
       toast.error('更新公司失败');
+      // Keep editing mode active if save failed
     }
   };
 
@@ -257,6 +264,9 @@ const CompanyManagement: React.FC = () => {
   const openEditDialog = (company: Company) => {
     console.log('Opening edit dialog for:', company.name);
     try {
+      // Start editing mode to extend admin session
+      startEditing();
+      
       setEditingCompany(company);
       setFormData({
         name: company.name || '',
@@ -672,12 +682,16 @@ const CompanyManagement: React.FC = () => {
         onOpenChange={(open) => {
           console.log('Dialog onOpenChange:', open, 'editingCompany:', editingCompany?.name);
           setIsEditDialogOpen(open);
-          if (!open && editingCompany) {
-            // Reset when closing
-            setTimeout(() => {
-              setEditingCompany(null);
-              resetForm();
-            }, 300);
+          if (!open) {
+            // Stop editing mode when dialog closes
+            stopEditing();
+            if (editingCompany) {
+              // Reset when closing
+              setTimeout(() => {
+                setEditingCompany(null);
+                resetForm();
+              }, 300);
+            }
           }
         }}
       >
