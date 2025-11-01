@@ -223,21 +223,10 @@ export function SimpleStoriesWall() {
 
   const loadTags = async () => {
     try {
-      console.log('🔵 SimpleStoriesWall: Loading tags from story_tags table');
-      const { data, error } = await supabase
-        .from('story_tags')
-        .select('id, name, display_name, color, usage_count')
-        .eq('is_active', true)
-        .order('usage_count', { ascending: false })
-        .limit(20);
-
-      if (error) {
-        console.error('🔴 SimpleStoriesWall: Error loading tags:', error);
-        throw error;
-      }
-      
-      console.log('🟢 SimpleStoriesWall: Loaded tags', { count: data?.length || 0 });
-      if (data) setTags(data);
+      // Tags will be extracted from stories after they're loaded
+      // Initial load - tags will be populated in loadStories after stories are loaded
+      console.log('🔵 SimpleStoriesWall: Tags will be extracted from stories');
+      // Don't query database - tags come from stories
     } catch (error) {
       console.error('🔴 SimpleStoriesWall: Error in loadTags:', error);
       // Don't show error to user, just log it
