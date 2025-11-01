@@ -1748,6 +1748,12 @@ export default async function handler(req: any, res: any) {
       case 'batch-enrich-fundings':
         return handleBatchEnrichFundings(req, res);
       
+      case 'enrich-company-llm':
+        return handleEnrichCompanyLLM(req, res);
+      
+      case 'save-enriched-company':
+        return handleSaveEnrichedCompany(req, res);
+      
       default:
         return res.status(400).json({ error: 'Invalid action' });
     }
@@ -5418,6 +5424,160 @@ async function handleBatchEnrichFundings(req: any, res: any) {
     });
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
+  }
+}
+
+// LLM补齐公司信息
+async function handleEnrichCompanyLLM(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { token, companyName } = req.body;
+  if (token !== process.env.ADMIN_TOKEN && token !== 'admin-token-123') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  if (!companyName) {
+    return res.status(400).json({ error: 'Company name is required' });
+  }
+
+  try {
+    initClients();
+    
+    // 判断是国内还是海外公司
+    const isOverseas = !['百度', 'Baidu', '阿里巴巴', 'Alibaba', '腾讯', 'Tencent', '字节跳动', 'ByteDance', '华为', 'Huawei'].some(n => companyName.includes(n));
+    
+    // 使用deepResearchCompany函数补齐信息
+    const researchData = await deepResearchCompany(companyName, isOverseas);
+    
+    // 判断层级
+    let companyTier = 'Emerging';
+    if (['OpenAI', 'Google', 'Microsoft', 'Meta', 'xAI', 'Baidu', 'Tencent', 'ByteDance', 'Alibaba'].some(n => companyName.includes(n))) {
+      companyTier = 'Giant';
+    } else if (researchData.valuation_usd && researchData.valuation_usd >= 1_000_000_000) {
+      companyTier = 'Unicorn';
+    } else if (researchData.founded_year && researchData.founded_year < 2019) {
+      companyTier = 'Independent';
+    }
+    
+    // 构建返回数据
+    const enrichedData = {
+      name: companyName,
+      description: researchData.description,
+      website: researchData.website,
+      valuation_usd: researchData.valuation_usd,
+      founded_year: researchData.founded_year,
+      headquarters: researchData.headquarters,
+      company_tier: companyTier,
+      industry_tags: researchData.industry_tags || []
+    };
+    
+    // 生成SQL（正确转义）
+    const desc = researchData.description ? researchData.description.replace(/'/g, "''") : '';
+    const hq = researchData.headquarters ? researchData.headquarters.replace(/'/g, "''") : '';
+    const tags = researchData.industry_tags?.map((t: string) => `'${t.replace(/'/g, "''")}'`).join(', ') || '';
+    
+    const sql = `
+UPDATE companies
+SET 
+  ${desc ? `description = '${desc}',` : ''}
+  ${researchData.website ? `website = '${researchData.website}',` : ''}
+  ${researchData.valuation_usd ? `valuation_usd = ${researchData.valuation_usd},` : ''}
+  ${researchData.founded_year ? `founded_year = ${researchData.founded_year},` : ''}
+  ${hq ? `headquarters = '${hq}',` : ''}
+  company_tier = '${companyTier}',
+  ${tags ? `industry_tags = ARRAY[${tags}],` : ''}
+  updated_at = NOW()
+WHERE name ILIKE '%${companyName.replace(/'/g, "''")}%';
+`;
+    
+    return res.status(200).json({
+      success: true,
+      data: enrichedData,
+      sql: sql
+    });
+  } catch (error: any) {
+    console.error('Error enriching company:', error);
+    return res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+}
+
+// 保存补齐的公司信息
+async function handleSaveEnrichedCompany(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { token, companyData } = req.body;
+  if (token !== process.env.ADMIN_TOKEN && token !== 'admin-token-123') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  if (!companyData || !companyData.name) {
+    return res.status(400).json({ error: 'Company data is required' });
+  }
+
+  try {
+    initClients();
+    
+    // 检查公司是否已存在
+    const { data: existing } = await supabase
+      .from('companies')
+      .select('id, name')
+      .ilike('name', `%${companyData.name}%`)
+      .maybeSingle();
+    
+    const updateData: any = {};
+    if (companyData.description) updateData.description = companyData.description;
+    if (companyData.website) updateData.website = companyData.website;
+    if (companyData.valuation_usd) updateData.valuation_usd = companyData.valuation_usd;
+    if (companyData.founded_year) updateData.founded_year = companyData.founded_year;
+    if (companyData.headquarters) updateData.headquarters = companyData.headquarters;
+    if (companyData.company_tier) updateData.company_tier = companyData.company_tier;
+    if (companyData.industry_tags) updateData.industry_tags = companyData.industry_tags;
+    
+    let result;
+    if (existing) {
+      // 更新现有公司
+      const { data, error } = await supabase
+        .from('companies')
+        .update(updateData)
+        .eq('id', existing.id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      result = data;
+    } else {
+      // 创建新公司
+      const { data, error } = await supabase
+        .from('companies')
+        .insert([{
+          name: companyData.name,
+          ...updateData
+        }])
+        .select()
+        .single();
+      
+      if (error) throw error;
+      result = data;
+    }
+    
+    return res.status(200).json({
+      success: true,
+      message: existing ? '公司信息已更新' : '公司已创建',
+      company: result
+    });
+  } catch (error: any) {
+    console.error('Error saving enriched company:', error);
+    return res.status(500).json({
+      success: false,
+      error: error.message
+    });
   }
 }
 

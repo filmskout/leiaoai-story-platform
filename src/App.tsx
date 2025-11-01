@@ -62,6 +62,7 @@ const ProjectDetail = lazyWithRetry(() => import('@/pages/ProjectDetail'));
 const MonitoringDashboard = lazyWithRetry(() => import('@/pages/MonitoringDashboard'));
 const ReconfigureData = lazyWithRetry(() => import('@/pages/ReconfigureDataSimplified'));
 const CompanyManagement = lazyWithRetry(() => import('@/pages/CompanyManagement'));
+const CompanyEnrichTool = lazyWithRetry(() => import('@/pages/CompanyEnrichTool'));
 const CategoryStories = lazyWithRetry(() => import('@/pages/CategoryStories'));
 
 // Error boundary for dynamic imports
@@ -288,6 +289,7 @@ function AppRoutes() {
           <Route path="monitoring" element={<MonitoringDashboard />} />
           <Route path="reconfigure-data" element={<ReconfigureData />} />
           <Route path="company-management" element={<CompanyManagement />} />
+          <Route path="company-enrich-tool" element={<CompanyEnrichTool />} />
           <Route path="ai-chat" element={<AIChat />} />
           <Route path="bp-analysis" element={<BPAnalysis />} />
           <Route path="stories" element={<Stories />} />
