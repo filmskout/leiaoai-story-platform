@@ -134,13 +134,28 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     // Check immediately
     checkStatus();
 
-    // Check periodically
-    const interval = setInterval(checkStatus, 30000); // Check every 30 seconds
+    // Check periodically - more frequent if editing
+    const getCheckInterval = () => {
+      const editingActive = localStorage.getItem('leoai-admin-editing-active') === 'true';
+      return editingActive ? 10000 : 30000; // Every 10 seconds if editing, 30 seconds otherwise
+    };
+    
+    let interval: NodeJS.Timeout | null = setInterval(checkStatus, getCheckInterval());
+    
+    // Adjust interval based on editing state changes
+    const adjustInterval = () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+      interval = setInterval(checkStatus, getCheckInterval());
+    };
 
     // Listen to storage changes (when localStorage is updated from another tab/console)
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'leoai-admin-verified' || e.key === 'leoai-admin-session') {
+      if (e.key === 'leoai-admin-verified' || e.key === 'leoai-admin-session' || 
+          e.key === 'leoai-admin-editing-active' || e.key === 'leoai-admin-editing-since') {
         checkStatus();
+        adjustInterval(); // Adjust check interval if editing state changed
       }
     };
     window.addEventListener('storage', handleStorageChange);
@@ -148,11 +163,14 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     // Also listen to custom events (for same-tab updates)
     const handleCustomStorage = () => {
       checkStatus();
+      adjustInterval();
     };
     window.addEventListener('localStorageUpdate', handleCustomStorage as EventListener);
 
     return () => {
-      clearInterval(interval);
+      if (interval) {
+        clearInterval(interval);
+      }
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('localStorageUpdate', handleCustomStorage as EventListener);
     };

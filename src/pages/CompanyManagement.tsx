@@ -107,6 +107,25 @@ const CompanyManagement: React.FC = () => {
     { value: 'domesticUnicorns', label: '国内独角兽' }
   ];
 
+  // Keep editing mode active while dialog is open
+  useEffect(() => {
+    if (isEditDialogOpen && editingCompany) {
+      // Refresh editing mode every 5 minutes while dialog is open
+      const refreshInterval = setInterval(() => {
+        startEditing();
+        console.log('🔄 Refreshing admin editing mode');
+      }, 300000); // 5 minutes
+      
+      // Also refresh on component mount if dialog is open
+      startEditing();
+      
+      return () => {
+        clearInterval(refreshInterval);
+        // Don't stop editing mode here, only when dialog closes
+      };
+    }
+  }, [isEditDialogOpen, editingCompany, startEditing]);
+
   // Load companies data
   useEffect(() => {
     if (isAdmin) {
