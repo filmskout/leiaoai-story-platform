@@ -520,13 +520,114 @@ const CompanyManagement: React.FC = () => {
           </p>
         </div>
         
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={() => resetForm()}>
-              <Plus className="h-4 w-4 mr-2" />
-              {t('company_management.buttons.add_company', 'Add Company')}
-            </Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          {/* Story生成按钮 */}
+          <Dialog open={isStoryGenDialogOpen} onOpenChange={setIsStoryGenDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" onClick={() => setSelectedCompanyForStory(null)}>
+                <Sparkles className="h-4 w-4 mr-2" />
+                {t('company_management.buttons.generate_stories', '生成Stories')}
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>{t('company_management.story_gen.title', '使用LLM生成Stories')}</DialogTitle>
+                <DialogDescription>
+                  {t('company_management.story_gen.description', '基于权威媒体报道生成包含项目评分的真实用户故事')}
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>{t('company_management.story_gen.select_company', '选择公司（可选）')}</Label>
+                  <Select value={selectedCompanyForStory || ''} onValueChange={(value) => setSelectedCompanyForStory(value || null)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('company_management.story_gen.all_companies', '所有公司')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">{t('company_management.story_gen.all_companies', '所有公司')}</SelectItem>
+                      {companies.map((company) => (
+                        <SelectItem key={company.id} value={company.id}>
+                          {company.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>{t('company_management.story_gen.select_category', '选择类别')}</Label>
+                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {storyCategories.map((cat) => (
+                        <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>{t('company_management.story_gen.count', '生成数量')}</Label>
+                  <Input
+                    type="number"
+                    min="1"
+                    max="20"
+                    value={storyGenCount}
+                    onChange={(e) => setStoryGenCount(parseInt(e.target.value) || 5)}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {t('company_management.story_gen.count_hint', '建议5-10个，每个story需要60-90秒')}
+                  </p>
+                </div>
+
+                {storyGenProgress && (
+                  <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                    <p className="text-sm">{storyGenProgress}</p>
+                  </div>
+                )}
+
+                <div className="flex justify-end gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setIsStoryGenDialogOpen(false);
+                      setStoryGenProgress('');
+                    }}
+                    disabled={storyGenLoading}
+                  >
+                    {t('common.cancel', '取消')}
+                  </Button>
+                  <Button
+                    onClick={handleGenerateStoriesBatch}
+                    disabled={storyGenLoading}
+                  >
+                    {storyGenLoading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        {t('company_management.story_gen.generating', '生成中...')}
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        {t('company_management.story_gen.start_batch', '开始批量生成')}
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button onClick={() => resetForm()}>
+                <Plus className="h-4 w-4 mr-2" />
+                {t('company_management.buttons.add_company', 'Add Company')}
+              </Button>
+            </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{t('company_management.dialog.create_title', 'Add New Company')}</DialogTitle>
