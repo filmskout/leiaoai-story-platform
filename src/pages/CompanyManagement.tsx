@@ -586,15 +586,28 @@ const CompanyManagement: React.FC = () => {
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => openEditDialog(company)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('Edit button clicked for:', company.name, company.id);
+                        openEditDialog(company);
+                      }}
+                      type="button"
+                      title="编辑公司"
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => handleDeleteCompany(company.id)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleDeleteCompany(company.id);
+                      }}
                       className="text-red-500 hover:text-red-700"
+                      type="button"
+                      title="删除公司"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
