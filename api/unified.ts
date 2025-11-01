@@ -1754,6 +1754,12 @@ export default async function handler(req: any, res: any) {
       case 'save-enriched-company':
         return handleSaveEnrichedCompany(req, res);
       
+      case 'generate-story':
+        return handleGenerateStory(req, res);
+      
+      case 'generate-stories-batch':
+        return handleGenerateStoriesBatch(req, res);
+      
       default:
         return res.status(400).json({ error: 'Invalid action' });
     }
@@ -5597,6 +5603,459 @@ async function handleSaveEnrichedCompany(req: any, res: any) {
       success: false,
       error: error.message
     });
+  }
+}
+
+// 生成单个Story（基于公司/项目，使用LLM搜索权威媒体原文）
+async function handleGenerateStory(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { token, companyId, projectId, category } = req.body;
+  
+  // 验证管理员权限
+  if (token !== process.env.ADMIN_TOKEN && token !== 'admin-token-123') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    initClients();
+    
+    // 获取公司和项目信息
+    let company = null;
+    let project = null;
+    
+    if (companyId) {
+      const { data: companyData, error: companyError } = await supabase
+        .from('companies')
+        .select('*')
+        .eq('id', companyId)
+        .single();
+      
+      if (companyError) throw companyError;
+      company = companyData;
+    }
+    
+    if (projectId) {
+      const { data: projectData, error: projectError } = await supabase
+        .from('projects')
+        .select(`
+          *,
+          company:companies(*)
+        `)
+        .eq('id', projectId)
+        .single();
+      
+      if (projectError) throw projectError;
+      project = projectData;
+      if (project.company && !company) {
+        company = project.company;
+      }
+    }
+
+    if (!company && !project) {
+      return res.status(400).json({ error: 'Company ID or Project ID is required' });
+    }
+
+    const targetName = project?.name || company?.name || 'Unknown';
+    const targetDescription = project?.description || company?.description || '';
+    const targetCategory = category || project?.project_category || 'general';
+
+    // 构建LLM提示 - 搜索权威媒体原文并生成story
+    const qwenApiKey = process.env.QWEN_API_KEY;
+    const qwenRegion = process.env.QWEN_REGION || 'singapore';
+    const openaiApiKey = process.env.OPENAI_API_KEY;
+    
+    const searchPrompt = `作为专业的技术媒体记者，请在权威主流媒体（如TechCrunch、The Verge、Wired、Ars Technica、MIT Technology Review、IEEE Spectrum、Forbes Tech、Business Insider Tech等）中搜索关于"${targetName}"（${targetDescription.substring(0, 200)}...）的最新报道和深度分析文章。
+
+如果这是一个AI项目/产品，请特别关注：
+1. 产品功能和技术特点的详细评测
+2. 用户体验和实际应用场景
+3. 与同类产品的对比分析
+4. 专业评测者的评分和评价
+5. 市场的接受程度和用户反馈
+
+请基于找到的权威媒体报道，创建一个真实的用户故事，要求：
+1. **标题**：吸引人的标题（50-80字符），体现真实体验
+2. **内容**：详细的用户使用体验叙述（600-1000字），包括：
+   - 首次使用的第一印象
+   - 核心功能测试和评价
+   - 实际应用场景和使用效果
+   - 优点和不足的客观分析
+   - 与竞品的对比
+   - 专业评分（1-5星，精确到0.5）
+   - 推荐程度和建议
+3. **摘要**：2-3句话总结（120-180字符）
+4. **标签**：3-5个相关标签，包括类别名称
+5. **封面图片建议**：相关的Unsplash搜索关键词
+6. **项目评分**：基于评测的专业评分（1-5星，数值格式，如4.5）
+
+输出JSON格式：
+{
+  "title": "...",
+  "content": "...",
+  "excerpt": "...",
+  "tags": ["tag1", "tag2", ...],
+  "cover_image_query": "...",
+  "project_rating": 4.5,
+  "source_media": "TechCrunch / The Verge / ..."
+}`;
+
+    // 调用LLM生成story
+    let llmResponse: string;
+    try {
+      if (qwenApiKey) {
+        llmResponse = await callQwen(searchPrompt, qwenApiKey, 'zh', qwenRegion, 2000, 'qwen-turbo-latest', 90000, true);
+      } else if (openaiApiKey) {
+        llmResponse = await callOpenAI(searchPrompt, openaiApiKey, 'zh', 'gpt-4', 2000, 90000, true);
+      } else {
+        throw new Error('没有可用的LLM API (需要QWEN_API_KEY或OPENAI_API_KEY)');
+      }
+    } catch (llmError: any) {
+      console.error('LLM调用失败:', llmError);
+      throw new Error(`LLM调用失败: ${llmError.message}`);
+    }
+
+    // 解析LLM响应
+    let storyData: any;
+    try {
+      const jsonMatch = llmResponse.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        storyData = JSON.parse(jsonMatch[0]);
+      } else {
+        throw new Error('无法从LLM响应中提取JSON');
+      }
+    } catch (parseError: any) {
+      console.error('解析LLM响应失败:', parseError);
+      throw new Error(`解析LLM响应失败: ${parseError.message}`);
+    }
+
+    // 生成封面图片URL（使用Unsplash）
+    const imageQuery = storyData.cover_image_query || `${targetName} ${targetCategory}`;
+    const coverImageUrl = `https://source.unsplash.com/1200x630/?${encodeURIComponent(imageQuery)}`;
+
+    // 准备story数据
+    const storyInsert = {
+      title: storyData.title || `使用${targetName}的真实体验`,
+      content: storyData.content || '',
+      excerpt: storyData.excerpt || storyData.content?.substring(0, 180) || '',
+      cover_image_url: coverImageUrl,
+      category: targetCategory,
+      tags: [...(storyData.tags || []), targetCategory],
+      author_id: '00000000-0000-0000-0000-000000000000', // System user
+      status: 'published',
+      ai_generated: true,
+      views_count: 0,
+      likes_count: 0,
+      comments_count: 0,
+      saves_count: 0
+    };
+
+    // 插入story到数据库
+    const { data: insertedStory, error: insertError } = await supabase
+      .from('stories')
+      .insert(storyInsert)
+      .select()
+      .single();
+
+    if (insertError) {
+      throw insertError;
+    }
+
+    // 链接到项目
+    if (projectId && insertedStory.id) {
+      await supabase
+        .from('project_stories')
+        .insert({
+          story_id: insertedStory.id,
+          project_id: projectId
+        })
+        .catch(err => console.warn('Failed to link project:', err));
+    }
+
+    // 链接到公司
+    if (companyId && insertedStory.id) {
+      await supabase
+        .from('company_stories')
+        .insert({
+          story_id: insertedStory.id,
+          company_id: companyId
+        })
+        .catch(err => console.warn('Failed to link company:', err));
+    }
+
+    // 如果project有rating字段，更新rating
+    if (projectId && storyData.project_rating) {
+      await supabase
+        .from('projects')
+        .update({ rating: storyData.project_rating })
+        .eq('id', projectId)
+        .catch(err => console.warn('Failed to update project rating:', err));
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Story生成成功',
+      story: insertedStory,
+      rating: storyData.project_rating || null,
+      source_media: storyData.source_media || 'AI生成'
+    });
+  } catch (error: any) {
+    console.error('生成Story失败:', error);
+    return res.status(500).json({
+      success: false,
+      error: `生成Story失败: ${error.message}`
+    });
+  }
+}
+
+// 批量生成Stories（按类别或公司）
+async function handleGenerateStoriesBatch(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { token, category, companyId, count = 10 } = req.body;
+  
+  // 验证管理员权限
+  if (token !== process.env.ADMIN_TOKEN && token !== 'admin-token-123') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    initClients();
+    
+    // 获取要生成的项目列表
+    let query = supabase
+      .from('projects')
+      .select(`
+        id,
+        name,
+        description,
+        project_category,
+        company_id,
+        company:companies(*)
+      `)
+      .limit(count);
+
+    if (category) {
+      query = query.eq('project_category', category);
+    }
+    
+    if (companyId) {
+      query = query.eq('company_id', companyId);
+    }
+
+    const { data: projects, error: projectsError } = await query;
+
+    if (projectsError) throw projectsError;
+    
+    if (!projects || projects.length === 0) {
+      return res.status(400).json({ error: '没有找到符合条件的项目' });
+    }
+
+    const results = [];
+    
+    // 逐个生成story
+    for (const project of projects) {
+      if (!project.company) {
+        results.push({
+          success: false,
+          project: project.name,
+          error: 'Company not found'
+        });
+        continue;
+      }
+      
+      try {
+        // 调用辅助函数生成story
+        const storyResult = await generateStoryForProject(
+          project, 
+          project.company, 
+          project.project_category || category || 'general',
+          token
+        );
+        
+        if (storyResult.success) {
+          results.push({
+            success: true,
+            project: project.name,
+            storyId: storyResult.story?.id,
+            rating: storyResult.rating,
+            source_media: storyResult.source_media
+          });
+        } else {
+          results.push({
+            success: false,
+            project: project.name,
+            error: storyResult.error
+          });
+        }
+        
+        // 限流：每次请求之间等待2秒
+        await new Promise(r => setTimeout(r, 2000));
+      } catch (error: any) {
+        results.push({
+          success: false,
+          project: project.name,
+          error: error.message
+        });
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `批量生成完成: ${results.filter(r => r.success).length}/${results.length} 成功`,
+      results
+    });
+  } catch (error: any) {
+    console.error('批量生成Stories失败:', error);
+    return res.status(500).json({
+      success: false,
+      error: `批量生成Stories失败: ${error.message}`
+    });
+  }
+}
+
+// 辅助函数：生成单个项目的story（供批量生成使用，复用handleGenerateStory的核心逻辑）
+async function generateStoryForProject(project: any, company: any, category: string, token: string) {
+  try {
+    const targetName = project.name;
+    const targetDescription = project.description || '';
+    const targetCategory = category || project.project_category || 'general';
+
+    // 构建LLM提示 - 搜索权威媒体原文并生成story
+    const qwenApiKey = process.env.QWEN_API_KEY;
+    const qwenRegion = process.env.QWEN_REGION || 'singapore';
+    const openaiApiKey = process.env.OPENAI_API_KEY;
+    
+    const searchPrompt = `作为专业的技术媒体记者，请在权威主流媒体（如TechCrunch、The Verge、Wired、Ars Technica、MIT Technology Review、IEEE Spectrum、Forbes Tech、Business Insider Tech等）中搜索关于"${targetName}"（${targetDescription.substring(0, 200)}...）的最新报道和深度分析文章。
+
+如果这是一个AI项目/产品，请特别关注：
+1. 产品功能和技术特点的详细评测
+2. 用户体验和实际应用场景
+3. 与同类产品的对比分析
+4. 专业评测者的评分和评价
+5. 市场的接受程度和用户反馈
+
+请基于找到的权威媒体报道，创建一个真实的用户故事，要求：
+1. **标题**：吸引人的标题（50-80字符），体现真实体验
+2. **内容**：详细的用户使用体验叙述（600-1000字），包括：
+   - 首次使用的第一印象
+   - 核心功能测试和评价
+   - 实际应用场景和使用效果
+   - 优点和不足的客观分析
+   - 与竞品的对比
+   - 专业评分（1-5星，精确到0.5）
+   - 推荐程度和建议
+3. **摘要**：2-3句话总结（120-180字符）
+4. **标签**：3-5个相关标签，包括类别名称
+5. **封面图片建议**：相关的Unsplash搜索关键词
+6. **项目评分**：基于评测的专业评分（1-5星，数值格式，如4.5）
+
+输出JSON格式：
+{
+  "title": "...",
+  "content": "...",
+  "excerpt": "...",
+  "tags": ["tag1", "tag2", ...],
+  "cover_image_query": "...",
+  "project_rating": 4.5,
+  "source_media": "TechCrunch / The Verge / ..."
+}`;
+
+    // 调用LLM生成story
+    let llmResponse: string;
+    if (qwenApiKey) {
+      llmResponse = await callQwen(searchPrompt, qwenApiKey, 'zh', qwenRegion, 2000, 'qwen-turbo-latest', 90000, true);
+    } else if (openaiApiKey) {
+      llmResponse = await callOpenAI(searchPrompt, openaiApiKey, 'zh', 'gpt-4', 2000, 90000, true);
+    } else {
+      throw new Error('没有可用的LLM API');
+    }
+
+    // 解析LLM响应
+    let storyData: any;
+    const jsonMatch = llmResponse.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      storyData = JSON.parse(jsonMatch[0]);
+    } else {
+      throw new Error('无法从LLM响应中提取JSON');
+    }
+
+    // 生成封面图片URL
+    const imageQuery = storyData.cover_image_query || `${targetName} ${targetCategory}`;
+    const coverImageUrl = `https://source.unsplash.com/1200x630/?${encodeURIComponent(imageQuery)}`;
+
+    // 准备story数据
+    const storyInsert = {
+      title: storyData.title || `使用${targetName}的真实体验`,
+      content: storyData.content || '',
+      excerpt: storyData.excerpt || storyData.content?.substring(0, 180) || '',
+      cover_image_url: coverImageUrl,
+      category: targetCategory,
+      tags: [...(storyData.tags || []), targetCategory],
+      author_id: '00000000-0000-0000-0000-000000000000',
+      status: 'published',
+      ai_generated: true,
+      views_count: 0,
+      likes_count: 0,
+      comments_count: 0,
+      saves_count: 0
+    };
+
+    // 插入story
+    const { data: insertedStory, error: insertError } = await supabase
+      .from('stories')
+      .insert(storyInsert)
+      .select()
+      .single();
+
+    if (insertError) throw insertError;
+
+    // 链接到项目（如果project_stories表存在）
+    if (project.id && insertedStory.id) {
+      await supabase
+        .from('project_stories')
+        .insert({
+          story_id: insertedStory.id,
+          project_id: project.id
+        })
+        .catch(() => {}); // 忽略错误，表可能不存在
+    }
+
+    // 链接到公司
+    if (company.id && insertedStory.id) {
+      await supabase
+        .from('company_stories')
+        .insert({
+          story_id: insertedStory.id,
+          company_id: company.id
+        })
+        .catch(() => {});
+    }
+
+    // 更新项目评分
+    if (project.id && storyData.project_rating) {
+      await supabase
+        .from('projects')
+        .update({ rating: storyData.project_rating })
+        .eq('id', project.id)
+        .catch(() => {});
+    }
+
+    return {
+      success: true,
+      story: insertedStory,
+      rating: storyData.project_rating || null,
+      source_media: storyData.source_media || 'AI生成'
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.message
+    };
   }
 }
 
