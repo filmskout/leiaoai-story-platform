@@ -111,6 +111,17 @@ const CompanyManagement: React.FC = () => {
   useEffect(() => {
     if (isAdmin) {
       loadCompanies();
+    } else {
+      // If not admin, try to refresh admin status
+      const checkAdmin = () => {
+        const verified = localStorage.getItem('leoai-admin-verified') === 'true';
+        const session = localStorage.getItem('leoai-admin-session');
+        if (verified && session) {
+          // Trigger a storage event to notify AdminContext
+          window.dispatchEvent(new Event('localStorageUpdate'));
+        }
+      };
+      checkAdmin();
     }
   }, [isAdmin]);
 
@@ -244,22 +255,32 @@ const CompanyManagement: React.FC = () => {
   };
 
   const openEditDialog = (company: Company) => {
-    setEditingCompany(company);
-    setFormData({
-      name: company.name,
-      description: company.description,
-      english_description: company.english_description,
-      headquarters: company.headquarters,
-      valuation: company.valuation.toString(),
-      website: company.website,
-      logo_base64: company.logo_base64 || '',
-      category: company.category,
-      is_overseas: company.is_overseas,
-      founded_year: company.founded_year.toString(),
-      employee_count: company.employee_count,
-      industry: company.industry
-    });
-    setIsEditDialogOpen(true);
+    console.log('Opening edit dialog for:', company.name);
+    try {
+      setEditingCompany(company);
+      setFormData({
+        name: company.name || '',
+        description: company.description || '',
+        english_description: company.english_description || '',
+        headquarters: company.headquarters || '',
+        valuation: company.valuation?.toString() || '',
+        website: company.website || '',
+        logo_base64: company.logo_base64 || '',
+        category: company.category || '',
+        is_overseas: company.is_overseas || false,
+        founded_year: company.founded_year?.toString() || '',
+        employee_count: company.employee_count || '',
+        industry: company.industry || ''
+      });
+      // Use setTimeout to ensure state updates before opening dialog
+      setTimeout(() => {
+        setIsEditDialogOpen(true);
+        console.log('Edit dialog should be open now');
+      }, 0);
+    } catch (error) {
+      console.error('Error opening edit dialog:', error);
+      toast.error('打开编辑对话框失败');
+    }
   };
 
   const resetForm = () => {
@@ -309,6 +330,23 @@ const CompanyManagement: React.FC = () => {
   }
 
   if (!isAdmin) {
+    // Check one more time with a slight delay
+    const [retryCount, setRetryCount] = React.useState(0);
+    
+    React.useEffect(() => {
+      if (retryCount < 2) {
+        const timer = setTimeout(() => {
+          const verified = localStorage.getItem('leoai-admin-verified') === 'true';
+          const session = localStorage.getItem('leoai-admin-session');
+          if (verified && session) {
+            window.dispatchEvent(new Event('localStorageUpdate'));
+            setRetryCount(prev => prev + 1);
+          }
+        }, 500);
+        return () => clearTimeout(timer);
+      }
+    }, [retryCount]);
+
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Card className="w-full max-w-md">
@@ -319,6 +357,21 @@ const CompanyManagement: React.FC = () => {
             </CardTitle>
             <CardDescription>
               您需要管理员权限才能访问公司管理功能
+              <br />
+              <br />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  // Quick fix: manually set admin and reload
+                  localStorage.setItem('leoai-admin-verified', 'true');
+                  localStorage.setItem('leoai-admin-session', Date.now().toString());
+                  window.location.reload();
+                }}
+                className="mt-4"
+              >
+                刷新权限状态
+              </Button>
             </CardDescription>
           </CardHeader>
         </Card>

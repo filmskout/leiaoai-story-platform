@@ -73,17 +73,51 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const adminStatus = checkAdminStatus();
     setIsAdmin(adminStatus);
     setAdminSessionValid(adminStatus);
+    
+    // Also check immediately on mount
+    if (isAuthenticated && user) {
+      const verified = localStorage.getItem('leoai-admin-verified') === 'true';
+      const session = localStorage.getItem('leoai-admin-session');
+      if (verified && session) {
+        setIsAdmin(true);
+        setAdminSessionValid(true);
+      }
+    }
   }, [isAuthenticated, user]);
 
-  // Check admin session periodically
+  // Check admin session periodically and listen to storage changes
   useEffect(() => {
-    const interval = setInterval(() => {
+    const checkStatus = () => {
       const adminStatus = checkAdminStatus();
       setIsAdmin(adminStatus);
       setAdminSessionValid(adminStatus);
-    }, 60000); // Check every minute
+    };
 
-    return () => clearInterval(interval);
+    // Check immediately
+    checkStatus();
+
+    // Check periodically
+    const interval = setInterval(checkStatus, 30000); // Check every 30 seconds
+
+    // Listen to storage changes (when localStorage is updated from another tab/console)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'leoai-admin-verified' || e.key === 'leoai-admin-session') {
+        checkStatus();
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+
+    // Also listen to custom events (for same-tab updates)
+    const handleCustomStorage = () => {
+      checkStatus();
+    };
+    window.addEventListener('localStorageUpdate', handleCustomStorage as EventListener);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('localStorageUpdate', handleCustomStorage as EventListener);
+    };
   }, []);
 
   // Admin features based on current status
