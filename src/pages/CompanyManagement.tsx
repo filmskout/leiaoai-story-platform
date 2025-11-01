@@ -113,39 +113,56 @@ const CompanyManagement: React.FC = () => {
     { value: 'Emerging', label: { zh: '新兴 (Emerging)', en: 'Emerging' } }
   ];
 
-  // Keep editing mode active while dialog is open
+  // Keep editing mode active while dialog is open AND maintain it during page usage
   useEffect(() => {
+    // Always maintain editing mode when on this page
+    const adminVerified = localStorage.getItem('leoai-admin-verified') === 'true';
+    const adminSession = localStorage.getItem('leoai-admin-session');
+    
+    if (adminVerified && adminSession) {
+      startEditing(); // Keep admin status active during page usage
+    }
+    
     if (isEditDialogOpen && editingCompany) {
       // Start editing mode immediately when dialog opens
       startEditing();
       console.log('🟢 Edit dialog opened, editing mode activated');
-      
-      // No need to refresh - editing mode will maintain admin status until closed
-      return () => {
-        // Cleanup only when component unmounts (not when dialog closes)
-        // Dialog close is handled by onOpenChange
-      };
-    } else if (!isEditDialogOpen) {
-      // Ensure editing mode is stopped when dialog is not open
-      stopEditing();
     }
-  }, [isEditDialogOpen, editingCompany, startEditing, stopEditing]);
+    
+    // Don't stop editing when dialog closes - keep admin status active on this page
+    // return () => {
+    //   stopEditing(); // Removed - don't stop editing when component unmounts
+    // };
+  }, [isEditDialogOpen, editingCompany, startEditing]);
 
-  // Load companies data
+  // Auto-activate admin status when page loads
+  useEffect(() => {
+    // Check if admin session exists in localStorage
+    const adminVerified = localStorage.getItem('leoai-admin-verified') === 'true';
+    const adminSession = localStorage.getItem('leoai-admin-session');
+    
+    if (adminVerified && adminSession) {
+      // Activate editing mode immediately to maintain admin status
+      startEditing();
+      console.log('🟢 CompanyManagement: Auto-activated admin status');
+    }
+    
+    // Always try to load companies if we have session
+    if (adminVerified && adminSession) {
+      loadCompanies();
+    }
+    
+    // Cleanup: stop editing when component unmounts
+    return () => {
+      // Don't stop editing on unmount - keep it active during page usage
+      // stopEditing();
+    };
+  }, []); // Only run on mount
+
+  // Load companies when admin status changes to true
   useEffect(() => {
     if (isAdmin) {
       loadCompanies();
-    } else {
-      // If not admin, try to refresh admin status
-      const checkAdmin = () => {
-        const verified = localStorage.getItem('leoai-admin-verified') === 'true';
-        const session = localStorage.getItem('leoai-admin-session');
-        if (verified && session) {
-          // Trigger a storage event to notify AdminContext
-          window.dispatchEvent(new Event('localStorageUpdate'));
-        }
-      };
-      checkAdmin();
     }
   }, [isAdmin]);
 
@@ -469,24 +486,15 @@ const CompanyManagement: React.FC = () => {
     );
   }
 
-  // Admin permission retry hook
-  const [adminRetryCount, setAdminRetryCount] = useState(0);
-  
-  useEffect(() => {
-    if (!isAdmin && adminRetryCount < 3) {
-      const timer = setTimeout(() => {
-        const verified = localStorage.getItem('leoai-admin-verified') === 'true';
-        const session = localStorage.getItem('leoai-admin-session');
-        if (verified && session) {
-          window.dispatchEvent(new Event('localStorageUpdate'));
-          setAdminRetryCount(prev => prev + 1);
-        }
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [isAdmin, adminRetryCount]);
+  // Check for admin session - if exists, allow access (don't block on isAdmin check)
+  const hasAdminSession = () => {
+    const adminVerified = localStorage.getItem('leoai-admin-verified') === 'true';
+    const adminSession = localStorage.getItem('leoai-admin-session');
+    return adminVerified && adminSession;
+  };
 
-  if (!isAdmin) {
+  // Only block if absolutely no admin session exists
+  if (!hasAdminSession() && !isAdmin) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Card className="w-full max-w-md">
@@ -506,6 +514,7 @@ const CompanyManagement: React.FC = () => {
                   onClick={() => {
                     localStorage.setItem('leoai-admin-verified', 'true');
                     localStorage.setItem('leoai-admin-session', Date.now().toString());
+                    startEditing(); // Activate editing mode
                     window.dispatchEvent(new Event('localStorageUpdate'));
                     window.location.reload();
                   }}
