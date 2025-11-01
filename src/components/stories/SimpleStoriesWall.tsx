@@ -196,48 +196,23 @@ export function SimpleStoriesWall() {
     if (stories.length === 0) return;
 
     try {
-      const storyIds = stories.map(s => s.id);
-      
-      // 查询所有story的tags（使用story_tag_assignments关联）
-      const { data: storyTagsData, error } = await supabase
-        .from('story_tag_assignments')
-        .select(`
-          story_id,
-          story_tags!inner(
-            id,
-            name,
-            display_name,
-            color
-          )
-        `)
-        .in('story_id', storyIds);
-
-      if (error) {
-        console.error('🔴 SimpleStoriesWall: Error loading story tags:', error);
-        // Set empty arrays on error
-        stories.forEach(story => {
-          story.tags = [];
-        });
-        return;
-      }
-
-      // 组织tags数据
-      const tagsByStory: Record<string, any[]> = {};
-      storyTagsData?.forEach((item: any) => {
-        if (!tagsByStory[item.story_id]) {
-          tagsByStory[item.story_id] = [];
-        }
-        tagsByStory[item.story_id].push(item.story_tags);
-      });
-
-      // 将tags附加到stories
+      // Tags are already in the story.tags array from the query
+      // Just ensure they're in the correct format
       stories.forEach(story => {
-        story.tags = tagsByStory[story.id] || [];
+        if (!story.tags || story.tags.length === 0) {
+          story.tags = [];
+        } else if (typeof story.tags[0] === 'string') {
+          // Convert string array to tag objects
+          story.tags = story.tags.map((t: string) => ({
+            id: t,
+            name: t,
+            display_name: t,
+            color: '#3B82F6'
+          }));
+        }
       });
 
-      console.log('🟢 SimpleStoriesWall: Loaded story tags', { 
-        storiesWithTags: Object.keys(tagsByStory).length 
-      });
+      console.log('🟢 SimpleStoriesWall: Processed story tags');
     } catch (error) {
       console.error('🔴 SimpleStoriesWall: Error in loadStoriesTags:', error);
       stories.forEach(story => {
