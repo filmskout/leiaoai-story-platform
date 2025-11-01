@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { PageHero } from '@/components/PageHero';
-import { Building, ExternalLink, Star, ArrowLeft, Globe2, Tag, BarChart3, Wrench } from 'lucide-react';
+import { Building, ExternalLink, Star, ArrowLeft, Globe2, Tag, BarChart3, Wrench, Heart, MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
@@ -51,6 +51,7 @@ type Company = {
 
 export default function CompanyDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [company, setCompany] = useState<Company | null>(null);
   const [loading, setLoading] = useState(true);
@@ -94,9 +95,13 @@ export default function CompanyDetail() {
 
       <div className="container-custom py-8">
         <div className="mb-4">
-          <Link to="/ai-companies">
-            <Button variant="ghost" size="sm"><ArrowLeft className="w-4 h-4 mr-1" />返回目录</Button>
-          </Link>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => navigate('/ai-companies')}
+          >
+            <ArrowLeft className="w-4 h-4 mr-1" />返回目录
+          </Button>
         </div>
 
         {loading ? (
@@ -225,22 +230,64 @@ export default function CompanyDetail() {
                   ) : (
                     <div className="space-y-4">
                       {stories.map((s) => (
-                        <div key={s.id} className="border border-border/30 rounded-lg p-4 hover:bg-muted/50 transition-colors">
-                          <Link to={`/story/${s.id}`} className="block">
-                            <h4 className="font-medium text-foreground hover:text-primary transition-colors line-clamp-2">
-                              {s.title}
-                            </h4>
-                            <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
-                              <span>{new Date(s.created_at).toLocaleDateString()}</span>
-                              {s.author && <span>• {s.author}</span>}
+                        <motion.div 
+                          key={s.id} 
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="border border-border/30 rounded-lg overflow-hidden hover:shadow-md transition-all"
+                        >
+                          {s.cover_image_url && (
+                            <div className="aspect-video w-full overflow-hidden">
+                              <img
+                                src={s.cover_image_url}
+                                alt={s.title}
+                                className="w-full h-full object-cover"
+                              />
                             </div>
-                            {s.excerpt && (
-                              <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
-                                {s.excerpt}
-                              </p>
-                            )}
-                          </Link>
-                        </div>
+                          )}
+                          <div className="p-4">
+                            <Link 
+                              to={`/story/${s.id}`} 
+                              state={{ fromCompany: id }}
+                              className="block"
+                            >
+                              <h4 className="font-semibold text-lg text-foreground hover:text-primary transition-colors line-clamp-2 mb-2">
+                                {s.title}
+                              </h4>
+                              {s.excerpt && (
+                                <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                                  {s.excerpt}
+                                </p>
+                              )}
+                            </Link>
+                            <div className="flex items-center justify-between pt-3 border-t">
+                              <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                                {s.created_at && (
+                                  <span>{new Date(s.created_at).toLocaleDateString()}</span>
+                                )}
+                                {s.category && (
+                                  <Link 
+                                    to={`/stories/category/${encodeURIComponent(s.category)}`}
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="hover:text-primary"
+                                  >
+                                    {s.category}
+                                  </Link>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                  <Heart className="w-3.5 h-3.5" />
+                                  {s.likes_count || 0}
+                                </div>
+                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                  <MessageCircle className="w-3.5 h-3.5" />
+                                  {s.comments_count || 0}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
                       ))}
                     </div>
                   )}

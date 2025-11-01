@@ -1004,6 +1004,14 @@ export default function AICompaniesCatalog() {
                     <Badge variant="outline" className="ml-auto">
                       {categoryCompanies.length} {categoryCompanies.length === 1 ? 'company' : 'companies'}
                     </Badge>
+                    <Link 
+                      to={`/stories/category/${encodeURIComponent(category.value)}`}
+                      className="ml-2"
+                    >
+                      <Button variant="outline" size="sm">
+                        查看故事
+                      </Button>
+                    </Link>
                   </div>
 
                   {/* Companies Grid */}

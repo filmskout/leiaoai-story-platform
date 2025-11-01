@@ -169,12 +169,33 @@ export async function getCompanyStories(companyId: string) {
     .from('company_stories')
     .select(`
       *,
-      story:stories(*)
+      story:stories(
+        id,
+        title,
+        content,
+        excerpt,
+        cover_image_url,
+        category,
+        tags,
+        likes_count,
+        views_count,
+        comments_count,
+        saves_count,
+        share_count,
+        created_at,
+        author_id,
+        status
+      )
     `)
     .eq('company_id', companyId)
     .order('created_at', { ascending: false });
   if (error) throw error;
-  return data;
+  
+  // Transform to flat structure
+  return (data || []).map(item => ({
+    ...item.story,
+    id: item.story.id
+  }));
 }
 
 // 搜索功能

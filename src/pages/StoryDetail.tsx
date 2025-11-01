@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -61,6 +61,7 @@ export default function StoryDetail() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { user } = useAuth();
+  const location = useLocation();
   const [story, setStory] = useState<Story | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -69,6 +70,20 @@ export default function StoryDetail() {
     hasSaved: false
   });
   const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
+  
+  // Back navigation logic
+  const handleBack = () => {
+    const state = location.state as any;
+    if (state?.fromCategory) {
+      navigate(`/stories/category/${encodeURIComponent(state.fromCategory)}`);
+    } else if (state?.fromCompany) {
+      navigate(`/ai-companies/${state.fromCompany}`);
+    } else if (state?.fromProject) {
+      navigate(`/project/${state.fromProject}`);
+    } else {
+      navigate(-1); // Default browser back
+    }
+  };
 
   // Fetch story details
   useEffect(() => {
@@ -249,15 +264,7 @@ export default function StoryDetail() {
     });
   };
 
-  const handleGoBack = () => {
-    // Try to go back to the previous page
-    if (window.history.length > 1) {
-      navigate(-1);
-    } else {
-      // Fallback to stories page
-      navigate('/stories');
-    }
-  };
+  const handleGoBack = handleBack;
 
   if (loading) {
     return (

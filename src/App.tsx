@@ -62,6 +62,7 @@ const ProjectDetail = lazyWithRetry(() => import('@/pages/ProjectDetail'));
 const MonitoringDashboard = lazyWithRetry(() => import('@/pages/MonitoringDashboard'));
 const ReconfigureData = lazyWithRetry(() => import('@/pages/ReconfigureDataSimplified'));
 const CompanyManagement = lazyWithRetry(() => import('@/pages/CompanyManagement'));
+const CategoryStories = lazyWithRetry(() => import('@/pages/CategoryStories'));
 
 // Error boundary for dynamic imports
 class ChunkLoadErrorBoundary extends React.Component<
@@ -290,6 +291,7 @@ function AppRoutes() {
           <Route path="ai-chat" element={<AIChat />} />
           <Route path="bp-analysis" element={<BPAnalysis />} />
           <Route path="stories" element={<Stories />} />
+          <Route path="stories/category/:category" element={<CategoryStories />} />
           <Route path="story/:id" element={<StoryDetail />} />
           <Route path="user/:id" element={<UserProfile />} />
           <Route path="u/:username" element={<UserProfile />} />
