@@ -793,6 +793,23 @@
     },
     "confirm": {
       "delete": "Are you sure you want to delete this company? This action cannot be undone."
+    },
+    "buttons": {
+      "generate_stories": "Generate Stories",
+      "generate_story": "Generate Story"
+    },
+    "story_gen": {
+      "title": "Generate Stories with LLM",
+      "description": "Generate real user stories with project ratings based on authoritative media reports",
+      "select_company": "Select Company (Optional)",
+      "all_companies": "All Companies",
+      "select_category": "Select Category",
+      "count": "Generate Count",
+      "count_hint": "Recommended 5-10, each story takes 60-90 seconds",
+      "generating": "Generating...",
+      "start_batch": "Start Batch Generation",
+      "success": "Story generated successfully!",
+      "error": "Generation failed"
     }
   }
 }

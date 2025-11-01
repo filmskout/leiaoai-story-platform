@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AlertCircle, Plus, Edit, Trash2, Save, X, Building2, Globe, Users, Calendar, DollarSign, Image, Check } from 'lucide-react';
+import { AlertCircle, Plus, Edit, Trash2, Save, X, Building2, Globe, Users, Calendar, DollarSign, Image, Check, Sparkles, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import CompanyLogoManager from '@/components/CompanyLogoManager';
@@ -82,6 +82,12 @@ const CompanyManagement: React.FC = () => {
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isStoryGenDialogOpen, setIsStoryGenDialogOpen] = useState(false);
+  const [storyGenLoading, setStoryGenLoading] = useState(false);
+  const [storyGenProgress, setStoryGenProgress] = useState('');
+  const [selectedCompanyForStory, setSelectedCompanyForStory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState('LLM & Language Models');
+  const [storyGenCount, setStoryGenCount] = useState(5);
   
   // Form states
   const [formData, setFormData] = useState({
@@ -625,6 +631,20 @@ const CompanyManagement: React.FC = () => {
                   </div>
                   
                   <div className="flex gap-1">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setSelectedCompanyForStory(company.id);
+                        setIsStoryGenDialogOpen(true);
+                      }}
+                      type="button"
+                      title={t('company_management.buttons.generate_story', '为该公司生成Story')}
+                    >
+                      <Sparkles className="h-4 w-4 text-purple-600" />
+                    </Button>
                     <Button
                       size="sm"
                       variant="ghost"

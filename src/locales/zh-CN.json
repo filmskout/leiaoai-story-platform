@@ -831,6 +831,23 @@
     },
     "confirm": {
       "delete": "确定要删除这家公司吗？此操作不可撤销。"
+    },
+    "buttons": {
+      "generate_stories": "生成Stories",
+      "generate_story": "生成Story"
+    },
+    "story_gen": {
+      "title": "使用LLM生成Stories",
+      "description": "基于权威媒体报道生成包含项目评分的真实用户故事",
+      "select_company": "选择公司（可选）",
+      "all_companies": "所有公司",
+      "select_category": "选择类别",
+      "count": "生成数量",
+      "count_hint": "建议5-10个，每个story需要60-90秒",
+      "generating": "生成中...",
+      "start_batch": "开始批量生成",
+      "success": "Story生成成功！",
+      "error": "生成失败"
     }
   }
 }
