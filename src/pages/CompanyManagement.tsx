@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAdmin } from '@/contexts/AdminContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,7 +25,7 @@ interface Company {
   valuation: number;
   website: string;
   logo_base64: string | null;
-  category: string;
+  company_tier: string;
   is_overseas: boolean;
   founded_year: number;
   employee_count: string;
@@ -71,6 +72,7 @@ interface Story {
 const CompanyManagement: React.FC = () => {
   const { isAdmin, startEditing, stopEditing } = useAdmin();
   const { isAuthenticated } = useAuth();
+  const { t, i18n } = useTranslation();
   
   const [companies, setCompanies] = useState<Company[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -90,21 +92,19 @@ const CompanyManagement: React.FC = () => {
     valuation: '',
     website: '',
     logo_base64: '',
-    category: '',
+    company_tier: '',
     is_overseas: false,
     founded_year: '',
     employee_count: '',
     industry: ''
   });
 
-  // Categories
-  const categories = [
-    { value: 'techGiants', label: '科技巨头' },
-    { value: 'aiUnicorns', label: 'AI独角兽' },
-    { value: 'aiTools', label: 'AI工具' },
-    { value: 'aiApplications', label: 'AI应用' },
-    { value: 'domesticGiants', label: '国内巨头' },
-    { value: 'domesticUnicorns', label: '国内独角兽' }
+  // Company tiers
+  const companyTiers = [
+    { value: 'Giants', label: { zh: '大厂 (Giants)', en: 'Giants' } },
+    { value: 'Unicorns', label: { zh: '独角兽 (Unicorns)', en: 'Unicorns' } },
+    { value: 'Independent', label: { zh: '独立 (Independent)', en: 'Independent' } },
+    { value: 'Emerging', label: { zh: '新兴 (Emerging)', en: 'Emerging' } }
   ];
 
   // Keep editing mode active while dialog is open
@@ -160,7 +160,7 @@ const CompanyManagement: React.FC = () => {
       }
     } catch (error) {
       console.error('Failed to load companies:', error);
-      toast.error('加载公司数据失败');
+      toast.error(t('company_management.error.load_failed', 'Failed to load company data'));
     } finally {
       setLoading(false);
     }
@@ -188,16 +188,16 @@ const CompanyManagement: React.FC = () => {
       const result = await response.json();
       
       if (result.success) {
-        toast.success('公司创建成功');
+        toast.success(t('company_management.success.created', 'Company created successfully'));
         setIsCreateDialogOpen(false);
         resetForm();
         loadCompanies();
       } else {
-        toast.error(result.error || '创建失败');
+        toast.error(result.error || t('company_management.error.create_failed', 'Creation failed'));
       }
     } catch (error) {
       console.error('Failed to create company:', error);
-      toast.error('创建公司失败');
+      toast.error(t('company_management.error.create_company_failed', 'Failed to create company'));
     }
   };
 
@@ -229,7 +229,7 @@ const CompanyManagement: React.FC = () => {
       const result = await response.json();
       
       if (result.success) {
-        toast.success('公司更新成功');
+        toast.success(t('company_management.success.updated', 'Company updated successfully'));
         // Stop editing mode after successful save
         stopEditing();
         setIsEditDialogOpen(false);
@@ -237,18 +237,18 @@ const CompanyManagement: React.FC = () => {
         resetForm();
         loadCompanies();
       } else {
-        toast.error(result.error || '更新失败');
+        toast.error(result.error || t('company_management.error.update_failed', 'Update failed'));
         // Keep editing mode active if save failed
       }
     } catch (error) {
       console.error('Failed to update company:', error);
-      toast.error('更新公司失败');
+      toast.error(t('company_management.error.update_company_failed', 'Failed to update company'));
       // Keep editing mode active if save failed
     }
   };
 
   const handleDeleteCompany = async (companyId: string) => {
-    if (!confirm('确定要删除这家公司吗？此操作不可撤销。')) {
+    if (!confirm(t('company_management.confirm.delete', 'Are you sure you want to delete this company? This action cannot be undone.'))) {
       return;
     }
 
@@ -268,14 +268,14 @@ const CompanyManagement: React.FC = () => {
       const result = await response.json();
       
       if (result.success) {
-        toast.success('公司删除成功');
+        toast.success(t('company_management.success.deleted', 'Company deleted successfully'));
         loadCompanies();
       } else {
-        toast.error(result.error || '删除失败');
+        toast.error(result.error || t('company_management.error.delete_failed', 'Delete failed'));
       }
     } catch (error) {
       console.error('Failed to delete company:', error);
-      toast.error('删除公司失败');
+      toast.error(t('company_management.error.delete_company_failed', 'Failed to delete company'));
     }
   };
 
@@ -294,7 +294,7 @@ const CompanyManagement: React.FC = () => {
         valuation: company.valuation?.toString() || '',
         website: company.website || '',
         logo_base64: company.logo_base64 || '',
-        category: company.category || '',
+        company_tier: company.company_tier || '',
         is_overseas: company.is_overseas || false,
         founded_year: company.founded_year?.toString() || '',
         employee_count: company.employee_count || '',
@@ -307,7 +307,7 @@ const CompanyManagement: React.FC = () => {
       }, 0);
     } catch (error) {
       console.error('Error opening edit dialog:', error);
-      toast.error('打开编辑对话框失败');
+      toast.error(t('company_management.error.open_dialog', 'Failed to open edit dialog'));
     }
   };
 
@@ -320,7 +320,7 @@ const CompanyManagement: React.FC = () => {
       valuation: '',
       website: '',
       logo_base64: '',
-      category: '',
+      company_tier: '',
       is_overseas: false,
       founded_year: '',
       employee_count: '',
@@ -419,9 +419,9 @@ const CompanyManagement: React.FC = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold">AI公司管理</h1>
+          <h1 className="text-3xl font-bold">{t('company_management.title', 'AI Company Management')}</h1>
           <p className="text-muted-foreground mt-2">
-            管理AI公司信息、项目和融资数据
+            {t('company_management.subtitle', 'Manage AI company information, projects and funding data')}
           </p>
         </div>
         
@@ -429,38 +429,38 @@ const CompanyManagement: React.FC = () => {
           <DialogTrigger asChild>
             <Button onClick={() => resetForm()}>
               <Plus className="h-4 w-4 mr-2" />
-              添加公司
+              {t('company_management.buttons.add_company', 'Add Company')}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>添加新公司</DialogTitle>
+              <DialogTitle>{t('company_management.dialog.create_title', 'Add New Company')}</DialogTitle>
               <DialogDescription>
-                填写公司基本信息，所有字段都是必填的
+                {t('company_management.dialog.create_description', 'Fill in the basic company information. All fields are required.')}
               </DialogDescription>
             </DialogHeader>
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="name">公司名称 *</Label>
+                <Label htmlFor="name">{t('company_management.fields.name', 'Company Name')} *</Label>
                 <Input
                   id="name"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="例如：OpenAI"
+                  placeholder={t('company_management.placeholders.name', 'e.g.: OpenAI')}
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="category">分类 *</Label>
-                <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+                <Label htmlFor="company_tier">{t('company_management.fields.tier', 'Tier')} *</Label>
+                <Select value={formData.company_tier} onValueChange={(value) => setFormData({ ...formData, company_tier: value })}>
                   <SelectTrigger>
-                    <SelectValue placeholder="选择分类" />
+                    <SelectValue placeholder={t('company_management.placeholders.select_tier', 'Select tier')} />
                   </SelectTrigger>
                   <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem key={category.value} value={category.value}>
-                        {category.label}
+                    {companyTiers.map((tier) => (
+                      <SelectItem key={tier.value} value={tier.value}>
+                        {i18n.language === 'zh-CN' || i18n.language === 'zh-HK' ? tier.label.zh : tier.label.en}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -468,17 +468,17 @@ const CompanyManagement: React.FC = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="headquarters">总部地址 *</Label>
+                <Label htmlFor="headquarters">{t('company_management.fields.headquarters', 'Headquarters')} *</Label>
                 <Input
                   id="headquarters"
                   value={formData.headquarters}
                   onChange={(e) => setFormData({ ...formData, headquarters: e.target.value })}
-                  placeholder="例如：San Francisco, USA"
+                  placeholder={t('company_management.placeholders.headquarters', 'e.g.: San Francisco, USA')}
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="website">官网 *</Label>
+                <Label htmlFor="website">{t('company_management.fields.website', 'Website')} *</Label>
                 <Input
                   id="website"
                   value={formData.website}
@@ -488,7 +488,7 @@ const CompanyManagement: React.FC = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="valuation">估值 (美元) *</Label>
+                <Label htmlFor="valuation">{t('company_management.fields.valuation', 'Valuation (USD)')} *</Label>
                 <Input
                   id="valuation"
                   type="number"
@@ -499,7 +499,7 @@ const CompanyManagement: React.FC = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="founded_year">成立年份 *</Label>
+                <Label htmlFor="founded_year">{t('company_management.fields.founded_year', 'Founded Year')} *</Label>
                 <Input
                   id="founded_year"
                   type="number"
@@ -510,44 +510,44 @@ const CompanyManagement: React.FC = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="employee_count">员工数量</Label>
+                <Label htmlFor="employee_count">{t('company_management.fields.employee_count', 'Employee Count')}</Label>
                 <Input
                   id="employee_count"
                   value={formData.employee_count}
                   onChange={(e) => setFormData({ ...formData, employee_count: e.target.value })}
-                  placeholder="例如：100-200"
+                  placeholder={t('company_management.placeholders.employee_count', 'e.g.: 100-200')}
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="industry">行业</Label>
+                <Label htmlFor="industry">{t('company_management.fields.industry', 'Industry')}</Label>
                 <Input
                   id="industry"
                   value={formData.industry}
                   onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
-                  placeholder="例如：Artificial Intelligence"
+                  placeholder={t('company_management.placeholders.industry', 'e.g.: Artificial Intelligence')}
                 />
               </div>
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="description">中文描述 *</Label>
+              <Label htmlFor="description">{t('company_management.fields.description_zh', 'Chinese Description')} *</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="详细描述公司的业务、技术特点等..."
+                placeholder={t('company_management.placeholders.description_zh', 'Detailed description of the company\'s business, technical features, etc...')}
                 rows={3}
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="english_description">英文描述 *</Label>
+              <Label htmlFor="english_description">{t('company_management.fields.description_en', 'English Description')} *</Label>
               <Textarea
                 id="english_description"
                 value={formData.english_description}
                 onChange={(e) => setFormData({ ...formData, english_description: e.target.value })}
-                placeholder="English description of the company..."
+                placeholder={t('company_management.placeholders.description_en', 'English description of the company...')}
                 rows={3}
               />
             </div>
@@ -560,16 +560,16 @@ const CompanyManagement: React.FC = () => {
                 onChange={(e) => setFormData({ ...formData, is_overseas: e.target.checked })}
                 className="rounded"
               />
-              <Label htmlFor="is_overseas">海外公司</Label>
+              <Label htmlFor="is_overseas">{t('company_management.fields.is_overseas', 'Overseas Company')}</Label>
             </div>
             
             <div className="flex justify-end space-x-2">
               <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
-                取消
+                {t('common.cancel', 'Cancel')}
               </Button>
               <Button onClick={handleCreateCompany}>
                 <Save className="h-4 w-4 mr-2" />
-                创建公司
+                {t('company_management.buttons.create', 'Create Company')}
               </Button>
             </div>
           </DialogContent>
@@ -613,7 +613,13 @@ const CompanyManagement: React.FC = () => {
                     <div>
                       <CardTitle className="text-lg">{company.name}</CardTitle>
                       <Badge variant="secondary" className="mt-1">
-                        {categories.find(c => c.value === company.category)?.label || company.category}
+                        {(() => {
+                          const tier = companyTiers.find(t => t.value === company.company_tier);
+                          if (tier) {
+                            return i18n.language === 'zh-CN' || i18n.language === 'zh-HK' ? tier.label.zh : tier.label.en;
+                          }
+                          return company.company_tier || t('company_management.unknown_tier', 'Unknown');
+                        })()}
                       </Badge>
                     </div>
                   </div>
@@ -715,17 +721,17 @@ const CompanyManagement: React.FC = () => {
       >
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>编辑公司信息</DialogTitle>
+            <DialogTitle>{t('company_management.dialog.edit_title', 'Edit Company Information')}</DialogTitle>
             <DialogDescription>
-              修改 {editingCompany?.name || '公司'} 的基本信息
-              {!editingCompany && <span className="text-red-500"> (错误：未找到公司数据)</span>}
+              {t('company_management.dialog.edit_description', 'Modify basic information for {{name}}', { name: editingCompany?.name || t('company_management.company', 'Company') })}
+              {!editingCompany && <span className="text-red-500"> ({t('company_management.error.company_not_found', 'Error: Company data not found')})</span>}
             </DialogDescription>
           </DialogHeader>
           
           <Tabs defaultValue="basic" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="basic">基本信息</TabsTrigger>
-              <TabsTrigger value="logo">Logo管理</TabsTrigger>
+              <TabsTrigger value="basic">{t('company_management.tabs.basic_info', 'Basic Information')}</TabsTrigger>
+              <TabsTrigger value="logo">{t('company_management.tabs.logo_management', 'Logo Management')}</TabsTrigger>
             </TabsList>
             
             <TabsContent value="basic" className="space-y-4">
@@ -741,15 +747,15 @@ const CompanyManagement: React.FC = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="edit-category">分类 *</Label>
-                  <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+                  <Label htmlFor="edit-company_tier">{t('company_management.fields.tier', 'Tier')} *</Label>
+                  <Select value={formData.company_tier} onValueChange={(value) => setFormData({ ...formData, company_tier: value })}>
                     <SelectTrigger>
-                      <SelectValue placeholder="选择分类" />
+                      <SelectValue placeholder={t('company_management.placeholders.select_tier', 'Select tier')} />
                     </SelectTrigger>
                     <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category.value} value={category.value}>
-                          {category.label}
+                      {companyTiers.map((tier) => (
+                        <SelectItem key={tier.value} value={tier.value}>
+                          {i18n.language === 'zh-CN' || i18n.language === 'zh-HK' ? tier.label.zh : tier.label.en}
                         </SelectItem>
                       ))}
                     </SelectContent>

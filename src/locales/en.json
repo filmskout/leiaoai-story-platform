@@ -728,5 +728,71 @@
   },
   "language_selector": "Select Language",
   "auto_detect_language": "Auto Detect Language",
-  "detecting": "Detecting..."
+  "detecting": "Detecting...",
+  
+  "company_management": {
+    "title": "AI Company Management",
+    "subtitle": "Manage AI company information, projects and funding data",
+    "company": "Company",
+    "unknown_tier": "Unknown",
+    "buttons": {
+      "add_company": "Add Company",
+      "create": "Create Company",
+      "edit": "Edit",
+      "delete": "Delete",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "fields": {
+      "name": "Company Name",
+      "tier": "Tier",
+      "headquarters": "Headquarters",
+      "website": "Website",
+      "valuation": "Valuation (USD)",
+      "founded_year": "Founded Year",
+      "employee_count": "Employee Count",
+      "industry": "Industry",
+      "description_zh": "Chinese Description",
+      "description_en": "English Description",
+      "is_overseas": "Overseas Company"
+    },
+    "placeholders": {
+      "name": "e.g.: OpenAI",
+      "select_tier": "Select tier",
+      "headquarters": "e.g.: San Francisco, USA",
+      "employee_count": "e.g.: 100-200",
+      "industry": "e.g.: Artificial Intelligence",
+      "description_zh": "Detailed description of the company's business, technical features, etc...",
+      "description_en": "English description of the company..."
+    },
+    "dialog": {
+      "create_title": "Add New Company",
+      "create_description": "Fill in the basic company information. All fields are required.",
+      "edit_title": "Edit Company Information",
+      "edit_description": "Modify basic information for {{name}}"
+    },
+    "tabs": {
+      "basic_info": "Basic Information",
+      "logo_management": "Logo Management"
+    },
+    "success": {
+      "created": "Company created successfully",
+      "updated": "Company updated successfully",
+      "deleted": "Company deleted successfully"
+    },
+    "error": {
+      "load_failed": "Failed to load company data",
+      "create_failed": "Creation failed",
+      "create_company_failed": "Failed to create company",
+      "update_failed": "Update failed",
+      "update_company_failed": "Failed to update company",
+      "delete_failed": "Delete failed",
+      "delete_company_failed": "Failed to delete company",
+      "open_dialog": "Failed to open edit dialog",
+      "company_not_found": "Error: Company data not found"
+    },
+    "confirm": {
+      "delete": "Are you sure you want to delete this company? This action cannot be undone."
+    }
+  }
 }

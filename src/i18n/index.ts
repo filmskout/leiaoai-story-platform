@@ -49,25 +49,26 @@ i18n
     resources,
     lng: 'en', // Default language
     fallbackLng: {
-      'zh-HK': ['zh-HK'],
-      'zh-CN': ['zh-CN'],
-      'zh': ['zh-CN'],
-      'ja': ['ja-JP'],
-      'fr': ['fr-FR'],
-      'de': ['de-DE'],
-      'es': ['es-ES'],
-      'it': ['it-IT'],
-      'pt': ['pt-PT'],
-      'ru': ['ru-RU'],
-      'ar': ['ar-SA'],
-      'hi': ['hi-IN'],
-      'nl': ['nl-NL'],
-      'vi': ['vi-VN'],
-      'th': ['th-TH'],
-      'ko': ['ko-KR'],
+      'zh-HK': ['zh-CN', 'en'], // 繁体中文默认回退到简体中文，再回退到英文
+      'zh-TW': ['zh-CN', 'en'], // 繁体中文默认回退到简体中文，再回退到英文
+      'zh-CN': ['zh-CN', 'en'], // 简体中文回退到英文
+      'zh': ['zh-CN', 'en'], // 通用中文回退到简体，再回退到英文
+      'ja': ['ja-JP', 'en'],
+      'fr': ['fr-FR', 'en'],
+      'de': ['de-DE', 'en'],
+      'es': ['es-ES', 'en'],
+      'it': ['it-IT', 'en'],
+      'pt': ['pt-PT', 'en'],
+      'ru': ['ru-RU', 'en'],
+      'ar': ['ar-SA', 'en'],
+      'hi': ['hi-IN', 'en'],
+      'nl': ['nl-NL', 'en'],
+      'vi': ['vi-VN', 'en'],
+      'th': ['th-TH', 'en'],
+      'ko': ['ko-KR', 'en'],
       'en-US': ['en'],
       'en-GB': ['en'],
-      'default': ['en']
+      'default': ['en'] // 所有非中文语言默认回退到英文
     },
     supportedLngs: ['zh-CN', 'en', 'zh-HK', 'ja-JP', 'ko-KR', 'fr-FR', 'de-DE', 'es-ES', 'it-IT', 'pt-PT', 'ru-RU', 'ar-SA', 'fa-IR', 'hi-IN', 'nl-NL', 'th-TH', 'vi-VN'],
     interpolation: {

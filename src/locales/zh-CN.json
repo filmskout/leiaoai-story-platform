@@ -766,5 +766,71 @@
   },
   "language_selector": "选择语言",
   "auto_detect_language": "自动识别语言",
-  "detecting": "检测中..."
+  "detecting": "检测中...",
+  
+  "company_management": {
+    "title": "AI公司管理",
+    "subtitle": "管理AI公司信息、项目和融资数据",
+    "company": "公司",
+    "unknown_tier": "未知",
+    "buttons": {
+      "add_company": "添加公司",
+      "create": "创建公司",
+      "edit": "编辑",
+      "delete": "删除",
+      "save": "保存",
+      "cancel": "取消"
+    },
+    "fields": {
+      "name": "公司名称",
+      "tier": "层级",
+      "headquarters": "总部地址",
+      "website": "官网",
+      "valuation": "估值 (美元)",
+      "founded_year": "成立年份",
+      "employee_count": "员工数量",
+      "industry": "行业",
+      "description_zh": "中文描述",
+      "description_en": "英文描述",
+      "is_overseas": "海外公司"
+    },
+    "placeholders": {
+      "name": "例如：OpenAI",
+      "select_tier": "选择层级",
+      "headquarters": "例如：San Francisco, USA",
+      "employee_count": "例如：100-200",
+      "industry": "例如：Artificial Intelligence",
+      "description_zh": "详细描述公司的业务、技术特点等...",
+      "description_en": "English description of the company..."
+    },
+    "dialog": {
+      "create_title": "添加新公司",
+      "create_description": "填写公司基本信息，所有字段都是必填的",
+      "edit_title": "编辑公司信息",
+      "edit_description": "修改 {{name}} 的基本信息"
+    },
+    "tabs": {
+      "basic_info": "基本信息",
+      "logo_management": "Logo管理"
+    },
+    "success": {
+      "created": "公司创建成功",
+      "updated": "公司更新成功",
+      "deleted": "公司删除成功"
+    },
+    "error": {
+      "load_failed": "加载公司数据失败",
+      "create_failed": "创建失败",
+      "create_company_failed": "创建公司失败",
+      "update_failed": "更新失败",
+      "update_company_failed": "更新公司失败",
+      "delete_failed": "删除失败",
+      "delete_company_failed": "删除公司失败",
+      "open_dialog": "打开编辑对话框失败",
+      "company_not_found": "错误：未找到公司数据"
+    },
+    "confirm": {
+      "delete": "确定要删除这家公司吗？此操作不可撤销。"
+    }
+  }
 }
