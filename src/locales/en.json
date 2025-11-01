@@ -809,7 +809,15 @@
       "generating": "Generating...",
       "start_batch": "Start Batch Generation",
       "success": "Story generated successfully!",
-      "error": "Generation failed"
+      "error": "Generation failed",
+      "searching_media": "Searching authoritative media sources with LLM...",
+      "success_with_title": "Generated successfully: {{title}}",
+      "error_with_msg": "Generation failed: {{msg}}",
+      "batch_starting": "Starting batch generation for {{count}} stories...",
+      "batch_success": "{{success}}/{{total}} stories generated successfully",
+      "batch_complete": "Batch generation complete: {{success}}/{{total}} success",
+      "batch_error": "Batch generation failed",
+      "batch_error_with_msg": "Batch generation failed: {{msg}}"
     }
   }
 }

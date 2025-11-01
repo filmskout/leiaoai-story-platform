@@ -345,6 +345,95 @@ const CompanyManagement: React.FC = () => {
     return `$${valuation}`;
   };
 
+  // Story生成函数
+  const handleGenerateStory = async (projectId?: string, companyId?: string) => {
+    setStoryGenLoading(true);
+    setStoryGenProgress(t('company_management.story_gen.searching_media', '正在调用LLM搜索权威媒体原文...'));
+    
+    try {
+      const response = await fetch('/api/unified', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'generate-story',
+          token: localStorage.getItem('leoai-admin-session') || 'admin-token-123',
+          projectId: projectId,
+          companyId: companyId || selectedCompanyForStory,
+          category: selectedCategory
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        toast.success(t('company_management.story_gen.success', 'Story生成成功！'));
+        setStoryGenProgress(`✅ ${t('company_management.story_gen.success_with_title', '生成成功：{{title}}', { title: result.story.title })}`);
+        loadCompanies();
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error: any) {
+      console.error('生成Story失败:', error);
+      toast.error(t('company_management.story_gen.error', '生成失败') + ': ' + error.message);
+      setStoryGenProgress('❌ ' + t('company_management.story_gen.error_with_msg', '生成失败：{{msg}}', { msg: error.message }));
+    } finally {
+      setStoryGenLoading(false);
+    }
+  };
+
+  const handleGenerateStoriesBatch = async () => {
+    setStoryGenLoading(true);
+    setStoryGenProgress(t('company_management.story_gen.batch_starting', '开始批量生成 {{count}} 个stories...', { count: storyGenCount }));
+    
+    try {
+      const response = await fetch('/api/unified', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'generate-stories-batch',
+          token: localStorage.getItem('leoai-admin-session') || 'admin-token-123',
+          category: selectedCategory,
+          companyId: selectedCompanyForStory || undefined,
+          count: storyGenCount
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        const successCount = result.results.filter((r: any) => r.success).length;
+        toast.success(t('company_management.story_gen.batch_success', '{{success}}/{{total}} 个stories生成成功', { 
+          success: successCount, 
+          total: result.results.length 
+        }));
+        setStoryGenProgress(`✅ ${t('company_management.story_gen.batch_complete', '批量生成完成：{{success}}/{{total}} 成功', { 
+          success: successCount, 
+          total: result.results.length 
+        })}`);
+        loadCompanies();
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error: any) {
+      console.error('批量生成失败:', error);
+      toast.error(t('company_management.story_gen.batch_error', '批量生成失败') + ': ' + error.message);
+      setStoryGenProgress('❌ ' + t('company_management.story_gen.batch_error_with_msg', '批量生成失败：{{msg}}', { msg: error.message }));
+    } finally {
+      setStoryGenLoading(false);
+    }
+  };
+
+  const storyCategories = [
+    'LLM & Language Models',
+    'Image Processing & Generation',
+    'Video Processing & Generation',
+    'Professional Domain Analysis',
+    'Virtual Companions',
+    'Virtual Employees & Assistants',
+    'Voice & Audio AI',
+    'Search & Information Retrieval'
+  ];
+
   if (!isAuthenticated) {
     return (
       <div className="flex items-center justify-center min-h-screen">

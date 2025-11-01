@@ -847,7 +847,15 @@
       "generating": "生成中...",
       "start_batch": "开始批量生成",
       "success": "Story生成成功！",
-      "error": "生成失败"
+      "error": "生成失败",
+      "searching_media": "正在调用LLM搜索权威媒体原文...",
+      "success_with_title": "生成成功：{{title}}",
+      "error_with_msg": "生成失败：{{msg}}",
+      "batch_starting": "开始批量生成 {{count}} 个stories...",
+      "batch_success": "{{success}}/{{total}} 个stories生成成功",
+      "batch_complete": "批量生成完成：{{success}}/{{total}} 成功",
+      "batch_error": "批量生成失败",
+      "batch_error_with_msg": "批量生成失败：{{msg}}"
     }
   }
 }
