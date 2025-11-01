@@ -329,24 +329,24 @@ const CompanyManagement: React.FC = () => {
     );
   }
 
-  if (!isAdmin) {
-    // Check one more time with a slight delay
-    const [retryCount, setRetryCount] = React.useState(0);
-    
-    React.useEffect(() => {
-      if (retryCount < 2) {
-        const timer = setTimeout(() => {
-          const verified = localStorage.getItem('leoai-admin-verified') === 'true';
-          const session = localStorage.getItem('leoai-admin-session');
-          if (verified && session) {
-            window.dispatchEvent(new Event('localStorageUpdate'));
-            setRetryCount(prev => prev + 1);
-          }
-        }, 500);
-        return () => clearTimeout(timer);
-      }
-    }, [retryCount]);
+  // Admin permission retry hook
+  const [adminRetryCount, setAdminRetryCount] = useState(0);
+  
+  useEffect(() => {
+    if (!isAdmin && adminRetryCount < 3) {
+      const timer = setTimeout(() => {
+        const verified = localStorage.getItem('leoai-admin-verified') === 'true';
+        const session = localStorage.getItem('leoai-admin-session');
+        if (verified && session) {
+          window.dispatchEvent(new Event('localStorageUpdate'));
+          setAdminRetryCount(prev => prev + 1);
+        }
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isAdmin, adminRetryCount]);
 
+  if (!isAdmin) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Card className="w-full max-w-md">
@@ -355,23 +355,31 @@ const CompanyManagement: React.FC = () => {
               <AlertCircle className="h-5 w-5 text-red-500" />
               权限不足
             </CardTitle>
-            <CardDescription>
-              您需要管理员权限才能访问公司管理功能
-              <br />
-              <br />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  // Quick fix: manually set admin and reload
-                  localStorage.setItem('leoai-admin-verified', 'true');
-                  localStorage.setItem('leoai-admin-session', Date.now().toString());
-                  window.location.reload();
-                }}
-                className="mt-4"
-              >
-                刷新权限状态
-              </Button>
+            <CardDescription className="space-y-4">
+              <div>
+                您需要管理员权限才能访问公司管理功能
+              </div>
+              <div className="flex flex-col gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    localStorage.setItem('leoai-admin-verified', 'true');
+                    localStorage.setItem('leoai-admin-session', Date.now().toString());
+                    window.dispatchEvent(new Event('localStorageUpdate'));
+                    window.location.reload();
+                  }}
+                >
+                  刷新权限状态
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => window.location.href = '/admin-login'}
+                >
+                  前往管理员登录
+                </Button>
+              </div>
             </CardDescription>
           </CardHeader>
         </Card>
