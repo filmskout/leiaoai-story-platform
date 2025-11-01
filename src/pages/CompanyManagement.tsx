@@ -110,21 +110,20 @@ const CompanyManagement: React.FC = () => {
   // Keep editing mode active while dialog is open
   useEffect(() => {
     if (isEditDialogOpen && editingCompany) {
-      // Refresh editing mode every 5 minutes while dialog is open
-      const refreshInterval = setInterval(() => {
-        startEditing();
-        console.log('🔄 Refreshing admin editing mode');
-      }, 300000); // 5 minutes
-      
-      // Also refresh on component mount if dialog is open
+      // Start editing mode immediately when dialog opens
       startEditing();
+      console.log('🟢 Edit dialog opened, editing mode activated');
       
+      // No need to refresh - editing mode will maintain admin status until closed
       return () => {
-        clearInterval(refreshInterval);
-        // Don't stop editing mode here, only when dialog closes
+        // Cleanup only when component unmounts (not when dialog closes)
+        // Dialog close is handled by onOpenChange
       };
+    } else if (!isEditDialogOpen) {
+      // Ensure editing mode is stopped when dialog is not open
+      stopEditing();
     }
-  }, [isEditDialogOpen, editingCompany, startEditing]);
+  }, [isEditDialogOpen, editingCompany, startEditing, stopEditing]);
 
   // Load companies data
   useEffect(() => {

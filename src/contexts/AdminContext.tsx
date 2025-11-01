@@ -37,6 +37,15 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   // Check admin status
   const checkAdminStatus = (): boolean => {
+    // If actively editing, skip all checks and maintain admin status
+    const editingActive = localStorage.getItem('leoai-admin-editing-active') === 'true';
+    if (editingActive) {
+      // During editing, always return true without any validation checks
+      // This prevents any state resets during editing
+      return true;
+    }
+
+    // Normal admin status check (only when not editing)
     if (!isAuthenticated || !user) {
       return false;
     }
@@ -46,24 +55,6 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     
     if (!adminVerified || !adminSession) {
       return false;
-    }
-
-    // Check if user is actively editing (extend session for 10 minutes during editing)
-    const editingSince = localStorage.getItem('leoai-admin-editing-since');
-    const editingActive = localStorage.getItem('leoai-admin-editing-active') === 'true';
-    
-    if (editingActive && editingSince) {
-      const editingTime = parseInt(editingSince, 10);
-      const currentTime = Date.now();
-      // During editing, extend session to at least 10 minutes from when editing started
-      const editingDuration = currentTime - editingTime;
-      const extendedValid = editingDuration < 600000; // 10 minutes = 600000 ms
-      
-      if (extendedValid) {
-        // Update session time to extend validity during editing
-        localStorage.setItem('leoai-admin-session', currentTime.toString());
-        return true;
-      }
     }
 
     // Check if session is within 24 hours (86400000 ms)
@@ -126,6 +117,16 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   // Check admin session periodically and listen to storage changes
   useEffect(() => {
     const checkStatus = () => {
+      // Skip status check if actively editing to prevent any resets
+      const editingActive = localStorage.getItem('leoai-admin-editing-active') === 'true';
+      if (editingActive) {
+        // Maintain admin status during editing without checks
+        setIsAdmin(true);
+        setAdminSessionValid(true);
+        return;
+      }
+      
+      // Only check status when not editing
       const adminStatus = checkAdminStatus();
       setIsAdmin(adminStatus);
       setAdminSessionValid(adminStatus);
@@ -134,36 +135,49 @@ export const AdminProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     // Check immediately
     checkStatus();
 
-    // Check periodically - more frequent if editing
-    const getCheckInterval = () => {
+    // Check periodically - skip checks entirely during editing
+    let interval: NodeJS.Timeout | null = null;
+    
+    const setupInterval = () => {
       const editingActive = localStorage.getItem('leoai-admin-editing-active') === 'true';
-      return editingActive ? 10000 : 30000; // Every 10 seconds if editing, 30 seconds otherwise
-    };
-    
-    let interval: NodeJS.Timeout | null = setInterval(checkStatus, getCheckInterval());
-    
-    // Adjust interval based on editing state changes
-    const adjustInterval = () => {
-      if (interval) {
-        clearInterval(interval);
+      if (!editingActive) {
+        // Only set interval when not editing
+        if (interval) {
+          clearInterval(interval);
+        }
+        interval = setInterval(checkStatus, 30000); // Every 30 seconds when not editing
+      } else {
+        // Clear interval during editing, maintain status directly
+        if (interval) {
+          clearInterval(interval);
+          interval = null;
+        }
+        setIsAdmin(true);
+        setAdminSessionValid(true);
       }
-      interval = setInterval(checkStatus, getCheckInterval());
     };
+
+    setupInterval();
 
     // Listen to storage changes (when localStorage is updated from another tab/console)
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'leoai-admin-verified' || e.key === 'leoai-admin-session' || 
-          e.key === 'leoai-admin-editing-active' || e.key === 'leoai-admin-editing-since') {
+      if (e.key === 'leoai-admin-editing-active') {
+        // Editing state changed, adjust interval
+        setupInterval();
         checkStatus();
-        adjustInterval(); // Adjust check interval if editing state changed
+      } else if (e.key === 'leoai-admin-verified' || e.key === 'leoai-admin-session') {
+        // Only check if not editing
+        if (localStorage.getItem('leoai-admin-editing-active') !== 'true') {
+          checkStatus();
+        }
       }
     };
     window.addEventListener('storage', handleStorageChange);
 
     // Also listen to custom events (for same-tab updates)
     const handleCustomStorage = () => {
+      setupInterval();
       checkStatus();
-      adjustInterval();
     };
     window.addEventListener('localStorageUpdate', handleCustomStorage as EventListener);
 
