@@ -219,7 +219,7 @@ export default function AICompaniesCatalog() {
       temp = temp.filter(company => company.projects?.some((p: any) => p.project_category === selectedProjectCategory));
     }
 
-    // 排序（映射到计算后的展示层级）
+    // 排序
     const sorters: Record<string, (a: Company, b: Company) => number> = {
       name: (a, b) => (a.name || '').localeCompare(b.name || ''),
       company_tier: (a, b) => {
@@ -227,11 +227,38 @@ export default function AICompaniesCatalog() {
         const aVal = tierOrder[computeDisplayTier(a) || 'zzz'] || 5;
         const bVal = tierOrder[computeDisplayTier(b) || 'zzz'] || 5;
         return aVal - bVal;
+      },
+      tools_count: (a, b) => (a.projects?.length || 0) - (b.projects?.length || 0),
+      valuation: (a, b) => {
+        // Handle null/undefined: missing values go to end
+        if (!a.valuation_usd && !b.valuation_usd) return 0;
+        if (!a.valuation_usd) return 1; // a goes after b
+        if (!b.valuation_usd) return -1; // b goes after a
+        return a.valuation_usd - b.valuation_usd;
+      },
+      rating: (a, b) => {
+        const aAvg = a.projects?.length > 0 
+          ? a.projects.reduce((sum, p) => sum + (p.project_stats?.average_rating || 0), 0) / a.projects.length 
+          : 0;
+        const bAvg = b.projects?.length > 0 
+          ? b.projects.reduce((sum, p) => sum + (p.project_stats?.average_rating || 0), 0) / b.projects.length 
+          : 0;
+        return aAvg - bAvg;
+      },
+      founded_year: (a, b) => {
+        // Handle null/undefined: missing values go to end
+        if (!a.founded_year && !b.founded_year) return 0;
+        if (!a.founded_year) return 1; // a goes after b
+        if (!b.founded_year) return -1; // b goes after a
+        return a.founded_year - b.founded_year;
       }
     };
 
     const sorter = sorters[sortBy] || sorters.name;
-    temp.sort((a, b) => sortOrder === 'asc' ? sorter(a, b) : -sorter(a, b));
+    temp.sort((a, b) => {
+      const result = sorter(a, b);
+      return sortOrder === 'asc' ? result : -result;
+    });
 
     setFilteredCompanies(temp);
   }, [companies, searchQuery, selectedCompanyTier, selectedProjectCategory, sortBy, sortOrder]);
