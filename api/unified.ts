@@ -5735,15 +5735,14 @@ async function handleGenerateStory(req: any, res: any) {
     const imageQuery = storyData.cover_image_query || `${targetName} ${targetCategory}`;
     const coverImageUrl = `https://source.unsplash.com/1200x630/?${encodeURIComponent(imageQuery)}`;
 
-    // 准备story数据
-    const storyInsert = {
+    // 准备story数据 - 兼容不同的表结构
+    const storyInsert: any = {
       title: storyData.title || `使用${targetName}的真实体验`,
       content: storyData.content || '',
       excerpt: storyData.excerpt || storyData.content?.substring(0, 180) || '',
       cover_image_url: coverImageUrl,
       category: targetCategory,
       tags: [...(storyData.tags || []), targetCategory],
-      author_id: '00000000-0000-0000-0000-000000000000', // System user
       status: 'published',
       ai_generated: true,
       views_count: 0,
@@ -5751,6 +5750,10 @@ async function handleGenerateStory(req: any, res: any) {
       comments_count: 0,
       saves_count: 0
     };
+
+    // 尝试添加author_id（如果字段存在，某些表结构需要）
+    // 如果插入失败，会从错误信息中得知缺少的字段
+    storyInsert.author_id = '00000000-0000-0000-0000-000000000000';
 
     // 插入story到数据库
     const { data: insertedStory, error: insertError } = await supabase
@@ -5988,15 +5991,14 @@ async function generateStoryForProject(project: any, company: any, category: str
     const imageQuery = storyData.cover_image_query || `${targetName} ${targetCategory}`;
     const coverImageUrl = `https://source.unsplash.com/1200x630/?${encodeURIComponent(imageQuery)}`;
 
-    // 准备story数据
-    const storyInsert = {
+    // 准备story数据 - 兼容不同的表结构
+    const storyInsert: any = {
       title: storyData.title || `使用${targetName}的真实体验`,
       content: storyData.content || '',
       excerpt: storyData.excerpt || storyData.content?.substring(0, 180) || '',
       cover_image_url: coverImageUrl,
       category: targetCategory,
       tags: [...(storyData.tags || []), targetCategory],
-      author_id: '00000000-0000-0000-0000-000000000000',
       status: 'published',
       ai_generated: true,
       views_count: 0,
@@ -6004,6 +6006,9 @@ async function generateStoryForProject(project: any, company: any, category: str
       comments_count: 0,
       saves_count: 0
     };
+
+    // 尝试添加author_id（如果字段存在）
+    storyInsert.author_id = '00000000-0000-0000-0000-000000000000';
 
     // 插入story
     const { data: insertedStory, error: insertError } = await supabase
