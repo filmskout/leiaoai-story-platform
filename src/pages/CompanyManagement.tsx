@@ -667,12 +667,26 @@ const CompanyManagement: React.FC = () => {
       )}
 
       {/* Edit Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+      <Dialog 
+        open={isEditDialogOpen} 
+        onOpenChange={(open) => {
+          console.log('Dialog onOpenChange:', open, 'editingCompany:', editingCompany?.name);
+          setIsEditDialogOpen(open);
+          if (!open && editingCompany) {
+            // Reset when closing
+            setTimeout(() => {
+              setEditingCompany(null);
+              resetForm();
+            }, 300);
+          }
+        }}
+      >
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>编辑公司信息</DialogTitle>
             <DialogDescription>
-              修改 {editingCompany?.name} 的基本信息
+              修改 {editingCompany?.name || '公司'} 的基本信息
+              {!editingCompany && <span className="text-red-500"> (错误：未找到公司数据)</span>}
             </DialogDescription>
           </DialogHeader>
           
