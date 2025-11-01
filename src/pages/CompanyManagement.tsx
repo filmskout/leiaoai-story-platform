@@ -550,7 +550,16 @@ const CompanyManagement: React.FC = () => {
           {/* Story生成按钮 */}
           <Dialog open={isStoryGenDialogOpen} onOpenChange={setIsStoryGenDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" onClick={() => setSelectedCompanyForStory(null)}>
+              <Button 
+                variant="outline"
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setSelectedCompanyForStory(null);
+                  setIsStoryGenDialogOpen(true);
+                }}
+              >
                 <Sparkles className="h-4 w-4 mr-2" />
                 {t('company_management.buttons.generate_stories', '生成Stories')}
               </Button>
@@ -796,7 +805,6 @@ const CompanyManagement: React.FC = () => {
             </div>
           </DialogContent>
         </Dialog>
-        </div>
       </div>
 
       {loading ? (

@@ -102,14 +102,22 @@ export function SimpleStoriesWall() {
 
       if (error) {
         console.error('🔴 SimpleStoriesWall: Database error:', error);
-        toast.error('Failed to load stories. Please try again.');
+        console.error('🔴 Error details:', {
+          message: error.message,
+          code: error.code,
+          details: error.details,
+          hint: error.hint
+        });
+        toast.error(`Failed to load stories: ${error.message || 'Database error'}`);
         setStories([]);
+        setLoading(false);
         return;
       }
 
       if (!storiesData || storiesData.length === 0) {
         console.log('🟡 SimpleStoriesWall: No stories found');
         setStories([]);
+        setLoading(false);
         return;
       }
       
