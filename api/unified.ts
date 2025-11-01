@@ -5045,29 +5045,48 @@ ${fields.join(', ')}
   "field2": "value2"
 }`;
 
-    // 调用LLM
+    // 调用LLM - 使用统一的LLM调用函数
     let llmResponse;
     try {
-      if (openai) {
-        const completion = await openai.chat.completions.create({
-          model: 'gpt-4',
-          messages: [{ role: 'user', content: prompt }],
-          temperature: 0.3,
-          max_tokens: 1000
-        });
-        llmResponse = completion.choices[0].message.content;
-      } else if (deepseek) {
-        const completion = await deepseek.chat.completions.create({
-          model: 'deepseek-chat',
-          messages: [{ role: 'user', content: prompt }],
-          temperature: 0.3,
-          max_tokens: 1000
-        });
-        llmResponse = completion.choices[0].message.content;
+      const qwenApiKey = process.env.QWEN_API_KEY;
+      const qwenRegion = process.env.QWEN_REGION || 'singapore';
+      
+      // 优先使用Qwen，如果不可用则使用OpenAI
+      if (qwenApiKey) {
+        llmResponse = await callQwen(prompt, qwenApiKey, 'zh', qwenRegion, 1000, 'qwen-turbo-latest', 60000);
+      } else if (openaiApiKey) {
+        llmResponse = await callOpenAI(prompt, openaiApiKey, 'zh', 'gpt-4', 1000, 60000);
+      } else if (deepseekApiKey) {
+        // 尝试使用DeepSeek API
+        try {
+          const response = await fetch('https://api.deepseek.com/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${deepseekApiKey}`
+            },
+            body: JSON.stringify({
+              model: 'deepseek-chat',
+              messages: [{ role: 'user', content: prompt }],
+              temperature: 0.3,
+              max_tokens: 1000
+            })
+          });
+          
+          if (!response.ok) {
+            throw new Error(`DeepSeek API error: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          llmResponse = data.choices[0].message.content;
+        } catch (error: any) {
+          console.error('DeepSeek API调用失败:', error);
+          throw new Error('没有可用的LLM API (Qwen/OpenAI/DeepSeek均不可用)');
+        }
       } else {
         throw new Error('没有可用的LLM API');
       }
-    } catch (llmError) {
+    } catch (llmError: any) {
       console.error('LLM调用失败:', llmError);
       throw new Error(`LLM调用失败: ${llmError.message}`);
     }

@@ -89,7 +89,7 @@ export default function CompanyLogoManager({ company, onUpdate }: CompanyLogoMan
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'upload-logo-to-storage',
-          token: localStorage.getItem('adminToken') || 'admin-token-123',
+          token: localStorage.getItem('leoai-admin-session') || localStorage.getItem('adminToken') || 'admin-token-123',
           companyId: company.id,
           logoBase64: logoBase64,
           fileName: `${company.name.toLowerCase().replace(/\s+/g, '-')}-logo.png`
@@ -110,6 +110,22 @@ export default function CompanyLogoManager({ company, onUpdate }: CompanyLogoMan
     }
   };
 
+  // 将URL转换为Base64
+  const urlToBase64 = async (url: string): Promise<string> => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      throw new Error('无法加载图片URL');
+    }
+  };
+
   // 保存logo（兼容模式）
   const handleSaveLogo = async () => {
     if (!logoBase64 && !logoUrl) {
@@ -119,15 +135,28 @@ export default function CompanyLogoManager({ company, onUpdate }: CompanyLogoMan
 
     setIsUploading(true);
     try {
+      let finalLogoBase64 = logoBase64;
+      
+      // 如果只有URL没有Base64，尝试将URL转换为Base64
+      if (!finalLogoBase64 && logoUrl) {
+        try {
+          finalLogoBase64 = await urlToBase64(logoUrl);
+          setLogoBase64(finalLogoBase64);
+        } catch (error: any) {
+          // 如果转换失败，直接保存URL
+          console.warn('URL转Base64失败，将保存URL:', error.message);
+        }
+      }
+
       const response = await fetch('/api/unified', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'update-company-logo',
-          token: localStorage.getItem('adminToken') || 'admin-token-123',
+          token: localStorage.getItem('leoai-admin-session') || localStorage.getItem('adminToken') || 'admin-token-123',
           companyId: company.id,
-          logoBase64,
-          logoUrl
+          logoBase64: finalLogoBase64,
+          logoUrl: logoUrl && !finalLogoBase64 ? logoUrl : undefined
         })
       });
 
@@ -135,6 +164,10 @@ export default function CompanyLogoManager({ company, onUpdate }: CompanyLogoMan
       if (result.success) {
         setMessage({ type: 'success', text: 'Logo保存成功' });
         onUpdate(result.company);
+        // 如果URL转换成功，清除URL输入
+        if (finalLogoBase64 && logoUrl) {
+          setLogoUrl('');
+        }
       } else {
         throw new Error(result.error);
       }
@@ -159,7 +192,7 @@ export default function CompanyLogoManager({ company, onUpdate }: CompanyLogoMan
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'complete-company-data',
-          token: localStorage.getItem('adminToken') || 'admin-token-123',
+          token: localStorage.getItem('leoai-admin-session') || localStorage.getItem('adminToken') || 'admin-token-123',
           companyId: company.id,
           fields: missingFields
         })

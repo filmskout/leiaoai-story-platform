@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AlertCircle, Plus, Edit, Trash2, Save, X, Building2, Globe, Users, Calendar, DollarSign, Image } from 'lucide-react';
+import { AlertCircle, Plus, Edit, Trash2, Save, X, Building2, Globe, Users, Calendar, DollarSign, Image, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import CompanyLogoManager from '@/components/CompanyLogoManager';
@@ -704,22 +704,25 @@ const CompanyManagement: React.FC = () => {
       <Dialog 
         open={isEditDialogOpen} 
         onOpenChange={(open) => {
-          console.log('Dialog onOpenChange:', open, 'editingCompany:', editingCompany?.name);
-          setIsEditDialogOpen(open);
+          // 如果通过X按钮关闭（open变为false），不保存数据
           if (!open) {
-            // Stop editing mode when dialog closes
+            console.log('Dialog closed via X button, not saving');
             stopEditing();
-            if (editingCompany) {
-              // Reset when closing
-              setTimeout(() => {
-                setEditingCompany(null);
-                resetForm();
-              }, 300);
-            }
+            setTimeout(() => {
+              setEditingCompany(null);
+              resetForm();
+              setIsEditDialogOpen(false);
+            }, 100);
           }
         }}
       >
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+        <DialogContent 
+          className="max-w-4xl max-h-[80vh] overflow-y-auto"
+          onInteractOutside={(e) => {
+            // 防止点击外部关闭对话框，必须使用按钮
+            e.preventDefault();
+          }}
+        >
           <DialogHeader>
             <DialogTitle>{t('company_management.dialog.edit_title', 'Edit Company Information')}</DialogTitle>
             <DialogDescription>
@@ -859,12 +862,24 @@ const CompanyManagement: React.FC = () => {
               </div>
               
               <div className="flex justify-end space-x-2">
-                <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-                  取消
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    // 取消按钮：不保存，直接关闭
+                    stopEditing();
+                    setIsEditDialogOpen(false);
+                    setTimeout(() => {
+                      setEditingCompany(null);
+                      resetForm();
+                    }, 100);
+                  }}
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button onClick={handleEditCompany}>
-                  <Save className="h-4 w-4 mr-2" />
-                  保存更改
+                  <Check className="h-4 w-4 mr-2" />
+                  {t('company_management.buttons.save', 'Save')}
                 </Button>
               </div>
             </TabsContent>
