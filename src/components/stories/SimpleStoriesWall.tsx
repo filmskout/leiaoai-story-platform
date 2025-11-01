@@ -191,9 +191,14 @@ export function SimpleStoriesWall() {
         }));
         setTags(tagArray);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('🔴 SimpleStoriesWall: Error loading stories:', error);
-      toast.error('Failed to load stories');
+      console.error('🔴 Error details:', {
+        message: error?.message,
+        stack: error?.stack
+      });
+      toast.error(`Failed to load stories: ${error?.message || 'Unknown error'}`);
+      setStories([]);
     } finally {
       setLoading(false);
       console.log('🔵 SimpleStoriesWall: loadStories completed');
